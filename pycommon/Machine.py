@@ -1,0 +1,5 @@
+#### server name
+Servers = ('psi', 'kdft', 'mu', 'rho', 'chi')
+
+PPNs={'kdft':12, 'psi':16, 'rho': 16, 'mu':32, 'chi':1}
+PBS_QChem_scripts={'kdft': 'pbs_qchemkdft.sh', 'psi': 'pbs_qchem.sh', 'rho': 'pbs_qchem.sh', 'mu': 'pbs_qchemmu.sh'}

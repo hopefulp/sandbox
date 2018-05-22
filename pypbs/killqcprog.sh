@@ -1,0 +1,21 @@
+#!/bin/tcsh
+n1 pkill qcprog
+n2 pkill qcprog
+n3 pkill qcprog
+n4 pkill qcprog
+n5 pkill qcprog
+n6 pkill qcprog
+n7 pkill qcprog
+n8 pkill qcprog
+n9 pkill qcprog
+n10 pkill qcprog
+n11 pkill qcprog
+n12 pkill qcprog
+n13 pkill qcprog
+n14 pkill qcprog
+n15 pkill qcprog
+n16 pkill qcprog
+n17 pkill qcprog
+n18 pkill qcprog
+n19 pkill qcprog
+n20 pkill qcprog

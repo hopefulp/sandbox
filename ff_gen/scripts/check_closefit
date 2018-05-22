@@ -1,0 +1,166 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# A simple script that checks if the GA fit is too close to boundaries
+# TBI: double check if bounds are so close that the fit is too close to each one...
+##    maybe a bound_count = 4 could prevent double line
+VERSION = '0.5'
+
+import sys, getopt
+import string
+
+### MODE STUFF
+mode='auto' # default value
+# TBI?: iterative automatic correction?
+
+### TUNING STUFF
+tolerance = .075 # TBI: shell options --- old: tolerance = .02
+timestol = 8 # needed only for auto mode #TBI: shell options
+
+### KEYWORD STUFF
+key_numatoms = {
+    "atom"     : 1,
+    "bond"     : 2,
+    "bond4"    : 2,
+    "bond5"    : 2,
+    "opbend"   : 4,
+    "angle"    : 3,
+    "anglef"   : 3,
+    "vdw"      : 1,
+    "charge"   : 1,
+    "chargemod": 2,
+    "strbnd"   : 3,
+    "torsion"  : 4,
+    "opbend"   : 4
+}
+
+### PRINTING STUFF
+symbol = (' \033[1m\033[94m<<<\033[0m ',' \033[1m\033[91m>>>\033[0m ')
+adjective = (' \033[1m\033[94mlower\033[0m ',' \033[1m\033[91mhigher\033[0m ')
+
+### SHELL INPUT STUFF
+def print_help():
+    print 'Usage: check_closefit -i <inputfile> -o <outputfile> [-c auto|hand]'
+    print '       Optional Arguments:'
+    print '       -TBI : '
+    print '       ...'
+
+argv = sys.argv[1:]
+
+try:
+    opts, args = getopt.getopt(argv, "hpfi:o:m:t:")
+except getopt.GetoptError:
+    print "Unknown option %s requested" % opt
+    print_help()
+    sys.exit(2)
+for opt, arg in opts:
+    if opt == '-h':
+        print_help()
+        sys.exit()
+    elif opt == "-i":
+        src_file = arg
+    elif opt == "-o":
+        tgt_file = arg
+    elif opt == '-m':
+        mode = arg
+    elif opt == '-t':
+        tolerance = arg
+    else:
+        print_help()
+        sys.exit(1)
+
+if src_file == tgt_file:
+    if src_file == '':
+        print_help()
+        sys.exit(1)
+    else:
+        sys.exit('Error: Your inputfile is also your outputputfile')
+
+if mode not in ('auto', 'hand', 'educ', 'told'):
+        print_help()
+        sys.exit('Error: No mode assigned')
+###
+
+f = open(src_file, 'r')
+v = open(tgt_file, 'w')
+
+### INIT STUFF
+split = [] # consistency w/ sline
+sline = [] # needed
+
+### SCRIPT STARTS HERE
+for line in f:
+    split = string.split(line)
+    sline.append(split)
+    if (split) and (split[0] == 'var'): # avoid blank lines
+        var_type = split[1]
+        var_numatoms = int(key_numatoms[var_type]) # consistency w/ parplace
+        var_atoms = split[2:2+var_numatoms] # atoms indexes
+        var_bounds = split[-3:-1] # bounds for algorithm
+        var_parplace = int(split[-4]) # str otherwise
+        for arr in sline[:-1]:
+            if arr[:1+var_numatoms] == split[1:2+var_numatoms]: # if previous line matches
+                fitplace = var_numatoms + var_parplace
+                fit = float(arr[fitplace]) # str otherwise
+                bound_count = 0 #'left'
+                close_bool = False # no close bound
+                for bound in var_bounds:
+                    bound = float(bound) # str otherwise
+                    reldist = abs(fit - bound)/fit
+                    if reldist < tolerance:
+                        old_bound = format(bound, '.6f')
+                        print '\033[1m\033[93m'+' '.join(split)+'\033[0m'
+                        warning_print = "\033[1m\033[93mWARNING: fit too close to bound\033[0m\n"
+                        print warning_print
+                        alarm_print = str(fit) + symbol[bound_count] + old_bound
+                        info_print = 'positive bound'+adjective[bound_count]+'than '+old_bound+'.\n'
+                        input_print = 'Insert new ' + info_print
+                        provide_print = 'Please provide ' + info_print
+                        print alarm_print
+                        while True:
+                            ### new code head
+                            if mode == 'educ':
+                                raw_guess = str(raw_input('Insert guess for fit\n'))
+                                try:
+                                    raw_guess = float(raw_guess)
+                                except ValueError: # avoid strings, which cannot be converted to float
+                                    print 'Please provide a number, at least! You inserted: ' + raw_guess
+                                    continue
+                                if raw_guess > 0: # raw_guess > 0 is for pikaia issue
+                                    if mode == 'educ':
+                                        other_count = (-1)**bound_count+bound_count
+                                        other_bound = raw_guess*(1-timestol*tolerance*(-1)**(other_count))
+                                        other_float = format(other_bound, '.6f')
+                                        split[-3 + other_count] = other_float
+                                    break # exit the "while" loop
+                                raw_bound = raw_guess*(1-timestol*tolerance*(-1)**bound_count)
+                            ### new code tail
+                            else:
+                                if mode == 'auto':
+                                    raw_bound = bound*(1-timestol*tolerance*(-1)**bound_count)
+                                elif mode == 'hand':
+                                    raw_bound = str(raw_input(input_print))
+                                    try:
+                                        raw_bound = float(raw_bound)
+                                    except ValueError: # avoid strings, which cannot be converted to float
+                                        print 'Please provide a number, at least! You inserted: ' + raw_bound
+                                        continue
+                                if (raw_bound > 0) and ((raw_bound-bound)*(-1)**bound_count < 0): # raw_bound > 0 is for pikaia issue
+                                    new_bound = format(raw_bound, '.6f')
+                                    split[-3 + bound_count] = new_bound
+                                    break # exit the "while" loop
+                                print provide_print
+                        #new_bound = format(raw_bound, '.6f')
+                        #split[-3 + bound_count] = new_bound
+                        strsplit = ' '.join(split)+'\n'
+                        print strsplit
+                        v.write(strsplit)
+                        close_bool = True # fit too close to a bound
+                    bound_count += 1
+                if close_bool == False:
+                    v.write(line)
+    else:
+        v.write(line)
+
+### SCRIPT ENDS HERE
+# python check_closefit.py > put.out

@@ -1,0 +1,36 @@
+#!/bin/sh
+
+if [ $# -ne 1 ]
+then
+  echo "Usage: potgenerate_pbe [pos file]"
+  exit
+fi
+
+PosFile=$1
+list=$(head -1 $PosFile)
+#PosName=${PosFile%.pos}
+#echo -n "" > $PosName.pot
+POTNAME="POTCAR"
+echo -n "" > $POTNAME
+for atom in $list
+do
+  if [ "$atom" == "Ca" ]
+  then
+    atomname="Ca_sv"
+
+  elif [ "$atom" == "Sc" ]
+  then
+	atomname="Sc_sv"
+
+  elif [ "$atom" == "K" ]
+  then
+	atomname="K_sv"
+
+  else
+    atomname=$atom
+  fi
+# cat /qcfs/common/vasp-pp/potpaw_PBE/$atomname/POTCAR >> $PosName.pot
+  cat /qcfs/common/vasp-pp/potpaw_PBE/$atomname/POTCAR >> $POTNAME
+    
+done
+

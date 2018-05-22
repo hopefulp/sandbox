@@ -1,0 +1,853 @@
+*********************** convasp help ***********************
+Version 5.6 Last updated 10Jan04 by Morgan - Curtarolo
+Basic usage
+
+	convasp -h  
+	convasp -cart | -direct | -scale s | -names A B ...|
+		-numnames A B ...|
+		-incell | -prim | -ltcell file| 
+                -ltcellfv v1 v2 v3 phi | -sd A B ... | 
+		-nosd | -shift Sx Sy Sz [cCdC]| -rm_copies | -gulp |
+		-findsym [tolerance_relative: default 1.0e-5] |
+		-platon [EQUAL] [EXACT] [ang d1 d2 d3] |
+		-xyz n1 n2 n3 | -msi | -ace | -pdb | -data | -ndata | 
+		-dist d | -disp d | -angle d | -xray l | 
+		-shell ns r1 r2 name dens | -supercell file | 
+		-rdf rmax nbins sigma  | 
+		-compare a b c d e f g h k j i l | -ewald [eta] |
+                -wignerseitz (or -ws) | -xyzwignerseitz (or -xyzws)
+		| -sewald eta 
+		< POSCAR
+	convasp -clat a b c alpha beta gamma
+	convasp -chgint CHGCAR
+	convasp -intpol f1 f2 n x
+	convasp -rbanal n x
+	convasp -spline npts < file
+	convasp -make_strlist OUTCAR XDATCAR
+	convasp -join_strlist strlist1 strlist2
+	convasp -supercell_strlist sc.txt strlist
+	convasp -raytrace file
+	convasp -pocc PROOUT
+	convasp -pdos pdos.in PROOUT
+        convasp -sumpdos pdos.in DOSCAR
+	convasp -bands PROOUT < POSCAR
+	convasp -planedens dens2d.in CHGCAR
+	convasp -chgdiff CHGCAR1 CHGCAR2
+	convasp -rdfcmp rmax nbins sigma nshmax POSCAR1 POSCAR2
+	convasp -rbdist POSCAR1 POSCAR2 n|N|e|E
+	convasp -mom POSCAR 
+	convasp -setcm cm1 cm2 cm3 POSCAR
+	convasp -niggli POSCAR
+	convasp -cmp_str POSCAR1 POSCAR2 rcut
+	convasp -data1 POSCAR1 rcut
+	
+
+
+	Detailed help on all possible functionality
+
+	In the following I will often refer to a POSCAR file.  This 
+	is a VASP file whose basic format is as follows
+
+	    TITLE
+	    1.000000000000000
+	    2.8619048823981780     .0000000000000000     .0000000000000000
+	    .0000000000000000    3.8747900333665160     .0000000000000000
+	    .0000000000000000     .0000000000000000    6.0115639071437000
+	    2   2   4
+	    Direct
+	    .2500000000000000   .7500000000000000   .0930470335145194
+	    .7500000000000000   .2500000000000000   .9069529664854805
+	    .2500000000000000   .7500000000000000   .6375942304936022
+	    .7500000000000000   .2500000000000000   .3624057695063981
+	    .2500000000000000   .2500000000000000   .1517340127860196
+	    .7500000000000000   .7500000000000000   .8482659872139805
+	    .2500000000000000   .2500000000000000   .5813623924505660
+	    .7500000000000000   .7500000000000000   .4186376075494341
+
+	The following items can be included in the POSCAR file and 
+	will be handled correctly by the code: names after the atoms,
+	selective dynamics formatting, negative scale to give volume,
+	arbitrary spaces on a line (although not extra newlines).
+
+	convasp -h|help|
+	     Gives this help information.
+	convasp -cart < POSCAR
+	     Outputs to standard out a new POSCAR file with atom 
+	     positions in cartesian coordinates.
+	convasp -direct < POSCAR      
+	     Outputs to standard out a new POSCAR file with 
+	     atom positions in direct (fractional) coordinates.
+	convasp -scale s < POSCAR
+	     Outputs POSCAR file giving same volume as input but 
+	     with scale = s.
+	convasp -names A1 A2 ... < POSCAR 
+	     Outputs to standard out a POSCAR file with names 
+	     A1,A2, ... after the atom positions.  Each name 
+	     Ai is assigned to all atoms of type i.  If 
+	     there are too few names then the remaining
+	     types are not given names.  This is useful for 
+	     cases where large numbers of atoms must be named, 
+	     like when creating an xyz file.
+	convasp -numnames A1 A2 ... < POSCAR 
+	     Same as names except appends an increasing integer to
+	     each different atom type.  Starts counting at 1 again
+	     for each new atom type.  Any names not given at 
+	     end are treated as H.
+	convasp -incell < POSCAR         
+	     Outputs to standard out a POSCAR file with all 
+	     atoms mapped to their images within the unit cell.
+	convasp -prim <POSCAR
+	     Outputs to standard out a POSCAR file with a 
+	     primitive unit cell.  In the primitive cell finding 
+	     function I look for a primitive cell by considering 
+	     as candidate cell vectors every possible triad of 3 
+	     vectors that can be made from the original cell vectors 
+	     or the basis vectors which translate the lattice onto 
+	     itself.  I then take the triad with the smallest volume 
+	     to be the primitive cell.  If there are multiple 
+	     candidates I take the ones with the largest projections 
+	     onto the original lattice vectors.  See the rouinte 
+	     GetPrim.cc for more information.  WARNING:  This is not 
+	     carefully tested and almost certainly has bugs!!!
+	convasp -ltcell file < POSCAR   
+	     Outputs to standard out the linear tranform of the input
+	     POSCAR file.  This simpy multiplies cell parameters and
+	     atom positions by the 3x3 matrix in file.  This can 
+	     be used to rotate the cell, swap x and y coordinates, etc.
+	     This cannot create a supercell (see -suopercell for that).  
+	     File should consist of 9 numbers, giving elements 
+	     a11,a12,a13,a21,a22,a23,a31,a32,a33 of the linear 
+	     transformation, respectively.  They can be on one or 
+	     mulitple lines.
+	convasp -ltcellfv v1 v2 v3 phi < POSCAR   
+	     Rotates the lattice vectors and atoms by angle phi (in degrees)
+             around vector (v1,v2,v3).  Outputs to standard out the new
+             POSCAR.  This can be used to rotate the cell, swap x and y 
+             coordinates, etc.
+	convasp -supercell file < POSCAR
+	     Outputs to standard out a supercell of the input
+	     POSCAR file.  This lattice vectors of the supercell are
+	     given by multiplying the original cell parameters by
+	     by the 3x3 matrix in file.  The supercell need not be integral
+	     combinations of the original lattice vectors, although using
+	     fraction may cause you to end up with a lattice inequivalent 
+	     to your original.  This can be used to build big supercells, 
+	     swap lattice vectors, etc.  This cannot do a rotation (see 
+	     -ltcell for that).  File should consist of 9 numbers, giving 
+	     elements a11,a12,a13,a21,a22,a23,a31,a32,a33 of the 3x3 
+	     supercell matrix, respectively.  They can be on one or
+	     mulitple lines.
+	convasp -sd A1 A2 ... < POSCAR     
+	     Outputs to standard out a POSCAR with selective dynamics 
+	     formatting.  Ai gives the selective dynamics setting for 
+	     atoms of type i and has the form Ai=TTT,TTF,etc..  If there
+	     are fewer Ai than atom types then the remaining types are 
+	     defaulted to TTT.
+	convasp -nosd < POSCAR
+	     Outputs to standard out a POSCAR without selective dynamics
+	     formatting.  Combined with the above -sd option this allows
+	     easy movement between POSCAR files with and without selective 
+	     dynamics formatting.
+	convasp -shift Sx Sy Sz [cCdD] < POSCAR
+	     Outputs to standard out a POSCAR with all positions shifted by 
+	     S=(Sx,Sy,Sz).  The shifted is added to the positions.  The shift
+	     is assumed to be given in Cartesian coordinates unless you specify
+             c or C for Cartesian or d or D for direct at the end.
+	convasp -rm_copies < POSCAR
+	     Outputs to standard out a POSCAR where only the first appearance of
+	     each position has been kept.  Useful if you have multiple copies of
+	     atoms at the same positions for some reason.
+	convasp -gulp <POSCAR          
+	     Outputs to standard out a gulp formatted input file based on 
+	     the POSCAR input file.  The formatting is for a distance 
+	     calculation in gulp.  If you want atom names you must put 
+	     them after each atom position in the POSCAR file (see -names).
+	     If any names are missing they are defaulted to H.
+	convasp -xyz n1 n2 n3 < POSCAR
+	     Outputs to standard out an xyz file based on the POSCAR input
+	     file.  This can be used as input for rasmol, xmol, etc..
+	     If you want atom names you must put them after each atom 
+	     position in the POSCAR file (see -names).  If any names are 
+	     missing they are defaulted to H.
+	convasp -msi < POSCAR
+	     Outputs to standard out a msi file based on the POSCAR input
+	     file.  This can be used as input for cerius.
+	     In the functions that output the msi format I do something 
+	     to put the lattice vectors in a form that cerius2 can read 
+	     happily.  It involvs making the third lattice vector parallel 
+	     to Z, the second once in the YZ plane, and the letting the 
+	     first lattice vector have all 3 components.  It is confusing 
+	     and probably done in a silly manner, but it seems to work.
+	     If you want atom names you must put them after each atom 
+	     position in the POSCAR file (see -names).  If any names are 
+	     missing they are defaulted to H.  For an msi file one
+	     needs the atomic numbers.  These are coded into the
+	     program for most atoms.  If you use atoms with atomic numbers 
+	     over 86 or f-electron atoms (Lanthanides and Actinides) then 
+	     you will have to increase the database.  For the list of all 
+	     coded atomic numbers see the constructor for the structure 
+	     class in structure.cc.
+	convasp -ace < POSCAR           
+	     Outputs to standard out a cell standard ASCII (ace) file 
+	     based on the POSCAR input file.  This can be used as input 
+	     for CaRIne.
+	convasp -pdb < POSCAR           
+	     Outputs to standard out a protein database (PDB) format file 
+	     based on the POSCAR input file.  This can be used as input
+             for many viewing programs.  Note that I don't really know 
+             anything about PDB but it seems to be an annoyingly column 
+             formatted.  Therefore, all the widths I use must tbe kept as is.  
+             This means that if we have width W for variable X, and prec P, 
+             then X takes up P+1 for for the decimal part and decimal point, 
+             and we have only R=W-(P+1)-1=W-P-2 remaining digits (the -1 is 
+             because if X takes up all of W then you run into the previous 
+             field).  So we have the constraints 
+             Cell vectors: W=9,P=3,R=4 => <=10^5
+             Cell angles: W=7,P=2,R=3 => <=10^3 (which always works since 
+                                                 angles are given as >=0 
+                                                 and <=360)
+             Cartesian positions: W=12,8,P=3,R=7,3 => <=10^8,10^4 (>0) 
+                                                  and <=10^7,10^3 (<0 since 
+                                                            you need a space
+                                                            for the - sign)
+             This is all probably fine unless an atom makes it to more 
+             negative than -999.999.
+	convasp -data < POSCAR
+	     Outputs to standard out basic data about the structure in the 
+	     POSCAR input file.  Output includes volume, 
+	     a b c alpha beta gamma, reciprocal lattice, reciprocal lattice
+	     volume.
+	convasp -ndata < POSCAR
+	     Outputs to standard output the following normalized data:
+	     a1 a2 a3 phi(a2,a3) phi(a3,a1) phi(a1,a2)
+	     a1,a2,a3 are NORMALIZED over V^1/3 and phi are in degrees.
+	convasp -compare a b c d e f g h k j i l < POSCAR
+	     Outputs to standard output the % comparison between
+	     a#g b#h c#k d#j e#i f#l in % 
+	      cout << abs(a1-a7)/((a1+a7)/2.0) << ;
+	      cout << abs(a2-a8)/((a2+a8)/2.0) << ;
+	      cout << abs(a3-a9)/((a3+a9)/2.0) << ;
+	      cout << abs(a4-a10)/((a4+a10)/2.0) << ;
+	      cout << abs(a5-a11)/((a5+a11)/2.0) << ;
+	      cout << abs(a6-a12)/((a6+a12)/2.0) << ;
+	      cout << endl;
+	     Useful with -ndata to compare % relaxations:
+	     convasp -compare `convasp -ndata < POS1` `convasp -ndata < POS2` 
+	convasp -ewald [eta] < POSCAR
+	     Finds the electrostatic energy of the POSCAR file using the 
+	     Ewald sum.  Charges must be entered after each atom position.
+	     E.g.,   Co 0 0 0 +2.  This is easy to do using the -names 
+	     option.  Eta is a real space screening parameter.  Setting 
+	     eta<=0 or leaving it out will cause convasp to choose it 
+	     automatically (and hopefully optimally).  Eta->0 is no 
+	     screening and the Ewald recipricol term will be zero.  Eta->inf 
+	     is total screening and the Ewald real term will be zero.  The 
+	     Ewald sum itself should always be the same and eta will only 
+	     affect the efficiency of the calculation. 
+	convasp -sewald eta < POSCAR
+	     Finds the screened electrostatic energy of the POSCAR file using a
+	     real space sum.  eta is now the screening length (ie, all 
+	     coulomb interactions are multiplied by exp(-eta*R).
+	     Charges must be entered after each atom position.
+	     E.g.,   Co 0 0 0 +2.  
+        convasp wignerseitz < POSCAR   [or -ws ]
+             Pops out a POSCAR stile file, but moves the images of the atoms in the
+             Wigner-Seitz cell. This parameter is usefull to fight against VASP trend
+             of moving atoms in different (but traslationally equivalent) positions
+             of the unit cell. (SC 10Jan03).
+        convasp -xyzwignerseitz < POSCAR   [or -xyzws ]
+             Performs "convasp -xyz 1 1 1" but moves the images of the atoms in the
+             Wigner-Seitz cell. This parameter is usefull to fight against VASP trend
+             of moving atoms in different (but traslationally equivalent) positions
+             of the unit cell. (SC 10Jan03).
+	convasp -clat a b c alpha beta gamma
+	     Outputs to standard out the cartesian lattice vectors obtained
+	     from the input a b c alpha beta gamma.
+	convasp -dist d < POSCAR        
+	     Outputs to standard out the distances for each atom to all
+	     neighors within a distance d.  Also gives which unit cell the
+	     neighbor is in.
+	convasp -disp d < POSCAR        
+	     Outputs to standard out the displacement from each atom to all
+	     neighors within a distance d.  Also gives which unit cell the
+	     neighbor is in.
+	convasp -angle d < POSCAR   
+	     Outputs to standard out the angles for each atom triplet 
+	     made up of neighors within a distance d of each other.  
+	     Actually, since this can be huge, only the first MAX_NUM_ANGLE-1 
+	     neighbors within d are used.  MAX_NUM_ANGLE=21 at present and
+	     can be set in PrintAngles.cc. 
+	convasp -xray l < POSCAR
+	     Outputs to standard out the powder xray scattering pattern for 
+	     the structure specified in the POSCAR input file.  The 
+	     wavelength of the scattering radiation is taken to be l.
+	     The xray calculation is almost nothing more that the structure 
+	     factor, altough it includes approximate treatments of the 
+	     Debye-Waller terms and the Lorentz-polarization.  In the xray 
+	     calculations there are a number of terms that require a lot of 
+	     information to really do right so I approximate them.  First, 
+	     scattering factors default to the atomic number.  In some cases 
+	     I coded more accurate values taken from tables for lambda=1.5418.
+	     No lambda dependence of the scattering factors is presently 
+	     included.  For the list of all coded atomic scattering factors
+	     see the constructor for the structure class in structure.cc.
+	     I include the Lorentz-polarization and an approximate 
+	     Debye-Waller factor (DWF).  The DWF is found assuming T=300, 
+	     T_Debye=300, and within the high-temperature Debye aproximation.
+	     The atomic mass defaults to twice the atomic number but I 
+	     have input a few more accurate values in the code.  For the 
+	     list of all coded atomic masses see the constructor for the 
+	     structure class in structure.cc.  This simulation should 
+	     give very accurate peak locations and qualitative relative 
+	     integrated intensities (peak heights).   I am still not 
+	     happy with why the peak intensitities do not reproduce other 
+	     codes better.  The output contains formats with and without
+	     peaks at the same 2theta grouped together.  It also contains
+	     data ready for plotting.  Each type of data has a keyword on 
+	     every line so you can grep it out easily.
+	convasp -shell ns r1 r2 name dens < POSCAR    
+	     Based on the structure in POSCAR, this outputs to standard 
+	     out all points with ns neighbors in a shell define by inner 
+	     radius r1 and outer radius r2 (r1<r2).  The shell is 
+	     restricted to only consider atoms of type name (name=NONE 
+	     is unrestricted).  The dens is the linear density of 
+	     candidate points.  So for example, to search for all sites with 
+	     4 oxygen around them between 1.8 and 2.2 Angstron you could type 
+		 convasp -shell 4 1.8 2.2 O 20
+	     This would construct a 20x20x20 grid of puts in the cell and
+	     print out all points that met the shell criteria.  The output
+	     gives all the points and their shelss meeting the shell criteria.
+	     However, since many points are in the same shell it is 
+	     convenient to find unique shell environments.  Therefore, I 
+	     reduce the complete list to keep only one representative point 
+	     from each unique shell. The shells are distinguished by their
+	     centers of mass.  The unique points and their shells are output
+	     as all unique points meeting the shell criteria.  The 
+	     representative point for each shell is the shell center of mass. 
+	     This routine is great for finding open tetrahedral and octahedral
+	     sites where one might put an intercalant.  This routine can
+	     take a while to run (usually a 20x20x20 mesh is enough, and might
+	     take a couple of minutes for a big cell - start small!).
+	convasp -chgint CHGCAR         
+	     Outputs to standard out the integrated charge density around 
+	     every atom.  The total integrated density within the voronoi 
+	     volume is given for each atom.  The code also calculates 
+	     the integrated density in a surrounding sphere for each atom.  
+	     This is output as a function of radius for radii from 0 to 3 
+	     angstrom in steps of 0.1 angstrom.  The total,Up-Dn,Up,Dn 
+	     charges are all integrated although for non-spin polarized 
+	     calculations only the first gives new information. The code
+	     works on all the recent versions of vasp we have tried but they 
+	     seem to change the CHGCAR formatting sometimes so it may crash 
+	     on different versions (at least 4.4.1 and 4.4.5 (including PAW) 
+	     work).  For a large cell this can take a while (e.g., 80 atoms 
+	     might take ~20 minutes). 
+	convasp -intpol file1 file2 nim nearest_image_flag  
+	     Creates nim image POSCAR files by interpolating linearly 
+	     between structures in file1 and file2.  File1 and file2 
+	     should both be POSCAR like files with corresponding atoms.  
+	     The nearest_image_flag is set to 'e' for exact interpolation 
+	     and 'n' or 'N' for nearest-image interpolation.  Exact 
+	     interpolation means that all the positions are taken exactly
+	     as they are input.  Nearest-image interpolation means that 
+	     the interpolation between two corresponding atoms in file1 
+	     and file2 is actually done between the atom in file1 and 
+	     the nearest image of the corresponding atom in file2.  This
+	     is useful, e.g., if the positions (in direct coordinates) 
+	     are 0.01 (file1) and 0.99 (file2).  These are far apart in 
+	     exact interpolation but very close in nearest-image 
+	     interpolation.  The POSCAR output files are numbered and 
+	     output to the present directory.  The code also creates 
+	     numbered subdirectories and copies the appropriate POSCAR 
+	     files into those.  This option makes it easy to set up a rubber
+	     band calculation in vasp. 
+	convasp -rbanal nim nearest_image_flag      
+	     This is meant to allow you to analyse a rubber band calculation
+	     to get energy vs. distance along activation path. The distance
+	     is given a cumulative from the 00 to END images (a line integral),
+	     and also as the total distance from 00 and END for each image.
+	     The first is the activation path, the others are for double checking.
+	     The rubber band run must have had nim images.  The distance 
+	     between two images is defined to be the square root of the 
+	     sum of all the squared distances between all the atoms in the 
+	     two images.  The distances depend on the 
+	     setting of nearest_image_flag (see -intpol).  The code works 
+	     in two steps.  First it gets energies and distances from the 
+	     OSZICAR and POSCAR/CONTCAR files, respectively.  This 
+	     requires that it be run in the directory above all the image 
+	     directories.  The distances are obtained from POSCAR files 
+	     for the first and last images, which are not actually calculated
+	     so now CONTCAR files exists.  For imtermediate images the
+	     POSCAR files are used.  The energies are pulled from the
+	     OSZICAR files.  First, these do not exist in the first and 
+	     last image directories, so you must put them their yourself
+	     based on other runs (if you leave them out then no energies
+	     will be obtained but you can add the energies later, as described
+	     below).  Second, the output format for OSZICAR in a parallel
+	     vasp rubber band run is all messed up.  Therefore, the energies
+	     are not E0 values (which are not the energy values of the 
+	     images) but the free energy from the line just before the 
+	     last E0.  This numbers differ somewhat from E0 values.  This
+	     whole output formatting problem changes with version of vasp - 
+	     I set  it up for version 4.4.1 beta.  It should also work with
+	     v 454.   We should change it to use E0 as soon as possible.  
+	     Once the distances and energies have been obtained then they 
+	     are interpolated with a cubic spline curve.  The spline 
+	     interpolation assumes that the derivatives at the end points 
+	     are 0.  The E.vs.dist data and the spline interpolation are 
+	     both output to standard out.  If there is any problem with 
+	     the energy data (e.g., you need to add end members) then 
+	     you can fix it and run the spline interpolation again 
+	     independently (see -spline).  The spline interpolation is 
+	     done on 50 points by default.  This can be 
+	     changed by setting DEFAULT_NPT_FOR_SPLINE in RBFuncs.cc.
+	convasp -spline npt < file
+	     Outputs to standard out a cubic spline interpolation of npt 
+	     evenly spaced points.  The infput file must be two colums 
+	     giving X and Y(X).  The derivatives at the endpoints are 
+	     assumed to be zero.  To change this, change yp1 and ypn 
+	     in the SetSpline function in the FittingFuncs.cc file.
+	convasp -raytrace rtfile
+	     Outputs jpeg or mpeg pictures created by ray tracing.  This 
+	     is a rather elaborate routine.  The basic idea is that it
+	     takes as input a list of structures (in POSCAR like format) 
+	     and converts them into a dat file, inputs that into the ray 
+	     tracing program tachyon, then takes the tga file output by 
+	     tachyon and uses convert to make it a jpeg, then if needed 
+	     takes all the jpegs and puts them together into and mpg using 
+	     mpeg_encoder.  Therefore the following programs must be 
+	     installed and in your path: tachyon, convert, mpeg_encoder 
+	     (only if making a movie).  There is an input file rtfile 
+	     which contains tokens setting characteristics of the calculation
+	     and the ray traced picture.  This input file looks like the 
+	     following:
+
+		# These set the input for the ray tracing program tachyon
+		CALCTYPE = 0 #0=strlist
+		INFILE = strlist # For CALCTYPE=0
+		OUTFILE = XXX # All ouput will have this prefix.
+		RESX = 600 # X pixels in images.
+		RESY = 500 # Y pixels in images.
+		ZOOM = 1.5 # Like a zoom lens.
+		ASPECTRATIO = 1 # Y height / X height.
+		ANTIALIASING = 0 # Something to do with extra accuracy.
+		RAYDEPTH = 12 # Number of reflections to keep in ray trace.
+		# x,y,z of camera location.  Changes incrementally each frame 
+		# from initial to final value.  format is ciX cfX ciY cfY ciZ cfZ, 
+		# where i,f denote initial and final, respectively.
+		# Default is displaced along -Y from structure center.
+		#CENTER = 1 1 -2 -2 2 4
+		#VIEWDIR = 1 0 0 # Direction of camera viewing.
+		#UPDIR = 0 0 1 # Up direction for picture.
+		BACKGROUND = 0.3 0.1 0.1 # Background lighting (all lights are R G B).
+		LIGHT = -20 -20 -20  0.01 1.0 1.0 1.0 # Spherical light source: center(3) radius(1) color(3)
+		LIGHT = 20 20 20  0.01 1.0 1.0 1.0 # Spherical light source: center(3) radius(1) color(3)
+		ATOMTEXTURE = 1 0.1 0.9 0.0  1.0 # atomtype ambient diffuse specular opacity
+		ATOMTEXTURE = 2 0.1 0.9 0.0  1.0 # atomtype ambient diffuse specular opacity
+		ATOMTEXTURE = 3 0.1 0.9 0.0  1.0 # atomtype ambient diffuse specular opacity
+		ATOMTEXTURE = 4 0.2 0.9 0.3  1.0 # atomtype ambient diffuse specular opacity
+		ATOMCOLOR = 1 1.0 0.75 0.3 # atomtype(1) color(3)
+		ATOMCOLOR = 2 0.2 0.4 1.0 # atomtype(1) color(3)
+		ATOMCOLOR = 3 1.0 1.0 1.0 # atomtype(1) color(3)
+		ATOMCOLOR = 4 1.0 0.0 0.0 # atomtype(1) color(3)
+		ATOMRAD = 1 0.6 # atomtype rad
+		ATOMRAD = 2 0.3 # atomtype rad
+		ATOMRAD = 3 1.0 # atomtype rad
+		ATOMRAD = 4 0.8 # atomtype rad
+		SHADING = mediumshade # fullshade,mediumshade,lowshade,lowestshade  
+		# A supercell matrix given as 9 reals:  a11 a12 a13 a21 a22 a23 
+		# a31 a32 a33.  Note that using this moves all atoms into images
+		# the unit cell.
+		# Default = 1 0 0 0 1 0 0 0 1
+		SUPERCELL = 1 0 0   0 1 0  0 0 1 
+		# Rotation around x,y,z axis through structure_origin 
+		# (counterclockwise).  Rotation take place incrementally each
+		# frame.  Rotation goes from initial to final value.  
+		# format is riX ifX riY rfY riZ rfZ, where i,f denote initial 
+		# and final, respectively.
+		# Default = 0 0 0 0 0 0
+		ROTATION = 0 0 0 0 -180 180 
+		# The zero for the structure coordinates and lattice parameters. 
+		# Rotations occur around this point.
+		# Default = First moment of atom positions.
+		STRUCTURE_ORIGIN = 0 0 0 
+		PLANE = 1 # 0 for no plane, 1 for plane.
+		PLANECENTER = 0 0 -9.21016 # X Y Z for center of plane. 
+		PLANENORMAL = 0 0 1 # Direction of plane normal.
+		PLANECOLOR = 1 1 1 # R G B for plane color.
+		PLANETEXTURE = 0.3 0.6 0.8 1.0 # ambient diffuse specular opacity for plane.
+
+	     Tokens can be in any order, whitespace is ignored, and anything 
+	     following a # on a line is ignored.  The CENTER, VIEDDIR, and 
+	     UPDIR depend on the structure and can be a pain to set by hand 
+	     so they have fairly elaborate defaults that seem to usually work 
+	     fine.  The other values are not bad places to start.  For 
+	     more info about these check out the tachyon documentation.
+
+	     For a single structure the output consists of XXX.dat, XXX.tga,
+	     XXX.jpg, XXX.enc, XXX.mpg.  Having all these files is useful 
+	     if some part of the program did not exectute properly and you 
+	     need to do steps by hand (tachyon XXX.dat produces XXX.tga, 
+	     convert XXX.tga XXX.jpg produces XXX.jpg, and mpeg_encode XXX.enc
+	     produces XXX.mpg).  For more than one structure the XXX.dat 
+	     and XXX.tga files are erased to avoid clutter.  The XXX.enc file 
+	     is used for the mpeg_encode programs and is totally set in 
+	     convasp and the user has not control over it from the rtfile.  
+	     If you want to alter it after it is output go ahead but I know 
+	     almost nothing about how it works.  To make your own mpg from 
+	     the jpg type: 
+		mpeg_encode XXX.enc 
+	     
+	     Right now I only know this works on africa.  The tga, jpg files 
+	     can be viewed with xv and the mpg with mpeg_play. 	
+	convasp -make_strlist OUTCAR XDATCAR
+	     Outputs to standard out a sequence of structures in POSCAR format.
+	     The strlist file created contains a list of structures, each 
+	     formatted exactly like a POSCAR file, with an empty line after 
+	     all but the last one.  The file must have no extra lines at the end
+	     or all routines that read it will crash.  The lattice parameters 
+	     are pulled out from the OUTCAR and the positions from XDATCAR.  
+	     If OUTCAR has too few lattice parameters then copies of the last 
+	     set are used for the remaining XDATCAR.
+	convasp -supercell_strlist sc.txt strlist
+	     Outputs to standard out a sequence of structures in POSCAR format.
+	     The structures are supercells formed using the supercell matrix
+	     in sc.txt based on the structures in strlist.  For more information
+	     on sc.txt and supercells see -supercell.  For more information
+	     on a strlist see -make_strlist.
+	convasp -join_strlist strlist1 strlist2
+	     Outputs to standard out a sequence of structures in POSCAR format.
+	     The structures consist of those in strlist1 with the atoms from 
+	     strlist2 added in.  The positions are taken from strlist2, 
+	     transformed into Cartesian coordinates, and then inserted into
+	     strlist1.  All inserted atoms are added as new types.  If one
+	     file has more structures than the other then the shorter file
+	     is padded with copies of the last structure.  For more information
+	     on a strlist see -make_strlist.
+	convasp -pocc PROOUT
+	     Outputs occupations calculated from projections onto spherical 
+	     harmonics for each ion for many combinations of L, M, bands, 
+	     and kpoints.  This works with version 445 and has not been tested 
+	     on any other version (and probably won't work).  To make this work
+	     you need to do the following
+		- Use slightly altered version of vasp (see below)
+		- set LORBIT=2 in INCAR (see below)
+		- Set ISYM=0 in INCAR (see below)
+		- Set RWIGS in INCAR (see below)
+	     Here is why you need to do these things (feel free to skip this).  
+	     The -pocc option reads the PROOUT file, which is produced by 
+	     running vasp with LORBIT=2 in the INCAR file.  There is an 
+	     annoying subtle point here. I am not sure I totally get this 
+	     but here is my best understanding.  The projection onto the 
+	     spherical harmonics actually uses some atomic like radial 
+	     functions (bessel functions).  This means that for each 
+	     spherical harmonic there are multiple states, corresponding 
+	     to different atomic energy levels and radial functions.  
+	     Write the projection of band n, at kpt k, onto spherical harmonic 
+	     with angular quantum numbers l,m and energy level e as Pnklme.  
+	     As compiled, the vasp code outputs projections Pnklm, summing 
+	     over the e parameter.  This makes each projection a sum of 
+	     complex numbers, allowing some cancellations.  However, for 
+	     occupations, like those output in PROCAR (LORBIT=1) and OUTCAR, 
+	     the summations over e are done with the squares of the Pnklme.  
+	     This makes sense, since you want to add up probabilities, 
+	     not amplitudes, to get an occupation.  Unfortunately, from 
+	     the output Pnklm one cannot reconstruct the Pnklme, so the 
+	     ouptut in PROOUT is not enough to reproduce the occupations.
+	     Therefore, I suggest the following.  Recompile vasp with following
+	     modifications to sphpro.F
+	     change line 252
+			WRITE(IUP,'(9F12.6)') CSUM_PHASE
+	     to
+			write(IUP,'(9F12.6)') CSUM_ABS
+	     CSUM_ABS is a complex variable but the imaginary part is zero.  It
+	     is the squared amplitude for each projection.  Note that this is 
+	     a probability.  You use it directly (do not square it) to get 
+	     occupations.  Note that the augmentations are added to this real 
+	     number, and are therefore probablities, not amplitudes.  
+	     This makes sense when you look at the code in sphpro.F that 
+	     calculates the augmentation portion.  The augmentations can be 
+	     <0, which I assume corresponds to reducing the probability of 
+	     finding electrons.  This make me a little uncomfortable but 
+	     I guess it is OK.  At this point the convasp code assumes 
+	     the above modification and uses the magnitude of the projections 
+	     to calculate all occupations (not the magnitude squared).  
+	       Also, there is another subtle point with the kpoints.  If 
+	     you use symmetry certain sets of symmetry equivalent kpoints 
+	     (a star) are represented by a single irreducible kpoint.  We 
+	     are used to ignoring this and simply weighting things associated 
+	     with the irreducible kpoint appropriately to account for the 
+	     whole star.  However, the projections onto different orbitals 
+	     are not the same for all the points in a star.  For example, 
+	     the kpoints (0.1,0,0),(0,0.1,0),(0,0,0.1) may all be in the 
+	     same star in fcc, but states associated with them will project 
+	     differently onto Px orbitals.  Therefore, if you use irreducible
+	     kpoints you will get the wrong projections (it seems like you
+	     do get the right totals for S,P, and D, bit I am not sure that 
+	     is always the case).  To be safe, don't use any symmetry - i.e.,
+	     set ISYM=0 in the INCAR file.
+	       You must set RWIGS so that the code knows the radius of
+	     the spheres onto which it projects. 
+	       To make sure all is in order you can look at the total 
+	     occupations for each ion in OUTCAR.  These should match 
+	     the Occupations vs. ION:LM values in the output of convasp 
+	     (the last lines in the output).  A more detailed check is 
+	     to run vasp with LORBIT=1 and compare the PROCAR file with 
+	     the output of convasp.  I am not sure that this will all 
+	     work the same way with PAW potentials.  
+	convasp -pdos pdos.in PROOUT
+	     Writes the projected DOS for any desired combination of atoms,
+	     kpoints, bands, and lm values.  The output consists of 6 
+	     columns, spin up, down, up-down, and the cumulative DOS for 
+	     each of those.  Only up spin data is given for non 
+	     spin-polarized calculations.  The PDOS should look like
+	     an equivalent vasp output but will not be identical since
+	     vasp uses a different smearing method to get the PDOS. 
+	     However, I think these PDOS are basically correct, at least
+	     qualitatively.  To make this work you must
+		- Use slightly altered version of vasp
+		- set LORBIT=2 in INCAR
+		- Set ISYM=0 in INCAR 
+		- Set RWIGS in INCAR (see below)
+	     The details explaining all this are given above in the -pocc 
+	     section.  The input file has the following format
+
+		# Input for convasp -pdos.
+
+		# These values you supply once.
+		EMIN = -20.01477264 # default: 0.5eV below lowest energy.
+		EMAX = 6.90250559 # default: 0.5ev above highest energy.
+		NBINS = 300 # default: 300 
+		SMOOTH_SIGMA = 0.1 # Gaussian smoothing of the DOS. 
+				   # default: 1 bin width.
+		PRINT_PARAMS = 1 # 0=prints only data (easy to plot).
+				 # 1=prints all the input parameters.
+				 # default: 0
+
+		# You can have as many cases as you want.
+		# They are all added together.
+
+		# case 1
+		ATOMS = 1 # default: all atoms.
+		KPOINTS = # default: all kpoints.  
+		BANDS = # default: all bands.
+		LMVALUES = # default: all s,p,d,f.
+
+		# case 1
+		ATOMS = 2 # default: all atoms.
+		KPOINTS = 1 2 3 # default: all kpoints.  
+		BANDS = 1 # default: all bands.
+		LMVALUES = 3 # default: all s,p,d,f.
+
+	     All # denote comment lines.  Each case is started when the token
+	     ATOMS is used.  Following an ATOMS token, all KPOINTS, BANDS, 
+	     LMVALUES tokens will apply to the atoms denoted in the preceeding 
+	     ATOMS token until the next ATOM token.  The  KPOINTS, BANDS, 
+	     LMVALUES tokens can be left out in which case their default values 
+	     will be used.  You can have any number of cases.  The above 
+	     example will calculate a PDOS with projections onto atom 1
+	     for all kpoints, bands, and s,p,d, and f (case 1) added to the
+	     projection onto atom 2 for kpoints 1-3, band 1, and the Pz orbital.
+	     I believe you can create any desired projections with this input
+	     file.  The LMVALUES use the following correspondence between 
+	     numerical input and orbitals projected.
+
+	     Input number: 1 2  3  4  5    6   7   8   9   10     11   
+	     Orbitals:     S Py Pz Px Ptot Dxy Dyz Dz2 Dxz Dx2-y2 Dtot
+	     Input number: 12 13 14 15 16 17 18 19   20
+	     Orbitals:     F1 F2 F3 F4 F5 F6 F7 Ftot Tot
+	 
+	     I have not done the work to figure out which of the standard
+	     f-orbital functions correspond to F1-F7.  
+	     
+	     This is only tested for version 4.4.5.
+	convasp -sumpdos pdos.in PROOUT
+             Works for vasp.46x
+             This allows you to sum up projected DOS together for convenient
+             plotting.  It only works when you have run with the following 
+             INCAR file settings.  LORBIT=1 or 2 and set RWIGS, or 
+             LORBIT = 11 or 12 and no RWIGS (only works when using PAW PP).
+             If you are running parallel you must set NPAR=1.  The
+             input file is similar to -pdos above but somewhat simpler
+             so I give a full example here.
+
+		# Input for convasp -sumpdos.
+
+		# These values you supply once.
+                SPIN = 1 # 1 = non-spin polarized, 2 = spin polarized
+                         # Default 1
+                EFERMI = -999 # This will be subracted from the energies.
+                              # Set to 0 to subtract nothing, -999 to use
+                              # the E_Fermi in the DOSCAR.  Default -999.
+                NLM = 9 # number of orbitals, 9 (spd:1+3+5) or 16 (spdf:1+3+5+7)
+                        # Default 9
+		PRINT_PARAMS = 0 # 0=prints only data (easy to plot).
+				 # 1=prints all the input parameters.
+				 # default: 0
+
+		# You can have as many cases as you want.
+		# They are all added together.
+
+		# case 1: t2g on atom 1
+		ATOMS = 1 # default: no atoms
+		LMVALUES = 5 6 8 # default: no lm
+		# case 2: eg on atoms 2 and 3
+		ATOMS = 2 3 # default: no atoms
+		LMVALUES = 7 9 # default: no lm
+
+	     All # denote comment lines and can be put anywhere.  
+             Each case is started when the token ATOMS is used.  
+             Following an ATOMS token, all LMVALUES tokens 
+             will apply to the atoms denoted in the preceeding 
+	     ATOMS token until the next ATOM token. You can have any number 
+             of cases, and the results for all cases are added together.  
+             WARNING: make sure to use SPIN to set if it is a spin poloarized
+             calculation, make sure to use EFERMI to your desired reference,
+             and make sure to set NLM to 9 (spd) or 16 (spdf).
+             The lm values correspond to orbitals by the following scheme.
+	     Input number: 1 2  3  4  5   6   7   8   9     
+	     Orbitals:     S Py Pz Px Dxy Dyz Dz2 Dxz Dx2-y2
+	     Input number: 10 11 12 13 14 15 16 
+	     Orbitals:     F1 F2 F3 F4 F5 F6 F7 
+  	convasp -bands PROOUT < POSCAR
+	     Outputs the up and down bands to band.up.out and band.dn.out.
+	     Format is
+	      k-space path length (true, fractional), bands (up or down), nkpt, kx, ky, kz
+	     Uses data in PROOUT file.  Uses POSCAR to get lattice to calculate
+	     true recipricol distances.  Must run vasp with LORBIT=2 to get
+	     the PROOUT file.
+	convasp -planedens dens2d.in CHGCAR
+	     This finds the charge density in a plane.  The input file dens2d.in 
+	     has the form
+		D # Coordinates for following points (Direct/Cartesian)
+		scale # Scale factor - edges of plane get mult. by this (but not origin).
+		x y z # origin point
+		x y z # X axis
+		x y z # Y axis
+		Nx Ny # Number of X and Y grid points
+		Middle # Location for origin (Middle/Corner).
+		Ortho # Whether to use Y orthogonal to X (Ortho/Strict).
+	     The output consists of 4 files, dens.[tot/diff/up/dn].out.  Each 
+	     has the same format, consisting of rows of density values, each 
+	     row corresponding to a value along the X axis and each column
+	     to a value along the Y axis.  The format can be read directly 
+	     into Excel and easily into MatLab.  This routine uses the same 
+	     routine as -chgint to read in the CHGCAR and should work
+	     for the same versions of vasp (see -chgint for more information).
+	convasp -chgdiff CHGCAR1 CHGCAR2
+	     This takes the difference between two CHGCAR files, outputting
+	     CHGCAR1-CHGCAR2.  The output is in the form of a vasp445 
+	     CHGCAR.  The output file is CHGCAR.diff.out.  
+	     This routine uses the same routine as -chgint to read in the 
+	     CHGCAR and should work for the same versions of vasp (see 
+	     -chgint for more information).
+	convasp -rdf rmax nbins sigma < POSCAR
+	     Get the radial distribution function (rdf) for a POSCAR file
+	     rmax: The radius out to which the rdf is calculated.
+	     nbins:  The number of bins for the rdf.
+	     sigma:  The sigma of the gaussian used to smear the rdf.
+	     This also finds the nearest-nieghbor shells by looking at 
+	     where the rdf has minima.  The output gives the rdf and nn shells
+	     for each atom and for each type of neighbor, including a sum
+	     of all neighbor types.  If you want to treat all atoms as the 
+	     same (e.g., to look at the parent lattice) just set one
+	     type in the POSCAR file.  You may need to play with sigma
+	     and the nbins to get atoms grouped together that you want in 
+	     one shell but not to group atoms you want in different shells.
+	     One apporach is to choose enough bins to make sure to distinguish
+	     every shell of interest and the increase sigma until you group
+	     desired atoms together.  sigma=0 does no smearing.
+	convasp -rdfcmp rmax nbins sigma nshmax POSCAR1 POSCAR2
+	     Uses the radial distribution functions (rdf) for POSCAR 1 and 2 
+	     to assess how close the structures are.  For each atom the
+	     rdf and radial shell function (rsf - this gives the coordination
+	     numbers for each shell) are found for each type.  
+	     The shells are found by looking at the derivatives of the rdf.
+	     Then the atoms of the same types are compared and the rms 
+	     errors in the rsf for POSCAR1 and POSCAR2 are computed.  Then 
+	     we step through the atoms of POSCAR1, matching them up 
+	     with the atoms of POSCAR2, based on the minimum rms.  When a 
+	     POSCAR2 atom is matched it not considered for later matches.
+	     The total rms based on these best matches is found by averaging 
+	     all the individual atom RMS's.  The total RMS and the 
+	     rsf for the best matched atoms are output.
+	     rmax: The radius out to which the rdf is calculated.
+	     nbins:  The number of bins for the rdf.
+	     sigma:  The sigma of the gaussian used to smear the density.
+	     nshmax:  The farthest possible shell used for computing RMS 
+		      with the rsf (if <nshmax shells are found then fewer
+		      will be used).
+	     I think this works but large changes in shape give rsf that 
+	     are too different to compare exactly and the RMS!=0.  However,
+	     looking at the output can make it clear how the shells are
+	     related.  At this point the 2 structure must have the same
+	     number of atoms of each type.  If you want to compare 2 POSCARs
+	     where one is a multiple of the other in terms of atoms of 
+	     each type you can create supercell (see -supercell) to make this
+	     function usable.
+	convasp -platon [EQUAL] [EXACT] [ang d1 d2 d3] < POSCAR | platonSG
+	     This finds the space group.  convasp is creating an output
+	     file, which is piped into a script platonSG, which uses the 
+	     program platon.
+	     Wraps input file for Platon ADDSYM package:
+	     CALC ADDSYM (EQUAL) (EXACT) (ang d1 d2 d3) 
+	     where: 
+	     EQUAL - Search with all atom type treated as equivalent. 
+	     EXACT - All atoms should fit for given criteria. 
+	     ang - Angle criterium in search for metrical symmetry of the
+		   lattice (default 1.0 degree). 
+	     d1 - Distance criterium for coinciding atoms for non-inversion 
+		  (pseudo)symmetry elements (default 0.25 Angstrom). 
+	     d2 - Distance criterium for coinciding atoms for (pseudo)
+		  inversion symmetry (default 0.45, 0.25 Angstrom). 
+	     d3 - Distance criterium for coinciding atoms for (pseudo)
+		  translation symmetry (default 0.45, 0.25 Angstrom). 
+	     To get the space group, type
+	         convasp -platon < POSCAR | platonSG
+	     To just get see the output file from convasp, type
+		convasp -platon < POSCAR
+	     To check for errors and see output from platon, type
+		convasp -platon < POSCAR | platon -o
+  	     Note that the added flags above do not seem to work.  To change tolerance
+             create output file from convasp, and then add the four tolerances
+             after CALC ADDSYM (on the same line).  Then pipe this file to platonSG. 
+	     Convasp will use your atom labels if they are there.  If you 
+	     give no atom labels it will use defaults for each atom type,
+	     (these are He,Li,Be,B,C, and then W for all remaining atom types).
+	     WARNING: If you have more than 6 atom types the W default will give the wrong space group.
+	     WARNING: The equal flag may not work.
+	     WARNING: Atoms labeled with H do not get read by default in platon.  Do not use H labels.
+	     SEE: http://www.cryst.chem.uu.nl/platon/pl000401.html
+	     ASK: Stefano or Eric or Dane
+	convasp -rbdist POSCAR1 POSCAR2 n|N|e|E
+	     Gets the distance between two POSCAR files.  Uses lattice params
+	     of POSCAR1.  For use of n|N|e|E see -intpol.
+	convasp -mom POSCAR 
+	     Gets the mass moments of the POSCAR file.  Gets only the first
+	     (center of mass) at this point.
+	convasp -setcm cm1 cm2 cm3 POSCAR
+	     Sets to center of mass to (cm1,cm2,cm3) by shifting all the 
+	     atom positions.  Use -mom to check the shift was correct.
+	convasp -niggli POSCAR
+	     Converts the unit cell to the standardized Niggli form.  The
+	     form is unique (up to some signs, I think).  The transformation
+	     makes use of only the lattice vectors and does not depend on the
+	     basis atoms.  This will work on any cell, but it treats the given
+	     cell as primitive, and it will not reduce the cell to primitive 
+	     if it is not primitive already.  At present the algorithm seems to 
+	     hang if I force more than about 6 digits of accuracy so be aware that
+	     small errors might be introduced (these can break symmetry!).
+	convasp -cmp_str POSCAR1 POSCAR2 rcut
+	     This compares the characteristics of two POSCAR files and is
+	     useful for determining if the files are the same.  Characteristics
+	     compared include number of atoms, number of types, total volume, 
+	     volume per atom, lattice parameters, number of neighbors of each
+	     pair type out to rcut, differences in bond lengths for neighbors
+	     of each pair type out to cutoff, and space groups.  For rcut<0 the
+	     cutoff is set to 4*(Wigner-Seitz radius of each atom) (this is the 
+	     radius such that num atom spheres occupies the whole volume).
+	convasp -data1 POSCAR1 rcut
+	     This is basically like cmp_str except that it works on 1 str.  Slightly
+	     different data is given: No space groups, All bond lengths.
+	     ******************** End of convasp help ******************** 
+	

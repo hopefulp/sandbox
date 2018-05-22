@@ -1,0 +1,62 @@
+#!/bin/tcsh
+
+if ( $# < 2 ) then
+    echo "Usage:: $0 o_dir n_dir poscar_tag[0|1|2] run_tag[pbs-file]"
+    exit
+endif
+
+set qcvin = /qcfs/joonho/binvasp
+set qcvi  = /qcfs/joonho/VaspINI
+
+set o_dir = $1
+set n_dir = $2
+set d_poscar = 0
+set poscar_tag = $3
+
+if ( $poscar_tag == "" ) then
+    set poscar_tag = $d_poscar
+endif
+
+set run_tag = $4
+
+if ( -d $n_dir ) then
+    echo "There is $n_dir directory already"
+    exit
+else
+    mkdir $n_dir
+endif
+
+if ( $poscar_tag == 0 ) then
+    echo "copy $n_dir.pos  $n_dir/POSCAR "
+    cp $n_dir.pos  $n_dir/POSCAR
+else if ( $poscar_tag == 1 ) then
+    echo "copy $o_dir/POSCAR $n_dir/ " 
+    cp $o_dir/POSCAR $n_dir/
+else if ( $poscar_tag == 2 ) then
+    echo "copy $o_dir/CONTCAR $n_dir/POSCAR "
+    cp $o_dir/CONTCAR $n_dir/POSCAR
+else
+    echo "refer usage:: type $ $0 "
+    exit
+endif
+	
+cp $o_dir/POTCAR  	$n_dir
+cp $o_dir/KPOINTS 	$n_dir
+cp $o_dir/INCAR 	$n_dir
+
+grep "ISTART = 1" $n_dir/INCAR
+if ( ! $? ) then
+    sed -i 's/ISTART = 1/ISTART = 0/' $n_dir/INCAR
+endif
+grep 'ICHARG = 0' $n_dir/INCAR
+if ( ! $? ) then
+    sed -i 's/ICHARG = 0/ICHARG = 2/' $n_dir/INCAR
+endif
+
+if ( $run_tag != "" ) then
+    echo "running on $n_dir"
+    $qcvin/changeline_pbs.pl $run_tag $n_dir 
+else
+    echo "Input pbs-file for running: pbs-..."
+endif
+

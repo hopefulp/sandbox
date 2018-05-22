@@ -1,0 +1,291 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+###   EXPERIMENTAL SCRIPT: USE AT YOUR OWN RISK ################################
+
+
+### UTILITIES ###
+from pprint import pprint as pp
+from time import sleep
+import pdb
+#################
+
+### FUNDAMENTALS ###
+from itertools import permutations, product
+import sys
+eprint = sys.stderr.write #stderr print
+####################
+
+### DEBUG KEYS ###
+VERBOSE = False
+SCRIPT_VERSION = '1.4 aleph test'
+SCRIPT_NAME = sys.argv[0].split('/')[-1]
+if VERBOSE: eprint(SCRIPT_NAME+' - version '+SCRIPT_VERSION+'\n')
+DEBUG = False
+##################
+
+### ATOMFUNCTIONS ###
+#N.B.: do not use falsy, even nested, singlets (e.g. 0, None, [0], ...)
+depth = lambda L: isinstance(L, list) and (max(map(depth, L)) + 1) if L else 1
+
+def fixd(L):
+    return [L]
+
+def flip(L):
+    return [L, L[::-1]]
+
+def perm(L):
+    return [[L[0]] + list(I) for I in permutations(L[1:])]
+
+def check(L, R, fR):
+    if VERBOSE:
+        eprint('\nCheck if ' + repr(L) + ' and ' + repr(R) + ' are ' + fR.__name__ + '-equivalent\n')
+        print L
+        print R
+        print fR
+    nR = fR(R)
+    assert depth(nR) == depth(L) + 1, 'L is not comparable among lists in nR'
+    if L == R:
+        matchflag = True # only for consistency
+        if VERBOSE:
+            eprint("exact MATCH!\n")
+            print L, '===', R
+    else:
+        matchflag = False
+        for J in nR:
+            if L == J:
+                matchflag = True
+                if VERBOSE:
+                    eprint("similar MATCH!\n")
+                    print L, '=~=', R
+        if not matchflag:
+            if VERBOSE:
+                eprint("no MATCH!\n")
+                print L, '=/=', R
+    return matchflag
+#####################
+
+FILEONE = sys.argv[1]
+FILETWO = sys.argv[2]
+TOL = ''
+if len(sys.argv) >= 4: TOL = float(sys.argv[3])
+
+if __name__ != "__main__":
+    FILEONE, FILETWO = sys.argv[1:3]
+
+def same_file(fname, vname):
+    if fname == vname:
+        if fname == '':
+            sys.exit('Error: You missed file assignment')
+        else:
+            sys.exit('Error: Your inputfile is also your outputfile')
+    else:
+        if VERBOSE: eprint(SCRIPT_NAME+' compares '+fname+' and '+vname+'\n')
+
+def get_key(filename):
+    if VERBOSE: eprint('Retrieving key from ' + filename + '...'+'\n')
+    dictkey = {}
+    with open(filename, 'r') as fileobj:
+        for line in fileobj:
+            #strips comments away
+            line = line.partition('#')[0].partition('\n')[0]
+            if line:
+                split = line.split()
+                if split[0] not in magicnatoms:
+                    if split[0] == 'var':
+                        ### DICTS EDIT DUE TO 'VAR' KEY ### bugged, check additional "atom"
+                        split[0] += ' '+split[1] #'key' => 'var key'
+                        magicnatoms[split[0]] = magicnatoms[split[1]] #new keyword, same natoms
+                        magicnvalues[split[0]] = 3 #default for 'var key'
+                        magicfunctions[split[0]] = magicfunctions[split[1]] ##new keyword, same method
+                        del split[1] #delete "key" ("var key" is left)
+                    else:
+                        ### DICTS EDIT DUE TO UNKNOWN KEY ###
+                        magicnatoms[split[0]] = 0 #zero atoms
+                        magicnvalues[split[0]] = 1 #only an option 
+                        magicfunctions[split[0]] = fixd #irrelevant
+                optarr = dictkey.setdefault(split[0], [])
+                optarr.append(split[1:])
+    return dictkey
+
+def isclose(a, b, rel_tol=1e-09, abs_tol=0.000001):
+    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
+def compare_key(keyobj1, keyobj2, rtol):
+    if VERBOSE: eprint('Comparing KEYOBJECTS...'+'\n')
+    eprint('KEYWORDS SHARED BY BOTH KEY OBJECTS\n')
+    printlist = []
+    key1write = []
+    key2write = []
+    diffkeys = [k for k in keyobj1 if k in keyobj2]
+    for k in diffkeys:
+        if VERBOSE:
+            eprint('\n*** START OF KEY ' + k + ' ***\n')
+        else:
+            print k
+        natoms = magicnatoms[k]
+        nvalues = magicnvalues[k]
+        function = magicfunctions[k]
+        if DEBUG:        
+            print natoms, nvalues, function
+            print keyobj1[k]
+            print keyobj2[k]
+        if VERBOSE: print keyobj1[k], '->', keyobj2[k]
+        ###############################
+        for a1, a2 in product(keyobj1[k], keyobj2[k]):
+            n1 = a1[:natoms]
+            n2 = a2[:natoms]          
+            if VERBOSE:            
+                print n1, '<->', n2
+                print check(n1, n2, function)
+            if check(n1, n2, function):
+                if VERBOSE: print n1, '<->', n2, #################################
+                v1 = a1[natoms:natoms+nvalues]
+                v2 = a2[natoms:natoms+nvalues]
+                if VERBOSE: print v1, '<--->', v2, ###############################
+                if len(v1) == len(v2):
+                    same=True                    
+                    for s1, s2 in zip(v1, v2):
+                        try:
+                            f1 = float(s1)
+                            f2 = float(s2)
+                            if VERBOSE:
+                                print '\t\t\t', f1, f2
+                                print '\t\t\t', isclose(f1, f2, rtol)
+                            if not isclose(f1, f2, rtol): same=False
+                        except:
+                            if not s1 == s2: same=False
+                else:
+                    same=False
+                    ################################
+                if VERBOSE:
+                    if same:
+                        print 'SAME!'
+                    else:
+                        print 'DIFFERENT!'
+                printlist.append([k, n1, v1, same, n2, v2] )
+                key1write.append([k, n1, v1, same])
+                key2write.append([k, n2, v2, same])
+        if VERBOSE: eprint('***** END OF KEY ' + k + ' ***\n')
+    eprint('KEYWORDS ONLY IN THE 1st KEY OBJECT\n')
+    onlykey1 = [k for k in keyobj1 if k not in keyobj2]
+    for k in onlykey1:
+        print k
+        if VERBOSE: pp(keyobj1[k]); print
+    eprint('KEYWORDS ONLY IN THE 2nd KEY OBJECT\n')
+    onlykey2 = [k for k in keyobj2 if k not in keyobj1]
+    for k in onlykey2:
+        print k
+        if VERBOSE: pp(keyobj2[k]); print
+    print
+    return printlist, key1write, key2write
+
+def translate_dict(keyobj, translist):
+    candidate_keys = [k for k in keyobj if k in maf.keys() or 'var ' in k]
+    for t in translist:
+        for k in candidate_keys:
+            for i, split in enumerate(keyobj[k]):
+                keyobj[k][i] = [t[1] if e == t[0] else e for e in split] ###BEWARE: it checks on EVERYTHING!!1!
+    return keyobj
+
+def format_keydiff(k, n1, v1, same=None, n2=None, v2=None):
+    natoms = max(len(n1), len(n2)) if n2 is not None else len(n1)
+    nfmt = '{:>3} '*natoms
+    nstr1 = nfmt.format(*n1)
+    if n2 is not None:
+        nstr2 = nfmt.format(*n2)
+    else:
+        nstr2 = ''
+    nvalues = max(len(v1), len(v2)) if v2 is not None else len(v1)
+    vfmt = '{:>9} '*nvalues
+    v1 += [''] * (nvalues - len(v1))        
+    vstr1 = vfmt.format(*v1)
+    if v2 is not None:
+        v2 += [''] * (nvalues - len(v2))
+        vstr2 = vfmt.format(*v2)
+    else:
+        vstr2 = ''
+    samestr = '{:<5}'.format(repr(same))
+    return nstr1, vstr1, samestr, nstr2, vstr2
+
+def print_keydiff(printlist):
+    eprint('KEYWORDS DIFF\n')
+    for split in printlist:
+        k, n1, v1, same, n2, v2 = split
+        ns1, vs1, ss, ns2, vs2 = format_keydiff(*split)
+        #if split[3]: print k, ns1, ns2, vs1,'=/=', vs2
+        if not split[3]: print k, ns1, ns2, vs1,'=/=', vs2
+
+def write_keydiff(writelist, filename):
+    eprint('WRITING KEY TO ' + filename + '\n')
+    with open(filename, 'w') as w:
+        for split in writelist:
+            k, n1, v1, same = split            
+            ns, vs, dmp, dmp, dmp = format_keydiff(*split)
+            if not split[3]: w.write(' '.join([k, ns, vs])+'\n')
+        
+
+magicnatoms = {
+    "atom"     : 1,
+    "vdw"      : 1,
+    "charge"   : 1,
+    "bond"     : 2,
+    "angle"    : 3,
+    "torsion"  : 4,
+    "opbend"   : 4,
+    "strbnd"   : 3,
+    #"anglef"   : 3,
+    "chargemod": 2,
+    "chargeadd": 2,
+}
+mad=magicnatoms.copy()
+
+magicnvalues = {
+    "atom"     : 1,
+    "vdw"      : 2,
+    "charge"   : 2,
+    "bond"     : 3,
+    "angle"    : 2,
+    "torsion"  : 4,
+    "opbend"   : 2,
+    "strbnd"   : 3,
+    #"anglef"   : 3, #??? check
+    "chargemod": 2,
+    "chargeadd": 2,
+}
+mav = magicnvalues.copy()
+
+magicfunctions = {
+    "atom"     : fixd,
+    "vdw"      : fixd,
+    "charge"   : fixd,
+    "bond"     : flip,
+    "angle"    : flip,
+    "torsion"  : flip,
+    "opbend"   : perm,
+    "strbnd"   : flip, #??? check
+    #"anglef"   : fixd, #??? check
+    "chargemod": fixd,
+    "chargeadd": fixd,
+}
+maf = magicfunctions.copy()
+
+assert len(magicnatoms) == len(magicnvalues) and len(magicnvalues) == len(magicfunctions), \
+    'Magic dictionaries are not consistent'
+
+### MAIN PROGRAM ###
+same_file(FILEONE, FILETWO)
+
+keyf = get_key(FILEONE)
+keyv = get_key(FILETWO)
+
+translation_list = [
+    ["22", "170"]
+]
+
+keyf = translate_dict(keyf, translation_list)
+
+printlist, keyfwrite, keyvwrite = compare_key(keyf, keyv, TOL)
+
+write_keydiff(keyfwrite, FILEONE.split('.key')[0]+'.dout')
+write_keydiff(keyvwrite, FILETWO.split('.key')[0]+'.dout')

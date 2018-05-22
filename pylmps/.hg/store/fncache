@@ -1,0 +1,6 @@
+data/pylmps/__init__.py.i
+data/pylmps_1.py.i
+data/pylmps.py.i
+data/.hgignore.i
+data/pylmps/ff2lammps.py.i
+data/pylmps/pylmps.py.i

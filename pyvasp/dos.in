@@ -1,0 +1,10 @@
+1 1                                         ! LORBIT, ISPIN(-1:dw 0:non 1:up)
+2 2                                         ! iprog (1:s 2:p 3:d 4:s+p+d) iorbit(1:px,d1 2:py,d2 3:pz,d3, etc)
+3                                           ! nregion
+1 -4 -32                                     ! ireg(i)
+1
+1.0 0.0 0.0                                 ! rgb
+2  5 
+0.0 1.0 0.0                                 ! rgb
+6  37
+0.0 0.0 1.0                                 ! rgb

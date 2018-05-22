@@ -1,0 +1,17 @@
+syntax: glob
+*.pyc
+*.swp*
+*~
+*.c
+*.so
+*.o
+build
+.spyderworkspace
+.spyderproject
+*_keep
+.swp.*
+.swp
+*.orig
+molsys.log
+localstore
+doc/_build

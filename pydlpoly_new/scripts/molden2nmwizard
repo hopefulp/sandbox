@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+###########################################
+#
+#        molden2nmwizard 
+#
+#   script to convert normal mode data 
+#   in molden file format to NMWizard
+#   file format
+#
+#    written by JPD (2015)
+#
+###########################################
+
+
+import string
+import sys
+import getopt 
+
+mfile = ''
+nmwfile = ''
+
+argv = sys.argv[1:]
+
+# defaults
+bohr2ang = 0.52917721092
+
+def print_help():
+    print 'Usage: molden2nmwizard -i <inputfile> -o <outputfile>' 
+
+
+try:
+    opts, args = getopt.getopt(argv, "hpfi:o:")
+except getopt.GetoptError:
+    print "Unknown option %s requested" % opt
+    print_help()
+    sys.exit(2)
+for opt, arg in opts:
+    if opt == '-h':
+        print_help()
+        sys.exit()
+    elif opt == "-i":
+        mfile = arg
+    elif opt == "-o":
+        nmwfile = arg
+    else:
+        print_help()
+        sys.exit(1)
+
+if mfile == nmwfile:
+    if key_old == '':
+        print_help()
+        sys.exit(1)
+    else:
+        sys.exit('Error: Your inputfile is also your outputputfile')
+    
+print 'Molden data file %s will be converted in NMWizard file %s' % (mfile, nmwfile)
+
+### first read mfile ###
+
+coords = []
+atoms  = []
+modes  = []
+
+f = open(mfile, 'r')
+line = f.readline()
+line = f.readline()
+line = f.readline()
+stop = False
+
+while not stop:
+    sline = string.split(f.readline())
+    if sline[0] == '[Atoms]':
+        sline = string.split(f.readline())
+        while not sline[0] == '[FREQ]':
+            atoms.append(sline[0])
+            coords += map(string.atof,sline[3:6])
+            #coords.append(map(string.atof,sline[3:6]))
+            sline = string.split(f.readline())
+    if sline[0] == '[FR-NORM-COORD]':
+        for i in range(len(coords)):
+            mode = []
+            sline = string.split(f.readline())
+            for j in range(len(coords)/3):
+                sline = string.split(f.readline())
+                mode += map(string.atof,sline[0:4])
+            modes.append(mode)
+        stop = True
+        f.close()
+
+### second write nmwfile ###
+
+f = open(nmwfile, 'w')
+f.write('nmwiz_load %s\n' % nmwfile)
+f.write('atomnames ')
+for i in range(len(atoms)):
+    f.write('%s ' % atoms[i])
+f.write('\n')
+f.write('coordinates ')
+for i in range(len(coords)):
+    f.write('%12.6f ' % (coords[i]*bohr2ang))
+f.write('\n')
+for i in range(len(modes)):
+    f.write('mode %s' % i)
+    for j in range(len(modes)):
+        f.write('%12.6f ' % (modes[i][j]*bohr2ang))
+    f.write('\n')
+f.close()

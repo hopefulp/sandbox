@@ -1,0 +1,5 @@
+ECHO_TEST: successfully loaded cmcc queue worker!
+
+LAUNCHPAD_LOC: /home/johannes/.fireworks/queue/my_launchpad.yaml
+FWORKER_LOC: /home/johannes/.fireworks/queue/my_fworker.yaml
+QUEUEADAPTER_LOC: /home/johannes/.fireworks/queue/my_qadapter.yaml

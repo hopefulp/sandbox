@@ -1,0 +1,71 @@
+#!/bin/sh
+
+if [ $# -ne 1 ]
+then
+  echo "Usage: potgenerate_pbe [pos file]"
+  exit
+fi
+
+PosFile=$1
+list=$(head -1 $PosFile)
+PosName=${PosFile%.pos}
+echo -n "" > POTCAR
+#echo -n "" > $PosName.pot
+for atom in $list
+do
+  if [ "$atom" == "Ca" ]
+  then
+    atomname="Ca_sv"
+  elif [ "$atom" == "Sc" ]
+  then
+	atomname="Sc_sv"
+  elif [ "$atom" == "K" ]
+  then
+	atomname="K_sv"
+  elif [ "$atom" == "Li" ]
+  then
+	atomname="Li_sv"
+  elif [ "$atom" == "Na" ]
+  then
+	atomname="Na_sv"
+  elif [ "$atom" == "Ti" ]
+  then
+	atomname="Ti_sv"
+  elif [ "$atom" == "V" ]
+  then
+	atomname="V_sv"
+  elif [ "$atom" == "Ba" ]
+  then
+	atomname="Ba_sv"
+  elif [ "$atom" == "Be" ]
+  then
+	atomname="Be_sv"
+  elif [ "$atom" == "Be" ]
+  then
+	atomname="Be_sv"
+  elif [ "$atom" == "Cs" ]
+  then
+	atomname="Cs_sv"
+  elif [ "$atom" == "Nb" ]
+  then
+	atomname="Nb_sv"
+  elif [ "$atom" == "Rb" ]
+  then
+	atomname="Rb_sv"
+  elif [ "$atom" == "Sr" ]
+  then
+	atomname="Sr_sv"
+  elif [ "$atom" == "Y" ]
+  then
+	atomname="Y_sv"
+  elif [ "$atom" == "Zr" ]
+  then
+	atomname="Zr_sv"
+  else
+    atomname=$atom
+  fi
+#  cat /qcfs/common/vasp-pp/potpaw_PBE/$atomname/POTCAR >> $PosName.pot
+  cat /qcfs/common/vasp-pp/potpaw_PBE/$atomname/POTCAR >> POTCAR
+    
+done
+

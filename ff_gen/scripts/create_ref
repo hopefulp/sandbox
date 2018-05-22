@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+########################################################################
+#
+#  Skript to sample the reference Information
+#  to an hdf5 file. It needs an loaded Turbomole 
+#  Environment because it uses t2x to read the optimized
+#  structure. In addition you have to have the hessian stored 
+#  in your control file. It is recommended to start aoforce with the 
+#  $noproj keyword in order to get an unprojected hessian. The 
+#  reference calculation files has to be in a directory called
+#  ref/<tag>.
+#
+#########################################################################
+
+
+import pydlpoly
+import ff_gen
+import ff_gen.refclass as refclass
+import ff_gen.turbomole as turbomole
+import ff_gen.IOmod as IOmod
+import molsys.stow as stow
+import molsys
+import molsys.util.h5craft as h5craft
+import os
+
+option = [
+        ['', 'c', 'xyzfile'],
+        ['', 'r', 'reffile'],
+        ['primary', 't', 'tag'    ],
+        ['$nprhessian', 'k', 'hessiankeyword'],
+        ['control', 'f', 'hessianfile'],
+        [None, 'p', 'path'],
+        [None, 'l', 'chargefile'],
+        ['control', 'i', 'inputfile']]
+          
+
+shellval = stow.main(stow.sys.argv[1:], option)
+
+m = molsys.mol()
+m.read(shellval[0],ftype = 'xyz')
+elements = m.elems
+print elements
+xyz = m.xyz
+refdat = []
+refdat.append(xyz)
+refdat.append(elements)
+
+#frefsplit = shellval[1].split('.')
+#if shellval[1] != 'hdf5' and frefsplit[-1] == 'hdf5': shellval[1] = ".".join(frefsplit[:-1])
+
+if ".hdf5" not in shellval[1]: shellval[1] += ".hdf5"
+#if shellval[1] != 'hdf5' and frefsplit[-1] == 'hdf5': shellval[1] = ".".join(frefsplit[:-1])
+
+#ref = refclass.refclass(refname = shellval[1], refdata = refdat)
+#ref.read_hessian(tag = shellval[2], fname = shellval[4], keyword = shellval[3], 
+#        path = shellval[5], fcharges = shellval[6])
+if shellval[5]!= None: 
+    retval = os.getcwd()
+    os.chdir(shellval[5])
+tb = turbomole.turbomole(m.natoms, m.elems)
+tb.read_optimized_xyz()
+tb.read_hessian(shellval[4], shellval[3])
+datadict = {'system':{'elements':elements, 'natoms':m.natoms},
+        'hessians': {shellval[2]:{'coord':tb.xyz, 'hessian':tb.hessian}}}
+if shellval[6] != None:
+    tb.read_kollman(shellval[6])
+    datadict['hessians'][shellval[2]]['charges'] = tb.charges
+if shellval[7] != None:
+    datadict['hessians'][shellval[2]]['input'] = tb.read_control(shellval[7])
+
+dr = h5craft.DataReference(shellval[1],'a')
+dr.build_rec_dataset(datadict)
+
+os.chdir(retval)

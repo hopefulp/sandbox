@@ -1,0 +1,17 @@
+syntax: glob
+*swp
+*mod
+*keep
+*.pyo
+*.pyc
+*~
+*.so
+*.mod
+*.o
+*orig
+*kate-swp
+doc/_build/
+examples/biphenyl/ph-ph
+/ric/tests/*
+ff_gen/ric_new/
+examples/BME-ph

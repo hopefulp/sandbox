@@ -1,0 +1,17 @@
+#!/bin/tcsh
+set posfile = 'POSCAR'
+set potfile = 'POTCAR'
+
+set potdir = '/qcfs/common/vasp-pp/newpot_PBE'
+
+if (-e $potfile) then
+	rm $potfile
+endif
+
+set line = `head -n 1 $posfile |xargs echo -n`
+foreach atom ($line)
+	set atomname = $atom
+	cat ${potdir}/${atomname}/POTCAR >> $potfile
+	echo $atomname
+	grep -i -e VRHFIN -e TITEL -e ENMIN -e ZVAL ${potdir}/${atomname}/POTCAR
+end

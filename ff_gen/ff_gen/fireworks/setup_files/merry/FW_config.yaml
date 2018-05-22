@@ -1,0 +1,4 @@
+ECHO_TEST: successfully loaded merry worker!
+
+LAUNCHPAD_LOC: /home/johannes/.fireworks/my_launchpad.yaml
+FWORKER_LOC: /home/johannes/.fireworks/my_fworker.yaml

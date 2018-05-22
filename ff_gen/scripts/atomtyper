@@ -1,0 +1,93 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+########################################################################
+#
+#  Script to generate atom types
+#
+#########################################################################
+
+
+import assign_FF
+import molsys.stow as stow
+import ff_gen.tools as tools
+import numpy
+import string
+import ff_gen.IOmod as IOmod
+from ff_gen.tools import atom as atom
+from ff_gen.tools import atomtyper as atomtyper
+
+
+
+if __name__ == "__main__":
+
+    option = [
+            ['', 'c', 'txyzfile'],
+            ['', 'o', 'otxyzfile'],
+            ['2', 'r', 'rules'],
+            ['', 'd', 'dic'],
+            ['', 'e', 'reftxyzfile']]
+            
+
+    shellval = stow.main(stow.sys.argv[1:], option)
+    fxyz = shellval[0]
+    foxyz = shellval[1]
+    rules = shellval[2]
+
+    io = IOmod.io()
+    io.read_tinker_xyz(fxyz)
+    at = atomtyper(io.elements, io.xyz, io.cnct)
+
+    try:
+        rules = int(rules)
+    except ValueError:
+        rules = eval(rules)
+    
+    if shellval[4] != '':
+        # match atom types in reference with atom types in txyzfile
+        io_ref = IOmod.io()
+        io_ref.read_tinker_xyz(shellval[4])
+        at_ref = atomtyper(io_ref.elements, io_ref.xyz, io_ref.cnct)
+        inttypes = io_ref.atypes
+        if rules > 2:
+            at_ref.__call__(2)
+            for i in range(rules-2):
+                at_ref.metacall(False)
+        else:
+            at_ref.__call__(rules)
+        strtypes = at_ref.atypes
+        d = {}           # dictionary contains all strtype/inttype pairs
+        for i in range(len(inttypes)):
+            if not strtypes[i] in d:
+                d[strtypes[i]] = inttypes[i]
+            else:
+                if d[strtypes[i]] != inttypes[i]:
+                    print("Warning: type " + strtypes[i] + " has multiple integer types, please try to use higher rules")
+        if rules > 2:
+            at.__call__(2)
+            for i in range(rules-2):
+                at.metacall(False)
+        else:
+            at.__call__(rules)
+        strtypes = at.atypes
+        inttypes = []
+        for i in strtypes:
+            inttypes.append(d[i])
+        at.atypes = inttypes
+    else:
+        # if no reference is given, new atomtypes are generated
+        if rules > 2:
+            at.__call__(2)
+            for i in range(rules-2):
+                at.metacall()
+        else:
+            at.__call__(rules)
+
+        if shellval[3] != '':
+            dic = eval(shellval[3])
+            at.atypes = [dic[at.atypes[i]] for i in range(at.natoms)]
+    
+    io.write_tinker_xyz(foxyz, atypes = at.atypes)
+
+    #print at.search_subs()
+

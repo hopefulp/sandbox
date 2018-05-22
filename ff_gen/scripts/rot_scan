@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+########################################################################
+#
+#  Script to rotate a dihedral angle in a molecule
+#
+#########################################################################
+
+import ff_gen.IOmod as IOmod
+import molsys.stow as stow
+import chemcoord as cc
+import numpy
+
+option = [
+        ['', 'i', 'xyzfile'],
+        ['', 'b', 'bond'],              # IDs of the 4 atoms which define the dihedral angle. Format: "a0 a1 a2 a3" (with " or ' signs)
+        ['0', 's', 'start_angle'],
+        ['180', 'e', 'end_angle'],
+        ['5', 'd', 'step']]
+
+shellval = stow.main(stow.sys.argv[1:], option)
+
+fname = shellval[0]
+bond  = shellval[1]
+start = shellval[2]
+end   = shellval[3]
+step  = shellval[4]
+
+bond_list = [int(i) for i in bond.split()]
+start = float(start)
+end =   float(end)
+step =  float(step)
+
+l = numpy.arange(start, end, step)
+for i in l:
+    kaskel = IOmod.io()
+    kaskel.read_xyz(fname)
+    kaskel.rotate_dihedral(bond_list, i)
+    kaskel.write_xyz('%d%s' % (i, fname))

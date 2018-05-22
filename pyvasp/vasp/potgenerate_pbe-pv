@@ -1,0 +1,95 @@
+#!/bin/sh
+
+if [ $# -ne 1 ]
+then
+  echo "Usage: potgenerate_pbe [pos file]"
+  exit
+fi
+
+PosFile=$1
+list=$(head -1 $PosFile)
+PosName=${PosFile%.pos}
+echo -n "" > POTCAR
+#echo -n "" > $PosName.pot
+for atom in $list
+do
+  if [ "$atom" == "Ca" ]
+  then
+    atomname="Ca_pv"
+  elif [ "$atom" == "Cr" ]
+  then
+	atomname="Cr_pv"
+  elif [ "$atom" == "Cu" ]
+  then
+	atomname="Cu_pv"
+  elif [ "$atom" == "Fe" ]
+  then
+	atomname="Fe_pv"
+  elif [ "$atom" == "Hf" ]
+  then
+	atomname="Hf_pv"
+  elif [ "$atom" == "K" ]
+  then
+	atomname="K_pv"
+  elif [ "$atom" == "Mg" ]
+  then
+	atomname="Mg_pv"
+  elif [ "$atom" == "Mn" ]
+  then
+	atomname="Mn_pv"
+  elif [ "$atom" == "Mo" ]
+  then
+	atomname="Mo_pv"
+  elif [ "$atom" == "Na" ]
+  then
+	atomname="Na_pv"
+  elif [ "$atom" == "Nb" ]
+  then
+	atomname="Nb_pv"
+  elif [ "$atom" == "Ni" ]
+  then
+	atomname="Ni_pv"
+  elif [ "$atom" == "Os" ]
+  then
+	atomname="Os_pv"
+  elif [ "$atom" == "Pd" ]
+  then
+	atomname="Pd_pv"
+  elif [ "$atom" == "Rb" ]
+  then
+	atomname="Rb_pv"
+  elif [ "$atom" == "Re" ]
+  then
+	atomname="Re_pv"
+  elif [ "$atom" == "Rh" ]
+  then
+	atomname="Rh_pv"
+  elif [ "$atom" == "Ru" ]
+  then
+	atomname="Ru_pv"
+  elif [ "$atom" == "Ta" ]
+  then
+	atomname="Ta_pv"
+  elif [ "$atom" == "Tc" ]
+  then
+	atomname="Tc_pv"
+  elif [ "$atom" == "Ti" ]
+  then
+	atomname="Ti_pv"
+  elif [ "$atom" == "V" ]
+  then
+	atomname="V_pv"
+  elif [ "$atom" == "W" ]
+  then
+	atomname="W_pv"
+#  elif [ "$atom" == "O" ]
+#  then
+#	atomname="Os_pv"
+  else
+    atomname=$atom
+  fi
+#  cat /qcfs/common/vasp-pp/potpaw_PBE/$atomname/POTCAR >> $PosName.pot
+  cat /qcfs/common/vasp-pp/potpaw_PBE/$atomname/POTCAR >> POTCAR
+    
+done
+

@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+################################################################################
+#
+#  Fitting script using the ffgenerator and the standard ric_fit objective, which
+#  was also used in the old ffgen. This script uses CMA-ES as optimizer.
+#
+#  https://www.lri.fr/~hansen/cmaes_inmatlab.html#python
+#
+#  The CMA-ES stuff is up to now a bit experimental, but in general much more
+#  efficient than pikaia
+#
+################################################################################
+
+#  do the import stuff
+import ff_gen.ff_gen as ff_gen
+import numpy as np
+import ff_gen.objectives.ric_fit2 as ric_fit
+import molsys.stow as stow
+import pydlpoly
+import cma
+import string
+import time
+
+option = [
+        ['', 'c', 'txyzfile'],
+        ['', 'k', 'keyfile'],
+        ['', 'r', 'reffile'],
+        ['', 'n', 'name'],
+        ['2000', 'i', 'maxiter'],
+        [None, 'l', 'lin_ref']]
+
+shellval = stow.main(stow.sys.argv[1:], option)
+
+fxyz  = shellval[0]
+fkey  = shellval[1]
+fref  = shellval[2]
+name  = shellval[3]
+miter = shellval[4]
+lin_ref = shellval[5]
+
+prefix = fxyz.split('.')[0]
+if fkey == '': fkey = prefix + '.key'
+if fref == '': fref = prefix
+frefsplit = fref.split('.')
+if fref != 'hdf5' and frefsplit[-1] == 'hdf5': fref = ".".join(frefsplit[:-1])
+if name == '': name = prefix
+
+#  initialize a pydlpoly instance
+pd = pydlpoly.pydlpoly(name)
+pd.setup(xyz = fxyz, key = fkey, local=False)
+
+#  initialize the ric_fit objective
+ric = ric_fit.ric_fit(fragtor = False, absolute = True, lin_ref = lin_ref)
+
+#  initialize the ffgen, the first argument is the name of the hdf5 reference file
+#  the second one is the the pd instance, the third one the objective instance
+#  the last argument is the minimize flag
+ff = ff_gen.ff_gen(fref, pd, objective = ric, minimize = True)
+
+for e,x in enumerate(ff.initials):
+    assert x, "Position "+repr(e)+": initial guess cannot be "+repr(x)
+bounds = [[0.0, np.inf] if x > 0 else [-np.inf, 0.0] if x < 0 else [0.2, 0.2] for x in ff.initials]
+#  initialize an CMA-ES instance with an random guess and an initial stepsize of 0.2
+es = cma.CMAEvolutionStrategy(ff.random_guess(), 0.2, {'bounds': zip(*bounds), 'maxiter':miter})
+
+#  start the optimizer
+start = time.clock()
+es.optimize(ff.calc_objective,verb_disp=1)
+ende = time.clock()
+#  write the optimized key file
+ff.write_key(es.result()[0])
+print (ende-start)/60.0

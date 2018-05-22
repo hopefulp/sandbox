@@ -1,0 +1,94 @@
+#!/bin/tcsh
+set posfile = 'POSCAR'
+set potfile = 'POTCAR'
+
+if (-e $potfile) then
+	rm $potfile
+endif
+
+set line = `head -n 1 $posfile |xargs echo -n`
+foreach atom ($line)
+	if ($atom == 'Ag') then
+		set atomname = 'Ag'
+		else if ($atom == 'Au') then
+			set atomname = 'Au'
+		else if ($atom == 'Ba') then
+			set atomname = 'Ba_sv'
+		else if ($atom == 'Be') then
+			set atomname = 'Be_sv'
+		else if ($atom == 'Ca') then
+			set atomname = 'Ca_sv'
+		else if ($atom == 'Cd') then
+			set atomname = 'Cd'
+		else if ($atom == 'Co') then
+			set atomname = 'Co'
+		else if ($atom == 'Cr') then
+			set atomname = 'Cr_pv'
+		else if ($atom == 'Cs') then
+			set atomname = 'Cs_sv'
+		else if ($atom == 'Cu') then
+			set atomname = 'Cu_pv'
+		else if ($atom == 'Fe') then
+			set atomname = 'Fe_pv'
+		else if ($atom == 'Hf') then
+			set atomname = 'Hf_pv'
+		else if ($atom == 'Hg') then
+			set atomname = 'Hg'
+		else if ($atom == 'Ir') then
+			set atomname = 'Ir'
+		else if ($atom == 'K') then
+			set atomname = 'K_sv'
+		else if ($atom == 'Li') then
+			set atomname = 'Li_sv'
+		else if ($atom == 'Mg') then
+			set atomname = 'Mg_pv'
+		else if ($atom == 'Mn') then
+			set atomname = 'Mn_pv'
+		else if ($atom == 'Mo') then
+			set atomname = 'Mo_pv'
+		else if ($atom == 'Na') then
+			set atomname = 'Na_pv'
+		else if ($atom == 'Nb') then
+			set atomname = 'Nb_pv'
+		else if ($atom == 'Ni') then
+			set atomname = 'Ni_pv'
+		else if ($atom == 'Os') then
+			set atomname = 'Os_pv'
+		else if ($atom == 'Pd') then
+			set atomname = 'Pd'
+		else if ($atom == 'Pt') then
+			set atomname = 'Pt'
+		else if ($atom == 'Rb') then
+			set atomname = 'Rb_sv'
+		else if ($atom == 'Re') then
+			set atomname = 'Re_pv'
+		else if ($atom == 'Rh') then
+			set atomname = 'Rh_pv'
+		else if ($atom == 'Ru') then
+			set atomname = 'Ru_pv'
+		else if ($atom == 'Sc') then
+			set atomname = 'Sc_sv'
+		else if ($atom == 'Sr') then
+			set atomname = 'Sr_sv'
+		else if ($atom == 'Ta') then
+			set atomname = 'Ta_pv'
+		else if ($atom == 'Tc') then
+			set atomname = 'Tc_pv'
+		else if ($atom == 'Ti') then
+			set atomname = 'Ti_pv'
+		else if ($atom == 'V') then
+			set atomname = 'V_sv'
+		else if ($atom == 'W') then
+			set atomname = 'W_pv'
+		else if ($atom == 'Y') then
+			set atomname = 'Y_sv'
+		else if ($atom == 'Zn') then
+			set atomname = 'Zn'
+		else if ($atom == 'Zr') then
+			set atomname = 'Zr_sv'
+		else set atomname = $atom
+		endif
+	cat /qcfs/common/vasp-pp/potpaw_PBE/$atomname/POTCAR >> $potfile
+	echo $atomname
+	grep -i -e TITEL -e ENMAX -e EAUG /qcfs/common/vasp-pp/potpaw_PBE/$atomname/POTCAR
+end
