@@ -11,6 +11,6 @@ pyqchem         # QChem scripts
 pyvasp          # VASP scripts
 
 # python develop using git clone
-git clone joonho@chi.kaist.ac.kr:/Data/Repository/draw_qcmo_gs pydraw_qcmo_gl
+git clone joonho@chi.kaist.ac.kr:/Data/Repository/sandbox.git
 
 
