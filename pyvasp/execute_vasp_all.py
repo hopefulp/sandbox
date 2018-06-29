@@ -18,9 +18,6 @@ def allvasp():
 		if os.path.isfile('INCAR') and os.path.isfile('POSCAR') and not os.path.isfile('OUTCAR'):
 			os.system('csh /qcfs/jackjack5/vasp/vaspenv.sh')
 		os.chdir('..')
-	
-			
-		
 
 
 def main():

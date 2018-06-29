@@ -92,6 +92,11 @@ def main():
         if yes_or_no(q):
             q = 'input .pos file: '
             poscar = get_answers(q)
+            if not re.match(".pos", poscar):
+                dirname = poscar
+                poscar += ".pos"
+            else:
+                dirname = poscar[:-4]
             get_poscar(poscar)
         ### 3. get POTCAR
         q = 'will you make POTCAR? '
@@ -104,13 +109,15 @@ def main():
         ### 4. get KPOINTS
         q = 'will you make KPOINTS?'
         if yes_or_no(q):
-            q = 'input nummber of kpoints: '
+            q = 'input nummber of kpoints: [gamma|3 digits [method]]'
             kp = get_answers(q).split()
             if len(kp) == 4:
                 method = kp.pop(3)
             elif len(kp) == 3:
                 method = 'monk'
                 print 'default is MH'
+            elif len(kp) == 1:
+                method = 'gamma'
             print kp, method
             make_kpoints(kp, method)
         ### 5. get INCAR :: use make_incar.py
@@ -119,6 +126,16 @@ def main():
             q = 'give input incar-key file or use make_incar.py: '
             keyfile = get_answers(q)
             get_incar(keyfile)
+        q = 'will you make dir? '
+        if yes_or_no(q):
+            if not "dirname" in locals():
+                q = 'input dirname: '
+                dirname = get_answers(q)
+            if not os.path.isdir(dirname):
+                com1 = "mkdir " + dirname
+                os.system(com1)
+            com2 = "cp POSCAR POTCAR INCAR KPOINTS " + dirname
+            os.system(com2)
             
     else:
         ### 2. get POSCAR
