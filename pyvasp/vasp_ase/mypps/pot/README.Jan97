@@ -1,0 +1,132 @@
+mail from Georg Kresse, 16. Jan. 97
+
+Some PP have been changed recently :->
+--------------------------------------
+
+New files can be found on server in the files
+ ~vamp/pot/potcar.Jan97.tar
+ ~vamp/pot_GGA/potcar.Jan97.tar
+the data_base files 
+ ~vamp/pot/data_base
+ ~vamp/pot_GGA/data_base
+have been updated as well
+
+What has been done and why:
+---------------------------
+
+)  I had problems with the p-elements in the 4th row
+   (i.e Ga, Ge, As, Se, Br). The equilibrium volume
+   is approximately 3 % to large, because the 
+   f-component is not sufficiently well described 
+   (QUESTION: there are no f electrons in these materials,
+              what is all this nonsense about ?
+    ANSWER:   right, but there is a very small f-contribution
+              in the DOS !)
+
+   To fix this situation I had to choose the f-PP as
+   local PP and I had to include d-non-locality.
+   New PP can be found on the server.
+
+)  PP for In, Sn and Ga have been recalculated with more care.
+   For these elements one should describe the 
+   3d or 4d states as valence, corresponding PP can be found on
+   the server:
+       Ga_d, In_d, Sn_d
+   If one puts the 3d or 4d states in the core the results
+   depend strongly on the location of the position of the 
+   d-reference energy.
+   I have now adjusted the d-reference energy for the 
+   Ga In and Sn PP (with d in the core) so that the
+   equilibrium volume is within 1 % of the equilibrium volume
+   for the Ga_d, In_d and Sn_d PP.
+   This is clearly a fix, but nevertheless a better choice than
+   I had before.
+
+   PP for Pb are also available and have been constructed
+   in the same way (i.e. Pb_d and Pb).
+
+   Mind that PP including d are currently missing for Ge,
+   and for very accurate calculations such a PP might
+   be required. 
+
+)  In addition new PP including semi core states exist
+   for 
+       Y, Zr
+   The following PP are currently available with semi-core
+   state:
+       Y_pv, Zr_pv, Nb_pv, Mo_pv
+    
+   Further PP with semi-core states are planed for transition 
+   metals (especially for the 3d-transition metals Sc-Mn).
+
+)  Some PP are probably still not perfect:
+   Notably one would need PP with p-semi core states for 
+   K, Ca, Rb and Sr (and maybe also for Na and Li).
+   Especially in Zintl phases and ionic compounds the
+   current PP are propably not sufficiently accurate !
+   If you are planning such calculations please check
+   where the p-semicore states will be situated with
+   respect to the valence bands, if they are lying in
+   the valence band (or only slightly below) please contact
+   us.
+
+Georg Kresse
+
+***************************************************************************
+
+mail from Georg Kresse, Feb. 97
+
+The cohesion energies written out by vasp require a correction
+for the spinpolarization energies of the atoms.
+Mind that fact, if you do any publication !
+
+For the transition metals there is one additional problem:
+The cohesion energies written out by VASP are with respect to an "virtual"
+non spinpolarized pseudoatom having one s electron and n-1 d electrons, 
+this is NOT the experimental ground state configuration.
+
+The table below gives the required energy corrections (d(E)) for transition
+metals:
+i.e. it contains the difference between our "virtual" 
+non spinpolarized pseudoatom
+and a spin-polarized groundstate (GS) atom calculated with VASP.
+The calculations have been done consistently with VASP. 
+
+Mind that LDA/GGA is not able to predict the correct groundstate (line exp.)
+for all transition metals. This is NOT a failure of VASP but one
+of the LDA/GGA approximation. Only configuration interaction (CI)
+calculations are at the moment able to predict the groundstate
+of all transition metals correctly. 
+
+3d  |  Sc    |   Ti    |     V  |     Cr  |   Mn   |   Fe   |    Co  |   Ni
+    |        |         |        |         |        |        |        |
+exp.| 3d 4s2 | 3d2 4s2 | 3d3 4s2|  3d5 4s | 3d5 4s2| 3d6  s2| 3d7 4s2| 3d8 4s2
+conf|
+GS  | 3d 4s2 |  3d3 4s | 3d4 4s | 3d5 4s  | 3d5 4s2| 3d6.2  | 3d7.7  | 3d9 4s
+                                                     4s1.8    4s1.3
+d(E)|
+GGA |  1.78  |  2.24   |  3.77  |  5.87   |  5.62  |  3.15  |  1.43  |  0.55
+LDA |  1.73  |  1.99   |  3.38  |  5.30   |  5.02  |  2.82  |  1.28  |  0.49
+
+4d  |  Y     |   Zr    |   Nb   |   Mo    |   Tc   |   Ru   |   Rh   |   Pd
+    |        |         |        |         |        |        |        |
+exp.| 4d 5s2 | 4d2 5s2 | 4d4 5s | 4d5 5s  | 4d5 5s2| 4d7 5s | 4d8 5s | 4d10
+conf|
+GS  | 4d 5s2 | 4d3 5s  | 4d4 5s | 4d5 5s  | 4d5 5s2| 4d7 5s | 4d8 5s | 4d10
+d(E)|
+GGA |  1.91  | 1.91    |  3.08  |  4.61   |  3.06  |  1.96  |  1.06  |  1.51
+LDA |  1.90  | 1.66    |  2.70  |  4.09   |  2.73  |  1.74  |  0.94  |  1.46
+
+
+5d  |        |  Hf     |  Ta    |   W     |   Re   |   Os   |   Ir   |  Pt
+    |        |         |        |         |        |        |        |
+exp.|        | 5d2 6s2 |5d3 6s2 | 5d4 6s2 |5d5 6s2 | 5d6 6s2|  5d9   | 5d9 6s
+conf|
+GS  |        | 5d2 6s2 |5d3 6s2 | 5d5 6s  |5d5 6s2 | 5d6 6s2| 5d8 6s1| 5d9 6s
+d(E)|
+GGA |        |  3.05   | 3.24   |  4.53   |  4.42  |  2.53  |  0.87  |  0.48
+LDA |        |  2.98   | 3.10   |  4.00   |  4.07  |  2.33  |  0.92  |  0.41
+
+Georg Kresse
+
+*****************************************************************************

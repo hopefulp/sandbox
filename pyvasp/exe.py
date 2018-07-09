@@ -1,4 +1,4 @@
-#!//home/jackjack5/epd/bin/python
+#!/usr/bin/python
 
 import os
 import argparse

@@ -1,0 +1,62 @@
+Dear all,
+
+Some PP have been installed and/or updated on the server and
+can be found in
+
+~vamp/pot/potcar.Jul97.tar
+~vamp/pot_GGA/potcar.Jul97.tar
+
+data_base files were also updated
+(~vamp/pot/data_base).
+
+1) H_soft:
+   A very soft H-PP to saturate dangling bonds in systems
+   with soft species.
+   Dimer length with this PP in H_2 is 2 % overestimated,
+   vibrational frequencies are wrong by 5 %.
+   (This is not absolutely dreadfull).
+   Use this PP to sature bonds for instance in Si.
+
+2) Li_h Na_h Mg_h Al_h Si_h: 
+   "Hard" NC-PP for these elements.
+   Should be used for accurate calculations in oxides, and
+   if one has problems with standard PP.
+   (The US Li-PP for instance gives sometimes ghoststates in
+    ionic systems, Li_h seems to saver !!)
+
+3)  Na_pv, Mg_pv K_pv Ca_pv Rb_pv Cs_pv:
+    PP that treat the next lower shell of p electrons
+    as valence electrons.
+    All PP have a small core radii and should be used
+    in ionic materials/oxides etc.
+    (To some people I have distributed prereleases of these PP
+     around the end of June/July. The PP in this release are
+     identical to those prereleased PP).
+
+4)  Cs:
+    The old PP was absolute garbage, and there is a new version
+    (for most applications one must use Cs_pv anyway).
+
+5)  Sc_pv Ti_pv V_pv:
+    PP with 3p states treated as valence orbitals
+    should/could be used for oxides etc.
+    But probably this will not change results very much.
+
+
+
+                                                   Georg Kresse
+
+
+
+
+
+-- 
+
+ V   V   AAA   SSSS PPPP      Institut fuer Theoretische Physik
+ V   V  A   A S     P   P     TU-Wien, Wiedner Hauptstr. 8-10/136
+ V   V  AAAAA  SSS  PPPP      A-1040 Vienna, AUSTRIA
+  V V   A   A     S P         email: vaspmaster@tph.tuwien.ac.at
+   V    A   A SSSS  P         www: html://tph.tuwien.ac.at/~vasp/
+
+... happy vasping to everyone!
+

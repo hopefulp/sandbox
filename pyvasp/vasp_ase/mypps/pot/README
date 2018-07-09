@@ -1,0 +1,32 @@
+Dear all,
+
+The PP data base has been updated after a long time.
+The changes are generally rather small, and mostly
+pseudopotentials treating semicore p-states
+(i.e. 3p in K, Ca, Sc, Ti
+      4p in Rb, Sr ...) have been finetuned.
+The updated potentials are:
+ Li_pv
+ Na_pv  Mg_pv
+        Ca_pv       V_pv
+ Rb_pv  Sr_pv
+        Ba_pv
+
+In addition the following PPs were added:
+ Bi_d Tl_d
+They treat the 5d states as valence states.
+
+The O_s pseudopotential includes now partial core
+corrections, since the old version caused negative
+charge densities in the core region, which in turn
+caused problems in the evaluation of the exchange
+correlation potential.
+
+Two new pseudopotentials for the saturation of dangling
+bonds on III-V semiconductor surfaces were added:
+ H.75 and H1.25.
+They have a core and valence charge of 0.75 and 1.25 electrons.
+
+
+                                Georg
+

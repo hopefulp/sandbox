@@ -1,4 +1,4 @@
-#!/home/jackjack5/epd/bin/python
+#!/usr/bin/python
 
 # 26Apr2017 developed by joonho
 from __future__ import print_function

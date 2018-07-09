@@ -1,0 +1,84 @@
+#!/bin/tcsh
+#PBS -N Aceton-rp-band
+#PBS -l nodes=1:ppn=16
+#PBS -q dque
+#PBS -l walltime=120:00:00
+#PBS -e ./pbsvasp.err
+#PBS -o ./pbsvasp.out
+
+set NPROC 	= `wc -l < $PBS_NODEFILE`
+set jobname	= $PBS_JOBNAME
+set wdir	=	$jobname
+set log_dir	= $PBS_O_WORKDIR
+set log_file	= $log_dir/${PBS_JOBID}_$jobname
+
+set MPI 	= "/opt/mpi/intel-12.1.6/openmpi-1.6.3/bin/mpirun -np $NPROC -hostfile $PBS_NODEFILE"
+#set EXEC	= "/opt/applic/vasp/bin/vasp-5.3.5-xe11-static-openmpi-1.6.3-gamma"
+set EXEC	= "/opt/applic/vasp/bin/vasp-5.3.5-xe11-static-openmpi-1.6.3-full"
+#set EXEC= # for V_run.sh
+setenv LD_LIBRARY_PATH /opt/intel/composer_xe_2011_sp1.13.367/compiler/lib/intel64:/opt/intel/composer_xe_2011_sp1.13.367/mkl/lib/intel64:/opt/mpi/intel-12.1.6/openmpi-1.6.3/lib:$LD_LIBRARY_PATH
+
+if ( ! -d "$PBS_O_WORKDIR/$wdir" ) then
+    echo "There is not $jobname directory" >> $log_file
+    exit
+endif
+
+echo $jobname > $log_file
+echo $PBS_NODEFILE >> $log_file
+cat $PBS_NODEFILE >> $log_file
+echo start >> $log_file
+date >> $log_file
+
+
+if ( -z "$EXEC" ) then
+    echo "EXEC is not defined" >> $log_file 	# blank|tap is working for -zero
+    exit
+endif
+
+cd $PBS_O_WORKDIR/$wdir
+
+#if grep 'POTIM = 0.3' INCAR ; then
+#    sed -i 's/POTIM = 0.3/POTIM = 0.1/' INCAR
+#fi
+
+$MPI $EXEC > $log_dir/$jobname.log
+mv $PBS_O_WORKDIR/$PBS_JOBNAME.log $PBS_O_WORKDIR/$PBS_JOBNAME.out
+echo end >> $log_file
+date >> $log_file
+
+### for no-cell relaxation, this part is skipped
+grep 'ISIF = 3' INCAR | grep -v "#"
+if ( ! $? ) then
+
+    set i = 1
+    set gr = `grep E0 OSZICAR |wc -l`
+    while ( $gr != 1 )
+	cp POSCAR ${i}POSCAR
+        cp XDATCAR ${i}XDATCAR
+        cp OUTCAR ${i}OUTCAR
+	cp INCAR  ${i}INCAR
+        #cp CHGCAR ${i}CHGCAR
+        cp CONTCAR POSCAR
+	grep 'ISTART = 0' INCAR
+	if ( ! $? )  then
+	    sed -i 's/ISTART = 0/ISTART = 1/' INCAR
+	endif
+	grep 'ICHARG = 2' INCAR
+	if ( ! $? ) then
+	    sed -i 's/ICHARG = 2/ICHARG = 0/' INCAR
+	endif
+	cp $PBS_O_WORKDIR/$PBS_JOBNAME.out ${i}$PBS_JOBNAME.out
+	@ i = $i + 1 
+
+	echo start >> $log_file
+	$MPI $EXEC > $log_dir/$jobname.log
+	mv $PBS_O_WORKDIR/$PBS_JOBNAME.log $PBS_O_WORKDIR/$PBS_JOBNAME.out
+	echo end >> $log_file
+	date >> $log_file
+        set gr = `grep E0 OSZICAR |wc -l`
+    end	
+endif
+
+mv $PBS_O_WORKDIR/$PBS_JOBNAME.log $PBS_O_WORKDIR/$PBS_JOBNAME.out
+    
+

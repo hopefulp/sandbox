@@ -1,11 +1,7 @@
-#!/home/jackjack5/epd/bin/python
-
+#!/usr/bin/python
 
 import argparse
 import os
-
-
-
 
 def vasp_jobs(dirs):
 	host = os.getenv('HOST')
