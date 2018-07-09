@@ -37,23 +37,26 @@ def get_vasp_repository():
     return ini_dvasp
 
 def make_kpoints(kp, method):
-    """ Make KPOINTS file from """
+    """ Make KPOINTS file 
+        only Gamma w. 1 1 1 and MH are adapted"""
     fname = 'KPOINTS'
     f = open(fname, 'w')
 
-    if 'method' not in locals():
-        method = "MH"
-
-    f.write("Monkhorst Pack\n")                 # 1st line
-    f.write("0\n")                              # 2nd line
-    if re.match("M", method, re.IGNORECASE):
-        f.write("Monkhosrt\n")                  # 3rd line
+    f.write("Automatic Mesh\n")                 # 1st line, description
+    f.write("0\n")                              # 2nd line, number of K, 0 for automatic
+    
+    if re.match("g", method, re.IGNORECASE):    # 3rd line, Auto - gamma-centered MH Pack
+        f.write("Gamma\n")                      #   gamma 
     else:
-        f.write("Gamma\n")
-    if len(kp) == 3:
+        f.write("Monkhosrt\n")                  #   MH
+    if len(kp) == 3:                            # kp input as "1 1 1"
         l = "  ".join(kp) + "\n"                # 4th liine
-        f.write(l)  
-    add = "000"                                 # 5th line
+        f.write(l)                              #
+    else:
+        kp_l = kp + "\n"
+        f.write(kp_l)
+
+    add = "000"                                 # 5th for shift of kp's
     l = "  ".join(add) + "\n"
     f.write(l)
     f.close()        

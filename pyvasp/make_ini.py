@@ -28,9 +28,6 @@ def get_poscar(poscar):
         exit(21)
             
     return 0    
-def get_answers(question):
-    reply = str(raw_input(question)).strip()
-    return reply
 
 def get_potcar(pot,atoms):
     potfiles=[]
@@ -109,17 +106,22 @@ def main():
         ### 4. get KPOINTS
         q = 'will you make KPOINTS?'
         if yes_or_no(q):
-            q = 'input nummber of kpoints: [gamma|3 digits [method]]'
-            kp = get_answers(q).split()
-            if len(kp) == 4:
-                method = kp.pop(3)
-            elif len(kp) == 3:
-                method = 'monk'
-                print 'default is MH'
-            elif len(kp) == 1:
-                method = 'gamma'
-            print kp, method
-            make_kpoints(kp, method)
+            q = 'input nummber of kpoints: [gamma|3 digits]'
+            kp_in = get_answers(q)
+            if re.match("g", kp_in, re.IGNORECASE) :
+                method = "gamma"
+                kps = "1  1  1"
+            else:
+                lkp = kp_in.split()
+                if len(lkp) == 3:
+                    method = 'MH'
+                    kps = kp_in
+                    print 'default is MH'
+                else:
+                    print "input error for KPOINTS"
+                    exit(11)
+            print kps, method
+            make_kpoints(kps, method)
         ### 5. get INCAR :: use make_incar.py
         q = 'will you make INCAR? '
         if yes_or_no(q):

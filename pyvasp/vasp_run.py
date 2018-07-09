@@ -24,7 +24,8 @@ def vasp_jobs(dirs):
                 os.system('csh /qcfs/jackjack5/vasp/vaspenv.sh')
             os.chdir('..')
     else:
-        
+        for dir in dirs:
+            if host == "" or host not in PPNs.keys():
 
 
 def main():

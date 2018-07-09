@@ -19,6 +19,12 @@ def yes_or_no(question):
     else:
         return False
 
+def get_answers(question):
+    reply = str(raw_input(question)).strip()
+    #print reply
+    return reply
+
+
 def get_files_pattern(m_type, pattern, dir):
     if m_type == 'p':
         f_list = get_files_prefix(pattern, dir)
