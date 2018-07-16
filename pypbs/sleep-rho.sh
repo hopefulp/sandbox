@@ -1,6 +1,6 @@
 #PBS -l walltime=100:00:00
 #PBS -l nodes=rho13:ppn=1
-#PBS -N qchem_n13
+#PBS -N test05
 
 #!/bin/tcsh
 

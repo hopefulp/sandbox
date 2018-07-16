@@ -28,7 +28,7 @@ def get_vasp_repository():
     if hostname == 'chi':
         ini_dvasp = '/Data/Bkaist/VaspINI'
     else:
-        ini_dvasp = '/qcfs/joonho/VaspINI'
+        ini_dvasp = '/qcfs/joonho/sandbox/pyvasp/VaspINI'
 
     print "vasp repository is ", ini_dvasp, ' in system ', hostname
     if not os.access(ini_dvasp, os.F_OK):

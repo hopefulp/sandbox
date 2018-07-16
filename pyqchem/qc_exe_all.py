@@ -6,7 +6,7 @@ import argparse
 import os
 import re
 import sys
-from Machine import *       # PPNs, PBS_QChem_scripts
+from Env_msg import *       # PPNs, PBS_QChem_scripts
 from common import *
 
 rem_files=[]
