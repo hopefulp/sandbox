@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N CO2n
+#PBS -N 
 #PBS -l nodes=1:ppn=16
 #PBS -q dque
 #PBS -l walltime=120:00:00
@@ -12,12 +12,11 @@ wdir=$jobname
 log_dir=$PBS_O_WORKDIR
 log_file=$log_dir/${PBS_JOBID}_$jobname
 
-MPI="/opt/mpi/intel-12.1.6/openmpi-1.6.3/bin/mpirun -np $NPROC -hostfile $PBS_NODEFILE"
-EXEC="/opt/applic/vasp/bin/vasp-5.3.3-xe11-static-openmpi-1.6.3-gamma"
-#EXEC="/opt/applic/vasp/bin/vasp-5.3.3-xe11-static-openmpi-1.6.3-half"
-#EXEC="/opt/applic/vasp/bin/vasp-5.3.3-xe11-static-openmpi-1.6.3-full"
+#MPI="/opt/mpi/intel-12.1.6/openmpi-1.6.3/bin/mpirun -np $NPROC -hostfile $PBS_NODEFILE"
+MPI="/opt/intel/compilers_and_libraries_2017.1.132/linux/mpi/intel64/bin/mpirun -n $NPROC -machinefile $PBS_NODEFILE"
+EXEC="/opt/applic/vasp/bin/vasp_std"
 #EXEC= # for V_run.sh
-export LD_LIBRARY_PATH=/opt/intel/composer_xe_2011_sp1.13.367/compiler/lib/intel64:/opt/intel/composer_xe_2011_sp1.13.367/mkl/lib/intel64:/opt/mpi/intel-12.1.6/openmpi-1.6.3/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/opt/intel/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2017.1.132/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2017.1.132/linux/mpi/intel64/lib:$LD_LIBRARY_PATH
 
 if [ ! -d "$PBS_O_WORKDIR/$wdir"]; then
     echo "There is not $jobname directory" >> $log_file

@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N Znbp-MEDA6SS-abs
+#PBS -N 
 #PBS -l nodes=1:ppn=12
 #PBS -q dque
 #PBS -l walltime=480:00:00
