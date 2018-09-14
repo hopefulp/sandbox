@@ -12,11 +12,9 @@ wdir=$jobname
 log_dir=$PBS_O_WORKDIR
 log_file=$log_dir/${PBS_JOBID}_$jobname
 
-MPI="/opt/intel/Compiler/composer_xe_2011_sp1.13.367/mpi/openmpi-1.6.3/bin/mpirun -np $NPROC -hostfile $PBS_NODEFILE"
-#EXEC="/opt/applic/vasp/bin/vasp-5.3.3-xe11-static-openmpi-1.6.3-gamma"
-#EXEC="/opt/applic/vasp/bin/vasp-5.3.3-xe11-static-openmpi-1.6.3-full"
-EXEC="/opt/applic/vasp/bin/vasp-5.3.3-xe11-static-openmpi-1.6.3-half"
-export LD_LIBRARY_PATH=/opt/intel/Compiler/composer_xe_2011_sp1.13.367/compiler/lib/intel64:/opt/intel/Compiler/composer_xe_2011_sp1.13.367/mkl/lib/intel64:/opt/intel/Compiler/composer_xe_2011_sp1.13.367/mpi/openmpi-1.6.3/lib:$LD_LIBRARY_PATH
+MPI="/opt/intel/impi/5.0.3.049/intel64/bin/mpirun -n $NPROC -machinefile $PBS_NODEFILE"
+EXEC="/opt/applic/vasp/bin/vasp-std"
+export LD_LIBRARY_PATH=/opt/intel/composer_xe_2013_sp1.2.144/compiler/lib/intel64:/opt/intel/composer_xe_2013_sp1.2.144/mkl/lib/intel64:/opt/intel/impi/5.0.3.049/intel64/lib:$LD_LIBRARY_PATH
 
 if [ ! -d "$PBS_O_WORKDIR/$wdir"]; then
     echo "There is not $jobname directory" >> $log_file
