@@ -1,0 +1,13 @@
+alias gom "cd $HOME/MOF-MC"
+alias goe "cd $HOME/exe-py"
+alias gow "cd /sharewin"
+alias gor "cd /sharewin/Research"
+alias gok "cd /sharewin/Res_KCRC"
+alias gon "cd /sharewin/Res_NRF"
+alias gos "cd $HOME/scripts"
+
+alias psi "ssh -Y $USER@psi.kaist.ac.kr"
+alias rho "ssh -Y $USER@rho.kaist.ac.kr"
+alias kdft "ssh -Y $USER@kdft.kaist.ac.kr"
+alias idft "ssh -Y $USER@idft.kaist.ac.kr"
+alias cerius "ssh -Y youhwa@cerius.kaist.ac.kr"
