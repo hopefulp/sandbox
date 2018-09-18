@@ -1,0 +1,20 @@
+########  dos_dir.sh
+#!/bin/bash
+
+dir="../vasp_dos/"
+
+for x in `cat dos.dir`
+    do
+#       y=`echo $x | sed "s/_done_dos/_anal/"`
+        y=`echo $x | sed "s/_done_dos//" | sed "s/cpo/CONT_cpo/"`
+
+#       mkdir $y
+#       z=DOS$y
+#       mv $y $z
+#       cp $dir$x/AE* $dir$x/DOS* $dir$x/EIG* $z
+
+        cp $dir$x/CONTCAR STRUCT/$y
+#       echo $z
+        echo $y
+    done
+

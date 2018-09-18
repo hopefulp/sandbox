@@ -1,0 +1,82 @@
+#!/bin/tcsh
+
+set job_list = ( bader bader2 convasp dos bchg end )
+set vbin = /qcfs/joonho/binvasp
+
+if ( $#argv < 2 ) then
+    echo "Usage:: $0 job_name dir_name"
+    echo "Job_name:: bader bader2 convasp dos bchg end"
+    exit
+endif
+
+set job = $1
+echo ${job_list[*]}
+if ( "${job_list[*]}" =~ "$job" ) then
+    echo "yes" 
+else
+    echo "no"
+endif
+
+exit
+
+#for dir in $@
+#    do
+#    	echo $dir
+#    done
+#exit
+
+#for dir in  $@
+for dir in  $@
+    do
+	
+      case $job in
+	"${job_list[0]}")
+	    echo "cd $dir"
+	    cd $dir
+	    	chgsum.pl AECCAR0 AECCAR2
+		bader CHGCAR -ref CHGCAR_sum
+		cd ..
+	    ;;
+	"${job_list[1]}")
+	    $vbin/vasp_chgcar_del.pl $dir
+	    echo "cd $dir"
+	    cd $dir
+		if [ -f "ACF2.dat" ]; then
+		    echo "Already there is ACF2.dat !"
+		elif [ -e "AECCAR2" ]; then
+		    chgsum.pl AECCAR0 AECCAR2
+	 	    chgsplit.sh CHGCAR
+	 	    bader cf1 -ref CHGCAR_sum
+	 	    mv ACF.dat ACF1.dat
+	 	    mv AVF.dat AVF1.dat
+	 	    mv BCF.dat BCF1.dat
+	 	    bader cf2 -ref CHGCAR_sum
+	 	    mv ACF.dat ACF2.dat
+	 	    mv AVF.dat AVF2.dat
+	 	    mv BCF.dat BCF2.dat
+	 	    cd ..
+		else
+		    echo "Error:: There is not AECCAR2"
+		fi
+	    ;;
+	"${job_list[2]}")
+	    echo "cd $dir"
+	    cd $dir
+		convasp -chgint CHGCAR > x.chg &
+		cd ..
+	    ;;
+	"${job_list[3]}")
+	    cd $w_dir
+	  	../dosall.pl .
+		cd .. 
+	    ;;
+	"${job_list[4]}")
+	    more $w_dir/ACF.dat | awk '{ print $5 }'
+	    ;;	
+	*)
+	    echo "the keyword should be one of \" ${job_list[@]} \" "
+                echo "present setting is no-job in $@ "
+                exit
+                ;;
+      esac
+    done
