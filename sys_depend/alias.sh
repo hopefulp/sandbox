@@ -55,8 +55,8 @@ alias goqc="cd $QC"
 alias goqch="cd $QCHOME"
 alias goqce="cd $QC_EXT_LIBS"
 
-alias gosand="cd $HOME/sandbox"
-alias goc="cd $HOME/sandbox/pycommon"
+alias gosand="cd $HOME/sandbox_gl"
+alias goc="cd $HOME/sandbox_gl/pycommon"
 alias gomod="cd $HOME/privatemodules"
 alias gogro="cd $GHOME"
 
