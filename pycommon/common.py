@@ -3,6 +3,7 @@
     yes_or_no(question) : to obtain y/n for next command
     get_files_prefix(list_prefix, directory) : returns list
     get_files_suffix(list_suffix, directory) : returns list
+    fname_decom(fname): returns prefix, extension
 """
 
 import re
@@ -97,4 +98,10 @@ def get_files_exclude(matches, dir):
         all_files.remove(file)
     return all_files
 
+def fname_decom(fname):
+    lname = fname.split('.')
+    if not len(lname) == 2:
+        print("Error: %s has more than 1 dot in file name" % fname)
+        exit(1)
+    return lname[0], lname[1]        
                 
