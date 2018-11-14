@@ -14,7 +14,8 @@ def whereami():
     return inspect.stack()[1][3]
 
 def yes_or_no(question):
-    reply = str(raw_input(question+' (y/n): ')).lower().strip()
+    #reply = str(raw_input(question+' (y/n): ')).lower().strip()
+    reply = str(input(question+' (y/n): ')).lower().strip()     # raw_input is renamed in v3.6
     if re.match('y', reply):
         return True
     else:

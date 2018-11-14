@@ -1,11 +1,7 @@
 #!/usr/bin/python
 
-
 import argparse
 import os
-
-
-
 
 def allvasp():
 	host = os.getenv('HOST')
