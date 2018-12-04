@@ -1,1 +1,0 @@
-sed -i -e '/^$ricore/d' -e 's/$rij/$esp_fit kollman/g' -e '/^$jbas/d' -e 's/$marij/$noproj/g'  control

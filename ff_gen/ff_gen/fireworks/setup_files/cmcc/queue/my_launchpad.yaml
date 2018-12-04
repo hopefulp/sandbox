@@ -1,7 +1,0 @@
-host: 134.147.45.7
-port: 27017
-name: fireworks
-username: null
-password: null
-logdir: null
-strm_lvl: INFO

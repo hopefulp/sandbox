@@ -1,8 +1,0 @@
-#! /bin/bash -f
-
-make mode=shlib mpi
-cd ../python
-sudo python install.py /usr/local/lib/python2.7/dist-packages/
-cd ../src
-
-
