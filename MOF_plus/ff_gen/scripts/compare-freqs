@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+import pydlpoly
+import hessutils
+import molsys.stow as stow
+import ff_gen.IOmod as IOmod
+import ff_gen.refclass as refclass
+import os
+import string
+
+# combine with initial
+
+def get_ref():
+    IO = IOmod.io()
+    IO.read_tinker_xyz(fxyz)
+    refdat = [IO.xyz, IO.elements]
+    ref = refclass.refclass(refname = fref, refdata = refdat)
+    refhess = hessutils.hessutils(IO.xyz, ref('hessian'), IO.elements) 
+    wn, evec = refhess.calc_eigenvalues()
+    refhess.write_molden_input('ref.freq')
+    return wn
+
+def get_ff():
+    pd = pydlpoly.pydlpoly(name)
+    pd.setup(xyz = fxyz, key = fkey, local = True)
+    pd.MIN_lbfgs(0.01)
+    hess = hessutils.hessian(pd)
+    ffhess = hessutils.hessutils(pd.get_xyz(), hess(), pd.get_elements())
+    wn, evec = ffhess.calc_eigenvalues()
+    ffhess.write_molden_input("ff.freq")
+    pd.end()
+    os.remove(name+'.pdlp')
+    return wn
+
+
+def main():
+    freqs_ref = get_ref()
+    freqs_ff = get_ff()
+    plt.clf()
+    plt.plot(freqs_ref,freqs_ff,linestyle='none',marker='o')
+    xmin = np.amin([np.amin(freqs_ref),np.amin(freqs_ff)])*0.9
+    xmax = np.amax([np.amax(freqs_ref),np.amax(freqs_ff)])*1.1
+    plt.plot([xmin,xmax],[xmin,xmax])
+    plt.xlabel("Ab initio frequency [cm$^{-1}$]")
+    plt.ylabel("Force-field frequency [cm$^{-1}$]")
+    plt.savefig('vib_scatter.png')
+
+
+if __name__=='__main__':
+    
+    option = [
+            ['', 'c', 'txyzfile'],
+            ['', 'k', 'keyfile'],
+            ['', 'r', 'reffile'],
+            ['', 'n', 'name']]
+
+    shellval = stow.main(stow.sys.argv[1:], option)
+
+    fxyz  = shellval[0]
+    fkey  = shellval[1]
+    fref  = shellval[2]
+    name  = shellval[3]
+
+    prefix = fxyz.split('.')[0]
+    if fkey == '': fkey = prefix + '.key'
+    if fref == '': fref = prefix
+    frefsplit = fref.split('.')
+    if fref != 'hdf5' and frefsplit[-1] == 'hdf5': fref = ".".join(frefsplit[:-1])
+    if name == '': name = prefix
+    main()

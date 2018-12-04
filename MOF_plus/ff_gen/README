@@ -1,0 +1,23 @@
+Hi user,
+
+you have to put the following stuff in your bashrc:
+
+export PATH=/home/username/sandbox/ff_gen/scripts:$PATH
+export PYTHONPATH=/home/username/sandbox/ff_gen/objectives:$PYTHONPATH
+export PYTHONPATH=/home/username/sandbox/ff_gen:$PYTHONPATH
+
+Of course you have to have an up to date Pydlpoly version loaded
+
+you have to go into the pikaia directory and compile it by typing
+
+>>> make
+
+you have to go into the ric directory and compile it by typing
+
+>>> make
+
+Have fun!
+
+P.S.: If you have questions, feel free to write an email to
+
+johannes.duerholt@rub.de

@@ -1,0 +1,166 @@
+#!/bin/sh
+# @(#) t2x transforms the coordinates from the control file to the XYZ format
+#
+# t2x from 15.04.1996 Ver. 1.0
+# originally written by Marco(?)
+#
+
+[ "$1" = "-h" -o "$1" = "-?" -o "$1" = "-help" ] && { 
+    echo "USAGE: t2x {option} [input file] [ > output_file ]"
+    echo "Purpose: convert TURBOMOLE coordinates into the common XYZ format."
+    echo "Options: -c[oord] : extract only actual coordinates "
+    echo "         -h[elp]  : show this help "
+    echo "         -v[ibro] : convert screwer output into jmol input"
+    echo "         -p[oints]: include point charges if present"
+    exit 0 ; }
+
+# take care of decimal points
+LANG="C"
+LC_ALL="C"
+LC_CTYPE="C"
+
+GRAD_OPT="true"
+VIB_OPT="true"
+PC_OPT="true"
+PPC_OPT="true"
+
+# set system-name
+if [ -x "${TURBODIR}/scripts/sysname" ]; then
+    TARCHDIR="`${TURBODIR}/scripts/sysname`"
+else
+    TARCHDIR="`sysname`"
+fi
+
+# set $SHOWDG if possible
+if [ -x "$TURBODIR/bin/${TARCHDIR}/sdg" ]; then
+    SHOWDG="$TURBODIR/bin/${TARCHDIR}/sdg"
+elif [ -x "`which sdg`" ]; then
+    SHOWDG="sdg"
+fi
+
+# check if coord file is given explicitly
+CRDFIL=""
+
+if [ -f "$1" ]; then
+    CRDFIL=$1
+fi
+if [ -f "$2" ]; then
+    CRDFIL=$2
+fi
+
+if [ -f "$CRDFIL" ]; then
+    SDG_OPT="-s $CRDFIL -c"
+    GRAD_OPT="false"
+    VIB_OPT="false"
+    PC_OPT="false"
+    PPC_OPT="false"
+    echo "Taking coordinates from file:  $CRDFIL" >&2
+
+# look for a control file
+elif [ -f "control" ]; then
+    SDG_OPT="-c"
+    if [ -n "`$SHOWDG $SDG_OPT grad 2>&1 | grep -i 'data group .* not found'`" ]; then
+	GRAD_OPT="false"
+    fi
+    if [ -n "`$SHOWDG $SDG_OPT vibrated 2>&1 | grep -i 'data group .* not found'`" ]; then
+	VIB_OPT="false"
+    fi
+    if [ -n "`$SHOWDG $SDG_OPT point_charges 2>&1 | grep -i 'data group .* not found'`" ]; then
+	PC_OPT="false"
+    fi
+    if [ -n "`$SHOWDG $SDG_OPT periodic_point_charges 2>&1 | grep -i 'data group .* not found'`" ]; then
+	PPC_OPT="false"
+    fi
+
+else
+    SDG_OPT="-s coord -c"
+    GRAD_OPT="false"
+    VIB_OPT="false"
+    PC_OPT="false"
+    PPC_OPT="false"
+    echo "No control file found. Trying to use coord file." >&2
+fi
+
+# check if options make sense
+if [ "$1" = "-v" -o "$1" = "-vibro" ]; then
+    shift
+    if [ "$VIB_OPT" = "false" ]; then
+	echo "No molecule vibration data found. Omitting option -vibrio." >&2
+    fi
+else
+    VIB_OPT="false"
+    if [ "$1" = "-coord" -o "$1" = "-c" ]; then
+        shift
+	GRAD_OPT="false"
+    else
+	if [ "$GRAD_OPT" = "false" ]; then
+	    echo "No structure optimization data found." >&2
+	    echo "Only coord data will be converted." >&2
+	fi
+    fi
+fi
+
+if [ "$1" = "-points" -o "$1" = "-p" ]; then
+  if [ "$PPC_OPT" = "true" ]; then
+    npcharges=`$SHOWDG $SDG_OPT periodic_point_charges | tail -n +2 | wc -l | awk '{print $1}'`
+    PC_OPT="false"
+  else
+    npcharges=`$SHOWDG $SDG_OPT point_charges | tail -n +2 | wc -l | awk '{print $1}'`
+    PPC_OPT="false"
+  fi
+else
+  npcharges=0
+  PC_OPT="false"
+  PPC_OPT="false"
+fi
+
+if [ "$VIB_OPT" = "true" ]; then
+    natoms=`$SHOWDG $SDG_OPT coord|tail -n +2|wc -l|awk '{print$1}'`
+    $SHOWDG $SDG_OPT vibrated|tail -n +2|awk '\
+        BEGIN {bohr=.52917720859; f=25}
+        /cycle/ {printf ("%d\n Energy = \n",n); next}
+        NF==4 || NF==5 {printf ("%-2s %12.7f %12.7f %12.7f %5.2f\n", \
+        toupper(substr($4,1,1))substr($4,2), $1*bohr,$2*bohr,$3*bohr,0)}
+' n=$natoms
+elif [ "$GRAD_OPT" = "true" ]; then
+	natoms=`$SHOWDG $SDG_OPT coord|tail -n +2|wc -l|awk '{print$1}'`
+	$SHOWDG $SDG_OPT grad|tail -n +2|awk '\
+        BEGIN {bohr=.52917706; f=25}
+        /cycle/ {printf ("%d\n Energy = %18.10f\n",n,$(NF-3)); i=0; j=0;  next}
+        NF==4 || NF==5 {a[i++]=sprintf ("%2s %12.7f %12.7f %12.7f %5.2f", \
+              toupper(substr($4,1,1))substr($4,2), \
+              $1*bohr,$2*bohr,$3*bohr,0)}
+        NF==3 {for (s=1; s<=NF; s++) sub("D","E",$s); \
+        printf ("%s %12.7f %12.7f %12.7f\n",a[j++],-$1*f,-$2*f,-$3*f)}
+' n=$natoms
+else
+    # Lesen aus control oder coord
+    if [ -n "`$SHOWDG $SDG_OPT coord 2>&1 | grep -i 'data group .* not found'`" ]; then
+	echo "Sorry, there is no coord- or control-file!" >&2
+	exit 1;
+    fi
+    natoms=`$SHOWDG $SDG_OPT coord |tail -n +2|wc -l|awk '{print$1}'`
+    ncenters=`expr $natoms \+ $npcharges` 
+    echo $ncenters
+    if [ -z "`$SHOWDG $SDG_OPT energy 2>&1 | grep -i 'data group .* not found'`" ]; then
+	echo Energy = `$SHOWDG $SDG_OPT energy | tail -n 1 | awk '{print$2}'`
+    else
+	echo Energy =
+    fi
+    $SHOWDG $SDG_OPT coord | tail -n +2 | awk '\
+        BEGIN {bohr=.52917706; f=25}
+        {printf ("%-2s %12.7f %12.7f %12.7f \n", \
+        toupper(substr($4,1,1))substr($4,2),$1*bohr,$2*bohr,$3*bohr)}'
+      # BEGIN {bohr=.52917706}
+      # {printf ("%2s %12.7f %12.7f %12.7f \n",toupper($4),$1*bohr,$2*bohr,$3*bohr)}
+    if [ "$PPC_OPT" = "true" ]; then
+      sdg $SDG_OPT periodic_point_charges | tail -n +2 | awk '\
+        BEGIN {bohr=.52917706; f=25}
+        {printf (" X %12.7f %12.7f %12.7f \n",$1*bohr,$2*bohr,$3*bohr)}'
+    fi
+    if [ "$PC_OPT" = "true" ]; then
+      $SHOWDG $SDG_OPT point_charges | tail -n +2 | awk '\
+        BEGIN {bohr=.52917706; f=25}
+        {printf (" X %12.7f %12.7f %12.7f \n",$1*bohr,$2*bohr,$3*bohr)}'
+    fi
+fi

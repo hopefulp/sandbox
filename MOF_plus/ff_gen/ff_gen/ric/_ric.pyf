@@ -1,0 +1,59 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module _ric ! in 
+    interface  ! in :_ric
+        module red_int_coords ! in :_ric:ric.f90
+            use ric_out_bends
+            use ric_stretches
+            use ric_in_bends
+            use ric_eckart
+            use ric_lin_bends
+            use ric_torsions
+            integer, allocatable,dimension(:,:) :: ric_def_lin_bends
+            integer, allocatable,dimension(:,:) :: ric_def_torsions
+            integer, allocatable,dimension(:,:) :: ric_def_in_bends
+            real(kind=8) dimension(3,3) :: cart_hmat
+            integer, allocatable,dimension(:) :: ric_ibr_eckart_trans
+            integer, allocatable,dimension(:) :: ric_ibr_lin_bends
+            real(kind=8), allocatable,dimension(:) :: ric_val_out_bends
+            integer, allocatable,dimension(:) :: ric_def_eckart_trans
+            real(kind=8), allocatable,dimension(:,:) :: bmat
+            integer, allocatable,dimension(:) :: ric_def_eckart_rots
+            real(kind=8), allocatable,dimension(:) :: ric_val_in_bends
+            real(kind=8), allocatable,dimension(:,:) :: cart_hessian
+            integer :: rank_bn
+            integer, allocatable,dimension(:) :: ric_ibr_stretches
+            real(kind=8), allocatable,dimension(:) :: ric_val_eckarts
+            integer, allocatable,dimension(:,:) :: ric_def_stretches
+            real(kind=8), allocatable,dimension(:,:) :: cart_coords
+            real(kind=8), allocatable,dimension(:,:) :: ric_lin_bend_axes
+            real(kind=8), allocatable,dimension(:,:) :: ric_hessian
+            integer, allocatable,dimension(:,:) :: ric_def_out_bends
+            integer, allocatable,dimension(:,:) :: ric_torsion_ivals
+            integer, parameter,optional :: dp=selected_real_kind(15,307)
+            integer, allocatable,dimension(:) :: ric_lin_bend_inds
+            integer, allocatable,dimension(:) :: ric_ibr_torsions
+            integer, allocatable,dimension(:) :: ric_ibr_in_bends
+            real(kind=8), allocatable,dimension(:) :: ric_val_lin_bends
+            integer, allocatable,dimension(:) :: ric_ibr_eckart_rots
+            integer, allocatable,dimension(:) :: ric_ibr_out_bends
+            real(kind=8), allocatable,dimension(:) :: ric_val_torsions
+            real(kind=8), allocatable,dimension(:,:) :: bmat_inv
+            real(kind=8), allocatable,dimension(:) :: atomic_masses
+            real(kind=8), allocatable,dimension(:) :: ric_val_stretches
+            function bmat_construct() ! in :_ric:ric.f90:red_int_coords
+                integer :: bmat_construct
+            end function bmat_construct
+            function bmat_invert() ! in :_ric:ric.f90:red_int_coords
+                integer :: bmat_invert
+            end function bmat_invert
+            function hessian_project() ! in :_ric:ric.f90:red_int_coords
+                integer :: hessian_project
+            end function hessian_project
+        end module red_int_coords
+    end interface 
+end python module _ric
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

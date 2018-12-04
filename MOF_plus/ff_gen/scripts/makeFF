@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
+import ff_gen.fireworks.automatic as automatic
+import molsys.stow as stow
+import string
+
+option = [
+        ['', 'n', 'name'],
+        ['', 'c', 'xyzfile'],
+        ['', 'd', 'protfile']]
+
+shellval = stow.main(stow.sys.argv[1:], option)
+
+wfname = shellval[0]
+fxyz   = shellval[1]
+fprot  = shellval[2]
+
+if wfname == '':
+    wfname = string.split(fxyz, '.')[0]
+
+if fxyz == '' or fprot == '':
+    raise IOError
+
+auto = automatic.automatic(wfname,fxyz,fprot)
+auto()
+
