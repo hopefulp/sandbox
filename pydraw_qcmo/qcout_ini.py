@@ -42,27 +42,4 @@ MO_type_list=['ALL', 'SEL', 'OR', 'AND', 'AND2']
 #### NBO
 L_NBO_analysis = False
 
-### mplot_qcdraw 
-### x divides 3 parts for 3 files
-XMIN=0
-XMAX=1
-# for Ni-CO2 0.05, 1.0 for CO2 -charges
-YMAX    =  0.2
-YMIN    =  -0.5
-
-"""
-if re.search("1-P", files[0]):
-    YMAX    =  0.05
-    YMIN    = -0.4
-elif re.search("2-P", files[0]):
-    YMAX    =  0.05
-    YMIN    = -0.3
-elif re.search("3-P", files[0]):   
-    YMAX    =  0.2
-    YMIN    = -0.3
-else:
-    YMAX    = 0.5       # 0.2
-    YMIN    = -0.6      # -0.7
-"""
-
 

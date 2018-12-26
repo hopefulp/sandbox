@@ -54,7 +54,8 @@ def main():
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')
     parser.add_argument('-m', '--match', nargs='*', help='remove matching file')
     #parser.add_argument('-r', '--reverse', nargs='*', help='remove matching file')
-    parser.add_argument('-e', '--exclude', default=["out","rem"], nargs='+', help='remove all files except list') 
+    #parser.add_argument('-e', '--exclude', default=["out","rem"], nargs='+', help='remove all files except list') 
+    parser.add_argument('-e', '--exclude', nargs='*', help='remove all files except list') 
     args = parser.parse_args()
 
     clean(args.prefix, args.suffix, args.match, args.exclude)

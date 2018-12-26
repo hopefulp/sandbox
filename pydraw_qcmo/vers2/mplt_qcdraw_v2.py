@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-from mo_draw_ini import *
-
+from mplt_mo_ini import *
+import os 
 #### print option
 tag_print=1
 
@@ -12,14 +12,7 @@ print_draw=0
 #### main module cannot give a value to sub-module
 #### another module is required to get Y values
 
-if 'YMIN' not in globals():
-    print "YMIN is not defined in globals"
-    XMIN    = 0
-    XMAX    = 3
-    YMAX    =  0.5
-    YMIN    = -1.0
-
-X_SHIFT = [0,1,2]
+X_SHIFT = [0,1,2,3,4]
 AB_GAP  = 0.4
 
 Linewidth=2.0
@@ -65,19 +58,28 @@ def mplt_line(degeneracy, x, y, ehomo):
 
 def mplt_line_link(x, y):
     plt.plot(x, y, 'g', ls='dashed', lw=Linewidth1)
-
+    #print x, y, " in ", os.path.basename(__file__)
     return 0
 ### 
 #key_word="Alpha MOs"
 
-def Xrange_nf(nfile,ifile,beta,ab, degen):
+#### xmin, xmax for a file
+def fx_region(x0, x1, n_f, i_f):
+    """
+        returns x_min, x_max - X diveded by number of files
+    """
+    dx = float(x1-x0)/n_f
+    xmin = i_f * dx
+    xmax = (i_f+1) * dx
+    return xmin, xmax
+
+def Xrange_nf(nfile,ifile,L_beta,ab, degen):
     """
     Xrange_nf args:: n_files, index_file, only_alpha(0)_or_beta_exists(1), alpha(0)_or_beta(1), degeneracy
     xrange: 0 ~ to XMAX
-    divide xrange with n_files
-        dx: xrange in each file is divided by degeneracy
-    ifile indicates each section by xmin, xmax
-    if beta, xmin~xmax is divided by half
+    nfile: divide xrange with number of files
+    ifile: indicates each section of xrange by xmin, xmax of each file
+    beta: xmin~xmax is divided by half
     alpha locates 1st half and beta locates 2nd half
         dx: half of each file is divided by degeneracy
     """
@@ -88,35 +90,15 @@ def Xrange_nf(nfile,ifile,beta,ab, degen):
     dx=float(xrange)/float(npart)   # devide Xrange into parts
 
     #### xmin, xmax for a file
-    if nfile==1:
-        xmin=XMIN
-        xmax=XMAX
-    elif nfile==2:
-        if ifile==0:
-            xmin=XMIN
-            xmax=xmin+float(xrange)
-        elif ifile==1:
-            xmin=XMIN+float(xrange)
-            xmax=XMAX
-    elif nfile==3:
-        if ifile==0:
-            xmin=XMIN
-            xmax=xmin+float(xrange)
-        elif ifile==1:
-            xmin=XMIN+float(xrange)
-            xmax=xmin+float(xrange)
-        elif ifile==2:
-            xmin=XMIN+float(xrange)*2
-            xmax=xmin+float(xrange)
-    #### xmin, xmax for alpha or beta in the file            
-    if beta:
+    xmin, xmax = fx_region(XMIN, XMAX, nfile, ifile)
+    #print "xrange", xmin, xmax
+    ### xmin, xmax for alpha or beta in the file            
+    if L_beta:
         x_2=float(xmax-xmin)/2
         if ab==0:
-            #xmin=xmin
             xmax=xmin+x_2
         elif ab==1:
             xmin+=x_2
-            #xmax=xmax
         else:
             print "error in function draw"
             exit(97)

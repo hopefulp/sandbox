@@ -14,8 +14,8 @@ def whereami():
     return inspect.stack()[1][3]
 
 def yes_or_no(question):
-    #reply = str(raw_input(question+' (y/n): ')).lower().strip()
-    reply = str(input(question+' (y/n): ')).lower().strip()     # raw_input is renamed in v3.6
+    reply = str(raw_input(question+' (y/n): ')).lower().strip()
+    #reply = str(input(question+' (y/n): ')).lower().strip()     # raw_input is renamed in v3.6
     if re.match('y', reply):
         return True
     else:
@@ -27,76 +27,88 @@ def get_answers(question):
     return reply
 
 
-def get_files_pattern(m_type, pattern, dir):
+def get_files_pattern(m_type, pattern,dirname):
+    #print(m_type)
     if m_type == 'p':
-        f_list = get_files_prefix(pattern, dir)
+        f_list = get_files_prefix(pattern, dirname)
     elif m_type == 's':
-        f_list = get_files_suffix(pattern, dir)
+        f_list = get_files_suffix(pattern, dirname)
     elif m_type == 'm':
-        f_list = get_files_match(pattern, dir)
+        f_list = get_files_match(pattern, dirname)
+    else:
+        print("No matching for file extraction")
     return f_list
 
-def get_files_prefix(prefixes, dir):
+def get_files_type(ftype, dirname):
+    matched_files=[]
+    print(ftype)
+    for fname in os.listdir(dirname):
+        if fname.endswith(ftype):
+            matched_files.append(fname)
+    print(matched_files)
+    return matched_files            
+
+def get_files_prefix(prefixes, dirname):
     """
         receive list of prefix & directory
         prefixes: list of prefix
     """
     matched_files=[]
     for pref in prefixes:
-        for file in os.listdir(dir):
+        for fname in os.listdir(dirma,e):
             # re.match finds only prefix
-            if re.match(pref, file) and not os.path.isdir(file):
-                matched_files.append(file)
+            if re.match(pref, fname) and not os.path.isdir(fname):
+                matched_files.append(fname)
                 #print pref, file
     return matched_files
 
-def get_files_suffix(suffixes, dir):
+def get_files_suffix(suffixes, dname):
     """
         receive list of suffixes & directory
         suffixes : list of suffix
     """
     matched_files=[]
     for suff in suffixes:
-        for file in os.listdir(dir):
-            if file.endswith(suff) and not os.path.isdir(file):
-                matched_files.append(file)
+        for fname in os.listdir(dname):
+            if fname.endswith(suff) and not os.path.isdir(fname):
+                matched_files.append(fname)
     return matched_files                
 
-def get_files_match(matches, dir):
+def get_files_match(matches, dname):
     """
         (not checked) receive list of patterns for match
         matches: list of match
     """
     matched_files=[]
     for match in matches:
-        for file in os.listdir(dir):
-            if re.search(match, file) and not os.path.isdir(file):
-                matched_files.append(file)
+        for fname in os.listdir(dname):
+            if re.search(match, fname) and not os.path.isdir(fname):
+                matched_files.append(fname)
     return matched_files
 
-def get_files_exclude(matches, dir):
+def get_files_exclude(matches, dname):
     """
         if not matched,
         return files
     """
-    all_files=os.listdir(dir)
+    all_files=os.listdir(dname)
     save_list=[]
     imatch=0
     for match in matches:
-        for file in all_files:
+        for fname in all_files:
             ### exclude dir once
             if imatch==0:
-                if os.path.isdir(file):
-                    save_list.append(file)
+                if os.path.isdir(fname):
+                    save_list.append(fname)
                     #print file
                     continue
-            if re.search(match, file):
-                save_list.append(file)
+            if re.search(match, fname):
+                save_list.append(fname)
                 #print file
         imatch+=1                
-    for file in save_list:
+    for fname in save_list:
         #print file
-        all_files.remove(file)
+        all_files.remove(fname)
     return all_files
 
 def fname_decom(fname):

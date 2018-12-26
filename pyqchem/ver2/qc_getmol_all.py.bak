@@ -40,12 +40,12 @@ def get_mol(ftype, job_type, prefix):
     if not job_type or job_type == "opt":
         for file in f_opt:
             cmd = "qgeo_mo.pl %s 1 " % file 
-            print(cmd)
+            print cmd
             os.system(cmd)
     if not job_type or job_type == "ts":
         for file in f_ts:
             cmd = "qgeo_mo.pl %s 3 " % file
-            print(cmd)
+            print cmd
             os.system(cmd)
     # print cmd
     #if fout_type == "ts":

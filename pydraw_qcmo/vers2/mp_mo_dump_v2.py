@@ -2,7 +2,7 @@ import numpy as np
 import re
 import os
 from common import *
-from qcout_ini import *
+from mplt_mo_ini import *
 from my_print import *
 import heapq
 check_id=130
@@ -68,7 +68,7 @@ def f_imo_dump(moc_list, l_atoms, filter_tag, mo_id):
                 f_imo_print(moc_list)
                 return 1
         else:
-            print ("Error:: No atom filtering type in", whereami() )
+            print "Error:: No atom filtering type in", whereami() 
             exit(55)
  
 def f_imo_basis(imoc_list, l_atoms, filter_tag, mo_id):
@@ -138,19 +138,19 @@ def f_imo_basis(imoc_list, l_atoms, filter_tag, mo_id):
                 base_coeff = f_imo_basis_dic(imoc_list)
                 selection= 1
         else:
-            print ("Error:: No atom filtering type in", whereami() )
+            print "Error:: No atom filtering type in", whereami() 
             exit(55)
     #print base_coeff
     new_dic = trim_coeff(base_coeff, n_latoms*Nbasis_show)
     if V_print_moc >=1: 
-        print ("%5d in %s" % (mo_id, whereami() ))
+        print "%5d in %s" % (mo_id, whereami() )
         lprint_sorted(new_dic)
     return selection, new_dic
 
 def trim_coeff(dic, n):
     """ trim dict to leave some maximum values """
     if V_print_moc >= 2:
-        print (whereami())
+        print whereami()
         lprint_sorted(dic)
     if len(dic) > n:
         a = heapq.nlargest(n, dic.items(), lambda i: i[1])
@@ -165,9 +165,9 @@ def f_imo_basis_dic(imoc_list):
     bcoeff={}
     for line in imoc_list:
         if i == 0:
-            if V_print_moc >= 2: print (line)
+            if V_print_moc >= 2: print line
         else:
-            if V_print_moc >= 2: print (line)
+            if V_print_moc >= 2: print line
             b_coeff = line.split()
             coeff = abs(float(b_coeff[1]))
             if not b_coeff[0] in bcoeff.keys():
@@ -178,7 +178,7 @@ def f_imo_basis_dic(imoc_list):
     if i==1:
         pass
 
-    if V_print_moc >= 2: print ("bases_coeff dictionary:", bcoeff  , whereami())
+    if V_print_moc >= 2: print "bases_coeff dictionary:", bcoeff  , whereami()
     return bcoeff
 
 def f_imo_dump1(moc_list, l_atoms, filter_tag, mo_id):
@@ -201,25 +201,25 @@ def f_imo_maxcoeff(moc_list):
     max_coeff = 0
     for line in moc_list:
         if i == 0:
-            print (line)
+            print line
         else:
             basis_coeff = line.split()
             coeff = abs(float(basis_coeff[1]))
             if max_coeff < coeff:
                 max_coeff = coeff
                 max_basis = basis_coeff[0]
-        if V_print >= 1: print  (line)
+        if V_print >= 1: print  line
         i+=1
     if i==1:
         max_basis = 'NONE'
         max_coeff = 0
-    print ("     max_basis: ",  max_basis, max_coeff, whereami())
+    print "     max_basis: ",  max_basis, max_coeff, whereami()
     return max_basis, max_coeff
 
 
 def f_imo_print(moc_list):
     for line in moc_list:
-        if V_print_moc >= 1: print  (line)
+        if V_print_moc >= 1: print  line
     return 0
 
 

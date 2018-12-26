@@ -1,7 +1,8 @@
 import os
 from atom_valence import *       # fatom_valence
+#from mplt_mo_ini import *
 from common import *
-from qcout_ini import *
+from mplt_mo_ini import *
 import numpy as np
 import operator
 import heapq
@@ -41,7 +42,7 @@ def atom_decompose(latoms):
         else:
             latom_name.append(atom)
             latom_index.append("")
-    print(latom_name, latom_index, "in", whereami())
+    print latom_name, latom_index, "in", whereami()
     atom_species = atom_compress(latom_name)
     return latom_name, latom_index, atom_species
 
@@ -60,7 +61,7 @@ def All_atom_count(latoms):
         else:
             all_atom_count[atom] = 1
 
-    print(all_atom_count, "in", whereami())
+    print all_atom_count, "in", whereami()
     return all_atom_count
 
 def Cal_Ncore(dict):
@@ -68,7 +69,7 @@ def Cal_Ncore(dict):
     for atom in dict:
         nc = Atom_Core_631g[Atom_Table.index(atom)]
         ncore += nc * dict[atom]
-    print("all the number of core basis:", ncore, "in", whereami())
+    print "all the number of core basis:", ncore, "in", whereami()
     return ncore        
 
 ### MO ENE block analysis
@@ -123,7 +124,7 @@ def f_extract_ene(index_homo_line, line_ene_ab):
         list_ene_ab.append(list_ene)     # store ie 2D
         iab += 1
     # after finish a/b list        
-    print("HOMO energy, ID, beta, max_lumo in:", whereami(), e_homo_ab, e_homo_id_ab, beta)
+    print "HOMO energy, ID, beta, max_lumo in:", whereami(), e_homo_ab, e_homo_id_ab, beta
     return list_ene_ab, e_homo_ab, e_homo_id_ab
 
 
@@ -149,7 +150,7 @@ def moc_line_analysis(line, nenergy, crit,imo, imo_ene, p_atom_name, icore,ncore
     moc_block=[]
 
     lmoc_line=line.split()
-    if V_print_moc >=2: print(lmoc_line)
+    if V_print_moc >=2: print lmoc_line
     ncol = len(lmoc_line)
     ind = ncol - nenergy
     lcoeff = lmoc_line[ind:]
@@ -157,7 +158,7 @@ def moc_line_analysis(line, nenergy, crit,imo, imo_ene, p_atom_name, icore,ncore
     ibasis = l_left.pop(0)
     
     ### make atom id
-    if V_print_moc >= 1: print(ibasis, l_left, lcoeff)
+    if V_print_moc >= 1: print ibasis, l_left, lcoeff
     #### FILTER 1  skip core orbital based on atom species in lmoc_line[1]: follow QChem basis
     #   as for new atom, skip number of core basis and count valence basis
     if atom_name != p_atom_name:
@@ -166,7 +167,7 @@ def moc_line_analysis(line, nenergy, crit,imo, imo_ene, p_atom_name, icore,ncore
         ncore=Atom_Core_631g[Atom_Table.index(lmoc_line[1])]
         #print ncore
         #### if there is beta electron, makes error
-        if V_print_moc >= 2: print("atom ID & num of core atomic orbital: ", id_atom, ncore)
+        if V_print_moc >= 2: print "atom ID & num of core atomic orbital: ", id_atom, ncore
     if icore < ncore:
         icore+=1
         ### ruturn with increase imoc, skip in main
@@ -184,7 +185,7 @@ def moc_line_analysis(line, nenergy, crit,imo, imo_ene, p_atom_name, icore,ncore
                                 
                 #### Add moc line in moc_block of 6 mo_id
                 moc_block.append(moc_tmp)
-                print((np.matrix(moc_block)))
+                print(np.matrix(moc_block))
         ### return with the same imoc, use moc_tmp
         return moc_block, p_atom_name, icore, ncore
 
@@ -220,7 +221,7 @@ def get_mo_types(i_type):
         mo_type="Two"                    # Ni is necessary and 1 of C or O
 
     else:
-        print("add more MO type list manually")
+        print "add more MO type list manually"
         exit(20)
     return  MO_atoms, mo_type    
 
@@ -257,22 +258,22 @@ def get_mo_labels(files, atoms, imotypes):
                 mo_type='ONE'
             else:
                 #### if there are atom_list, and more than one atom, mo_type should be input
-                print("Usage:: A='atom1 atom2' T[ype]= all[1sub]")
+                print "Usage:: A='atom1 atom2' T[ype]= all[1sub]"
                 exit(11)
         mo_atoms, mo_type = get_mo_types(index) 
         Fl_MO_atoms.append(mo_atoms)
         Fl_MO_type.append(mo_type)
 
     if atoms:
-        print("mo_type list: ", MO_type_list)
+        print  "mo_type list: ", MO_type_list
         for type in Fl_MO_type:
             if not type in MO_type_list:
-                print("type should be one of ", MO_type_list)
+                print "type should be one of ", MO_type_list
                 exit(10)
-        print("atoms for MO in ", os.path.basename(__file__), Fl_MO_atoms)
-        print("MO_type in ", os.path.basename(__file__) ,": ", Fl_MO_type)
+        print "atoms for MO in ", os.path.basename(__file__), Fl_MO_atoms
+        print "MO_type in ", os.path.basename(__file__) ,": ", Fl_MO_type
 
-    print("input files in module ", os.path.basename(__file__),  ": ", files)
+    print "input files in module ", os.path.basename(__file__),  ": ", files
 
     '''
     1                                       88 homo    
@@ -287,26 +288,26 @@ def get_mo_labels(files, atoms, imotypes):
 
 def get_homo_ind_in_qcdic(qc_dic, ihomo):
     ind = -1
-    print(qc_dic)
+    print qc_dic
     for i, qc_key in enumerate(qc_dic):         # default .keys()
-        print(i, qc_key)
+        print i, qc_key
         if qc_key == ihomo:
             ind = i
             break
     if ind == -1:
-        print("there is no homo id in tuple", whereami())
+        print "there is no homo id in tuple", whereami()
         exit(34)
     else:
         return ind
 def get_homo_ind_in_qclist(qc_lclass, ihomo):
     ind = -1
     for i, qc_class in enumerate(qc_lclass):         # default .keys()
-        if V_print_link >= 3: print(i, qc_class.imo, whereami())
+        if V_print_link >= 3: print i, qc_class.imo, whereami()
         if qc_class.imo == ihomo:
             ind = i
             break
     if ind == -1:
-        print("there is no homo id in tuple", whereami())
+        print "there is no homo id in tuple", whereami()
         exit(34)
     else:
         return ind
@@ -319,7 +320,7 @@ def matched_key_bmol(sorted_bases, key1):
     coeff = 0.0
     #print sorted_bases
     for i, bas_co in enumerate(sorted_bases):
-        print(i, bas_co, key1, whereami())
+        print i, bas_co, key1, whereami()
 
         if bas_co[0] == key1:
             coeff = bas_co[1]
@@ -335,7 +336,7 @@ def find_level_nbases(n, qc_list, ihomo,imo_homo, tag_hl, matom):
         locc = qc_list[ihomo:]
 
     for qc in locc:     # homo homo-1 homo-2 ...
-        buffer = heapq.nlargest(n, list(qc.bas_dic.items()), lambda i: i[1])
+        buffer = heapq.nlargest(n, qc.bas_dic.items(), lambda i: i[1])
         for mbasis in buffer:           # 1d
             if re.search(matom, mbasis[0]):
                 ind = qc.imo - imo_homo                 
@@ -344,7 +345,7 @@ def find_level_nbases(n, qc_list, ihomo,imo_homo, tag_hl, matom):
                     j = ind
                 elif tag_hl == 'lumo':
                     j = ind + 1
-                print("%s%2d level [1st base:coeff] = %-7s %5.2f" % (tag_hl, j, mbasis[0], mbasis[1])) 
+                print "%s%2d level [1st base:coeff] = %-7s %5.2f" % (tag_hl, j, mbasis[0], mbasis[1]) 
                 break
     return level_base
 
@@ -360,11 +361,11 @@ def get_link(qc_lclass_A, ihomo_A, qc_lclass_B, ihomo_B, ltype, nlinking, atom_g
     ### get homo index in the list: this is ordered dictionary
     h_index_A = get_homo_ind_in_qclist(qc_lclass_A, ihomo_A)
     h_index_B = get_homo_ind_in_qclist(qc_lclass_B, ihomo_B)
-    print(atom_groups)
+    print atom_groups
     ### for single atom Ni, first mol is reactant, left-side
-    print("Left Mol OCC")
+    print "Left Mol OCC"
     AObases=find_level_nbases(1, qc_lclass_A, h_index_A, ihomo_A, 'homo', atom_groups[0])
-    print("Left Mol VAL")
+    print "Left Mol VAL"
     AVbases=find_level_nbases(1, qc_lclass_A, h_index_A, ihomo_A, 'lumo', atom_groups[0])
     
     if ltype == 'flow':
@@ -372,9 +373,9 @@ def get_link(qc_lclass_A, ihomo_A, qc_lclass_B, ihomo_B, ltype, nlinking, atom_g
         BVbases=find_level_nbases(1, qc_lclass_B, h_index_B,ihomo_B, 'lumo',atom_groups[0]) 
     ### for complex homo , second mol is complex
     elif ltype == 'lsplit':
-        print("Right Mol OCC")
+        print "Right Mol OCC"
         BObases=find_level_nbases(5, qc_lclass_B, h_index_B, ihomo_B,'homo', atom_groups[0])
-        print("Right Mol VAL")
+        print "Right Mol VAL"
         BVbases=find_level_nbases(1, qc_lclass_B, h_index_B, ihomo_B,'lumo', atom_groups[0])
         
     ### Find matched indices for A and B molecule using index i, j [0, 1, 2.. for occ
@@ -382,12 +383,12 @@ def get_link(qc_lclass_A, ihomo_A, qc_lclass_B, ihomo_B, ltype, nlinking, atom_g
     val_match=[]
     for i, AObase in AObases:
         for j, BObase in BObases:
-            print(AObase, BObase)
+            print AObase, BObase
             if AObase == BObase:
                 if occ_match and j in [ y for x, y in occ_match ]:
-                    print("already %d pair exists in [%d, %d] " % (j, x, y))
+                    print "already %d pair exists in [%d, %d] " % (j, x, y)
                     continue
-                print(" ---  matched in B:",j,"-th occ MO",AObase)
+                print " ---  matched in B:",j,"-th occ MO",AObase
                 pair = [i, j]
                 occ_match.append(pair)
                 break
@@ -395,13 +396,13 @@ def get_link(qc_lclass_A, ihomo_A, qc_lclass_B, ihomo_B, ltype, nlinking, atom_g
             for j, BVbase in BVbases:
                 if AObase == BVbase:
                     if val_match and j in [ y for x, y in val_match ]:
-                        print("already %d pair exists in [%d, %d] " % (j, x, y))
+                        print "already %d pair exists in [%d, %d] " % (j, x, y)
                         continue
-                    print(" ---  matched in B lumo:",j,"-th occ MO",AObase)
+                    print " ---  matched in B lumo:",j,"-th occ MO",AObase
                     pair = [i, j]
                     val_match.append(pair)
                     break
-    print(occ_match, val_match)
+    print occ_match, val_match
     occ_match.extend(val_match)
     return occ_match
     """
@@ -470,14 +471,14 @@ def get_link_QCIMO(qc_class_a, homo_id_a, qc_class_b, homo_id_b, ltype, nlinking
     for i in range(len(qc_class_a)):
         if qc_class_a[i].imo == homo_id_a:
             ihomo_a = i
-            print(ihomo_a)
+            print ihomo_a
             break
     basis1 = qc_class_a[i].basis
     basis1L = qc_class_a[ihomo_a+1].basis
     for i in range(len(qc_class_b)):
         if qc_class_b[i].imo == homo_id_b:
             ihomo_b = i
-            print(ihomo_b)
+            print ihomo_b
             break
 
     if ltype == 'flow':
@@ -503,7 +504,7 @@ def get_link_QCIMO(qc_class_a, homo_id_a, qc_class_b, homo_id_b, ltype, nlinking
         mp_lumo_a = 1
         mp_lumo_ab = qc_class_b[match_k].imo - homo_id_b
         mo_hl.append([1, mp_lumo_ab])
-        print(mo_hl)
+        print mo_hl
 
     elif ltype == 'split':
         ### scan 
@@ -532,7 +533,7 @@ def get_link_QCIMO(qc_class_a, homo_id_a, qc_class_b, homo_id_b, ltype, nlinking
 
 
     else:
-        print("link type error in", whereami)
+        print "link type error in", whereami
 
     #test = [[0,0], [1,1]]
     return mo_hl
@@ -567,7 +568,7 @@ def get_nlumo_linkid(nfiles):
             Fl_nlumo=[Nmax_virtual,Nmax_virtual,Nmax_virtual]
     elif nfiles == 4:
         #x_max=4
-        print("error")
+        print "error"
         exit(10)
     elif nfiles == 5:
         #x_max=5
@@ -583,7 +584,7 @@ def get_nlumo_linkid(nfiles):
         else:
             Fl_nlumo=[Nmax_virtual,Nmax_virtual,Nmax_virtual,Nmax_virtual,Nmax_virtual]
     else:
-        print("Error: too many files of ", nfiles, " : ", os.path.basename(__file__))
+        print "Error: too many files of ", nfiles, " : ", os.path.basename(__file__)
         exit(11)
     #print FL_cut_nlumo
     #exit(99)

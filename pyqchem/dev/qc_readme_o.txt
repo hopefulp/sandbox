@@ -1,3 +1,4 @@
+
 ##### Q-CHEM ########################################################
 ### PSI : Parallel
 #   PRIMP2: Parallel for SP but serial for Opt
@@ -9,13 +10,11 @@ qc_exe_all.py -i {inputfile} -r {remfile} -t [mol|in] -l [240|280] -e {for
 running}
     "qsub_changeline_qc.py"
         change pbs file and run t.csh
-qsub pbs_qchem1_psi[kdft].sh
+qsub pbs_qchem1_psii[kdft].sh
 	: modify jobname[.in]
 	: correct rem
 pbs_qchem1_in_psi.sh
 	:modify jobname[.in]
-# serial job
-
 
 ### KDFT : Serial
 # single job
