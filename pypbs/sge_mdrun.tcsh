@@ -14,6 +14,7 @@ endif
 
 if ( ! $?job ) then
     echo "variable job is not defined"
+    echo "Usage:: qsub -N jobname -v tpr=mdname sge_mdrun.sh"
     exit(2)
 endif
 
