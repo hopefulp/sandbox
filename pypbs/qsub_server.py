@@ -29,10 +29,24 @@ def print_sge(software):
             os.system(com)
     return 0
 
+def print_chi(software):
+    _HOME = os.getenv('HOME')
+    if not software:
+        print "Input software using -s software"
+    elif software == 'qchem':
+        print "Check for library: "
+        com = "module li"
+        os.system(com)
+        print "If serial   is loaded: $qchem a.in a.out"
+        print "If parallel is loaded: $mpirun -np n_process $QC/exe/qcprog a.in $QCSCRATCH > a.out &"
+    return 0
+
 def job_description(server, software):
     if server == 'sge':
         print_sge(software) 
-
+    elif server == 'chi':
+        print_chi(software)
+    return 0        
 
 def main():
     parser = argparse.ArgumentParser(description='how to use qsub')
