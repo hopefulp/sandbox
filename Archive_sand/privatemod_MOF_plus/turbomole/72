@@ -1,0 +1,24 @@
+#%Module1.0
+proc ModulesHelp { } {
+global version prefix
+
+puts stderr "\tPaths to turbomole 72"
+}
+
+module-whatis   "Paths to turbomole 72"
+module-log verb stderr,stdout
+
+conflict turbomole/71
+
+set prefix /home/joonho/tools/turbomole/72
+
+setenv TURBODIR $prefix
+#not so good to do in that way, but... !!!
+set TURBOARCH em64t-unknown-linux-gnu
+setenv TURBOMOLE_SYSNAME $TURBOARCH
+setenv PARA_ARCH SMP
+append-path PATH $prefix/bin/em64t-unknown-linux-gnu_smp
+append-path PATH $prefix/scripts
+setenv PARNODES 8
+setenv TM_PAR_FORK on
+

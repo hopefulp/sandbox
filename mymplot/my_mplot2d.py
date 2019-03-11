@@ -8,16 +8,18 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import sys
 
-### font size
-font = {'size': 15}
-
-mpl.rcParams['legend.fontsize'] = 10
-mpl.rc('font', **font)
-font_size=15
-
-fig = plt.figure()
+### do not open figure here
+#fig = plt.figure()
 #ax = plt.subplot(111)
-ax = fig.gca()
+#ax = fig.gca()
+
+### font size
+#font = {'size': 15}
+
+#mpl.rcParams['legend.fontsize'] = 10
+#mpl.rc('font', **font)
+#font_size=15
+
 
 def my_font(pack):
     if pack == 'amp':

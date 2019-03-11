@@ -1,0 +1,37 @@
+#%Module1.0
+
+<<<<<<< HEAD:MOFff/version_old/anaconda2
+set LIB_SOURCE /home/joonho/anaconda2
+
+source mod_source
+=======
+set MOD_SOURCE /home/joonho/anaconda2
+>>>>>>> 3579b132a2bcd6c17222e014c6e4ee6fdabccb2e:anaconda2
+
+proc ModulesHelp { } {
+
+puts stderr "\tPaths to jupyter & ase in server"
+}
+
+module-whatis   "Paths to jupyter & ase in server"
+
+<<<<<<< HEAD:MOFff/version_old/anaconda2
+setenv ANACONDA2_DIR $LIB_SOURCE/bin
+set ANACONDA2_DIR $LIB_SOURCE/bin
+=======
+setenv ANACONDA2_DIR $MOD_SOURCE/bin
+set ANACONDA2_DIR $MOD_SOURCE/bin
+>>>>>>> 3579b132a2bcd6c17222e014c6e4ee6fdabccb2e:anaconda2
+# for server
+#set ASE /home/joonho/.local/bin
+#setenv ASE /home/joonho/.local/bin
+#set PYASE /home/joonho/.local/lib/python2.7/site-packages
+#setenv PYASE /home/joonho/.local/lib/python2.7/site-packages
+
+prepend-path PYTHONPATH $ANACONDA2_DIR
+prepend-path PATH $ANACONDA2_DIR
+#prepend-path PATH $ASE
+#prepend-path PYTHONPATH $ASE
+#prepend-path PATH $PYASE
+#prepend-path PYTHONPATH $PYASE
+

@@ -1,0 +1,17 @@
+#%Module1.0
+proc ModulesHelp { } {
+global version prefix
+
+puts stderr "\tPaths to pydlpoly"
+}
+
+module-whatis   "Paths to pydlpoly"
+
+conflict pydlpoly/devel
+set prefix /home/joonho/sandbox
+
+setenv PDLPDIR $prefix/pydlpoly_new
+set PDLPDIR $prefix/pydlpoly_new
+prepend-path PYTHONPATH $PDLPDIR/py:$PDLPDIR/so
+prepend-path PATH $PDLPDIR/scripts:$PDLPDIR/bin
+

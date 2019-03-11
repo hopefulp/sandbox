@@ -1,0 +1,15 @@
+#%Module1.0
+proc ModulesHelp { } {
+global version prefix
+
+puts stderr "\tPaths to cp2k 5.1"
+}
+
+module-whatis   "Paths to cp2k 5.1"
+module-log verb stderr,stdout
+
+set prefix /home/joonho/tools/cp2k/5.1
+
+append-path PATH $prefix
+setenv OMP_NUM_THREADS 8
+

@@ -1,21 +1,22 @@
+import re
+import os
+import inspect
+
 """
     common functions gathering
     yes_or_no(question) : to obtain y/n for next command
     get_files_prefix(list_prefix, directory) : returns list
     get_files_suffix(list_suffix, directory) : returns list
     fname_decom(fname): returns prefix, extension
+    whereami(): returns function name
 """
-
-import re
-import os
-import inspect
 
 def whereami():
     return inspect.stack()[1][3]
 
 def yes_or_no(question):
-    reply = str(raw_input(question+' (y/n): ')).lower().strip()
-    #reply = str(input(question+' (y/n): ')).lower().strip()     # raw_input is renamed in v3.6
+    #reply = str(raw_input(question+' (y/n): ')).lower().strip()
+    reply = str(input(question+' (y/n): ')).lower().strip()     # raw_input is renamed in v3.6
     if re.match('y', reply):
         return True
     else:
@@ -118,3 +119,9 @@ def fname_decom(fname):
         exit(1)
     return lname[0], lname[1]        
                 
+def fname_parsing(fname):
+    lname = fname.split('.')
+    if not len(lname) == 2:
+        print("Error: %s has more than 1 dot in file name" % fname)
+        exit(1)
+    return lname[0], lname[1]        

@@ -1,0 +1,18 @@
+#%Module1.0
+proc ModulesHelp { } {
+global version prefix
+
+puts stderr "\tPaths to cmc_lammps"
+}
+
+module-whatis   "Paths to cmc_lammps"
+
+prereq molsys
+set prefix /home/joonho/sandbox
+
+setenv PYLMPSDIR $prefix/pylmps
+set PYLMPSDIR $prefix/pylmps
+setenv LMPSDIR $prefix/cmc_lammps/python
+set LMPSDIR $prefix/cmc_lammps/python
+prepend-path PYTHONPATH $PYLMPSDIR
+prepend-path PYTHONPATH $LMPSDIR

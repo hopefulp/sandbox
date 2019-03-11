@@ -1,0 +1,20 @@
+#%Module1.0
+proc ModulesHelp { } {
+global version prefix
+
+puts stderr "\tPaths to FFgen"
+}
+
+module-whatis   "Paths to FFgen"
+
+set prefix /home/joonho/sandbox
+prereq molsys
+
+setenv NUMEXPR_NUM_THREADS 1
+setenv OPENBLAS_NUM_THREADS 1
+setenv MKL_NUM_THREADS 1
+
+setenv FFDIR $prefix/ff_gen
+set FFDIR $prefix/ff_gen
+prepend-path PYTHONPATH $FFDIR
+prepend-path PATH $FFDIR/scripts

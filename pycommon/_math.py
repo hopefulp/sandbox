@@ -16,4 +16,11 @@ def l_smalleq(a, b):
             pass
         else:
             return False
-    return True            
+    return True           
+
+def minmax(value, _min, _max):
+    if value < _min:
+        _min = value
+    elif _max < value:
+        _max = value
+    return _min, _max

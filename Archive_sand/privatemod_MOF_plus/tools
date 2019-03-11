@@ -1,0 +1,10 @@
+#%Module1.0
+proc ModulesHelp { } {
+global version prefix
+
+puts stderr "\tPaths to cmd tools"
+}
+
+module-whatis   "Paths to cmd tools"
+
+prepend-path PATH /home/joonho/tools/bin

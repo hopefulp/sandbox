@@ -25,19 +25,20 @@ def lprint(obj):
         print (obj)
     return 0        
 
-def lprint_sorted(obj):
+def lineprint_sorted(obj):
     if type(obj) == dict:
-        a = sorted(obj.items(), key=lambda i: i[1], reverse=True)
-        for k, v in a:
+        #a = sorted(obj.items(), key=lambda i: i[1], reverse=True)
+        #for k, v in a:
+        for k, v in obj:
             if hasattr(v, '__iter__'):
                 print (k)
-                dumpclean(v)
+                lineprint_sorted(v)
             else:
                 print ('\t%-10s : %10.2f' % ( k, float(v)))
     elif type(obj) == list:
         for v in obj:
             if hasattr(v, '__iter__'):
-                dumpclean(v)
+                lineprint_sorted(v)
             else:
                 print (i, v)
     else:
@@ -55,8 +56,6 @@ def fread_pair_list(fname):
         pair_list = [ [ int(x) for x in line.split()] for line in f ]
     return pair_list            
         
-
-
 
 
 

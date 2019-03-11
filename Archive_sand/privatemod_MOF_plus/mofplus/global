@@ -1,0 +1,19 @@
+#%Module1.0
+proc ModulesHelp { } {
+global version prefix
+
+puts stderr "\tPaths to mofplus api"
+}
+
+module-whatis   "Paths to mofplus api"
+
+conflict mofplus/local
+prereq molsys
+
+set prefix /home/joonho/sandbox
+
+setenv MFPDIR $prefix/mofplus
+set MFPDIR $prefix/mofplus
+prepend-path PYTHONPATH $MFPDIR
+prepend-path PATH $MFPDIR/scripts
+set-alias mofplus "python -i $MFPDIR/mofplus/ff.py"
