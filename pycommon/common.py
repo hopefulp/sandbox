@@ -5,6 +5,7 @@ import inspect
 """
     common functions gathering
     yes_or_no(question) : to obtain y/n for next command
+    dir_files(): returns files with execution|module
     get_files_prefix(list_prefix, directory) : returns list
     get_files_suffix(list_suffix, directory) : returns list
     fname_decom(fname): returns prefix, extension
@@ -17,6 +18,7 @@ def whereami():
 def yes_or_no(question):
     #reply = str(raw_input(question+' (y/n): ')).lower().strip()
     reply = str(input(question+' (y/n): ')).lower().strip()     # raw_input is renamed in v3.6
+    print(reply)
     if re.match('y', reply):
         return True
     else:
@@ -62,6 +64,24 @@ def get_files_prefix(prefixes, dirname):
                 matched_files.append(fname)
                 #print pref, file
     return matched_files
+
+def dir_files(dir_):
+    '''
+    separate files into executable and module in that directory
+    '''
+    executable=[]
+    mod=[]
+    for f in os.listdir(dir_):
+        if re.match('\.', f) or os.path.isdir(dir_+'/'+f) or f_ext(f) == 'pyc' or f_ext(f) == 'bak' :
+            continue
+        if os.access(dir_+'/'+f, os.X_OK):
+            executable.append(f)
+        else:
+            mod.append(f)
+    return executable, mod            
+
+def f_ext(fname):
+    return fname.split('.')[-1]
 
 def get_files_suffix(suffixes, dname):
     """
