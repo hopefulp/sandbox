@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 if [ $1 == "-h" ] ; then
     echo "Usage:: amp_validation.sh Ethylene.extxyz '3 3 3' 0.001 -g "

@@ -1,4 +1,4 @@
-#!/home/joonho/anaconda3/bin/python
+#!/gpfs/home/joonho/anaconda3/bin/python
 
 import argparse
 import os
@@ -11,12 +11,12 @@ def jobs(job):
         mdir = os.path.dirname(__file__)
         exe, mod = dir_files(mdir)
         print("Executable:: ")
-        sort_exe = sorted(exe)
-        sort_mod = sorted(mod)
-        for f in sort_exe:
+        exe_s = sorted(exe)
+        mod_s = sorted(mod)
+        for f in exe_s:
             print("    {}".format(f))
         print("Module:: ")
-        for f in sort_mod:
+        for f in mod_s:
             print("    {}".format(f))
         print("#Comment: ")
     
