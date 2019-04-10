@@ -1,7 +1,6 @@
 #!/usr/bin/tcsh
 #$ -cwd
 #$ -N amp
-#$ -pe numa 4
 #$ -V
 
 ## bash is not working
@@ -13,5 +12,9 @@ if ( ! $?fname || ! $?py_job ) then
     exit(1)
 endif    
 
-/gpfs/home/joonho/sandbox_gl/py_ai/sge_amp_ene.py $fname $py_job -hl 4 4 4 -el 0.001 +g
+setenv PYTHONPATH $HOME/sandbox_gl/pycommon:$HOME/sandbox_gl/mymplot:$HOME/sandbox_gl/acpype:$HOME/sandbox_gl/py_ai
+set PYTHON = "$HOME/anaconda3/bin/python"
+set EXE = "$HOME/sandbox_gl/py_ai/amp_ene.py"
+
+$PYTHON $EXE $fname $py_job -hl 4 4 4 -el 0.001 -g
 

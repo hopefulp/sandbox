@@ -38,8 +38,10 @@ def jobs(job):
     elif job == 'grmx':
         print("    qsub -v tpr=mdname sge_mdrun2.sh")
     elif job == 'amp':
-        print("    qsub -v fname=water128.extxyz -v py_job=tr /gpfs/home/joonho/sandbox_gl/pypbs/sge_amp.tcsh")
-        print("    in script::\n\t/gpfs/home/joonho/sandbox_gl/py_ai/sge_amp_ene.py $fname $py_job -hl 4 4 4 -el 0.001 +g")
+        print("    qsub -v fname=extxyz_file -v py_job=tr[va|te] -q sandy@opt03 -pe numa 8 $SGE_HOME/sge_amp.tcsh")
+        print(      "\tsetenv SGE_HOME $HOME/sandbox_gl/pypbs")
+        print(      "\tfind nodd:: sge_nodes.py || qstat -f")
+        print("    in script::\n\tsetenv PYTHONPATH $HOME/sandbox_gl/pycommon:$HOME/sandbox_gl/mymplot\n\tset PYTHON = \"$HOME/anaconda3/bin/python\"\n\tset EXE = \"$HOME/sandbox_gl/py_ai/amp_ene.py\"\n\t$PYTHON $EXE $fname $py_job -hl 4 4 4 -el 0.001 +g")
 
     return
         

@@ -81,7 +81,7 @@ def draw_dots_two(y, h, title, suptitle):
     plt.plot(range(nlen), ones)
     plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.0, 0.1))
     plt.show()
-    return rmse
+    return rmse, max_res
 def xtitle_font(tit):
     st = "\'{}\', fontsize=20".format(tit)
     print(st)

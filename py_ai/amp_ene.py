@@ -77,11 +77,25 @@ def exe_test_images(job, test_images, amp_pes, title, suptitle,Lgraph,val_id=Non
         y_bar.append(mol.get_potential_energy())
 
     if Lgraph:
-        err = draw_dots_two(y, y_bar, title, suptitle)
+        err, res_max = draw_dots_two(y, y_bar, title, suptitle)
     else:
-        err = rmse(y, y_bar)*my_chem.ev2kj
-    return err
+        h_conv = np.array(y_bar) * my_chem.ev2kj
+        y_conv = np.array(y) * my_chem.ev2kj
+        diff =  np.subtract(h_conv,y_conv)
+        err = np.sqrt((diff**2).mean())
+        res_max = abs(max(diff, key=abs))
+        #err = rmse(y, y_bar)*my_chem.ev2kj
+    return err, res_max
 
+def f_write(fname, HL, E_conv, err, max_res, job, job_index=None):
+    outf = fname.split(".")[0] + ''.join(str(x) for x in HL) + str(E_conv) + "." + job
+    with open(outf, "a") as f:
+        if job_index == None:
+            f.write("{:5.3f}, {:5.3f}\n".format(err, max_res))
+        else:
+            f.write("{}: {:5.3f} {:5.3f}\n".format(job_index,err,max_res))
+    return 0            
+    
 def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set):
     total_images = ase.io.read(fdata, index=':')
     images_sets = Images(total_images, nsets)
@@ -95,19 +109,21 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set):
         images = images_sets.get_training_images()
         print("data training:total sets %d/%d" % (len(images), len(total_images)))
         exe_train_images(images, HL, E_conv)
-    ### job == training & test - test can be done at once by commenting one line below
+        ### job == training & test - test can be done at once by commenting one line below
         amp_pes = "amp.amp"
         images = images_sets.get_test_images()
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
-        exe_test_images(job, images, amp_pes, title, suptitle,Lgraph)
+        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph)
+        f_write(fdata, HL, E_conv, rmserr, max_res, job)
     ### only test
     elif re.search("te",job):
         amp_pes = "amp.amp"
         images = images_sets.get_test_images()
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
-        exe_test_images(job, images, amp_pes, title, suptitle,Lgraph)
+        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph)
+        f_write(fdata, HL, E_conv, rmserr, max_res, job)
     ### job == validation
     elif re.search("va",job):
         print("validation test")
@@ -115,7 +131,6 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set):
         ### training set scan for valicaiotn
         #for i in [0,1,2,3]:   #range(nsets-1):    # last one [4] is kept for test
         # ival_set should be lower than nsets-1
-        
         if ival_set is None:
             print("index for validation set is reguired with '-i num' between 0 ~ {}".format(nsets-2))
             sys.exit(0)
@@ -124,9 +139,6 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set):
                 print("validation set index should be lower than {}".format(nsets-1))
                 print("refer to py_ai_ini.py -j amp")
                 sys.exit(3)
-        fname = fdata.split(".")[0]
-        hl = ''.join(str(x) for x in HL)
-        fname += hl + str(E_conv) + ".val"
         #for i in range(nsets-1): # last one is kept for test, this is not working at the moment
         for i in [ival_set]:   
             ### training
@@ -136,9 +148,8 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set):
             ### validating
             amp_pes = "amp.amp"
             title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
-            rmserr = exe_test_images(job, img_valid, amp_pes, title, suptitle, Lgraph,val_id=i)
-            with open(fname, "a") as f:
-                f.write("{}: {:5.3f}\n".format(ival_set,rmserr))
+            rmserr,max_res = exe_test_images(job, img_valid, amp_pes, title, suptitle, Lgraph,val_id=i)
+            f_write(fdata, HL, E_conv,rmserr, max_res, job, i)
             # check divided image sets: plot 2d here
             if False:
                 x_draw=[]
@@ -171,8 +182,8 @@ def main():
     group_valid.add_argument('-i', '--index_val_set', type=int, help='validation set index')
     args = parser.parse_args()
 
-    if re.search("tr", args.job):
-        args.g = True
+    #if re.search("tr", args.job):
+    #    args.g = True
     amp_jobs(args.fin, args.job, args.nsets, args.hidden_layer, args.e_convergence,args.g,args.index_val_set)
     return
 
