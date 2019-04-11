@@ -19,9 +19,9 @@ def jobs(job):
         for f in mod_s:
             print("    {}".format(f))
         print("#Comment for sge: -j [amp|grmx|qchem|qstat for q command|qsub for arguments]")
-        print("    sge_amp.tcsh for AMP")
-        print("    sge_mdrun2.tcsh for GROMACS MD")
-        print("    sge_qchem.tcsh for Q-Chem")
+        print("    AMP::     sge_amp.tcsh")
+        print("    Gromacs:: sge_mdrun2.tcsh")
+        print("    Q-Chem::  sge_qchem.tcsh")
     elif job == 'qstat':
         print("    $qstat -f    # see all nodes(/used/total) and my job")
         print("    $qfree       # free nodes")
@@ -38,10 +38,16 @@ def jobs(job):
     elif job == 'grmx':
         print("    qsub -v tpr=mdname sge_mdrun2.sh")
     elif job == 'amp':
-        print("    qsub -v fname=extxyz_file -v py_job=tr[va|te] -q sandy@opt03 -pe numa 8 $SGE_HOME/sge_amp.tcsh")
+        print("SGE validation::")
+        print("    qsub -v fname=extxyz_file -v py_job=val[trn|tet] -v scan=scan -q sandy@opt03 -pe numa 8 $SGE_HOME/sge_amp.csh")
+        print(      "\tpy_job for [validation||train||test]")
+        print(      "\tscan variable (if exists) average for several trial with the same [HL, ene convergency]")
         print(      "\tsetenv SGE_HOME $HOME/sandbox_gl/pypbs")
-        print(      "\tfind nodd:: sge_nodes.py || qstat -f")
-        print("    in script::\n\tsetenv PYTHONPATH $HOME/sandbox_gl/pycommon:$HOME/sandbox_gl/mymplot\n\tset PYTHON = \"$HOME/anaconda3/bin/python\"\n\tset EXE = \"$HOME/sandbox_gl/py_ai/amp_ene.py\"\n\t$PYTHON $EXE $fname $py_job -hl 4 4 4 -el 0.001 +g")
+        print(      "\tfind node:: sge_nodes.py || qstat -f")
+        print("    in script::\n\tsetenv PYTHONPATH $HOME/sandbox_gl/pycommon:$HOME/sandbox_gl/mymplot")
+        print(                 "\tset PYTHON = \"$HOME/anaconda3/bin/python\"")
+        print(                 "\tset EXE = \"$HOME/sandbox_gl/py_ai/amp_ene.py\"")
+        print(                 "\t$PYTHON $EXE $fname $py_job -hl 4 4 4 -el 0.001 -n 5 -g")
 
     return
         
