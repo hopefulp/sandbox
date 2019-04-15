@@ -27,16 +27,20 @@ def file_conversion():
     return 0
 
 
-def run_amp():
+def run_amp(fname,HL,elimit,nc,Lgraph):
+    hl = " ".join(HL)
     print("amp run        : {}".format(amp_collection['amp_run']))
     print("    For sample profile::\n\t{} {} profile".format(amp_collection['amp_run'],models['Diss_CHO']))
-    print("    For job=tr(ain)::\n\t{} {} tr -hl 4 4 4 -el 0.001 -n 5".format(amp_collection['amp_run'],models['ethylene']))
-    print("    For job=te(st)::\n\t{} {} te -hl 4 4 4 -el 0.001 -n 5".format(amp_collection['amp_run'],models['ethylene']))
+    print(f"    For job=tr(ain)::\n\t{amp_collection['amp_run']} {fname} tr -hl {hl} -el {elimit} -n 5 -nc {nc}")
+    if Lgraph:
+        print(f"    For job=te(st)::\n\t{amp_collection['amp_run']} {fname} te -hl {hl} -el {elimit} -n 5 -nc {nc} +g")
+    else:
+        print(f"    For job=te(st)::\n\t{amp_collection['amp_run']} {fname} te -hl {hl} -el {elimit} -n 5 -nc {nc} -g")
     print("    For job=md::\n\t{} {} md".format(amp_collection['amp_run'],models['ethylene']))
     print("    For validation::\n\t{} -h\n\t{} {} '4 4 4' 0.001 +g | sh".format(amp_collection['amp_valid'],amp_collection['amp_valid'],models['ethylene']))
     return 0
 
-def jobs(job):
+def jobs(job,fname,HL, elimit, nc, Lgraph):
     if job == None :
         print("List this directory = ")
         mdir = os.path.dirname(__file__)
@@ -53,17 +57,20 @@ def jobs(job):
     elif job == 'amp':
         print("For AMP::")
         file_conversion()
-        run_amp()
+        run_amp(fname,HL, elimit, nc, Lgraph)
 
 def main():
 
-    parser = argparse.ArgumentParser(description="display Usage for /mymplot  ")
-    parser.add_argument('-j','--job',  help=" ")
-    #parser.add_argument('-l','--list', action='store_true',  help="list directory files ")
-    #parser.add_argument('-ls','--list_detail', action='store_true',  help="list directory files ")
+    parser = argparse.ArgumentParser(description="display Usage for ~/py_ai")
+    parser.add_argument('-j','--job',  help="[val,train,test] ")
+    parser.add_argument('-f','--file',  help="input energy data file ")
+    parser.add_argument('-hl','--hidden_layer',nargs='*', default=['4','4','4'], help="list of number of Hidden Layer")
+    parser.add_argument('-el','--energy_limit',default=0.001, type=float,  help="energy_limit for training")
+    parser.add_argument('-nc','--ncore',  help="number of parallel process")
+    parser.add_argument('-g','--graph', action='store_true',  help="draw graph or not")
     args = parser.parse_args()
 
-    jobs(args.job)
+    jobs(args.job, args.file, args.hidden_layer, args.energy_limit,args.ncore, args.graph )
 
 if __name__ == "__main__":
     main()
