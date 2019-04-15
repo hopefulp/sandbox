@@ -25,12 +25,12 @@ else
         echo $i >> a.log
         ### repeat 5 times iteration
         foreach j  ( 1 2 3 4 5 )
-            echo $j >> a.log
+            echo $i $j >> a.log
             ### validation check 1~4 parts among 5 parts
             if ( $py_job == 'val' ) then
                 foreach k  ( 0 1 2 3 )
-                    echo $k >> a.log
-                    $PYTHON $EXE $fname $py_job -n 5 -hl $i $i $i -el 0.001 -i $k -g
+                    echo $i $j $k >> a.log
+                    $PYTHON $EXE $fname $py_job -n 5 -hl $i $i $i -el 0.001 -i $k -g -nc $nc
                 end
             else
                 $PYTHON $EXE $fname $py_job -n 5 -hl $i $i $i -el 0.001 -g

@@ -30,11 +30,11 @@ def get_title(job, fname, HL, E_conv, ntotal, ndata):
         suptitle += "train:validation:test=3:1:1\n"
     return title, suptitle
 
-def exe_train_images(images, HL, E_conv):
+def exe_train_images(images, HL, E_conv,ncore):
     Hidden_Layer=tuple(HL)
     print("Hidden Layer: {}".format(Hidden_Layer))
     print("Energy convergence: {}".format(E_conv))
-    calc = Amp(descriptor=Gaussian(), model=NeuralNetwork(hiddenlayers=Hidden_Layer))
+    calc = Amp(descriptor=Gaussian(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=ncore)
     calc.model.lossfunction = LossFunction(convergence={'energy_rmse': E_conv})
     #calc.model.lossfunction = LossFunction(convergence={'energy_rmse': E_conv},force_coefficient=-0.1)
     #calc.model.lossfunction = LossFunction(force_coefficient=-0.1)
@@ -66,7 +66,7 @@ def run_md(atoms):
         traj.write(atoms)
     f.close()        
 
-def exe_test_images(job, test_images, amp_pes, title, suptitle,Lgraph,val_id=None):
+def exe_test_images(job, test_images, amp_pes, title, suptitle,ncore, Lgraph,val_id=None):
     calc = Amp.load(amp_pes)
     y=[]
     y_bar=[]
@@ -96,7 +96,7 @@ def f_write(fname, HL, E_conv, err, max_res, job, job_index=None):
             f.write("{}: {:5.3f} {:5.3f}\n".format(job_index,err,max_res))
     return 0            
     
-def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set):
+def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set,ncore):
     total_images = ase.io.read(fdata, index=':')
     images_sets = Images(total_images, nsets)
     if re.search("pr", job):
@@ -108,13 +108,13 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set):
     elif re.search("tr",job):
         images = images_sets.get_training_images()
         print("data training:total sets %d/%d" % (len(images), len(total_images)))
-        exe_train_images(images, HL, E_conv)
+        exe_train_images(images, HL, E_conv,ncore)
         ### job == training & test - test can be done at once by commenting one line below
         amp_pes = "amp.amp"
         images = images_sets.get_test_images()
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
-        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph)
+        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore)
         f_write(fdata, HL, E_conv, rmserr, max_res, job)
     ### only test
     elif re.search("te",job):
@@ -122,7 +122,7 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set):
         images = images_sets.get_test_images()
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
-        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph)
+        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore)
         f_write(fdata, HL, E_conv, rmserr, max_res, job)
     ### job == validation
     elif re.search("va",job):
@@ -144,11 +144,11 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set):
             ### training
             images, img_valid = images_sets.get_val_train_images(i)
             print("num images: training {} validation {}".format(len(images),len(img_valid)))
-            exe_train_images(images, HL, E_conv)
+            exe_train_images(images, HL, E_conv, ncore)
             ### validating
             amp_pes = "amp.amp"
             title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
-            rmserr,max_res = exe_test_images(job, img_valid, amp_pes, title, suptitle, Lgraph,val_id=i)
+            rmserr,max_res = exe_test_images(job, img_valid, amp_pes, title, suptitle,ncore,Lgraph,val_id=i)
             f_write(fdata, HL, E_conv,rmserr, max_res, job, i)
             # check divided image sets: plot 2d here
             if False:
@@ -180,11 +180,12 @@ def main():
     parser.add_argument('+g', action="store_true", help='if val default is False, otherwise True')
     group_valid = parser.add_argument_group()
     group_valid.add_argument('-i', '--index_val_set', type=int, help='validation set index')
+    parser.add_argument('-nc', '--ncore', default=1, type=int, help='number of core needs to be defined')
     args = parser.parse_args()
 
     #if re.search("tr", args.job):
     #    args.g = True
-    amp_jobs(args.fin, args.job, args.nsets, args.hidden_layer, args.e_convergence,args.g,args.index_val_set)
+    amp_jobs(args.fin, args.job, args.nsets, args.hidden_layer, args.e_convergence,args.g,args.index_val_set,args.ncore)
     return
 
 if __name__ == '__main__':
