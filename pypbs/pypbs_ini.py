@@ -39,7 +39,7 @@ def jobs(job,fname,que,np,nmem):
         print("    qsub -v tpr=mdname sge_mdrun2.sh")
     elif job == 'amp':
         print("SGE validation::")
-        print(f"    qsub -v fname={fname} -v py_job=val -v scan=scan -q {que} -pe numa {np} -l h_vmem={nmem} $SGE_HOME/sge_amp.csh")
+        print(f"    qsub -v fname={fname} -v py_job=val -v scan=scan -v nc={np} -q {que} -pe numa {np} -l h_vmem={nmem} $SGE_HOME/sge_amp.csh")
         print(      "\tpy_job for [validation||train||test]")
         print(      "\tscan variable (if exists) average for several trial with the same [HL, ene convergency]")
         print(      "\tsetenv SGE_HOME $HOME/sandbox_gl/pypbs")
