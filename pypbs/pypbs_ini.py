@@ -1,4 +1,4 @@
-#!/gpfs/home/joonho/anaconda3/bin/python
+#!/home/joonho/anaconda3/bin/python
 
 import argparse
 import os
@@ -18,10 +18,11 @@ def jobs(job,fname,que,np,nmem):
         print("Module:: ")
         for f in mod_s:
             print("    {}".format(f))
-        print("#Comment for sge: -j [amp|grmx|qchem|qstat for q command|qsub for arguments]")
+        print("#Comment for sge: -j [amp|grmx|qchem|sleep|qstat for q command|qsub for arguments]")
         print("    AMP::     sge_amp.tcsh")
         print("    Gromacs:: sge_mdrun2.tcsh")
         print("    Q-Chem::  sge_qchem.tcsh")
+        print("    dummy job::  sge_sleep.csh")
     elif job == 'qstat':
         print("    $qstat -f    # see all nodes(/used/total) and my job")
         print("    $qfree       # free nodes")
@@ -48,6 +49,10 @@ def jobs(job,fname,que,np,nmem):
         print(                 "\tset PYTHON = \"$HOME/anaconda3/bin/python\"")
         print(                 "\tset EXE = \"$HOME/sandbox_gl/py_ai/amp_ene.py\"")
         print(                 "\t$PYTHON $EXE $fname $py_job -hl 4 4 4 -el 0.001 -n 5 -g")
+    elif job == 'qsleep':
+        print("Dummy job::")
+        print(f"            qsub -q {que} -pe numa {np} -l mem={nmem} $SB/pypbs/sge_sleep.csh")
+        print("    Sample: qsub -q qname(sandy@slet02) -pe numa 6(num of process) -l mem=24G $SB/pypbs/sge_sleep.csh")
 
     return
         
@@ -55,7 +60,7 @@ def jobs(job,fname,que,np,nmem):
 def main():
 
     parser = argparse.ArgumentParser(description="display Usage for /pycommon in SGE  ")
-    parser.add_argument('-j','--job',  choices=['amp','grmx','qchem','qstat','qsub'], help="several explanation option ")
+    parser.add_argument('-j','--job',  choices=['amp','grmx','qchem','qstat','qsub','qsleep'], help="several explanation option ")
     #parser.add_argument('-l','--list', action='store_true',  help="list directory files ")
     parser.add_argument('-f', '--file', default=".extxyz", help='energy data input file')
     parser.add_argument('-q', '--queue', default="sandy@opt03", help='if you want to assign queue')

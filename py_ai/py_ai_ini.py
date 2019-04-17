@@ -8,11 +8,13 @@ from common import dir_files
 amp_collection = {
     'file_conv':    'im2extxyz.py'  ,
     'amp_run':      'amp_ene.py'    ,
-    'amp_valid':    'amp_validation.sh'}
+    'amp_valid':    'amp_validation.sh',
+    'amp_scan':     'amp_loop.sh'}
 
 models= {
     'ethylene': 'Ethylene.extxyz',
-    'Diss_CHO': 'Diss_H2COH.extxyz' }
+    'Diss_CHO': 'Diss_H2COH.extxyz',
+    'water'   : 'water128.extxyz'}
 
 def fconvert_eg():
     print("    INF file to extxyz\n\t{} xxx.inf -a atom_list -y_bar [1,2,3]".format(amp_collection['file_conv']))
@@ -38,6 +40,9 @@ def run_amp(fname,HL,elimit,nc,Lgraph):
         print(f"    For job=te(st)::\n\t{amp_collection['amp_run']} {fname} te -hl {hl} -el {elimit} -n 5 -nc {nc} -g")
     print("    For job=md::\n\t{} {} md".format(amp_collection['amp_run'],models['ethylene']))
     print("    For validation::\n\t{} -h\n\t{} {} '4 4 4' 0.001 +g | sh".format(amp_collection['amp_valid'],amp_collection['amp_valid'],models['ethylene']))
+    print("    For validation scan::")
+    print("                    [scan|not] job-type[val|tr] fname n_core")
+    print("\t{} -h\n\t{} scan val {} 6 ".format(amp_collection['amp_scan'],amp_collection['amp_scan'],models['water']))
     return 0
 
 def jobs(job,fname,HL, elimit, nc, Lgraph):

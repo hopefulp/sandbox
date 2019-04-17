@@ -14,6 +14,7 @@ def reset(package_name, dsave, save_files, Lrun):
 
     commands=[]
     if package_name == 'amp':
+        '''
         if not os.path.isdir(dsave):
             print(" there is not dir %s" % dsave)
             os.mkdir(dsave)
@@ -23,7 +24,7 @@ def reset(package_name, dsave, save_files, Lrun):
         if not os.listdir("./%s" % dsave):
             print("first save files to %s manually" % dsave)
             return
-
+        '''
         com = 'rm * '
         print(com)
         commands.append(com)
@@ -34,7 +35,7 @@ def reset(package_name, dsave, save_files, Lrun):
         print(com)
         commands.append(com)
 
-        if Lrun or yes_or_no("will you run?"):
+        if Lrun or yes_or_no("Did you save and will you run?"):
             run_commands(commands)
             
     return 0
