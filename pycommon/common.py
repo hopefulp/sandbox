@@ -73,12 +73,33 @@ def dir_files(dir_):
     mod=[]
     for f in os.listdir(dir_):
         if re.match('\.', f) or os.path.isdir(dir_+'/'+f) or f_ext(f) == 'pyc' or f_ext(f) == 'bak' :
-            continue
-        if os.access(dir_+'/'+f, os.X_OK):
+            pass
+        elif os.access(dir_+'/'+f, os.X_OK):
             executable.append(f)
         else:
             mod.append(f)
     return executable, mod            
+
+def dir_all(dir_):
+    '''
+    all the directories and files
+    '''
+    dirs=[]
+    executable=[]
+    mod=[]
+    d_link_indices=[]
+    for f in os.listdir(dir_):
+        if re.match('\.', f) or f_ext(f) == 'pyc' or f_ext(f) == 'bak' :
+            pass
+        elif os.path.isdir(os.path.join(dir_, f)):
+            dirs.append(f)
+            if os.path.islink(os.path.join(dir_, f)):
+                d_link_indices.append(dirs.index(f))
+        elif os.access(os.path.join(dir_, f), os.X_OK):
+            executable.append(f)
+        else:
+            mod.append(f)
+    return executable, mod, dirs, d_link_indices
 
 def f_ext(fname):
     return fname.split('.')[-1]

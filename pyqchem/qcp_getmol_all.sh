@@ -1,6 +1,7 @@
 #!/bin/bash
 
-bin=/qcfs/joonho/bin
+bin=/home/joonho/bin
+
 
 for outfile in `ls *.out`
   do
