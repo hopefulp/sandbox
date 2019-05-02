@@ -1,4 +1,4 @@
-#!/usr/bin/tcsh
+#!/usr/bin/csh
 #$ -cwd
 #$ -pe numa 4
 #$ -V
