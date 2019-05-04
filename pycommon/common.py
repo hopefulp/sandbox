@@ -16,6 +16,22 @@ import inspect
 class MyClass(dict):
     pass
 
+def dir_classify(lsorted, classobj_dict_key,classobj_dict):
+    #print(classobj_dict_key)
+    c_obj = classobj_dict[classobj_dict_key]
+    luse=[]
+    for f in lsorted:
+        f1=re.split("\.",f)[0]
+        if f1 in c_obj.__dict__.keys():
+            luse.append(f)
+            continue
+        print(f"    {f}")
+    ### classify modules used
+    print("  {:<10}::".format(classobj_dict_key+" used"))
+    for f in luse:
+        print(f"    {f}")
+    return 0
+
 def whereami():
     return inspect.stack()[1][3]
 
