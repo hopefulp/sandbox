@@ -15,7 +15,7 @@ print_draw=0
 mpl.rcParams['xtick.labelsize']=16
 mpl.rcParams['ytick.labelsize']=16
 mpl.rcParams['lines.linewidth']=5
-mpl.rcParams['figure.figsize']=(8, 12)
+mpl.rcParams['figure.figsize']=(15, 12)
 mpl.rcParams['axes.titlesize']= 'large'
 #plt.ylabel('E(Hr)')
 ## arrow
@@ -28,8 +28,8 @@ XMAX=1
 XLength=0.07
 XL_2=XLength/2.
 # for Ni-CO2 0.05, 1.0 for CO2 -charges
-YMAX    =  0.5
-YMIN    =  -0.5
+YMAX    =  0.61
+YMIN    =  -0.55
 
 """
 if re.search("1-P", files[0]):
@@ -328,4 +328,12 @@ def mplt_ab_draw(nfile, fid, beta_tag, ab_tag, diction, e_homo):
     return 0
 
 
+def main():
+    print("matplotlib.rcParams are set")
+    print("def mplt_ab_draw:: main function for draw including alpha, beta")
+    print("            calls: Xrange_nf_fixed_x_length for x dividing")
+    print("def Xrange_nf_fixed_x_length:: x's for 5 files")
 
+
+if __name__ == "__main__":
+    main()

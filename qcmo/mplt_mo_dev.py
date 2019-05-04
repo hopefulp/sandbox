@@ -11,8 +11,8 @@
 ### 2017. 02. 06 developing for ini.py
 ### 2017. 02. 14 up to 5 files
 ### 2018. 05. 14 atom two group for link_split
-### git test
-### argparse
+### git, argparse
+### 2019. 05. 01 start from dev5, more simplify each part
 
 import re
 import os
@@ -662,8 +662,8 @@ def analyze_files(files,atomlists,atom_group,motypes, base_type,link_types, link
         print (" ", FL_homo_id[i], end='')
         print ("%4d" % Fl_beta_tag[i], end='')
         print ("%8s" % motypes[i], end='')
-        if i > 0:
-            print ("%8s" % link_types[i-1])
+        if link_types and i > 0:
+            print ("%8s" % link_types[i-1])         # NoneType ERROR
         print ("")        # for new line
 
     ################# Block 5 ::PLOT using MPL ###########
@@ -786,7 +786,7 @@ def analyze_files(files,atomlists,atom_group,motypes, base_type,link_types, link
 
 def main():
     parser = argparse.ArgumentParser(description="to analyize QChem outfile and draw MO levels with several files")
-    parser.add_argument("-f", "--outfiles", nargs="+", help="more than 1 out files")
+    parser.add_argument("-f", "--qcouts", nargs="+", help="more than 1 out files")
     #parser.add_argument("-co", "--mocoeff", action='store_true', help="do coeff analysis")
     parser.add_argument("-ag", "--atomgroup", nargs='*', help="atom list of 2 groups for mo and link")
     parser.add_argument("-a", "--atomlists", nargs='*', help="atom lists with id for all files")
@@ -806,7 +806,7 @@ def main():
 
     print (args.atomlists)
 
-    analyze_files(args.outfiles, args.atomlists, args. atomgroup, args.motypes , args.basetype, args.linktypes, args.linkfile, args.splitgroup)
+    analyze_files(args.qcouts,args.atomlists,args.atomgroup,args.motypes,args.basetype,args.linktypes, args.linkfile, args.splitgroup)
     return(0)
 
 

@@ -3,22 +3,36 @@
 import argparse
 import os
 import re
-from common import dir_files
+from common import dir_files, MyClass
 
 usage = {   'xyz22mol' : ' a.xyz[a.mol]\t# makes a.mol[a.xyz]',
             'qout_geo' : ' a.out\t# extract the last optimized geometry as a.xyz',
             'qout_non_opt': ' a.out\t# extract the last non-optimized geometry as a.xyz'
         }
+
+qc_out = MyClass()
+qc_out.qcout_geo="get optimized geometry (xyz, mol) from qc.out"
+qc_out.qcout_geo_nonopt="obtain last geometry when optimzation failed from qc.out"
+
+xyz = MyClass()
+xyz.xyz22mol="convert a.xyz to a.mol vice versa"
+xyz.xyz2inp="convert a.xyz to a.inp"
+xyz.xyz_angle="calculate angle"
+xyz.xyz_dist="calculate distance"
+
+classobj_dict={'XYZ':xyz, 'QC-OUT':qc_out}
+
+
 def if_usage(f):
     f_pre = f.split('.')[0]
     if f_pre in usage.keys():
         print("    {}".format(f), usage[f_pre])
     else:
         print("    {}".format(f))
-def jobs(job,ifile,np):
+def jobs(job,cclass,ifile,np):
     if job == None or re.search("cl", job):
-        print("List this directory = ")
         mdir = os.path.dirname(__file__)
+        print(f"List directory of{mdir}")
         exe, mod = dir_files(mdir)
         print("Executable:: ")
         sort_exe = sorted(exe)
@@ -28,13 +42,13 @@ def jobs(job,ifile,np):
                 print("    {}".format(f))
         else:
             lxyz=[]
-            qc_out=[]
+            lqc_out=[]
             for f in sort_exe:
                 if re.match('xyz',f):
                     lxyz.append(f)
                     continue
-                elif re.match('qout',f):
-                    qc_out.append(f)
+                elif re.match('qcout',f):
+                    lqc_out.append(f)
                     continue
                 print("    {}".format(f))
             ### classify xyz files
@@ -42,13 +56,19 @@ def jobs(job,ifile,np):
             for f in lxyz:
                 if_usage(f)
             ### classify qout files
-            print("  {:<10}::".format('QC-out'))
-            for f in qc_out:
+            print("  {:<10}::".format('QC-OUT'))
+            for f in lqc_out:
                 if_usage(f)
         print("Module:: ")
         for f in sort_mod:
             print("    {}".format(f))
-        print("#Comment: -j run for 'how to run'\n\t -j classify for detail ")
+        if not cclass == None:
+            print(f"Detail for {cclass}::")
+            name_class = classobj_dict[cclass]
+            for key in name_class.__dict__.keys():
+                print(f"    {key}\t:: {name_class.__dict__[key]}")
+
+        print("#Comment: -j run for 'how to run'\n\t  -j classify\n\t  -c class for detail ")
     elif job == 'run':
         com_serial="qchem {0}.in {0}.out &".format(ifile)
         com_parallel="mpirun -np {1} $QC/exe/qcprog {0}.in $QCSCRATCH > {0}.out &".format(ifile,np)
@@ -62,11 +82,12 @@ def main():
 
     parser = argparse.ArgumentParser(description="explanation for /pyqchem ")
     parser.add_argument('-j','--job', choices=['run','classify'],  help="qchem run in chi, mlet ")
+    parser.add_argument('-c','--cname',  help="detail for each class ")
     parser.add_argument('-f','--infile',  help="qchem input file")
     parser.add_argument('-np','--nprocess', default=2, type=int, help="number of parallel process")
     args = parser.parse_args()
 
-    jobs(args.job,args.infile, args.nprocess)
+    jobs(args.job,args.cname,args.infile, args.nprocess)
 
 if __name__ == "__main__":
     main()

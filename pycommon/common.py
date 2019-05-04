@@ -12,6 +12,9 @@ import inspect
     whereami(): returns function name
 """
 
+class MyClass(dict):
+    pass
+
 def whereami():
     return inspect.stack()[1][3]
 
