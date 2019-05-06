@@ -58,7 +58,7 @@ def get_files_prefix(prefixes, dirname):
     """
     matched_files=[]
     for pref in prefixes:
-        for fname in os.listdir(dirma,e):
+        for fname in os.listdir(dirname):
             # re.match finds only prefix
             if re.match(pref, fname) and not os.path.isdir(fname):
                 matched_files.append(fname)
