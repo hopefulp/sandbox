@@ -1,13 +1,19 @@
 #!/bin/bash
 
-cmd=$1
 
+#cmd=$1
+input=$1
+
+if [ $# -lt 1 ]; then
+    echo "Argument required: qchem input type"
+    exit
+fi    
 
 for f in $(pwd)/*; do
     fname=$(basename -- "$f")
     ext="${fname##*.}"
     fhead="${fname%.*}"
-    if [ $ext == "out" ]; then
+    if [ $ext == $input ]; then
         # for qcout_mol_in.pl m=$f r=$f
         echo "$cmd m=$fname r=$fname "
         #echo "xyz22mol.pl $fname"

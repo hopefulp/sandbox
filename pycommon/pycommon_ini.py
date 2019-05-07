@@ -10,7 +10,7 @@ mod_dir.common="module with commonly used functions \"import common\""
 
 
 exe_dir= MyClass()
-exe_dir.dir_clean_p2="clean dir by -prefix -suffix -middle match -job{qchem,ai}"
+exe_dir.dir_clean_p2="clean dir by -prefix -suffix -middle match -e excluded -ef 'exclude these files' -work {qchem,ai} -j rm[mv] -jd new_dir\n\t\tUsage   :: dir_clean_p2.py -s out -ef 6-CC-NiFe-A-relax.out 5-FePNP-CO2.out -j mv -jd j631gs_v3.2"
 exe_dir.dir_clean_rec_p2="clean dir recursively by -p -s -m"
 exe_dir.dir_reset="reset dir as initial state by job: -j ai"
 exe_dir.dir_run="scan dir and run the same command for all the files such as\n\t\tqcout_mol_in.pl"
