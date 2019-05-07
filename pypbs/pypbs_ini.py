@@ -46,6 +46,7 @@ def jobs(work,fname,Lrun,quejob,np,nmem,que):
             print("    \"{}\" is aliased to \"{}\"".format(os.path.basename(__file__)+" -w qchem", "qchem_run"))
             print("    use :: qchem_run -j Queue-jobname -f qin-file -n num_process")
             print("    e.g.:: qchem_run -jopt -fCO2 -n4")
+            print("For batch::\n\tdir_run.sh in \# $1 for qchem input type")
             if fname == None:
                 print(f"    in script::\n\t/gpfs/home/joonho/sciware/qchem5.1p/bin/qchem -np {np} a.in a.out")
             else:
