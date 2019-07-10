@@ -1,6 +1,7 @@
 import re
 import os
 import inspect
+import numpy as np
 
 """
     version dependency included
@@ -20,17 +21,20 @@ def dir_classify(lsorted, classobj_dict_key,classobj_dict):
     #print(classobj_dict_key)
     c_obj = classobj_dict[classobj_dict_key]
     luse=[]
+    ukeys=[]
     for f in lsorted:
         f1=re.split("\.",f)[0]
         if f1 in c_obj.__dict__.keys():
             luse.append(f)
+            lsorted.remove(f)
+            ukeys.append(f1)
             continue
-        print(f"    {f}")
+        #print(f"    {f}")      # to print all the not-selected files
     ### classify modules used
     print("  {:<10}::".format(classobj_dict_key+" used"))
     for f in luse:
         print(f"    {f}")
-    return 0
+    return ukeys
 
 def whereami():
     return inspect.stack()[1][3]
@@ -178,10 +182,28 @@ def fname_decom(fname):
         print("Error: %s has more than 1 dot in file name" % fname)
         exit(1)
     return lname[0], lname[1]        
-                
+
+
+
+
 def fname_parsing(fname):
     lname = fname.split('.')
     if not len(lname) == 2:
         print("Error: %s has more than 1 dot in file name" % fname)
         exit(1)
-    return lname[0], lname[1]        
+    return lname[0], lname[1]
+
+
+def expand_dim_str(lstring):
+    """ expand 1D string to 2D string """
+    a = np.array(lstring)
+    dim = len(a.shape)
+    new_2d=[]
+    if dim == 1:
+        ### ele is string
+        for ele in a:
+            new_list=ele.split()
+            new_2d.append(new_list)
+    return new_2d
+
+        

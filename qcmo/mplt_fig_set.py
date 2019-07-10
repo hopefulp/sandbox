@@ -2,10 +2,10 @@
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-plt.ylabel('E(Hr)', fontsize=18)
+#plt.ylabel('E(Hr)', fontsize=18)
 #plt.xlabel('XXX', fontsize=18)
 
-plt.rcParams["figure.figsize"] = (4, 15)
+#plt.rcParams["figure.figsize"] = (4, 15)
 plt.rcParams['lines.linewidth'] = 2
 plt.rcParams['axes.grid'] = False
 

@@ -1,4 +1,4 @@
-from qcout_ini import *
+from mplt_mo_ini import *
 
 def lprint(obj):
     if type(obj) == dict:
@@ -55,7 +55,27 @@ def fread_pair_list(fname):
     with open(fname, 'r') as f:
         pair_list = [ [ int(x) for x in line.split()] for line in f ]
     return pair_list            
+
+def fprint_pair_2Dlist(fname, mylist):
+    with open(fname, 'w') as f:
+        for links in mylist:
+            for pair in links:
+                f.write(str(pair[0]) + '\t' + str(pair[1]) + '\n')
+            f.write("\n")
         
+def fread_pair_2Dlist(fname):
+    pair_2Dlists=[]
+    with open(fname, 'r') as f:
+        one_link=[]
+        for line in f:
+            pair=line.split()
+            if pair:
+                one_link.append(pair)
+            else:
+                pair_2Dlists.append(one_link)
+                one_link=[]
+        pair_2Dlists.append(one_link)
+    return pair_2Dlists
 
 
 

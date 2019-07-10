@@ -1,54 +1,29 @@
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-#from mplt_fig_set import *
-#from qcout_ini import *
+import matplotlib as mpl
+import matplotlib.ticker as ticker
+
+from common import *
 import os 
-#### print option
-tag_print=1
+from decimal import *
+getcontext().prec=3
 
 ### line draw function
 TEMP_ENE=-1000
-print_draw=0
 
 #### MatPlotLib ini #####
 #plt.style.use('classic')
-mpl.rcParams['xtick.labelsize']=16
-mpl.rcParams['ytick.labelsize']=16
-mpl.rcParams['lines.linewidth']=5
-mpl.rcParams['figure.figsize']=(15, 12)
-mpl.rcParams['axes.titlesize']= 'large'
-#plt.ylabel('E(Hr)')
-## arrow
+from mplt_mo_ini import *
+#from mymplot_default import *
 
+fig=plt.figure()
+ax=plt.subplot(111)
 
-### mplot_qcdraw 
-### x divides 3 parts for 3 files
-XMIN=0
-XMAX=1
-XLength=0.07
-XL_2=XLength/2.
-# for Ni-CO2 0.05, 1.0 for CO2 -charges
-YMAX    =  0.61
-YMIN    =  -0.55
-
-"""
-if re.search("1-P", files[0]):
-    YMAX    =  0.05
-    YMIN    = -0.4
-elif re.search("2-P", files[0]):
-    YMAX    =  0.05
-    YMIN    = -0.3
-elif re.search("3-P", files[0]):   
-    YMAX    =  0.2
-    YMIN    = -0.3
-else:
-    YMAX    = 0.5       # 0.2
-    YMIN    = -0.6      # -0.7
-"""
-
-
-#### main module cannot give a value to sub-module
-#### another module is required to get Y values
+ax.set_xlim([XMIN,XMAX])
+ax.set_ylim([YMIN,YMAX])
+ax.yaxis.set_major_locator(ticker.MultipleLocator(0.05))
+ax.xaxis.set_major_locator(plt.NullLocator())
+ax.tick_params(labelsize=25)
+plt.ylabel('E(Hr)', fontsize=35)
 
 X_SHIFT = [0,1,2,3,4]
 AB_GAP  = 0.4
@@ -56,27 +31,36 @@ AB_GAP  = 0.4
 Linewidth=2.0
 Linewidth1=1.0
 
-fig=plt.figure()
-ax=plt.subplot(111)
-ax.set_xlim([XMIN,XMAX])
-ax.set_ylim([YMIN,YMAX])
+arrow_x_dist=0.01
+arrow_w=0.001
+arrow_y_len=0.01
+arrow_y_half=arrow_y_len/2
+
+#### main module cannot give a value to sub-module
+#### another module is required to get Y values
+
 
 def mplot_arrow_homo(x, y, l_split_s, spin):
     """
         x, y is 2-element rank=1
     """        
     if l_split_s==0:
-        xm1=(x[0]+x[1])/2.-0.02
-        xm2=(x[0]+x[1])/2.+0.02
-        plt.arrow(xm1, y[0]-0.02, 0.0, 0.04, width=0.002, length_includes_head=True)
-        plt.arrow(xm2, y[0]+0.02, 0.0, -0.04, width=0.002, length_includes_head=True)
+        xm1=(float(x[0]+x[1])/2.)-arrow_x_dist
+        xm2=(float(x[0]+x[1])/2.)+arrow_x_dist
+        plt.arrow(xm1, y[0]-arrow_y_half, 0.0, arrow_y_len, width=arrow_w, length_includes_head=True)
+        plt.arrow(xm2, y[0]+arrow_y_half, 0.0, -arrow_y_len, width=arrow_w, length_includes_head=True)
     else:
-        xm1=(x[0]+x[1])/2.
+        xm1=(float(x[0]+x[1])/2.)
         if spin==0:
-            plt.arrow(xm1, y[0]-0.02, 0.0, 0.04, width=0.002, length_includes_head=True)
+            plt.arrow(xm1, y[0]-arrow_y_half, 0.0, arrow_y_len, width=arrow_w, length_includes_head=True)
         else:
-            plt.arrow(xm1, y[0]+0.02, 0.0, -0.04, width=0.002, length_includes_head=True)
+            plt.arrow(xm1, y[0]+arrow_y_half, 0.0, -arrow_y_len, width=arrow_w, length_includes_head=True)
         
+    return 0
+
+def mplt_line_link(x, y):
+    plt.plot(x, y, 'g', ls='dashed', lw=Linewidth1)
+
     return 0
 
 def mplt_level(degeneracy, x, y, ehomo, s_tag, abspin):
@@ -96,7 +80,7 @@ def mplt_level(degeneracy, x, y, ehomo, s_tag, abspin):
         else:
             plt.plot(x, y, 'b', lw=Linewidth )
     elif degeneracy == 2:
-        print (x, y)
+        if vp_draw >=2: print(f"DEGENARCY:{degeneracy} {x} {y} in function {whereami()}()")
         x1=x[0:2]
         x2=x[2:4]
         if y[0] <= ehomo:
@@ -117,8 +101,21 @@ def mplt_level(degeneracy, x, y, ehomo, s_tag, abspin):
             mplot_arrow_homo(x3,y,s_tag,abspin)
         else:
             plt.plot(x1, y, 'b', x2, y, 'b', x3, y, 'b', lw=Linewidth)
+    elif degeneracy == 4:
+        x1=x[0:2]
+        x2=x[2:4]
+        x3=x[4:6]
+        x4=x[6:8]
+        if y[0] <= ehomo:
+            plt.plot(x1, y, 'r', x2, y, 'r', x3, y, 'r', x4, y, 'r', lw=Linewidth)
+            mplot_arrow_homo(x1,y,s_tag,abspin)
+            mplot_arrow_homo(x2,y,s_tag,abspin)
+            mplot_arrow_homo(x3,y,s_tag,abspin)
+            mplot_arrow_homo(x4,y,s_tag,abspin)
+        else:
+            plt.plot(x1, y, 'b', x2, y, 'b', x3, y, 'b', x4, y, 'b', lw=Linewidth)
     else:
-        print ("Error in n_degeneracy in function mplt_level")
+        print (f"Error in degeneracy {degeneracy} in functioni {whereami()}() ")
         exit(55)
     return 0
 
@@ -129,15 +126,28 @@ def mplt_level_link(x, y):
 ### 
 #key_word="Alpha MOs"
 
+
+
 #### xmin, xmax for a file
 def fx_region(x0, x1, n_f, i_f):
     """
-        returns x_min, x_max - X diveded by number of files
+        returns x_min, x_max - X divided by number of files
     """
     dx = float(x1-x0)/n_f
     xmin = i_f * dx
     xmax = (i_f+1) * dx
     return xmin, xmax
+
+def fx_region2(x0, x1, n_f, i_f):
+    """
+        spacing between files
+    """
+    interval = Decimal(x1-x0)
+    dx = interval/Decimal(n_f)
+    space = Decimal(dx/10)
+    xmin = Decimal(i_f) * dx + space
+    xmax = (i_f+1) * dx - space
+    return float(xmin), float(xmax)
 
 def Xrange_nf_fixed_x_length(nfile,ifile,L_beta,ab, degen):
     """
@@ -156,7 +166,7 @@ def Xrange_nf_fixed_x_length(nfile,ifile,L_beta,ab, degen):
     #dx=float(xrange)/float(npart)   # devide Xrange into parts
 
     #### xmin, xmax for a file
-    if_xmin, if_xmax = fx_region(XMIN, XMAX, nfile, ifile)
+    if_xmin, if_xmax = fx_region2(XMIN, XMAX, nfile, ifile)
     #print "xrange", xmin, xmax
     ### xmin, xmax for alpha or beta in the file            
     if L_beta:
@@ -168,35 +178,42 @@ def Xrange_nf_fixed_x_length(nfile,ifile,L_beta,ab, degen):
         else:
             print ("error in function draw")
             exit(97)
+
         #dx=float(x_2)/float(npart)
-    if_x_center = (if_xmax - if_xmin) /2. + if_xmin
+    if_x_center = Decimal((if_xmax - if_xmin) /2. + if_xmin)
+    interv = Decimal(if_xmax-if_xmin)
+    del_x=interv/10
+    x_width = Decimal(interv/(degen*2+2))
+
 
     if degen == 1:
-        x1 = if_x_center - XL_2
-        x2 = if_x_center + XL_2
-        return x1, x2
+        x1 = if_x_center - x_width/2
+        x2 = if_x_center + x_width/2
+        return float(x1), float(x2)
     elif degen == 2:
-        x1 = if_x_center - XL_2*3
-        x2 = if_x_center - XL_2*1
-        x3 = if_x_center + XL_2*1
-        x4 = if_x_center + XL_2*3
-        return x1, x2, x3, x4
+        x2 = if_x_center - del_x
+        x3 = if_x_center + del_x
+        x1 = x2 - x_width
+        x4 = x3 + x_width
+        return float(x1), float(x2), float(x3), float(x4)
     elif degen==3:
-        x1 = if_x_center - XL_2*4
-        x2 = if_x_center - XL_2*2
-        x3 = if_x_center - XL_2*1
-        x4 = if_x_center + XL_2*1
-        x5 = if_x_center + XL_2*2
-        x6 = if_x_center + XL_2*4
-        return x1, x2, x3, x4, x5, x6
-    elif degen==4:
-        x1 = if_x_center - XL_2*5
-        x2 = if_x_center - XL_2*3
-        x3 = if_x_center - XL_2*1
-        x4 = if_x_center + XL_2*1
-        x5 = if_x_center + XL_2*3
-        x6 = if_x_center + XL_2*5
-        return x1, x2, x3, x4, x5, x6, x7, x8
+        x3 = if_x_center - x_width/2
+        x4 = if_x_center + x_width/2
+        x2 = x3 - del_x
+        x1 = x2 - x_width
+        x5 = x4 + del_x
+        x6 = x5 + x_width
+        return float(x1), float(x2), float(x3), float(x4), float(x5), float(x6)
+    elif degen==4: # not yet
+        x4 = if_x_center - del_x
+        x5 = if_x_center + del_x
+        x3 = x4 - x_width
+        x6 = x5 + x_width
+        x2 = x3 - del_x
+        x7 = x6 + del_x
+        x1 = x2 - x_width
+        x8 = x7 + x_width
+        return float(x1), float(x2), float(x3), float(x4), float(x5), float(x6), float(x7), float(x8)
         
     return 0
 
@@ -250,22 +267,31 @@ def Xrange_nf_cal_dx(nfile,ifile,L_beta,ab, degen):
         
     return 0
 
-def mplt_ab_draw(nfile, fid, beta_tag, ab_tag, diction, e_homo):
+def mplt_ab_draw(nfile, fid, beta_tag, ab_tag, diction, e_homo, title=None, xticklabel=None):
     """
+    main call()
     type ab_draw(int, int, int, int, hash(int, float), float)
     args:: n_files, index_file, beta_exists?, alpha_or_beta, imo_ene_dictionary, homo_energy
         sub function: Xrange_nf, mplt_level
         degeneracy is calculated using dictionary
     """
+    if title == None:
+        pass
+    else:
+        plt.title(title, fontsize=40) 
+    if xticklabel == None:
+        pass
+    else:
+        ax.set_xticklabels(xticklabel)
+        
     #### change into sorted dictionary: but list of (key, value) tuples
-    if tag_print >= 2:
-        print ("func: ab_draw ", e_homo)
+    if vp_draw >= 1: print (f"energy home {e_homo} in {whereami()}()")
     l_dic=sorted(diction.items())     
     nkeys=len(l_dic)
 
     #### initialize variables for each file drawing
     #tag_draw_beta="NO"
-    #### MO level ragne is classified by nfiles
+    #### MO level range is classified by nfiles
     i=0
     degen_eline=1
     #e_homo=float(FL_homo_ene[fid][0])
@@ -284,14 +310,13 @@ def mplt_ab_draw(nfile, fid, beta_tag, ab_tag, diction, e_homo):
     for tup in l_dic:
         i+=1
         v_ene=tup[1]
-        if print_draw:
-            print (v_ene)
+        if vp_draw>=2: print (f"v_ene {v_ene}")
         if temp_ene==TEMP_ENE:         # for initial energy value, just save 
             temp_ene=v_ene
             continue
         #### draw the previous energy y
         y=[temp_ene, temp_ene]
-        #### if energies are same, increase multi degeneracy 
+        #### DEGENERACY increase if energies are same
         if temp_ene == v_ene:
             degen_eline += 1
             ### if not last energy
@@ -302,7 +327,7 @@ def mplt_ab_draw(nfile, fid, beta_tag, ab_tag, diction, e_homo):
                 x_r=Xrange_nf_fixed_x_length(nfile, fid, beta_tag, ab_tag, degen_eline)
                 mplt_level(degen_eline, x_r, y, e_homo, beta_tag, ab_tag)
             #print "finish drawing"
-        ### Draw if energies are different 
+        #### Draw if energies are different 
         else:
             ### draw 3 kind of plots with degeneracy for previous energies
             if degen_eline > 4:

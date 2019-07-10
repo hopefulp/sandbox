@@ -6,6 +6,7 @@
 """    
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from cycler import cycler
 import sys
 import my_chem 
 import numpy as np
@@ -39,10 +40,22 @@ def my_font(pack):
 def common_figure():
     fig = plt.figure(figsize=(15,10))
     ax = plt.axes()
-    mpl.rcParams.update({'font.size':22})
-    ax.tick_params(axis='both', which='major', labelsize=15)
+    mpl.rcParams.update({'font.size':30})
+    ax.tick_params(axis='both', which='major', labelsize=23)
+    #ax.tick_params(labelsize=25)
+
+    #custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
+    #custom_cycler = (cycler(color=['r','g']))                                          # Figure 8(b)
+    #custom_cycler = (cycler(color=['darkcyan','b']))                                   # Figure S17(a)
+    custom_cycler = (cycler(color=['r','darkcyan']))                                    # Figure 8(b)
+    #custom_cycler = (cycler(color=['orange','m','g','b']))
+    ax.set_prop_cycle(custom_cycler)
     return fig, ax
 
+def common_figure_after():
+    plt.legend(loc=2)
+
+    return 0
 def draw_dots_two(y, h, title, suptitle):
     '''
     this makes error in serial plotting
@@ -87,7 +100,61 @@ def xtitle_font(tit):
     print(st)
     return st
 
-def mplot_nvector(x, y, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False):
+
+
+def mplot_twinx(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None):
+    '''
+    call with x=[] and y=[ [...
+    x:: [] or [size]
+    y:: [size] or [[multi],[multi],...size]
+    '''
+    fig, ax1 = common_figure()
+    ys = np.array(y)
+    if len(x) != 0:
+        xsize = len(x)
+    else:
+        xsize = ys.shape[0]
+        x=range(xsize)
+    #print(f"{x}-{ys}")
+
+    plt.title(Title)
+    if Xtitle:
+        plt.xlabel(Xtitle, fontsize=30)
+    plt.ylabel(Ytitle, fontsize=30)
+    #ax.xaxis.set_major_locator(plt.NullLocator())
+    #print(f"x, y shape:: {np.array(x).shape} {y.shape}")
+    if Colors:  color = Colors.pop(0)       #color = 'tab:' + Colors.pop(0)
+    else:       color = 'tab:red'
+    ax1.set_ylabel(Ylabels.pop(0), color=color)
+    ax1.plot(x, ys[0,:], 'o-', color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    ax2=ax1.twinx()
+    if Colors:  color = Colors.pop(0)       #'tab:' + Colors.pop(0)
+    else:       color='tab:green'
+    ax2.set_ylabel(Ylabels.pop(0), color=color)
+    ax2.plot(x, ys[1,:], 'o-', color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+    #if ys.ndim == 1:
+    #    plt.plot(x, y, 'bo-')
+        #plt.scatter(x, y)
+    #elif ys.ndim == 2:
+    #    for i in range(len(Ylabels)):
+    #        plt.plot(x,ys[i,:], 'o-', label=Ylabels[i] )
+    #else:
+    #    print(f"Error:: obscure in y-dim {ys.ndim}")
+
+    #plt.legend(loc=2)                   # locate after plot
+    common_figure_after()
+    plt.show()
+    if Lsave:
+        plt.savefig(figname, dpi=150)
+    return 0
+
+
+
+
+def mplot_nvector(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None):
     '''
     call with x=[] and y=[ [...
     x:: [] or [size]
@@ -101,23 +168,35 @@ def mplot_nvector(x, y, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsav
         xsize = ys.shape[0]
         x=range(xsize)
     #print("hmm: {}".format(xsize))
-    plt.xticks(np.arange(min(x), max(x)+1, int(max(x)/10)))
+    print(f"{x}-{ys}")
+    #plt.xticks(np.arange(min(x), max(x)+1, int(max(x)/dx)))
+    #plt.xticks(np.arange(min(x), max(x)+1))
+    #if tag=='x-sub':
+    #    #xlabels = [item.get_text() for item in ax.get_xticklabels()]
+    #    xlabels = tag_value
+    #    ax.set_xticklabels(xlabels)
 
     plt.title(Title)
-    plt.xlabel(Xtitle, fontsize=20)
-    plt.ylabel(Ytitle, fontsize=20)
+    if Xtitle:
+        plt.xlabel(Xtitle, fontsize=30)
+    plt.ylabel(Ytitle, fontsize=35)
+    #ax.xaxis.set_major_locator(plt.NullLocator())
+    #print(f"x, y shape:: {np.array(x).shape} {y.shape}")
     if ys.ndim == 1:
-        #plt.plot(x, y)
-        plt.scatter(x, y)
+        plt.plot(x, y, 'bo-')
+        #plt.scatter(x, y)
     elif ys.ndim == 2:
         for i in range(len(Ylabels)):
-            plt.plot(x,ys[:,i], label=Ylabels[i])
+            plt.plot(x,ys[i,:], 'o-', label=Ylabels[i] )
+    else:
+        print(f"Error:: obscure in y-dim {ys.ndim}")
 
-    plt.legend(loc=1)
+    #plt.legend(loc=2)                   # locate after plot
+    common_figure_after()
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)
-
+    return 0
 
 def draw_histogram(y, nbin, Lsave, fname):
     n, bins, patches = plt.hist(y, nbin)

@@ -161,11 +161,8 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set,ncore):
                 mplot_vector_two(x_draw,y_draw, Title="Extracted Training Set %d" % i, Xtitle="serial number", Ytitle="Epot")
 
     elif re.search('md',job):
-        #print("nsets is used for start geometry")
-        if not nsets:
-            atoms = ase.io.read(fdata, index='0')
-        else:
-            atoms = ase.io.read(fdata, index=nsets)
+        # use first geometry 
+        atoms = ase.io.read(fdata, index='0')
         run_md(atoms)
     return
 

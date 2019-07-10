@@ -24,10 +24,6 @@ def f_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_jo
             for f in excl_fnames:
                 if f in f_list:
                     f_list.remove(f)
-        #for file in f_list:
-        #    comm = "rm %s" % file
-        #    print comm
-        #    q_list.append(comm)
     elif work == 'qchem':
         if w_option == None:
             print "work==qchem requires pid number with -wo n"

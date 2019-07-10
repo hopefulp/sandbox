@@ -1,8 +1,8 @@
 import re
 
-Atom_Table      =[ 'H', 'B', 'C', 'N', 'O', 'F', 'P', 'Ni' ]
+Atom_Table      =[ 'H', 'B', 'C', 'N', 'O', 'F', 'P', 'Ni' ,'Fe']
 #Atom_Valence=[ 2,  2,   2,   2,   3,   4 ]
-Atom_Core_631g  =[  0,   1,   1,   1,   1,   1,   5,   9 ]    
+Atom_Core_631g  =[  0,   1,   1,   1,   1,   1,   5,   9, 9 ]    
 ######## 6-31Gs
 ######## Ni: 9
 #### P : 1s 2s 2p*3         = 5

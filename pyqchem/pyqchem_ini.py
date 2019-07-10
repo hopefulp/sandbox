@@ -10,17 +10,17 @@ usage = {   'xyz22mol' : ' a.xyz[a.mol]\t# makes a.mol[a.xyz]',
             'qout_non_opt': ' a.out\t# extract the last non-optimized geometry as a.xyz'
         }
 
-qc_out = MyClass()
-qc_out.qcout_geo="get optimized geometry (xyz, mol) from qc.out"
-qc_out.qcout_geo_nonopt="obtain last geometry when optimzation failed from qc.out"
-
+qcout = MyClass()
+qcout.qcout_geo="get optimized geometry (xyz, mol) from qc.out"
+qcout.qcout_geo_nonopt="obtain last geometry when optimzation failed from qc.out"
+qcout.qcout_mol_in="obtain input file from qcout file by option r=fname m=fname i=inputf"
 xyz = MyClass()
 xyz.xyz22mol="convert a.xyz to a.mol vice versa"
 xyz.xyz2inp="convert a.xyz to a.inp"
 xyz.xyz_angle="calculate angle"
 xyz.xyz_dist="calculate distance"
 
-classobj_dict={'XYZ':xyz, 'QC-OUT':qc_out}
+classobj_dict={'XYZ':xyz, 'QC-OUT':qcout}
 
 
 def if_usage(f):
@@ -42,13 +42,13 @@ def jobs(job,cclass,ifile,np):
                 print("    {}".format(f))
         else:
             lxyz=[]
-            lqc_out=[]
+            lqcout=[]
             for f in sort_exe:
                 if re.match('xyz',f):
                     lxyz.append(f)
                     continue
                 elif re.match('qcout',f):
-                    lqc_out.append(f)
+                    lqcout.append(f)
                     continue
                 print("    {}".format(f))
             ### classify xyz files
@@ -57,7 +57,7 @@ def jobs(job,cclass,ifile,np):
                 if_usage(f)
             ### classify qout files
             print("  {:<10}::".format('QC-OUT'))
-            for f in lqc_out:
+            for f in lqcout:
                 if_usage(f)
         print("Module:: ")
         for f in sort_mod:
@@ -81,7 +81,7 @@ def jobs(job,cclass,ifile,np):
 def main():
 
     parser = argparse.ArgumentParser(description="explanation for /pyqchem ")
-    parser.add_argument('-j','--job', choices=['run','classify'],  help="qchem run in chi, mlet ")
+    parser.add_argument('-j','--job',  help="qchem run in chi, mlet ")
     parser.add_argument('-c','--cname',  help="detail for each class ")
     parser.add_argument('-f','--infile',  help="qchem input file")
     parser.add_argument('-np','--nprocess', default=2, type=int, help="number of parallel process")

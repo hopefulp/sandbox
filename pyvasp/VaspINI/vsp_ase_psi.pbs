@@ -1,9 +1,0 @@
-#PBS -N co-1fold
-#PBS -l nodes=1:ppn=16
-#PBS -l walltime=120:00:00
-
-#!/bin/tcsh
-cd $PBS_O_WORKDIR
-python ./co-1fold.py > ./co-1fold.log
-mv ./co-1fold.log ./co-1fold.out 
-/qcfs/jackjack5/scripts/gmail_push/gmail_push.py ‘seoin0226@gmail.com’ 
