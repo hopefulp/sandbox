@@ -12,8 +12,18 @@ if ( ! $?qcjob ) then
     exit(2)
 endif
 
-#### parallel version 5.1
-/gpfs/home/joonho/sciware/qchem5.1p/bin/qchem -np $nc $qcjob.in $qcjob.out
+set iqc = '5.1'
+
+#### parallel version 5.1 (keyword) && 3.2 (Jmol)
+if ( $iqc == '5.1' ) then
+    if ( $opt == 'save') then
+        /gpfs/home/joonho/sciware/qchem5.1p/bin/qchem -save -np $nc $qcjob.in $qcjob.out $qcjob
+    else
+        /gpfs/home/joonho/sciware/qchem5.1p/bin/qchem -np $nc $qcjob.in $qcjob.out
+    endif
+else if ( $iqc == '3.2' ) then
+    /gpfs/opt/qchem/bin/qchem -np $nc $qcjob.in $qcjob.out
+endif    
 
 
 
