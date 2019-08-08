@@ -126,6 +126,7 @@ def get_files_match(matches, dname):
         for fname in os.listdir(dname):
             if re.search(match, fname) and not os.path.isdir(fname):
                 matched_files.append(fname)
+                #print match, fname
     return matched_files
 
 def get_files_exclude(matches, dname):

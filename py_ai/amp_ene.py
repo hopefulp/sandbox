@@ -66,15 +66,15 @@ def run_md(atoms):
         traj.write(atoms)
     f.close()        
 
-def exe_test_images(job, test_images, amp_pes, title, suptitle,ncore, Lgraph,val_id=None):
+def exe_test_images(job, test_images, amp_pes, title, suptitle,ncore, Lgraph,val_id=None,nmol=1):
     calc = Amp.load(amp_pes)
     y=[]
     y_bar=[]
     #return         # this runs
     for mol in test_images:
-        y.append(mol.get_potential_energy())
+        y.append(mol.get_potential_energy()/nmol)
         mol.set_calculator(calc)
-        y_bar.append(mol.get_potential_energy())
+        y_bar.append(mol.get_potential_energy()/nmol)
 
     if Lgraph:
         err, res_max = draw_dots_two(y, y_bar, title, suptitle)
@@ -96,7 +96,7 @@ def f_write(fname, HL, E_conv, err, max_res, job, job_index=None):
             f.write("{}: {:5.3f} {:5.3f}\n".format(job_index,err,max_res))
     return 0            
     
-def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set,ncore):
+def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set,ncore,n_mol):
     total_images = ase.io.read(fdata, index=':')
     images_sets = Images(total_images, nsets)
     if re.search("pr", job):
@@ -114,7 +114,7 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set,ncore):
         images = images_sets.get_test_images()
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
-        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore)
+        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore,)
         f_write(fdata, HL, E_conv, rmserr, max_res, job)
     ### only test
     elif re.search("te",job):
@@ -122,7 +122,7 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set,ncore):
         images = images_sets.get_test_images()
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
-        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore)
+        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore,nmol=n_mol)
         f_write(fdata, HL, E_conv, rmserr, max_res, job)
     ### job == validation
     elif re.search("va",job):
@@ -171,6 +171,7 @@ def main():
     parser.add_argument('fin', help='extxyz input file')
     parser.add_argument('job', default='train', help='job option:"train","test","md","validation","profile"')
     parser.add_argument('-n','--nsets',default=5,type=int,help='num of sets:1 train all sets, otherwise, last set is for test')
+    parser.add_argument('-nm','--nmol',default=1,type=int,help='num of molecules in the system to normalize error')
     parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     parser.add_argument('-el', '--e_convergence', default=0.001, type=float, help='energy convergence limit')
     parser.add_argument('-g', action="store_false", help='if val default is False, otherwise True')
@@ -182,7 +183,7 @@ def main():
 
     #if re.search("tr", args.job):
     #    args.g = True
-    amp_jobs(args.fin, args.job, args.nsets, args.hidden_layer, args.e_convergence,args.g,args.index_val_set,args.ncore)
+    amp_jobs(args.fin, args.job, args.nsets, args.hidden_layer, args.e_convergence,args.g,args.index_val_set,args.ncore,args.nmol)
     return
 
 if __name__ == '__main__':

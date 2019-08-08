@@ -89,7 +89,7 @@ def extract_data(fin, atom_list, ny_bar, dmining):
     return
 
 def main():
-    parser = argparse.ArgumentParser(description='obtain extxyz from IM input file (.fin)')
+    parser = argparse.ArgumentParser(description='make extxyz from IM input file (.fin)')
     parser.add_argument('fin', help='IM/MM input file of .fin')
     parser.add_argument('-a', '--atoms', default='ethylene', choices=['ethylene','Diss_CHO'], help='atom list of the molecule')
     parser.add_argument('-y', '--ny_bar', default=1, type=int, choices=[1,2,3], help='machine learning target={1:ene,2:ene & force,3:ene & force & hessian}')

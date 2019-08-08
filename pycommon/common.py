@@ -31,10 +31,30 @@ def dir_classify(lsorted, classobj_dict_key,classobj_dict):
             continue
         #print(f"    {f}")      # to print all the not-selected files
     ### classify modules used
-    print("  {:<10}::".format(classobj_dict_key+" used"))
-    for f in luse:
-        print(f"    {f}")
+    if luse:
+        print("  {:<10}::".format(classobj_dict_key+" used"))
+        for f in luse:
+            print(f"    {f}")
     return ukeys
+
+def classify_dirs(lsorted, classobj_dict_key,classobj_dict):
+    c_obj = classobj_dict[classobj_dict_key]
+    luse=[]
+    ukeys=[]
+
+    #print(c_obj.__dict__.keys())
+    #print(lsorted)
+    for d in c_obj.__dict__.keys():
+        if d in lsorted:
+            luse.append(d)
+            lsorted.remove(d)       # lsorted affect the calling module
+            #ukeys.append(d)
+    ### classify modules used
+    if luse:
+        print(f"  {classobj_dict_key} -- Dirs ::")
+        for d in luse:
+            print(f"    {d}")
+    return luse
 
 def whereami():
     return inspect.stack()[1][3]

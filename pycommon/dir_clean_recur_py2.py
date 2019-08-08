@@ -39,6 +39,8 @@ def search_dir(job, dir, foption, lfile_exc, exe_tag):
             search_dir(job, file, foption, lfile_exc, exe_tag)
     os.chdir('..')                
     print "####....... exit %s directory" % dir
+
+
 def main():
 
     parser = argparse.ArgumentParser(description='remove files recursively u. size or filename')

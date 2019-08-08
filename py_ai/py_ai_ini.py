@@ -24,7 +24,17 @@ amp_run.amp_loop="loop for many situation used in SGE"
 fconv = MyClass()
 fconv.fconv2extxyz="convert file format to extxyz: im_format"
 
-classobj_dict={'AMP_RUN': amp_run, 'FILE_CONV': fconv} 
+qchem = MyClass()
+qchem.aimd = "EComponent:: $1=time; $2=Etot; $3=Epot; $13=Ekin \
+                    \n\t\t\t NR==1 {next} for skip\
+                    \n\t\t\t NR==2 time=0.0 $3=Epot0(Epot=Etot of opt); $13=Ekin from T=Etot from Epot0\
+                    \n\t\t\t awk '{ if(NR==1) {next} else if(NR==2) {epot0=$3; printf \"total energy %.7f\\n\", $13*2600} else {printf \"Epot %.7f Etot %.7f\\n\", ($3-epot0)*2600, ($2-epot0)*2600}}' EComponents\
+                    "
+qchem.NucCarts2xyz="Convert NucCarts (AIMD) to xyz format\
+                    \n\t\t\tNucCarts2xyz.py -d dirname -a atom_series such as O H H"
+
+
+classobj_dict={'AMP_RUN': amp_run, 'FILE_CONV': fconv, 'QCHEM': qchem} 
 
 def fconvert_eg():
     print("    INF file to extxyz\n\t{} xxx.inf -a atom_list -y_bar [1,2,3]".format(amp_collection['file_conv']))
@@ -81,6 +91,16 @@ def jobs(job,cclass,fname,HL, elimit, nc, Lgraph):
         print("For AMP::")
         file_conversion()
         run_amp(fname,HL, elimit, nc, Lgraph)
+    ### print dictionary here
+    if job in classobj_dict.keys():
+        name_class = classobj_dict[job]
+        for key in name_class.__dict__.keys():
+            print(f" {job}   \t:: {name_class.__dict__[key]}")
+
+    print(f"#Comment: -c    for classification'\
+            \n\t  -u for usage: equal to -j USAGE\
+            \n\t  -j {classobj_dict.keys()} for detail ")
+            
 
 def main():
 
