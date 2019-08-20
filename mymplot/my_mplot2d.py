@@ -56,7 +56,7 @@ def common_figure_after():
     plt.legend(loc=2)
 
     return 0
-def draw_dots_two(y, h, title, suptitle):
+def draw_dots_two(y, h, title, suptitle,escale=my_chem.ev2kj):
     '''
     this makes error in serial plotting
     '''
@@ -64,8 +64,8 @@ def draw_dots_two(y, h, title, suptitle):
     ax = plt.axes()
 
     nlen = len(y)
-    h_conv = np.array(h) * my_chem.ev2kj
-    y_conv = np.array(y) * my_chem.ev2kj
+    h_conv = np.array(h) * escale        # escale = my_chem.ev2kj
+    y_conv = np.array(y) * escale
     diff =  np.subtract(h_conv,y_conv)
     rmse = np.sqrt((diff**2).mean())
     max_res = abs(max(diff, key=abs))

@@ -12,6 +12,8 @@ import chem_space as cs
 #import mdForce
 
 fqchems = Q_Chem_aimd()
+
+
 def cal_nframes(fname, ntitle, n):
     com = f'wc -l {fname}'
     results = subprocess.check_output(com, shell=True)
@@ -25,7 +27,8 @@ def obtain_Force(l_forces, iatom):
     ind = iatom*3 + 1
     return list_force[ind], list_force[ind+1], list_force[ind+2]
 
-def aimd2extxyz(job, fxyz, fene, ffor, Lattice_Size):
+def aimd2extxyz(job, dname, fxyz, fene, ffor, Lattice_Size):
+    escale = hr2ev
 
     outf = job + '.extxyz'
 
@@ -33,21 +36,25 @@ def aimd2extxyz(job, fxyz, fene, ffor, Lattice_Size):
     ### Advance by natom+2
     lxyz_coord = fxyz.readlines()        # natom+2 lines per frame
     natom = int(lxyz_coord[0])
-    nframe1 = cal_nframes(fqchems.xyz, 0, natom+2)
+    #nframe1 = cal_nframes(fqchems.xyz, 0, natom+2)
+    nframe1 = len(lxyz_coord)/(natom+2)
     print(f"{nframe1} frames in {fqchems.xyz}")
     ### Advance by 1
     lenergies = fene.readlines()
-    nframe2 = cal_nframes(fqchems.energies, 1, 1) 
+    #nframe2 = cal_nframes(fqchems.energies, 1, 1) 
+    nframe2 = len(lenergies)-1
     print(f"{nframe2} frames in {fqchems.energies}")
     ### Advance by 1
     lforces = ffor.readlines()
-    nframe3 = cal_nframes(fqchems.force, 1, 1)
+    #nframe3 = cal_nframes(fqchems.force, 1, 1)
+    nframe3 = len(lforces)
     print(f"{nframe3} frames in {fqchems.force}")
     nframe = min(nframe1, nframe2, nframe3)
 
 
     i=0
     iframe=0
+    print(f"write to {outf}")
     with open(outf, 'w') as f:
         ### scan xyz file and modify it
         for xyzline in lxyz_coord:
@@ -67,7 +74,7 @@ def aimd2extxyz(job, fxyz, fene, ffor, Lattice_Size):
                     E_pot_hr0 = E_pot_hr
                     epot = 0.0  # in unit of 100 kJ/mol
                 else:
-                    epot = (float(E_pot_hr) - E_pot_hr0)*hr2kj
+                    epot = (float(E_pot_hr) - E_pot_hr0)*escale
                 f.write('energy={:<.10f}\n'.format(epot))
                 i+=1
             else:
@@ -86,6 +93,8 @@ def aimd2extxyz(job, fxyz, fene, ffor, Lattice_Size):
             #        f.write('{:.8f}   '.format(ForceList[direc]))
             #    f.write('\n')
     f.close()
+    print(f"output file is {outf} in Energy scale of {escale}")
+    print("use -f for output file name")
     return 0
 
 def hack_qchem_AIMDdir(job, dir1, lattice_size):
@@ -115,22 +124,22 @@ def hack_qchem_AIMDdir(job, dir1, lattice_size):
     #ForceList = mdForce.ExForce(NucFor,numatoms,int(args.steps))
    
     #aimd2extxyz(outfin, numatoms, Lattice_Size, EnergyList, Atoms, X, Y, Z, atomic_number, ForceList, int(args.steps)) 
-    aimd2extxyz(job, fxyz, fene, ffor, lattice_size)
+    aimd2extxyz(job, dir_aimd, fxyz, fene, ffor, lattice_size)
     fxyz.close()
     fene.close()
     ffor.close()
     return 0
 
 def main():
-    parser = argparse.ArgumentParser(description='make extxyz from qchem output file: AIMD')
-    parser.add_argument('-f', '--fjob', default='test', help='job or filename for output')
+    parser = argparse.ArgumentParser(description='make extxyz from qchem output file: AIMD in scale of kj/mol')
+    parser.add_argument('-j', '--job', default='test', help='output filename')
     parser.add_argument('-d', '--onedir', help='directory where AIMD output files exist')
     parser.add_argument('-ls', '--lattice_size', default=10.0, type=float, help='size of lattice vector in cubic')
     #parser.add_argument('-n','--steps', help='the number of MD step')
 
     args = parser.parse_args()    
 
-    hack_qchem_AIMDdir(args.fjob, args.onedir, args.lattice_size)
+    hack_qchem_AIMDdir(args.job, args.onedir, args.lattice_size)
 
 if __name__ == '__main__':
     main()

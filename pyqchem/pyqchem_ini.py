@@ -19,9 +19,12 @@ xyz.xyz22mol="convert a.xyz to a.mol vice versa"
 xyz.xyz2inp="convert a.xyz to a.inp"
 xyz.xyz_angle="calculate angle"
 xyz.xyz_dist="calculate distance"
+job = MyClass()
+job.aimd="refer to py_ai_ini.py"
+
 
 classobj_dict={'XYZ':xyz, 'QC-OUT':qcout}
-
+classobj_work={'JOB':job}
 
 def if_usage(f):
     f_pre = f.split('.')[0]
@@ -75,7 +78,13 @@ def jobs(job,cclass,ifile,np):
         print("{:^8}::".format('Chi'))
         print("\t{:^8}::".format('serial'), com_serial)
         print("\t{:^8}::".format('parallel'), com_parallel)
-
+    ### As for Q-Chem job
+    print("[As for Q-Chem job]")
+    for job in classobj_work.keys():
+        name_class = classobj_work[job]
+        for key in name_class.__dict__.keys():
+            print(f"{key}    \t:: {name_class.__dict__[key]}")
+    
     
 
 def main():

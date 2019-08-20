@@ -19,6 +19,7 @@ from my_images import Images
 import re
 import sys
 
+
 def get_title(job, fname, HL, E_conv, ntotal, ndata):
     title = fname.split(".")[0] + "\n"
     hl = '$\\times$'.join(str(x) for x in HL) 
@@ -48,26 +49,42 @@ def run_md(atoms):
 
     traj = ase.io.Trajectory("traj.traj", 'w')
 
-    calc = Amp.load("amp.amp")
+    try:
+        calc = Amp.load("amp.amp")
+    except FileNotFoundError:
+        try:
+            calc = Amp.load("amp-untrained-parameters.amp") 
+        except FileNotFoundError:
+            print("Error: amp-pes.amp file does not exist, input amp-pot file by -p")
+            sys.exit(1)
+
     atoms.set_calculator(calc)
     atoms.get_potential_energy()
-    MaxwellBoltzmannDistribution(atoms, 10. * units.kB)
+    MaxwellBoltzmannDistribution(atoms, 100 * units.kB)
     traj.write(atoms)
     dyn = VelocityVerlet(atoms, dt=1. * units.fs)
     f = open("md.ene", "w")
     f.write("{:^5s}{:^10s}{:^10s}{:^10s}\n".format("time","Etot","Epot","Ekin"))
-    for step in range(100):
+    for step in range(200):
         pot = atoms.get_potential_energy()  # 
         kin = atoms.get_kinetic_energy()
         tot = pot + kin
         f.write("{:5d}{:10.5f}{:10.5f}{:10.5f}\n".format(step, tot, pot, kin))
         print("{}: Total Energy={}, POT={}, KIN={}".format(step, tot, pot, kin))
-        dyn.run(10)
+        dyn.run(5)
         traj.write(atoms)
     f.close()        
 
 def exe_test_images(job, test_images, amp_pes, title, suptitle,ncore, Lgraph,val_id=None,nmol=1):
-    calc = Amp.load(amp_pes)
+    try:
+        calc = Amp.load(amp_pes)
+    except FileNotFoundError:
+        try:
+            calc = Amp.load("amp-untrained-parameters.amp")
+        except FileNotFoundError:
+            print("Error: amp-pes.amp file does not exist, input amp-pot file by -p")
+            sys.exit(1)
+    escale = 1                  # my_chem.ev2kj            
     y=[]
     y_bar=[]
     #return         # this runs
@@ -79,12 +96,12 @@ def exe_test_images(job, test_images, amp_pes, title, suptitle,ncore, Lgraph,val
     if Lgraph:
         err, res_max = draw_dots_two(y, y_bar, title, suptitle)
     else:
-        h_conv = np.array(y_bar) * my_chem.ev2kj
-        y_conv = np.array(y) * my_chem.ev2kj
+        h_conv = np.array(y_bar) * escale
+        y_conv = np.array(y) * escale
         diff =  np.subtract(h_conv,y_conv)
         err = np.sqrt((diff**2).mean())
         res_max = abs(max(diff, key=abs))
-        #err = rmse(y, y_bar)*my_chem.ev2kj
+        #err = rmse(y, y_bar)*escale
     return err, res_max
 
 def f_write(fname, HL, E_conv, err, max_res, job, job_index=None):
@@ -96,9 +113,11 @@ def f_write(fname, HL, E_conv, err, max_res, job, job_index=None):
             f.write("{}: {:5.3f} {:5.3f}\n".format(job_index,err,max_res))
     return 0            
     
-def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set,ncore,n_mol):
+def amp_jobs(fdata, job, amp_pes, nsets, HL, E_conv, Lgraph,ival_set,ncore,n_mol):
     total_images = ase.io.read(fdata, index=':')
     images_sets = Images(total_images, nsets)
+    #if not os.path.isfile(amp_pes):
+
     if re.search("pr", job):
         y=[]
         for mol in total_images:
@@ -110,7 +129,6 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set,ncore,n_mol):
         print("data training:total sets %d/%d" % (len(images), len(total_images)))
         exe_train_images(images, HL, E_conv,ncore)
         ### job == training & test - test can be done at once by commenting one line below
-        amp_pes = "amp.amp"
         images = images_sets.get_test_images()
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
@@ -118,7 +136,6 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set,ncore,n_mol):
         f_write(fdata, HL, E_conv, rmserr, max_res, job)
     ### only test
     elif re.search("te",job):
-        amp_pes = "amp.amp"
         images = images_sets.get_test_images()
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
@@ -146,7 +163,6 @@ def amp_jobs(fdata, job, nsets, HL, E_conv, Lgraph,ival_set,ncore,n_mol):
             print("num images: training {} validation {}".format(len(images),len(img_valid)))
             exe_train_images(images, HL, E_conv, ncore)
             ### validating
-            amp_pes = "amp.amp"
             title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
             rmserr,max_res = exe_test_images(job, img_valid, amp_pes, title, suptitle,ncore,Lgraph,val_id=i)
             f_write(fdata, HL, E_conv,rmserr, max_res, job, i)
@@ -170,6 +186,7 @@ def main():
     parser = argparse.ArgumentParser(description='run amp with extxyz ', prefix_chars='-+/')
     parser.add_argument('fin', help='extxyz input file')
     parser.add_argument('job', default='train', help='job option:"train","test","md","validation","profile"')
+    parser.add_argument('-p', '--pot', default="amp.amp", help="input amp potential")
     parser.add_argument('-n','--nsets',default=5,type=int,help='num of sets:1 train all sets, otherwise, last set is for test')
     parser.add_argument('-nm','--nmol',default=1,type=int,help='num of molecules in the system to normalize error')
     parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
@@ -183,7 +200,7 @@ def main():
 
     #if re.search("tr", args.job):
     #    args.g = True
-    amp_jobs(args.fin, args.job, args.nsets, args.hidden_layer, args.e_convergence,args.g,args.index_val_set,args.ncore,args.nmol)
+    amp_jobs(args.fin, args.job, args.pot, args.nsets, args.hidden_layer, args.e_convergence,args.g,args.index_val_set,args.ncore,args.nmol)
     return
 
 if __name__ == '__main__':

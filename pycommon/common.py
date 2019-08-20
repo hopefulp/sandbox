@@ -17,24 +17,25 @@ import numpy as np
 class MyClass(dict):
     pass
 
-def dir_classify(lsorted, classobj_dict_key,classobj_dict):
+def dir_classify(lsorted, classobj_dict_key,classobj_dict,Lwrite=1):
     #print(classobj_dict_key)
     c_obj = classobj_dict[classobj_dict_key]
     luse=[]
-    ukeys=[]
-    for f in lsorted:
-        f1=re.split("\.",f)[0]
-        if f1 in c_obj.__dict__.keys():
-            luse.append(f)
-            lsorted.remove(f)
-            ukeys.append(f1)
+    ukeys=[]        # used keys
+    for f in c_obj.__dict__.keys():             # as for keys == py_fname(.py)
+        fpy=f+".py"
+        if fpy in lsorted:                      # scan for keys
+            luse.append(fpy)
+            lsorted.remove(fpy)                 # remove key.py
+            ukeys.append(f)                     # return key
             continue
-        #print(f"    {f}")      # to print all the not-selected files
+        #print(f" in dir_classify():   {f}")      # to print all the not-selected files
     ### classify modules used
     if luse:
         print("  {:<10}::".format(classobj_dict_key+" used"))
-        for f in luse:
-            print(f"    {f}")
+        if Lwrite:
+            for f in luse:
+                print(f"    {f}     ")
     return ukeys
 
 def classify_dirs(lsorted, classobj_dict_key,classobj_dict):
