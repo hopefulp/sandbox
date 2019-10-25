@@ -1,0 +1,14 @@
+print                          .
+print =====================================
+print "10000 steps NVT dynamics at 300K"
+print =====================================
+print            .
+
+fix             2 all nvt temp 300.0 300.0 250.0
+restart         10 ${sname}_nvt.restart1 ${sname}_nvt.restart2
+dump            1 all atom 1000 ${sname}_nvt.lammpstrj
+dump_modify     1 image yes scale no 
+run             10000
+unfix           2
+undump          1
+

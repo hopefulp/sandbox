@@ -1,0 +1,41 @@
+SYSTEM = rpd2-ac
+
+#MAGMOM = 6 -6 6 -6 6 -6 200*0
+MAGMOM = 6*6 200*0
+#acety    1          6            11          16            21            26
+#MAGMOM = -6 6 6 -6 6 6 -6 6 6 -6 -6 -6 6 6 -6 6 -6 6 -6 -6 -6 6  -6 -6 6 -6  -6 6 6 -6 -6 6 -6 6 6 6 800*0
+
+# continuation
+ISTART = 0
+ICHARG = 2
+ISPIN = 2
+
+# precision
+ENCUT = 520
+PREC = high
+ISMEAR = 0 ; SIGMA = 0.05
+#ISMEAR = -5
+GGA = RP
+NELMIN = 4 ; LMAXMIX = 4
+EDIFF = 1E-4 ;  EDIFFG = -2.5E-2
+
+# parallel
+ALGO = Fast
+IALGO=48
+NSIM=4
+NPAR=4
+LREAL = Auto
+LPLANE = .TRUE.
+#LSCALAPACK = .FALSE.
+
+# opt
+NSW = 1000 ; ISIF = 3
+IBRION = 2
+POTIM = 0.1
+
+LORBIT = 11
+#LAECHG=.TRUE.
+LWAVE = .TRUE.
+#LCHARG = .TRUE.
+
+LVDW = .TRUE.

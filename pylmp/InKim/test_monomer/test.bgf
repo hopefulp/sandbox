@@ -1,0 +1,81 @@
+BIOGRF 200
+DESCRP secondary.b3lyp.opt.out
+REMARK Trajectory updated with _polymer_3.min.lammpstrj
+REMARK Trajectory updated with test.py by noische on Thu Nov 26 02:05:20 2015
+PERIOD 111
+AXES   ZYX
+SGNAME P 1                  1    1
+CRYSTX 10.83448   4.96477    5.01780    90.00000   90.00000   90.00000   
+CELLS  -1   1    -1   1    -1   1    
+FORMAT ATOM   (a6,1x,i5,1x,a5,1x,a3,1x,a1,1x,a5,3f10.5,1x,a5,i3,i2,1x,f8.5,i2,i4,f10.5)
+HETATM     1 C1    SEC H     0  10.07946   3.18568   1.95211 C_3    4 0 -0.44979
+HETATM     2 C2    SEC A     0   8.74414   2.80339   2.62607 C_3    4 0 -0.10770
+HETATM     3 H3    SEC A     0   9.95298   4.06406   1.31785 H_     1 0  0.15934
+HETATM     4 H4    SEC A     0  10.44713   2.35626   1.34508 H_     1 0  0.13697
+HETATM     5 H5    SEC A     0  10.82444   3.41867   2.71538 H_     1 0  0.14336
+HETATM     6 N6    SEC B     0   7.73462   2.25914   1.68632 N_3    3 0 -0.41671
+HETATM     7 H7    SEC A     0   8.34735   3.65998   3.17343 H_     1 0  0.13858
+HETATM     8 H8    SEC A     0   8.94948   2.01792   3.35628 H_     1 0  0.10679
+HETATM     9 H10   SEC A     0   6.96895   1.87532   2.24262 H___A  1 0  0.28916
+HETATM    10 C1    SEC H     1   7.13716   3.17791   0.68884 C_3    4 0 -0.31282
+HETATM    11 C2    SEC A     1   6.21715   4.28842   1.25562 C_3    4 0 -0.10770
+HETATM    12 H3    SEC A     1   6.54408   2.56165   0.00995 H_     1 0  0.15934
+HETATM    13 H5    SEC A     1   7.92690   3.63619   0.09061 H_     1 0  0.14336
+HETATM    14 N6    SEC B     1   4.99263   3.75693   1.89960 N_3    3 0 -0.24255
+HETATM    15 H7    SEC A     1   5.88317   4.89482   0.41071 H_     1 0  0.13858
+HETATM    16 H8    SEC A     1   6.77392   4.95478   1.91820 H_     1 0  0.10679
+HETATM    17 H9    SEC A     1   4.25305   4.44081   1.72354 H___A  1 0  0.11500
+HETATM    18 C1    SEC H     2   5.04803   3.59116   3.37002 C_3    4 0 -0.29045
+HETATM    19 C2    SEC A     2   3.69352   3.09603   3.93180 C_3    4 0 -0.10770
+HETATM    20 H4    SEC A     2   5.82990   2.88531   3.65336 H_     1 0  0.13697
+HETATM    21 H5    SEC A     2   5.27536   4.55883   3.82572 H_     1 0  0.14336
+HETATM    22 N6    SEC B     2   3.44587   1.64191   3.77609 N_3    3 0 -0.41671
+HETATM    23 H7    SEC A     2   2.87082   3.67738   3.51070 H_     1 0  0.13858
+HETATM    24 H8    SEC A     2   3.69381   3.28389   5.00782 H_     1 0  0.10679
+HETATM    25 H10   SEC A     2   2.59824   1.42741   4.30619 H___A  1 0  0.28916
+HETATM    26 C1    PRI H     3   3.24784   1.09012   2.41436 C_3    4 0 -0.29404
+HETATM    27 C2    PRI A     3   2.00840   1.62899   1.66162 C_3    4 0 -0.12755
+HETATM    28 H3    PRI A     3   3.13219   0.01007   2.52808 H_     1 0  0.13574
+HETATM    29 H4    PRI A     3   4.14263   1.25085   1.81154 H_     1 0  0.15983
+HETATM    30 N6    PRI B     3   0.78472   1.46455   2.45361 N_3    3 0 -0.70870
+HETATM    31 H7    PRI A     3   1.88974   1.08458   0.72237 H_     1 0  0.11144
+HETATM    32 H8    PRI A     3   2.13857   2.68605   1.42492 H_     1 0  0.14044
+HETATM    33 H9    PRI A     3   0.64186   0.46060   2.58373 H___A  1 0  0.28937
+HETATM    34 H10   PRI A     3   0.00992   1.80063   1.87794 H___A  1 0  0.29347
+FORMAT CONECT (a6,14i6)
+FORMAT ORDER (a6,i6,13f6.3)
+CONECT     1     3     2     5     4
+CONECT     2     7     6     1     8
+CONECT     3     1
+CONECT     4     1
+CONECT     5     1
+CONECT     6     2     9    10
+CONECT     7     2
+CONECT     8     2
+CONECT     9     6
+CONECT    10    12    11    13     6
+CONECT    11    15    14    10    16
+CONECT    12    10
+CONECT    13    10
+CONECT    14    17    11    18
+CONECT    15    11
+CONECT    16    11
+CONECT    17    14
+CONECT    18    19    21    20    14
+CONECT    19    23    22    18    24
+CONECT    20    18
+CONECT    21    18
+CONECT    22    19    25    26
+CONECT    23    19
+CONECT    24    19
+CONECT    25    22
+CONECT    26    28    27    29    22
+CONECT    27    31    26    30    32
+CONECT    28    26
+CONECT    29    26
+CONECT    30    33    27    34
+CONECT    31    27
+CONECT    32    27
+CONECT    33    30
+CONECT    34    30
+END

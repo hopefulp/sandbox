@@ -1,0 +1,27 @@
+
+print                          .
+print =====================================
+print "NVT heatup"
+print =====================================
+print .
+
+velocity        all create 0.0 12345678 dist uniform
+thermo          100
+restart         10 ${sname}_heat.restart1 ${sname}_heat.restart2
+dump            1 all atom 1000 ${sname}_heat.lammpstrj
+dump_modify     1 image yes scale no 
+fix		restraint solute spring/self 10.0
+variable        l loop 300 #number of increments
+variable        i index 1 #temp increments
+
+label           loop
+variable        t equal v_l*$i # temperature this loop
+print           "temperature: $t"
+fix		2 all nvt temp $t $t 100.0
+run		1000
+unfix		2
+next            l
+jump		${input} loop
+undump		1
+unfix		restraint
+

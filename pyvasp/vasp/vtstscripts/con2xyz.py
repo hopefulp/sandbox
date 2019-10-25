@@ -5,7 +5,7 @@ import aselite
 from sys import argv, exit
 
 if len(argv) < 2 or '-h' in argv:
-    print "usage: con2xyz.py FILENAME\n"
+    print("usage: con2xyz.py FILENAME\n")
     exit(0)
     
 filename = argv[1]

@@ -24,37 +24,37 @@ def get_vasp_repository():
     else:
         ini_dvasp = '/qcfs/joonho/VaspINI'
     
-    print "vasp repository is ", ini_dvasp, ' in system ', hostname
+    print("vasp repository is ", ini_dvasp, ' in system ', hostname)
     if not os.access(ini_dvasp, os.F_OK):
-        print "Error:: the directory cannot be found\n stop"
+        print("Error:: the directory cannot be found\n stop")
         exit(1)
     return 0
 
 def yes_or_no(question):
-    reply = str(raw_input(question+' (y/n): ')).lower().strip()
+    reply = str(input(question+' (y/n): ')).lower().strip()
     if reply[0] == 'y':
         return True
     else:
-        print 'skipped'
+        print('skipped')
         return False
 
 def get_poscar(poscar):
     # confirm file location
     if not os.access('%s' % poscar, os.F_OK):
-        print 'poscar is not detectable'
+        print('poscar is not detectable')
         exit(2)
     else:
         comm = 'cp %s POSCAR' % poscar
         os.system(comm)
-        print 'POSCAR is made'
+        print('POSCAR is made')
     # confirm POSCAR is made        
     if not os.access('POSCAR', os.F_OK):
-        print 'POSCAR is not here'
+        print('POSCAR is not here')
         exit(21)
             
     return 0    
 def get_atoms(question):
-    reply = str(raw_input(question)).split()
+    reply = str(input(question)).split()
     return reply
 
 def get_potcar(pot,atoms):
@@ -73,7 +73,7 @@ def get_potcar(pot,atoms):
                 potfiles.append(f1)
                 break
         if d_tag == 'No':
-            print "atom %s is not detected" % atom
+            print("atom %s is not detected" % atom)
             exit(32)
     comm = 'cat '            
     for potfile in potfiles:
@@ -81,7 +81,7 @@ def get_potcar(pot,atoms):
         comm += fname + ' '
     comm += ' > POTCAR'
     os.system(comm)
-    print 'POTCAR is combined from atoms ', atoms
+    print('POTCAR is combined from atoms ', atoms)
 
     return 0    
 
@@ -92,9 +92,9 @@ def get_kpoints(kp,method):
     if os.access(fullname, os.F_OK):
         comm = 'cp '+ fullname + ' ./KPOINTS'
         os.system(comm)
-        print 'KPONTS was copied'
+        print('KPONTS was copied')
     else:
-        print fullname, ' is not detectable'
+        print(fullname, ' is not detectable')
         exit(41)
     return 0
      

@@ -9,7 +9,7 @@ import operator
 
 #usage description
 if len(sys.argv) < 5:
-	print "Usage: [POSCAR file] [chg file] [Atom name] [# Remaining] [# Max Conf.]"
+	print("Usage: [POSCAR file] [chg file] [Atom name] [# Remaining] [# Max Conf.]")
 	sys.exit()
 
 posfilename=sys.argv[1]
@@ -19,33 +19,33 @@ nrmngstr=sys.argv[4]
 enmaxstr=sys.argv[5]
 
 if not os.path.isfile(posfilename):
-	print posfilename + " is not found."
+	print(posfilename + " is not found.")
 	sys.exit()
 if not os.path.isfile(chgfilename):
-	print chgfilename + " is not found."
+	print(chgfilename + " is not found.")
 	sys.exit()
 if not os.path.isfile('INCAR'):
-	print "INCAR is not found."
+	print("INCAR is not found.")
 	sys.exit()
 if not os.path.isfile('KPOINTS'):
-	print "KPOINTS is not found."
+	print("KPOINTS is not found.")
 	sys.exit()
 if nrmngstr.isdigit():
 	nremaining = nrmngstr
 else:
 	nremaining = 0
-	print "# of remaining atoms is wrong."
+	print("# of remaining atoms is wrong.")
 	sys.exit()
 if enmaxstr.isdigit():
 	enmax = int(enmaxstr)
 else:
 	enmax = 20
-	print "# of configurations is wrong."
+	print("# of configurations is wrong.")
 	sys.exit()
 
 #read atom species from POTCAR
 if not os.path.isfile('POTCAR'):
-	print "POTCAR is not found."
+	print("POTCAR is not found.")
 	sys.exit()
 else:
 	species = []
@@ -57,7 +57,7 @@ else:
 		if "ZVAL" in line:
 			zspecies.append(line.split()[5])
 
-print species
+print(species)
 
 #read poscar
 poscarfile = open(posfilename)
@@ -72,7 +72,7 @@ else:
 poscarfile.close()
 
 if len(nspecies) != len(species):
-	print posfilename +" and POTCAR are inconsistent."
+	print(posfilename +" and POTCAR are inconsistent.")
 	sys.exit()
 
 #calc number of atoms
@@ -83,14 +83,14 @@ for i in range(len(nspecies)):
 		ntarget = int(nspecies[i])
 	ntotal = ntotal + int(nspecies[i])
 if ntarget is 0:
-	print targetname +" is not in "+ posfilename
+	print(targetname +" is not in "+ posfilename)
 	sys.exit()
 
 #make combination list
 def xuniqueCombinations(items, n):
     if n==0: yield []
     else:
-        for i in xrange(len(items)):
+        for i in range(len(items)):
             for cc in xuniqueCombinations(items[i+1:],n-1):
                 yield [items[i]]+cc\
 
@@ -228,7 +228,7 @@ while 1:
 	if not line:
 		break
 	occlist = line.split()
-	print "%d - %s\n" % (i, occlist)
+	print("%d - %s\n" % (i, occlist))
 	
 	targetfile.close()
 	targetfile = open(posfilename + '.target')

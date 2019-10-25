@@ -37,13 +37,13 @@ calc = Vasp(
 adsorbedH.set_calculator(calc)
 electronicenergy = adsorbedH.get_potential_energy()
 
-print "electronic energy is %.5f"%electronicenergy
+print("electronic energy is %.5f"%electronicenergy)
 
 vib = Vibrations(adsorbedH, indices=[23], delta=0.01, nfree=2)
 vib.run()
-print vib.get_frequencies()
+print(vib.get_frequencies())
 vib.summary()
-print vib.get_mode(-1)
+print(vib.get_mode(-1))
 vib.write_mode(-1)
 vib_energies = vib.get_energies()
 

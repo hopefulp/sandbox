@@ -17,7 +17,11 @@ import numpy as np
 class MyClass(dict):
     pass
 
+
 def dir_classify(lsorted, classobj_dict_key,classobj_dict,Lwrite=1):
+    """
+    classify files in a directory
+    """
     #print(classobj_dict_key)
     c_obj = classobj_dict[classobj_dict_key]
     luse=[]
@@ -39,6 +43,7 @@ def dir_classify(lsorted, classobj_dict_key,classobj_dict,Lwrite=1):
     return ukeys
 
 def classify_dirs(lsorted, classobj_dict_key,classobj_dict):
+    """ classify directories """
     c_obj = classobj_dict[classobj_dict_key]
     luse=[]
     ukeys=[]
@@ -69,7 +74,7 @@ def yes_or_no(question):
         return False
 
 def get_answers(question):
-    reply = str(raw_input(question)).strip()
+    reply = str(input(question)).strip()
     #print reply
     return reply
 

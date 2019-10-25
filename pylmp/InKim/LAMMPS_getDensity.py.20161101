@@ -1,0 +1,336 @@
+#!/home/noische/python
+
+import sys, re, string, getopt, optparse, math, time
+import os
+
+import nutils as nu
+
+option = ""; args = ""; bgf_file = ""; trj_file = ""; out_file = ""
+usage = """
+getLAMMPSDensity.py: 
+	Read atom data from the LAMMPS trajectory file and atom mass from LAMMPS data file
+	Write the data to the output file
+	You can get the density either by getting volume and atoms from trajectory, mass from LAMMPS data file
+	  or getting volume from LAMMPS log (thermodynamic data) and mass from LAMMPS data file, atoms from trajectory.
+
+	Assigning DATA, TRAJECTORY, and LOG file might give you specific density profile.
+	Assigning only DATA and TRAJECTORY file will give you the density only for steps in the trajectory.
+	
+Usage: getLAMMPSDensity.py -d dat_file -t trj_file (-l log_file -o out_file -f frequency)
+
+	dat_file: REQUIRED. LAMMPS data file.
+	trj_file: REQUIRED. LAMMPS trajectory file.
+	log_file: OPTIONAL. LAMMPS log file which contains thermodynamic data.
+	out_file: OPTIONAL. Output file. (Default: _density.dat)
+	frequency: OPTIONAL. In case you specified log file, density will be calculated for every this step. (Default: 1)
+"""
+
+version = "120119"
+
+def getLAMMPSDensity(trj_file, log_file, dat_file, out_file, frequency, silent):
+	"""
+getLAMMPSDensity: read atom data from the LAMMPS trajectory file and atom mass from LAMMPS data file
+           write the density to the output file
+	"""
+	if not silent: print("Getting the density from the trajectory " + trj_file + " with the information in " + dat_file + " to " + out_file + " .")
+
+	# initialization
+	mass = 0; l_information = []; avr_density = 0; mode = 0;
+
+	# get masses from data file
+	if not silent: print("== Step 1. Loading LAMMPS Data for mass calculation")
+	atom_mass = dict();
+	atom_type_number = 0;
+	f_dat_file = open(dat_file)
+	while 1:
+		line = f_dat_file.readline()
+
+		if not line:
+			break;
+
+		# determine how many atoms in the data file
+		if "atom type" in line:
+			parse = re.split('\s*', line)
+			atom_type_number = int(parse[1])
+
+		# get masses of atom type as a dictionary
+		if "Masses" in line:
+			line2 = f_dat_file.readline()
+			for i in range(0, atom_type_number):
+				line2 = f_dat_file.readline()
+				parse = re.split('\s*',line2)
+
+				atom_mass[int(parse[1])] = float(parse[2])
+
+
+	# get volumes and atoms at the specific step from the trajectory
+	if log_file != "":
+		mode = 1
+
+		# trajectory loading
+		if not silent: print("\n== Step 2. Loading LAMMPS Trajectory for mass calculation")
+		myDUMP = dump.dump(trj_file)
+		atoms = myDUMP.viz(0)[2]
+
+		# calculate mass from the trajectory and data file
+		for atom in atoms:
+			mass += atom_mass[atom[1]]
+
+		# log file loading
+		myLOG = open(log_file)
+		log_temp_file = log_file + ".temp"
+		myLOG_rev = open(log_temp_file, "w")
+		l_step = []; l_vol = []; l_temp = []; s1 = 0; s2 = 0;
+
+		# preprocessing
+		if not silent: print("\n== Step 3. Loading LAMMPS Log for temperature and volume")
+		wc_log_file = os.popen("wc -l " + log_file).read()	# file newline counts
+		log_file_length = int(wc_log_file.split()[0])
+		n_count = 0;
+		while 1:
+			try:
+				line = myLOG.readline()
+	
+				if not line:
+					break;
+	
+				n_count += 1;
+				if not silent:
+					if n_count % 10000 == 0 or n_count == log_file_length:
+						sys.stdout.write("\rPreprocessing.. "+ str(n_count) + " / " + str(log_file_length) + ".. ")
+						sys.stdout.flush()
+	
+	
+				# keyword checking
+				if "angle_coeff" in line or "angle_style" in line or "atom_modify" in line or "atom_style" in line or \
+					"bond_coeff" in line or "bond_style" in line or "boundary" in line or "change_box" in line or \
+					"variable" in line or "data" in line or "group" in line or "dump" in line or \
+					"clear" in line or "communicate" in line or "compute" in line or "compute_modify" in line or \
+					"create_atoms" in line or "create_box" in line or "delete_atoms" in line or "delete_bonds" in line or \
+					"dielectric" in line or "dihedral_coeff" in line or "dihedral_style" in line or "dimension" in line or \
+					"displace_atoms" in line or "displace_box" in line or "dump" in line or "dump" in line or "image" in line or \
+					"dump_modify" in line or "echo" in line or "fix" in line or "fix_modify" in line or \
+					"group" in line or "if" in line or "improper_coeff" in line or "improper_style" in line or \
+					"include" in line or "jump" in line or "kspace_modify" in line or "kspace_style" in line or \
+					"label" in line or "lattice" in line or "log" in line or "mass" in line or \
+					"minimize" in line or "min_modify" in line or "min_style" in line or "neb" in line or \
+					"neigh_modify" in line or "neighbor" in line or "newton" in line or "next" in line or \
+					"package" in line or "pair_coeff" in line or "pair_modify" in line or "pair_style" in line or \
+					"pair_write" in line or "partition" in line or "prd" in line or "print" in line or \
+					"processors" in line or "read_data" in line or "read_restart" in line or "region" in line or \
+					"replicate" in line or "reset_timestep" in line or "restart" in line or "run" in line or \
+					"run_style" in line or "set" in line or "shell" in line or "special_bonds" in line or \
+					"suffix" in line or "tad" in line or "temper" in line or "thermo" in line or \
+					"thermo_modify" in line or "thermo_style" in line or "timestep" in line or "uncompute" in line or \
+					"undump" in line or "unfix" in line or "units" in line or "variable" in line or \
+					"velocity" in line or "write_restart" in line:
+					pass;
+				elif "Step" in line or "TotEng" in line or "PotEng" in line or "E_dihed" in line or "E_coul" in line or \
+					"Temp" in line or "Volume" in line:
+					myLOG_rev.write(line)
+				elif "KinEng" in line or "E_bond" in line or "E_impro" in line or "E_long" in line or \
+					"E_angle" in line or "E_vdwl" in line or "Press" in line or  \
+					"v_" in line or "c_" in line:
+					myLOG_rev.write(line)
+			except KeyboardInterrupt:
+				nu.die("Keyboard Break - Force quit.")
+				sys.exit(0)
+
+		if not silent: sys.stdout.write("Done.\n")
+		myLOG_rev.close()
+
+		if not silent: print("\n== Step 4. Calculating Density")
+		# reopen the parsed log file
+		myLOG_rev = open(log_temp_file)
+		myLOG_parse = open(log_file + ".parsed", "w")
+		section = ""; thermo_data = []; line = ""; n_count = 0;
+
+		# first line
+		line = myLOG_rev.readline()
+		section += line;
+
+		while 1:
+			line = myLOG_rev.readline()
+			if not line:
+				break;
+
+			section_full = False;
+
+			if "Step" in line:
+				section_full = True;
+
+			if section_full == True:
+				# parse section and extract all thermodynamic data
+				pat1 = re.compile(r"Step\s*(\S*)\s")
+				pat2 = re.compile(r"([A-z]+)\s+=\s*-*\d+\.\d+")	# keywords
+				pat3 = re.compile(r"[A-z]+\s+=\s*(-*\d+\.\d+)")	# numbers
+	
+				step = int(re.search(pat1, section).group(1)) # steps
+				keyword = re.findall(pat2, section) # keywords
+				value = re.findall(pat3, section) # numbers
+
+				# display step
+				if not silent:
+					if step % 10000 == 0:
+						sys.stdout.write("\rParsing the Step " + str(step) + ".. ")
+						sys.stdout.flush()
+
+				if len(keyword) != len(value):
+					nu.die("Suspicious parsing at " + str(step) + ".. Exiting.")
+
+				# Write thermodynamic data to a new file for further use
+				output_myLOG_parse = "Step\t" + str(step) + "\t"
+				for asdf in range(0, len(keyword)):
+					output_myLOG_parse += keyword[asdf] + "\t" + str(value[asdf]) + "\t"
+				output_myLOG_parse += "\n"
+				myLOG_parse.write(output_myLOG_parse)
+
+				# Do what we want
+				if step % frequency == 0:
+					# find 'Volume' from the thermodynamic section!
+					try:
+						i = keyword.index("Volume")
+					except:
+						vol = 0
+					else:
+						vol = float(value[i])
+		
+					try:
+						i = keyword.index("Temp")
+					except:
+						temp = 0
+					else:
+						temp = float(value[i])
+		
+					if vol > 0:
+						density = mass / 6.022 / vol * 10
+						avr_density += density
+					else:
+						density = 0 
+		
+					l_information.append([step, temp, vol, mass, density])
+	
+				# empty bin
+				section = line;
+				section_full = False;
+			else:
+				section += line;
+
+		myLOG_parse.close()
+		if not silent: sys.stdout.write("Done.\n")
+
+	elif log_file == "":
+		# rough density calculation
+		mode = 2
+
+		if not silent: print("\n== Step 2. Loading Trajectory for mass and density calculation")
+		myDUMP = dump.dump(trj_file)
+		l_timestep = myDUMP.time()
+		if len(l_timestep) == 0:
+			print("No trajectory found on " + trj_file + " !!")
+			sys.exit(0);
+	
+		for index, t in enumerate(l_timestep):
+			box = myDUMP.viz(index)[1]
+			atoms = myDUMP.viz(index)[2]
+			mass = 0;
+			vol = 0;
+	
+			# volumes
+			x = box[3] - box[0]
+			y = box[4] - box[1]
+			z = box[5] - box[2]
+			vol = x*y*z
+			
+			# atoms
+			for atom in atoms:
+				mass += atom_mass[atom[1]]
+		
+			# density
+			# volumes = A^3, mass = g/mol
+			# thus density = mass/NA / (vol * 10^-24) = mass / 6.022 / vol * 10 (g/cm3)
+			if vol > 0:
+				density = mass / 6.022 / vol * 10
+				avr_density += density
+			else:
+				density = "None"
+			
+			l_information.append([t, -1 , vol, mass, density])
+
+	else:
+		print("Something is wrong. check the script.")
+		sys.exit(1)
+
+	# file output
+	f_out_file = open(out_file, "w")
+	f_out_file.write("Requested options: " + str(sys.argv) + "\n")
+	f_out_file.write("Job started at " + time.asctime(time.gmtime()) + " on " + os.environ["HOSTNAME"] + " by " + os.environ["USER"] + " at " + os.environ["PWD"] + "\n")
+	f_out_file.write("Timestep\tTemp\tVolume\tMass\tDensity\n")
+	for i in l_information:
+		f_out_file.write("{0:>10}\t{1:>10.4f}\t{2:>10.5f}\t{3:>10.5f}\t{4:>8.6f}\n".format(*i))
+		#f_out_file.write(str(i[0]) + "\t" + str(i[1]) + "\t" + str(i[2]) + "\t" + str(i[3]) + "\n")
+	f_out_file.write("="*60 + "\n")
+
+	if mode == 1:
+		temp = 0;
+		for i in l_information:
+			if i[1] > 0:
+				temp += 1;
+		if avr_density != 0: 
+			avr_density = avr_density/temp;
+		f_out_file.write("* Density is calculated from the thermodynamic data.\n")
+	elif mode == 2:
+		if avr_density != 0: 
+			avr_density = avr_density/len(l_information)
+		f_out_file.write("* Density is calculated from the trajectory.\n")
+
+	f_out_file.write("\t\t\t\tAvr.density\t" + "{0:10.5f}".format(avr_density) + "\n")
+	f_out_file.close()
+
+	if not silent: print("SUCCESS: The density information is written in " + out_file + " .")
+
+	return 1;	# success
+
+	### end of updatebgf
+
+
+if __name__ == "__main__":
+
+	if len(sys.argv) < 2:
+		print(usage);
+		sys.exit(1)
+
+	dat_file = ""; trj_file = ""; out_file = ""; log_file = ""; frequency = 1;
+
+	options, args = getopt.getopt(sys.argv[1:], 'hd:t:o:l:f:', ['help','data=','trj=','out=','log=','frequency='])
+	for option, value in options:
+		if option in ('-h', '--help'):
+			print(usage)
+			sys.exit(0);
+		elif option in ('-d', '--data'):
+			dat_file = value
+		elif option in ('-t', '--trj'):
+			trj_file = value
+		elif option in ('-o', '--out'):
+			out_file = value
+		elif option in ('-l', '--log'):
+			log_file = value
+		elif option in ('-f', '--frequency'):
+			frequency = int(value)
+		elif option == NULL:
+			print(usage)
+			sys.exit(0)
+
+	if trj_file == "" and log_file =="":
+		print("You have to specify either trajectory file or log file!")
+		sys.exit(1)
+	if dat_file == "":
+		print("You have to specify data file for atom mass.")
+		sys.exit(1)
+	if out_file == "":
+		out_file = trj_file[:-3] + "_density.dat"
+
+	# main call
+	print(sys.argv[0] + " version " + str(version))
+	getLAMMPSDensity(trj_file, log_file, dat_file, out_file, frequency, silent=False)
+

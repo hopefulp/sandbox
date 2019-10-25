@@ -21,10 +21,10 @@ def getsh(command):
 
 #
 if not os.path.isfile('EIGENVAL'):
-	print "EIGENVAL is not found."
+	print("EIGENVAL is not found.")
 	sys.exit()
 if not os.path.isfile('OUTCAR'):
-	print "OUTCAR is not found."
+	print("OUTCAR is not found.")
 	sys.exit()
 
 if len(sys.argv) is 2:
@@ -82,4 +82,4 @@ for i in revset:
 	sumset.append(temp)
 
 for i in range(int(npoint)+1):
-	print sumset[i]
+	print(sumset[i])

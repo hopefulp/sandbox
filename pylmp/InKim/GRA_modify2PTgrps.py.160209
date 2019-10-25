@@ -1,0 +1,75 @@
+#!/home/noische/python
+
+import sys
+import os
+import time
+
+from numpy import pi
+import bgf
+import CNT
+from LAMMPS_trj2bgf import *
+
+usage = """
+GRA_modify2PTgrps.py prefix temp_dir bgf_file restart_file grps_file distance
+
+	This script modifies GroupVolume part in grps_file.
+	This script should be run within Tod's LAMMPS-2PT pbs script.
+
+    *IMPORTANT* This script assumes infinite graphene
+      => distance between two graphene sheet will only be used
+         to calculate group volume for water.
+
+"""
+version = "160209"
+
+if len(sys.argv) < 6:
+	print usage;
+	sys.exit(0);
+
+prefix = sys.argv[1]
+temp_dir = sys.argv[2]
+bgf_filename = sys.argv[3]
+restart_filename = sys.argv[4]	# example: 05x05_bnnt_H_2pt.npt.1400000.restart
+grps_filename = sys.argv[5]
+distance = float(sys.argv[6])
+
+# read LAMMPS trajectory from scratch
+npt_trj = temp_dir + "/" + prefix + ".npt.lammps"
+if not os.path.exists(npt_trj):
+    npt_trj = temp_dir + "/" + prefix + ".nvt.lammps"
+timestep = int(restart_filename.split('.')[-2])
+mybgf = bgf.BgfFile(bgf_filename)
+mybgf = getLAMMPSTrajectory(mybgf, npt_trj, 0, timestep, True, False)
+pbc = mybgf.CRYSTX[:3]
+
+# calculate effective volume between graphene
+vdw_radii = 3.38383824 / 2	# C_2G in QMFF
+#vdw_radii = 2.45            # from g(r) of C_2G and OW
+height = distance - 2 * vdw_radii
+total_volume = pbc[0] * pbc[1] * pbc[2]
+inner_volume = pbc[0] * pbc[1] * distance # assume the sheet is lying on xy-plane
+sheet_volume = pbc[0] * pbc[1] * ( 2 * vdw_radii )    # double layer
+outer_volume = total_volume - inner_volume - sheet_volume
+
+# write GroupVolume to grps file
+gf = open(grps_filename)
+lines = gf.readlines()
+gf.close()
+
+# graphene interlayer total
+if "GroupVolume\n" in lines:
+	lines[lines.index('GroupVolume\n') + 1] = str(sheet_volume) + " " + str(inner_volume) +'\n'
+else:
+	lines.append("GroupVolume\n")
+	lines.append(str(sheet_volume) + " " + str(inner_volume) +'\n')
+
+gf = open(grps_filename, 'w')	# reopen
+gf.writelines(lines)
+gf.close()
+
+grps_dir = os.path.dirname(grps_filename)
+logf = open(grps_dir + "/" + "GRA_modify2PTvol.log", 'a')
+logf.write(str(time.asctime(time.gmtime())) + '\t' + str(timestep) + '\t' + str(vdw_radii) + '\t' + str(height) + '\t' + str(total_volume) + '\t' + str(sheet_volume) + '\t' + str(inner_volume) + '\t' + str(outer_volume) + '\n')
+logf.close()
+
+### end of code

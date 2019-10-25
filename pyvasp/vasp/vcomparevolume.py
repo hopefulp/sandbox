@@ -17,16 +17,16 @@ inifile = 'POSCAR'
 finfile = 'CONTCAR'
 
 if not os.path.isfile(inifile):
-	print inifile + " is not found."
+	print(inifile + " is not found.")
 	sys.exit()
 
 if not os.path.isfile('CONTCAR'):
-	print "\nCONTCAR is not found."
+	print("\nCONTCAR is not found.")
 	finfile = 'POSCAR'
 
 if os.path.isfile('CONTCAR'):
 	if not os.path.getsize('CONTCAR'):
-		print "\nCONTCAR is empty."
+		print("\nCONTCAR is empty.")
 		finfile = 'POSCAR'
 
 posfile = open(inifile)
@@ -93,8 +93,8 @@ bdiff = (clenb - plenb) / plenb * 100
 cdiff = (clenc - plenc) / plenc * 100
 voldiff = (cvol - pvol) / pvol * 100
 
-print "              a          b          c        Volume"
-print "------------------------------------------------------"
-print "POSCAR  : %8.5f   %8.5f   %8.5f   %10.5f" % (plena, plenb, plenc, pvol)
-print "CONTCAR : %8.5f   %8.5f   %8.5f   %10.5f" % (clena, clenb, clenc, cvol)
-print "DIFF.( ): %8.5f   %8.5f   %8.5f   %10.5f" % (adiff, bdiff, cdiff, voldiff)
+print("              a          b          c        Volume")
+print("------------------------------------------------------")
+print("POSCAR  : %8.5f   %8.5f   %8.5f   %10.5f" % (plena, plenb, plenc, pvol))
+print("CONTCAR : %8.5f   %8.5f   %8.5f   %10.5f" % (clena, clenb, clenc, cvol))
+print("DIFF.( ): %8.5f   %8.5f   %8.5f   %10.5f" % (adiff, bdiff, cdiff, voldiff))

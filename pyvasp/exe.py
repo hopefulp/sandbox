@@ -9,7 +9,7 @@ def allvasp():
         if not os.path.isdir(dir):
             continue
         os.chdir(dir)
-        print 'now on' + dir
+        print('now on' + dir)
         if os.path.isfile('POSCAR') and os.path.isfile('POTCAR') and not os.path.isfile('OUTCAR'):
             os.chdir(dir)
             os.system('echo "here is", dir')

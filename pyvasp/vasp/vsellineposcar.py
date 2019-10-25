@@ -6,7 +6,7 @@ import re
 
 #usage description
 if len(sys.argv)<3:
-	print "Usage: [POSCAR file] [atom list file]"
+	print("Usage: [POSCAR file] [atom list file]")
 	sys.exit()
 
 posfilename=sys.argv[1]
@@ -38,10 +38,10 @@ while 1:
 			if not line:
 				break
 			if i in dellist:
-				print "Line %d added" % i
+				print("Line %d added" % i)
 				newfile.write(line)
 			else:
-				print "Line %d removed" % i
+				print("Line %d removed" % i)
 				
 swfiles = 'mv %s %s.old;mv %s.new %s' % (posfilename, posfilename, posfilename, posfilename)
 os.system(swfiles)

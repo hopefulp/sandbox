@@ -14,18 +14,18 @@ def length(v):
         return math.sqrt(dotproduct(v, v))
 
 if len(sys.argv) < 2:
-	print "Usage: [file1] [file2]"
+	print("Usage: [file1] [file2]")
 	sys.exit()
 
 filename1 = sys.argv[1]
 filename2 = sys.argv[2]
 
 if not os.path.isfile(filename1):
-	print inifile + " is not found."
+	print(inifile + " is not found.")
 	sys.exit()
 
 if not os.path.isfile(filename2):
-	print finfile + " is not found."
+	print(finfile + " is not found.")
 	sys.exit()
 
 file1 = open(filename1)
@@ -215,7 +215,7 @@ for i in range (len(species)):
 		len = length(vec)
 		atname = species[i]+str(j+1)
 	#	print "%-5s %8.5f from( %8.5f , %8.5f , %8.5f ) to( %8.5f , %8.5f , %8.5f )" % (atname,len,x1,y1,z1,x2,y2,z2)
-		print "%-5s %8.5f" % (atname,len)
+		print("%-5s %8.5f" % (atname,len))
 
 file1.close
 file2.close

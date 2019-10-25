@@ -9,7 +9,7 @@ def get_jobs():
     ### obtain new_dir
     jobs = []
     jobs.extend(glob.glob('*.pos'))
-    print jobs
+    print(jobs)
     return jobs[0]
 
 def modify_kpoints():
@@ -55,9 +55,9 @@ def main():
     cp_files=['CONTCAR', 'IBZKPT', 'POTCAR', 'INCAR', 'WAVECAR', 'CHGCAR']
     if re.search('cont', args.job):
         if not args.odir:
-            print ('job== %s requires odir' % (args.odir))
+            print(('job== %s requires odir' % (args.odir)))
             exit(2)
-        print ("copy from %s to  %s" % (args.odir, args.new_dir))
+        print(("copy from %s to  %s" % (args.odir, args.new_dir)))
         cmd0 = 'mkdir ' + args.new_dir
         os.system(cmd0)
         if args.job == 'cont':
@@ -71,7 +71,7 @@ def main():
                 obj = ''
             filename = args.odir + '/' + cfile
             if not os.path.isfile(filename):
-                print ('there is not %s' % (filename))
+                print(('there is not %s' % (filename)))
                 exit(3)
             cmd0    = 'cp ' + filename + '  ' + args.new_dir + '/' + obj
             os.system(cmd0)
@@ -90,7 +90,7 @@ def main():
     ### pwd::mk job directory
     cmd = 'mkdir ' + new_dir
     if os.path.isdir(new_dir):
-        print("%s directory is already there" % (new_dir))
+        print(("%s directory is already there" % (new_dir)))
         exit(10)       # should exit when being used, now testing
     else:        
         os.system(cmd)
@@ -99,7 +99,7 @@ def main():
     if os.path.isfile(st_poscar):
         cmd = 'cp ' + st_poscar + ' ' + new_dir + '/POSCAR'
         os.system(cmd)
-        print ("%s was copied to %s" % (st_poscar, new_dir))
+        print(("%s was copied to %s" % (st_poscar, new_dir)))
     #else:
     #    cmd = 'cp POSCAR ' + new_dir
     #    os.system(cmd)
@@ -113,25 +113,25 @@ def main():
     if args.path:
 
         if not os.path.isdir(args.path):
-            print ("there is no path to %s" % (args.path))
+            print(("there is no path to %s" % (args.path)))
             exit(30)
         ### path2vasp_ini:: 2 copy KPOINTS
         if 'K' in args.files or 'A' in args.files:
 
             k_file  = args.path + '/kp.' + args.ksample
             if not os.path.isfile(k_file):
-                print ("there is not %s file" % (k_file))
+                print(("there is not %s file" % (k_file)))
                 exit(31)
             cmd1    = 'cp ' + k_file + ' ./KPOINTS'
             cmds.append(cmd1)
-            print "KPOINTS was copied from VaspINI to here"
+            print("KPOINTS was copied from VaspINI to here")
             cmd1    = 'cp KPOINTS ' + new_dir
             cmds.append(cmd1)
         ### path2vasp_ini:: 3 copy pseudo-potential
         if 'P' in args.files or 'A' in args.files:
             pot_dir = args.path +'/'+ args.pdir
             if not os.path.isdir(pot_dir):
-                print("there is not dir for POTCAR in %s" % (args.pdir))
+                print(("there is not dir for POTCAR in %s" % (args.pdir)))
                 exit(320)
             # make POTCAR                
             if args.atoms:
@@ -139,7 +139,7 @@ def main():
                 for at in args.atoms:
                     fname = pot_dir + '/' + at +'.pot'
                     if not os.path.isfile(fname):
-                        print("there is not %s.pot in %s" % (at, potdir))
+                        print(("there is not %s.pot in %s" % (at, potdir)))
                         exit(32)
                     else:
                         cmd += pot_dir + '/' + at + '.pot '
@@ -151,22 +151,22 @@ def main():
             #    exit(32)
             cmd2    = 'cp ' + pot_file + ' ./POTCAR'
             cmds.append(cmd2)
-            print "POTCAR was copied from VaspINI to here"
+            print("POTCAR was copied from VaspINI to here")
             cmd2    = 'cp POTCAR ' + new_dir
             cmds.append(cmd2)
         if 'I' in args.files or 'A' in args.files:            
             in_file = args.path +'/'+ args.idir +'/incar.'+ args.incar
             if not os.path.isfile(in_file):
-                print("there is not %s incar file" % (in_file))
+                print(("there is not %s incar file" % (in_file)))
                 exit(33)
             cmd3    = 'cp ' + in_file + ' ./INCAR'
             cmds.append(cmd3)
-            print "INCAR was copied from VaspINI to here"
+            print("INCAR was copied from VaspINI to here")
             cmd3    = 'cp INCAR ' + new_dir
             cmds.append(cmd3)
     ### if not -p: copy files to working-dir 
     elif args.odir:
-        print ("copy from %s" % (args.odir))
+        print(("copy from %s" % (args.odir)))
         cmd1    = 'cp ' + args.odir + '/KPOINTS ' + new_dir
         cmd2    = 'cp ' + args.odir + '/POTCAR ' + new_dir
         cmd3    = 'cp ' + args.odir + '/INCAR ' + new_dir

@@ -25,7 +25,7 @@ def main():
 	args = parser.parse_args()
 #	print args.outcar
 #	e = find_energy(args.outcar,args.phrase,args.index)
-	print args.outcar, e
+	print(args.outcar, e)
 	return
 
 if __name__=='__main__':

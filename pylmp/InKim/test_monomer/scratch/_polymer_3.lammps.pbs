@@ -1,0 +1,110 @@
+#PBS -l nodes=1:ppn=8
+#PBS -l walltime=480:00:00
+#PBS -q batch
+#PBS -j oe
+#!/bin/tcsh
+#!/bin/csh
+#PBS -N _polymer_3
+
+echo "Nodes:"
+cat $PBS_NODEFILE
+echo "JOB: MD Simulation of _polymer_3"
+echo
+
+set prefix = _polymer_3
+set curr_dir = /qcfs/noische/scripts/test_monomer/scratch
+set temp_dir = /scratch/noische/_polymer_3
+set bgf_file = /qcfs/noische/scripts/test_monomer/scratch/_polymer_3.bgf
+set force_field = "/home/noische/ff/DREIDING2.21.ff"
+set input_file = in._polymer_3
+set data_file = data._polymer_3
+set twoPT_file = in.${prefix}.2pt
+set atom_eng_file = in.${prefix}.atom.eng
+set grp_file = ${curr_dir}/${prefix}.grps
+set nodes = 1
+set nprocs = `wc -l < $PBS_NODEFILE`
+set outputfiles = "*"
+set do_2pt = 0 # change this flag to do the 2pt analysis
+
+if($do_2pt) then
+  set create2PT = "csh -f /home/tpascal/scripts/createVacInp.csh"
+  set do2PT = /home/yjn1818/codes/bin/2pt_analysis
+  set tstep = 0.002 #CHANGE!!! default to 2fs
+  set rotational_symmetry = 2 # **IMPORTANT** change this value to match your system if doing 2PT. Defaults to 2 for water!!
+  if (-e $bgf_file) then
+    if ! (-e ${grp_file}) then
+      /home/tpascal/scripts/bgf2VACgrp.pl -b $bgf_file -f resname -c 1 -o 1 -s $grp_file >& /dev/null
+    endif
+  endif
+  if ! (-e ${grp_file}) then
+    set grp_file = `/home/tpascal/scripts/getDOF.pl -b $bgf_file -v 0`
+    set grp_file = "${grp_file} ${rotational_symmetry}"
+  endif
+  if (-e ${curr_dir}/in.${prefix}_singlepoint) then
+    set shakeStr = `grep "fix             shakeH" ${curr_dir}/in.${prefix}`
+    cp ${curr_dir}/in.${prefix}_singlepoint ${curr_dir}/_in.test
+    sed -i 's/read_data.*$/read_restart ${restart}/' ${curr_dir}/_in.test
+    sed -i 's/variable.*//' ${curr_dir}/_in.test
+    sed -i 's/group.*//' ${curr_dir}/_in.test
+    sed -i 's/run.*//' ${curr_dir}/_in.test
+    cat ${curr_dir}/_in.test /home/yjn1818/scripts/dat/LAMMPS/in.lammps.2pt > ${curr_dir}/in.${prefix}.2pt
+    sed -i "s/fix             shakeH.*/$shakeStr/" ${curr_dir}/in.${prefix}.2pt
+    cat ${curr_dir}/_in.test /home/yjn1818/scripts/dat/LAMMPS/in.lammps.atom.eng > ${curr_dir}/in.${prefix}.atom.eng
+    sed -i "s/fix             shakeH.*/$shakeStr/" ${curr_dir}/in.${prefix}.atom.eng
+    sed -i -r 's/(ewald.*|pppm.*)/ewald 0.001/' ${curr_dir}/in.${prefix}.atom.eng
+    rm -fr ${curr_dir}/_in.test
+  endif
+endif
+
+setenv LAMMPS_PARALLEL "/home/yjn1818/codes/openmpi/1.4.3/bin/mpirun -hostfile $PBS_NODEFILE -np $nprocs"
+set executable = "/home/yjn1818/codes/bin/lmp_cluster -screen none"
+
+echo Running $executable on $nodes nodes $nprocs processors launched from $PBS_O_HOST
+echo "Nodes:"
+cat $PBS_NODEFILE
+
+cat $PBS_NODEFILE > $curr_dir/nodelist.$PBS_JOBID
+
+mkdir -p $temp_dir/analysis ${curr_dir}/results
+cd $temp_dir
+foreach i ($input_file $data_file $twoPT_file $atom_eng_file)
+  if (-e ${curr_dir}/${i}) cp ${curr_dir}/${i} ./
+end
+
+
+
+echo "LAMMPS equilibration dynamics of ${prefix}"
+$LAMMPS_PARALLEL $executable  -in $input_file -log ${prefix}.equil.lammps.log || goto error
+
+if !(-e ${twoPT_file}) set do_2pt = 0
+if ($do_2pt == 1) then
+  foreach i (${prefix}.npt.*.restart)
+    cd ${temp_dir}
+    set sname = `basename $i .restart`
+    echo "2PT analysis using $sname"
+    $LAMMPS_PARALLEL $executable  -in $twoPT_file -var restart $i -var sname $sname || continue
+    foreach j (${sname}.2pt.*.restart)
+      $LAMMPS_PARALLEL $executable  -in $atom_eng_file -var restart $j -var sname $sname >& /dev/null
+      rm -fr $j
+    end
+    cd ${temp_dir}/analysis
+      ${create2PT} ../${sname}.2pt ../${data_file} 3 ${tstep} ${grp_file}
+      ${do2PT} ${sname}.2pt.mol.grps.in >& ${sname}.2pt.mol.grps.screen.out
+      cp ${sname}.2pt.mol.grps.* ${curr_dir}/results
+    cd ../
+    rm -fr ./${sname}.2pt.lammps
+  end
+endif
+
+exit:
+echo " "
+echo No errors detected
+echo " "
+exit(0)
+
+error:
+echo " "
+echo ERROR OCCURRED: Check output file
+echo " "
+exit(1)
+

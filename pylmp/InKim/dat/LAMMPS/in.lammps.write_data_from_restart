@@ -1,0 +1,2 @@
+write_data  $datafile
+run         0

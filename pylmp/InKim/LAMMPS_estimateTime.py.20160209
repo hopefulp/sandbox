@@ -1,0 +1,76 @@
+#!/home/noische/python
+"""
+estimateTime.py
+Original: Dec 28 2011 In Kim
+"""
+
+# Python Modules
+import sys
+import os
+import string
+import random
+import datetime
+import getopt
+import math
+
+# Custom Modules
+sys.path.append("/home/noische/scripts")
+sys.path.append("/home/noische/script")
+
+# Globals
+version = '140304'
+
+def estimateTime(elapsedTime, elapsedStep, targetStep, silent=False):
+	"""
+def estimateTime():
+	Write what this function does.
+
+Function Parameters:
+	bgf_file	A string of filename or BgfFile class.
+	out_file	A string of filename or BgfFile class.
+	"""
+	nowTime = datetime.datetime.now()
+	jobTime = int(targetStep * elapsedTime / elapsedStep)
+	leftTime = jobTime - elapsedTime
+	endTime = nowTime + datetime.timedelta(seconds=leftTime)
+
+	print("Estimated time left: " + str(leftTime) + " seconds (about " + str(int(math.ceil(leftTime/60.0))) + " minutes)")
+	print("Estimated End time: " + str(endTime))
+
+	### end of estimateTime
+
+
+if __name__ == '__main__':
+
+	option = ""; args = ""; elapsedTime = 0; elapsedStep = 0; targetStep = 0;
+	usage = """
+Usage: estimateTime.py -t elapsedTime -s elapsedStep -T targetStep
+
+Options are:
+	-t self-descriptive
+	-s self-descriptive
+	-T self-descriptive
+	"""
+
+	if len(sys.argv) < 2:
+		print(usage); sys.exit(0)
+
+	options, args = getopt.getopt(sys.argv[1:], 'ht:s:T:', ['help','time=','step=','targetstep='])
+	for option, value in options:
+		if option in ('-h', '--help'):
+			print(usage); sys.exit(0)
+		elif option in ('-t', '--time'):
+			elapsedTime = float(value)
+		elif option in ('-s', '--step'):
+			elapsedStep = int(value)
+		elif option in ('-T', '--targetstep'):
+			targetStep = int(value)
+		elif option in (''):
+			print(usage); sys.exit(0)
+
+	# default settings
+	if elapsedTime == 0 or elapsedStep == 0 or targetStep == 0:
+		print(usage); sys.exit(0)
+
+	estimateTime(elapsedTime, elapsedStep, targetStep, silent=False)
+

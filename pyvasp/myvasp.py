@@ -3,6 +3,7 @@
 import os
 import json
 import re
+import sys
 
 """ repository for many vasp script 
 def get_vasp_repository():
@@ -13,10 +14,11 @@ def make_kpoints(kp, MH|gamma, **args=[band])
 
 eps_H2O = 78.3
 
+ini_dvasp = '/tmp'
 
 def get_vasp_repository():
     """ my vasp repository for POTCAR & KPOTINS """
-
+    global ini_dvasp
     hostname = os.popen('hostname').read().rstrip()
     #print 'hostname is', hostname
 
@@ -26,22 +28,36 @@ def get_vasp_repository():
     #(out, err) = proc.communicate()
     #print "program output:", out
     if hostname == 'chi':
-        ini_dvasp = '/Data/Bkaist/VaspINI'
+        ini_dvasp = '/home/joonho/sandbox_gl/pyvasp/VaspINI'
+    elif hostname == 'login':
+        ini_dvasp = '/gpfs/home/joonho/sandboxg/pyvasp/VaspINI'
+    elif hostname == 'login04':
+        ini_dvasp = '/home01/x1813a01/sandboxg/pyvasp/VaspINI'
     else:
-        ini_dvasp = '/qcfs/joonho/sandbox/pyvasp/VaspINI'
+        print('host is not recognized: exit')
+        sys.exit(1)
 
-    print "vasp repository is ", ini_dvasp, ' in system ', hostname
+    print("vasp repository is ", ini_dvasp, ' in system ', hostname)
     if not os.access(ini_dvasp, os.F_OK):
-        print "Error:: the directory cannot be found\n stop"
+        print("Error:: the directory cannot be found\n stop")
         exit(1)
     return ini_dvasp
 
 def make_kpoints(kp, method):
-    """ Make KPOINTS file 
-        only Gamma w. 1 1 1 and MH are adapted"""
+    """ 
+        Make KPOINTS file 
+        only Gamma w. 1 1 1 and MH are adapted
+    """
     fname = 'KPOINTS'
-    f = open(fname, 'w')
 
+    if not kp:
+        if method == 'gamma':
+            kfile = ini_dvasp + '/kp.gamma'
+            s = 'cp %s KPOINTS' % kfile
+            print('KPOINTS was copied from %s' % kfile)
+            os.system(s)
+
+    f = open(fname, 'w')
     f.write("Automatic Mesh\n")                 # 1st line, description
     f.write("0\n")                              # 2nd line, number of K, 0 for automatic
     
@@ -81,10 +97,10 @@ def make_incar(dic, rw, iofile):
     elif rw == 'r':
         dic = json.load(open(iofile))
     else:
-        print "w/r error for iofile"
+        print("w/r error for iofile")
         exit(1)
 
-    print dic
+    print(dic)
 
     fname = 'INCAR'
     f = open(fname, 'w')
@@ -100,7 +116,7 @@ def make_incar(dic, rw, iofile):
             natom = dic['nmag']
         else:
             question = "number of magnetic atom? "
-            natom = int(str(raw_input(question)).strip())
+            natom = int(str(input(question)).strip())
         magmom = dic['magmom']
         comm = 'MAGMOM = '
         if dic['mag'] == 'fm':
@@ -134,7 +150,12 @@ def make_incar(dic, rw, iofile):
     com1 += 'PREC = %s\n' % dic['precision']
     com1 += 'ISMEAR = 0 ; SIGMA = 0.05\n'
     com1 += 'NELMIN = 4 ; NELM = 500\n'
-    com1 += 'EDIFF = 1E-5 ; EDIFFG = -0.025\n\n'
+    if dic['crelax'] == 'atom':
+        com1 += 'EDIFF = 1E-5'
+    elif dic['crelax'] == 'cell':
+        com1 += 'EDIFF = 1E-5 ; EDIFFG = -0.025\n\n'
+    else:
+        pass
     f.write(com1)
     f.write('# precision 2\n')
     com1 = 'GGA_COMPAT=.FALSE.\n'
@@ -145,17 +166,24 @@ def make_incar(dic, rw, iofile):
     com1 = 'LMAXMIX = 4\n'
     com1 += '#IMIX = 4; #AMIX = 0.2; #BMIX = 0.0001; #AMIX_MAG = 0.8; #BMIX_MAG = 0.0001\n\n'
     f.write(com1)
-    f.write('# performance')
-    com1 = 'ALGO = Fast\n'
-    com1 += '#IALGO=48\n'
-    com1 += 'NSIM = 4; NPAR = 4\n'
-    com1 += 'LREAL = Auto; LPLANE = .TRUE.\n'
-    com1 += 'LSCALAPACK = .FALSE.\n\n'
-    f.write(com1)
+    f.write('# parallel performance')
+    #com1 = 'ALGO = Fast\n'
+    #com1 += '#IALGO=48\n'
+    #com1 += 'NSIM = 4; NPAR = 4\n'
+    #com1 += 'LREAL = Auto; LPLANE = .TRUE.\n'
+    #com1 += 'LSCALAPACK = .FALSE.\n\n'
+    #f.write(com1)
     ###### 4: dft+D+U
-    f.write('# functional (PE=PBE,RE=revPBE,b3=B3LYP,ML=vdw-df2, MK=rev-vdW-DF2, \n')
+    f.write('# functional (PE=PBE,RP=RPBE,RE=revPBE,b3=B3LYP,ML=vdw-df2, MK=rev-vdW-DF2, \n')
     f.write('# D correction if not vdW-DF (0-no, 1-d2, 11-d3_zero(Grimme), 12-de_BJ, 2-ts)\n')
-    comm = 'GGA = '+dic['dft']+'\n'
+    if len(dic['dft'])==2:
+        comm = 'GGA = '+dic['dft']+'\n'
+    elif len(dic['dft'])==3:
+        comm = 'GGA = '+dic['dft'][:2]+'\n'
+        if dic['dft'][2]=='0':
+            Ladd_hybrid="YES"
+    else:
+        print("add more options in dft name")
     ### B3LYP
     if re.search('b3',dic['dft'],re.IGNORECASE):
         comm += 'LHFCALC = .TRUE.\n'
@@ -171,6 +199,20 @@ def make_incar(dic, rw, iofile):
         comm += 'PRECFOCK = F\n'
         comm += 'NKRED = 2\n'
         comm += '#block the NPAR\n'
+    elif re.search('pe',dic['dft'],re.IGNORECASE) or re.search('re',dic['dft'],re.IGNORECASE):      # for PBE, revPBE        
+        comm += 'LREAL = Auto; LPLANE = .TRUE.\n'
+        comm += 'LSCALAPACK = .FALSE.\n\n'
+        if "Ladd_hybrid" not in locals():
+            comm = 'ALGO = Fast\n'
+            comm += '#IALGO=48\n'
+            comm += 'NSIM = 4; NPAR = 4\n'
+        else:                                       # PBE0 or revPBE0
+            comm += 'LHFCALC = .TRUE.\n'
+            comm += 'ALGO = D; TIME = 0.4\n'
+            comm += 'NSIM = 4\n'
+            comm += 'ENCUTFOCK = 0\n'
+            comm += 'NKRED = 2\n'
+            comm += 'Block NPAR tag\n'
     elif re.search('e0',dic['dft'],re.IGNORECASE):
         comm += 'LHFCALC = .TRUE.\n'
         comm += 'ALGO = D; TIME = 0.4\n'
@@ -187,8 +229,14 @@ def make_incar(dic, rw, iofile):
             comm += 'PARAM1 = 0.1234 \n'
             comm += 'PARAM2 = 0.711357 \n'
     else:            
-        if dic['dispersion']:
-            comm += 'IVDW = 12    ! D2\n\n'
+        if dic['dispersion']=='d2':
+            comm += 'IVDW = 10      ! D2\n\n'
+        elif dic['dispersion']=='d3':
+            comm += 'IVDW = 11      ! D3-Grimme\n\n'
+        elif dic['dispersion']=='d3bj':
+            comm += 'IVDW = 12      ! D3-Becke-Jonson\n\n'
+        elif dic['dispersion']=='ts':
+            comm += 'IVDW = 20      ! Tkatchenko-Scheffler\n\n'
     comm += '\n'
     f.write(comm)
     ### DFT virtual orbital
@@ -206,19 +254,33 @@ def make_incar(dic, rw, iofile):
     else:
         comm = '\n'
         f.write(comm)
-    ### 5: Relaxation
+    ### 5: Movement: Relaxation, MD
     f.write('# Optimization\n')
     if dic['crelax'] == 'sp':
         comm = '#NSW = ; ISIF = ; IBRION = ; POTIM = \n\n'
     else:
-        if dic['crelax'] == 'atom':
+        if dic['crelax'] == 'atom' :
             isif = 2
         else:
             isif = 3
-        comm = 'NSW = 999 ; ISIF = %d\n' % isif
-        comm += 'IBRION = 2\nPOTIM = 0.3\n'
+        if dic['dynamics'] == 'nvt':
+            isif=0
+            nsw=5000
+            ibrion=0
+            potim=2.0
+        else:
+            nsw=999
+            ibrion=2
+            potim=0.3
+        comm = 'NSW = %d ; ISIF = %d\n' % (nsw, isif)
+        comm += 'IBRION = %d\nPOTIM = %f\n' % (ibrion, potim)
         comm += '#ADDGRID = .TRUE.\n\n'
+        comm += '### AIMD more\n'
+        comm += 'TEIN = 300; TEBEG=300; TEEND=300\n'
+        comm += 'SMASS = 0.05; ISYM=0\n\n'
     f.write(comm)
+    ### AIMD
+    #f.write('# aimd - nvt:: nsw=5000; isif=0; ibrion=0;potim=2.0;tein=300;tebeg=300;teend=300;smass=0.05;isym=0\n\n')
     ### Solvent effect
     f.write('# Solvent effect::higher Ecut is required (LSOL=.TRUE. EB_K for dielectric) \n')
     if dic['solvent']:
@@ -228,8 +290,6 @@ def make_incar(dic, rw, iofile):
         comm += '#TAU = 0\n'
         comm += '#LRHOB = .TRUE\n\n'
         f.write(comm)
-    ### AIMD
-    f.write('# aimd - nvt:: nsw=5000; isif=0; ibrion=0;potim=2.0;tein=300;tebeg=300;teend=300;smass=0.05;isym=0\n\n')
     ###### 6: POST-SCF 
     f.write('###### POST SCF CALC :: SOC [DOS|PCHG|NEB]  #########\n')
     ### SOC

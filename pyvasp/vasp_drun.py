@@ -12,7 +12,7 @@ def vasp_jobs(dirs, run):
     pbs_name = Env_msg.pbs_vname
     commands=[]
     if not dirs:
-        print "input directory to run out of directory"
+        print("input directory to run out of directory")
         exit(0)
     elif re.match("all", dirs[0], re.IGNORECASE):
         lists = os.listdir('.')
@@ -20,27 +20,27 @@ def vasp_jobs(dirs, run):
             if not os.path.isdir(dir):
                 continue
             os.chdir(dir)
-            print 'now on '+dir
+            print('now on '+dir)
             if os.path.isfile('INCAR') and os.path.isfile('POSCAR') and not os.path.isfile('OUTCAR'):
                 os.system('csh /qcfs/jackjack5/vasp/vaspenv.sh')
             os.chdir('..')
     else:
         for dir in dirs:
             if not os.path.isdir(dir):
-                print "%f is not directory" % dir
+                print("%f is not directory" % dir)
                 exit(11)
-            print "copy pbs from ..: ", pbs
+            print("copy pbs from ..: ", pbs)
             cmd = 'cp ' + pbs + ' .'
             os.system(cmd)
             cmd = "sed -i 's/#PBS -N/#PBS -N " + dir + "/' " + pbs_name
-            print cmd
+            print(cmd)
             os.system(cmd)
             cmd = 'qsub ' + pbs_name
-            print cmd
+            print(cmd)
             if run:
                 os.system(cmd)
         if not run:
-            print "to run use option -r"
+            print("to run use option -r")
             exit(1)
 
     return 0

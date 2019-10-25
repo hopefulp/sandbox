@@ -18,6 +18,12 @@ def is_int(s):
         if len(_str) >= 1:
             return len(_str)
     else:
-        print "null string"
+        print("null string")
         exit(1)
 
+def is_there_char(st):
+    """ return True if there is char """
+    for char in st:
+        if char.isalpha():
+            return True
+    return False

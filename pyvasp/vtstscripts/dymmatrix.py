@@ -8,7 +8,7 @@ from sys import exit
 
 def check_file(filename):
     if not os.path.isfile(filename):
-        print 'No such file: %s' % filename
+        print('No such file: %s' % filename)
         exit(1)
 
 
@@ -18,7 +18,7 @@ def dymmatrix(displacecars, outcars):
     displacements = None
     for displacecar in displacecars:
         check_file(displacecar)
-        print 'Reading %s' % displacecar
+        print('Reading %s' % displacecar)
         d = numpy.loadtxt(displacecar).flatten()
         all_displacements.extend(d)
         if displacements == None:
@@ -29,12 +29,12 @@ def dymmatrix(displacecars, outcars):
     ndisp = numpy.count_nonzero(displacements)
     #indices of the nonzero displacements
     di = numpy.nonzero(all_displacements)[0] % ndisp
-    print 'Number of displacements: %i' % ndisp
+    print('Number of displacements: %i' % ndisp)
 
     traj = []
     for outcar in outcars:
         check_file(outcar)
-        print 'Reading %s' % outcar
+        print('Reading %s' % outcar)
         images = aselite.read_vasp_out(outcar)
         atoms = images[0]
         traj += images[1:]
@@ -47,11 +47,11 @@ def dymmatrix(displacecars, outcars):
     masses = numpy.array(displacement_masses)
 
     if len(traj) != ndisp:
-        print 'ERROR: number of displacements (%i) !=' % ndisp,
-        print 'number of calculations (%i)' % len(traj)
+        print('ERROR: number of displacements (%i) !=' % ndisp, end=' ')
+        print('number of calculations (%i)' % len(traj))
         exit(1)
 
-    print 'Building dynamical matrix'
+    print('Building dynamical matrix')
     dymmat = numpy.zeros((ndisp,ndisp))
     hessian = numpy.zeros_like(dymmat)
 
@@ -70,7 +70,7 @@ def dymmatrix(displacecars, outcars):
 
     numpy.savetxt('freq.mat', dymmat, fmt='%16.8f')
 
-    print 'Diagonalizing matrix'
+    print('Diagonalizing matrix')
 
     omegas, ev = numpy.linalg.eigh(dymmat)
     numpy.savetxt('eigs.dat', omegas, fmt='%25.15g')
@@ -83,7 +83,7 @@ def dymmatrix(displacecars, outcars):
         freq = numpy.sqrt(numpy.abs(omega))*521.47
         s = '%12.6f cm^{-1} ... %i ' % (freq, imag)
         f.write(s+'\n')
-        print s
+        print(s)
     f.close()
 
     numpy.savetxt('modes.dat', ev, fmt='%16.8f')
@@ -94,11 +94,11 @@ def dymmatrix(displacecars, outcars):
     numpy.savetxt('effective_masses.dat', effective_masses, fmt='%12.6f')
 
 def usage():
-    print 'usage: dymmmatrix.py [DISPLACECAR] [OUTCAR]'
-    print '   or  dymmmatrix.py #DISPLACECAR DISPLACECAR1',
-    print 'DISPLACECAR2 ...'
-    print '                     OUTCAR1 OUTCAR2 OUTCAR3 ...'
-    print
+    print('usage: dymmmatrix.py [DISPLACECAR] [OUTCAR]')
+    print('   or  dymmmatrix.py #DISPLACECAR DISPLACECAR1', end=' ')
+    print('DISPLACECAR2 ...')
+    print('                     OUTCAR1 OUTCAR2 OUTCAR3 ...')
+    print()
 
 if __name__ == '__main__':
     from sys import argv

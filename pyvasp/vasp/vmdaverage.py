@@ -29,8 +29,8 @@ def getsh(command):
 tmin = float(getsh("grep TEBEG INCAR | awk '{print $3}'")[0].strip())
 tmax = float(getsh("grep TEEND INCAR | awk '{print $3}'")[0].strip())
 tt = (tmin + tmax)/2
-print "-------------------------------------------"
-print " - Target Temperature : %6.1f ~ %6.1f" % (tmin, tmax)
+print("-------------------------------------------")
+print(" - Target Temperature : %6.1f ~ %6.1f" % (tmin, tmax))
 
 #get output results
 if os.path.isfile(pwd+'.log'):
@@ -166,13 +166,13 @@ sev = sdv / math.sqrt(len(grepvol))
 #se0 = sd0 / math.sqrt(nimg)
 
 #print
-print " - Last %d images" % (len(greposz))
-print "-------------------------------------------"
+print(" - Last %d images" % (len(greposz)))
+print("-------------------------------------------")
 #print "Total %d images from the last %d samples" % (nimg, len(greposz))
-print "  T  = %9.4f (sd:%8.4f, se:%8.4f)" % (avgt, sdt, set)
-print "  E  = %9.4f (sd:%8.4f, se:%8.4f)" % (avge, sde, see)
-print "  E0 = %9.4f (sd:%8.4f, se:%8.4f)" % (avg0, sd0, se0)
-print "  P  = %9.4f (sd:%8.4f, se:%8.4f)" % (avgp, sdp, sep)
-print "  K  = %9.4f (sd:%8.4f, se:%8.4f)" % (avgk, sdk, sek)
+print("  T  = %9.4f (sd:%8.4f, se:%8.4f)" % (avgt, sdt, set))
+print("  E  = %9.4f (sd:%8.4f, se:%8.4f)" % (avge, sde, see))
+print("  E0 = %9.4f (sd:%8.4f, se:%8.4f)" % (avg0, sd0, se0))
+print("  P  = %9.4f (sd:%8.4f, se:%8.4f)" % (avgp, sdp, sep))
+print("  K  = %9.4f (sd:%8.4f, se:%8.4f)" % (avgk, sdk, sek))
 #print "  Et = %9.4f (sd:%8.4f, se:%8.4f)" % (avgo, sdo, seo)
-print "  V  = %9.4f (sd:%8.4f, se:%8.4f)" % (avgv, sdv, sev)
+print("  V  = %9.4f (sd:%8.4f, se:%8.4f)" % (avgv, sdv, sev))

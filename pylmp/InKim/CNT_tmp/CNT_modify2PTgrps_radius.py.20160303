@@ -1,0 +1,147 @@
+#!/home/noische/python
+
+import sys
+import os
+import time
+import shutil
+import math
+
+from numpy import pi
+import numpy as np
+import bgf
+import CNT
+from LAMMPS_trj2bgf import *
+import nutils as nu
+
+usage = """
+CNT_modify2PTgrps_radius.py bgf_file grps_file 
+
+- This script modifies Group Atoms in *grps file
+- Originally intended to use for (36, 36) CNT with four radial sections.
+- This script should be run within Tod's LAMMPS-2PT pbs script.
+"""
+version = "160225"
+
+if len(sys.argv) < 2:
+	print usage;
+	sys.exit(0);
+
+print "CNT_modify2PTgrps_radius.py"
+print sys.argv
+
+# initialization
+bgf_filename = sys.argv[1]
+grps_filename = sys.argv[2] # target grps_file
+grps_original_filename = grps_filename + ".original"
+
+radius_bin = [8.0, 15.0, 22.0]  # bin for radial sections. the last value will be replaced to cnt_radius - r_vdw_C. 
+n_group = len(radius_bin) + 2  # CNT, total, 0~8, 8~15, 15~22
+
+# keep original grps file at the first run
+if not os.path.exists(grps_original_filename):
+    shutil.copy(grps_filename, grps_original_filename)
+
+# read atoms from bgf file
+mybgf = bgf.BgfFile(bgf_filename)
+pbc = mybgf.CRYSTX[:3]
+r_vdw_C = 2.45	# value from the gofr of trajectory
+
+# CNT center
+print "Calculating CNT center.."
+CNT = []; cnt_atoms = []; water_atoms = [];
+for atom in mybgf.a:
+    if "NT" in atom.rName:
+        CNT.append([atom.x, atom.y])
+        cnt_atoms.append(atom.aNo)
+    elif "WAT" in atom.rName or "OW" in atom.ffType or "HW" in atom.ffType:
+        water_atoms.append(atom.aNo)
+cnt_atoms.sort()
+water_atoms.sort()
+
+CNT = np.array(CNT); n_CNT = len(CNT); n_water = len(water_atoms) / 3
+x_CNT, y_CNT = np.mean(CNT, axis=0)
+CNT_center = np.array([x_CNT, y_CNT])   # CNT center
+CNT_height = mybgf.CRYSTX[2]        # CNT height from pbc
+CNT_radius = np.mean(np.sqrt(((CNT-CNT_center)**2).sum(axis=-1)))
+
+# reassign radius_bin
+radius_bin[len(radius_bin) - 1] = CNT_radius - r_vdw_C  # touch the last value
+r_atoms = dict()
+for i in radius_bin:
+    r_atoms[i] = []
+
+# water distance
+print "Calculating water distance.."
+WATER = [];
+for atom in mybgf.a:
+    if "O" in atom.ffType:
+        coord = np.array([atom.x, atom.y])
+        dist = np.sqrt(((coord - CNT_center)**2).sum(axis=-1))  # O distance from CNT center
+        ind = np.digitize(dist, radius_bin) # find a suitable bin
+        r_atoms[radius_bin[ind]].append(atom.aNo)    # add water mols to the bin
+        r_atoms[radius_bin[ind]].append(atom.CONECT[0])
+        r_atoms[radius_bin[ind]].append(atom.CONECT[1])
+
+for i in r_atoms.keys():
+    r_atoms[i].sort()
+
+# effective volume
+total_volume = pbc[0] * pbc[1] * pbc[2]
+vacuum_volume = total_volume - ( (CNT_radius + r_vdw_C)**2 * math.pi * pbc[2] )
+cnt_volume = ((CNT_radius + r_vdw_C)**2 - (CNT_radius - r_vdw_C)**2) * math.pi * pbc[2]
+inner_volume = 0.0; group_volume = []; r = [0] + radius_bin # 0 8 15 x
+for i in range(len(radius_bin)):
+    vol = (r[i+1]**2 - r[i]**2) * math.pi * pbc[2]
+    group_volume.append(vol)
+    inner_volume += vol
+
+# write grps file
+print "Creating grps file.."
+line = ""
+line += "Total Groups: " + str(n_group) + "\n"
+# Group Atoms: CNT group
+line += "Group %d Atoms %d" % (1, n_CNT) + "\n"
+line += ' '.join((('%i - %i' % r) if len(r) == 2 else '%i' % r) for r in nu.range_extract(cnt_atoms)) + "\n"
+# Group Atoms: total water group
+line += "Group %d Atoms %d" % (2, len(water_atoms)) + "\n"
+line += ' '.join((('%i - %i' % r) if len(r) == 2 else '%i' % r) for r in nu.range_extract(water_atoms)) + "\n"
+# Group Atoms: radial water groups
+for index, i in enumerate(radius_bin):
+    grpid = index + 3   # 1 + cnt + total_water
+    line += "Group %d Atoms %d" % (grpid, len(r_atoms[i])) + "\n"
+    ##line += ' '.join((('%i - %i' % r) if len(r) == 2 else '%i' % r) for r in nu.range_extract(r_atoms[i])) + "\n" # failed
+    line += ' '.join("%d " % i for i in r_atoms[i]) + "\n"
+
+# Constraints
+line += "Constraints" + "\n"
+line += "0 %d " % (len(water_atoms))
+for index, i in enumerate(radius_bin):
+    line += "%d " % (len(r_atoms[i]))
+line += "\n"
+
+# RotationalSymmetryNumber
+line += "RotationalSymmetryNumber" + "\n"
+line += "1 2 "
+for index, i in enumerate(radius_bin):
+    line += "2 "
+line += "\n"
+
+# LinearMoleculeFlag
+line += "LinearMoleculeFlag" + "\n"
+line += "0 0 "
+for index, i in enumerate(radius_bin):
+    line += "0 "
+line += "\n"
+
+# GroupVolume
+line += "GroupVolume" + "\n"
+line += "%15.6f %15.6f " % (cnt_volume, inner_volume)
+line += ''.join("%15.6f " % i for i in group_volume) + "\n"
+
+gf = open(grps_filename, 'w')	# reopen
+gf.writelines(line)
+gf.close()
+
+print "Done."
+### end of code
+

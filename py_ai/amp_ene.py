@@ -60,18 +60,18 @@ def run_md(atoms):
 
     atoms.set_calculator(calc)
     atoms.get_potential_energy()
-    MaxwellBoltzmannDistribution(atoms, 100 * units.kB)
+    MaxwellBoltzmannDistribution(atoms, 300 * units.kB)
     traj.write(atoms)
     dyn = VelocityVerlet(atoms, dt=1. * units.fs)
     f = open("md.ene", "w")
     f.write("{:^5s}{:^10s}{:^10s}{:^10s}\n".format("time","Etot","Epot","Ekin"))
-    for step in range(200):
+    for step in range(3):
         pot = atoms.get_potential_energy()  # 
         kin = atoms.get_kinetic_energy()
         tot = pot + kin
         f.write("{:5d}{:10.5f}{:10.5f}{:10.5f}\n".format(step, tot, pot, kin))
         print("{}: Total Energy={}, POT={}, KIN={}".format(step, tot, pot, kin))
-        dyn.run(5)
+        dyn.run(10)
         traj.write(atoms)
     f.close()        
 

@@ -1,0 +1,11 @@
+K-points for BS in monoclinic: (X-G-Y: modified)
+30
+line
+reciprocal
+    0.0 0.5 0.0     ! Y
+    0.0 0.0 0.0     ! G
+
+    0.0 0.0 0.0     ! G
+    0.5 0.0 0.0     ! X
+
+

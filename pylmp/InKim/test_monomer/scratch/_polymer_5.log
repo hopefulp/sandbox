@@ -1,0 +1,270 @@
+LAMMPS (10 Feb 2015)
+units           real
+atom_style      full
+boundary        s s s
+dielectric      72
+special_bonds   lj/coul 0.0 0.0 1.0
+
+pair_style      lj/cut/coul/debye 0.142 10
+bond_style      harmonic
+angle_style     harmonic
+dihedral_style  charmm
+improper_style  none
+kspace_style    none
+
+read_data       data._polymer_5
+  orthogonal box = (-50 -50 -50) to (50 50 50)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  50 atoms
+  scanning bonds ...
+  4 = max bonds/atom
+  scanning angles ...
+  6 = max angles/atom
+  scanning dihedrals ...
+  16 = max dihedrals/atom
+  reading bonds ...
+  49 bonds
+  reading angles ...
+  90 angles
+  reading dihedrals ...
+  120 dihedrals
+  4 = max # of 1-2 neighbors
+  9 = max # of 1-3 neighbors
+  12 = max # of special neighbors
+
+pair_modify     mix geometric
+neighbor        2.0 multi
+neigh_modify    every 2 delay 4 check yes
+thermo_style    multi
+
+variable        input index in._polymer_5
+variable        sname index _polymer_5
+
+print                          .
+.
+print ==========================================
+==========================================
+print "500 steps CG Minimization"
+500 steps CG Minimization
+print ==========================================
+==========================================
+print                          .
+.
+
+dump            1 all atom 25 ${sname}.min.lammpstrj
+dump            1 all atom 25 _polymer_5.min.lammpstrj
+dump_modify     1 image yes scale yes
+thermo          10
+min_style       sd
+minimize        1.0e-4 1.0e-4 500 5000
+WARNING: Resetting reneighboring criteria during minimization (../min.cpp:168)
+Neighbor list info ...
+  1 neighbor list requests
+  update every 1 steps, delay 0 steps, check yes
+  master list distance cutoff = 12
+Memory usage per processor = 1.08056 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =   3753780.2029 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =   3753780.2029 E_bond   =        70.0829 E_angle  =       117.3469 
+E_dihed  =         7.5420 E_impro  =         0.0000 E_vdwl   =   3753585.2978 
+E_coul   =        -0.0667 E_long   =         0.0000 Press    = 2265687860.4111 
+Volume   =       454.4439 
+---------------- Step       10 ----- CPU =      0.0017 (sec) ----------------
+TotEng   =       307.4186 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =       307.4186 E_bond   =        40.9014 E_angle  =       139.9780 
+E_dihed  =        11.2324 E_impro  =         0.0000 E_vdwl   =       115.4494 
+E_coul   =        -0.1425 E_long   =         0.0000 Press    =     63255.4275 
+Volume   =       454.4439 
+---------------- Step       20 ----- CPU =      0.0042 (sec) ----------------
+TotEng   =       110.2945 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =       110.2945 E_bond   =         8.5259 E_angle  =        44.5397 
+E_dihed  =        11.7332 E_impro  =         0.0000 E_vdwl   =        45.6754 
+E_coul   =        -0.1796 E_long   =         0.0000 Press    =     20865.3450 
+Volume   =       470.2346 
+---------------- Step       30 ----- CPU =      0.0069 (sec) ----------------
+TotEng   =        83.1888 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        83.1888 E_bond   =         5.0557 E_angle  =        30.2435 
+E_dihed  =        11.5245 E_impro  =         0.0000 E_vdwl   =        36.5534 
+E_coul   =        -0.1883 E_long   =         0.0000 Press    =     17063.8227 
+Volume   =       470.2346 
+---------------- Step       40 ----- CPU =      0.0095 (sec) ----------------
+TotEng   =        68.3320 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        68.3320 E_bond   =         4.1839 E_angle  =        23.5163 
+E_dihed  =        11.1227 E_impro  =         0.0000 E_vdwl   =        29.7008 
+E_coul   =        -0.1917 E_long   =         0.0000 Press    =     12356.5607 
+Volume   =       470.2346 
+---------------- Step       50 ----- CPU =      0.0123 (sec) ----------------
+TotEng   =        55.1166 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        55.1166 E_bond   =         4.2006 E_angle  =        20.4996 
+E_dihed  =         9.9369 E_impro  =         0.0000 E_vdwl   =        20.6638 
+E_coul   =        -0.1844 E_long   =         0.0000 Press    =      2734.2002 
+Volume   =       539.0176 
+---------------- Step       60 ----- CPU =      0.0148 (sec) ----------------
+TotEng   =        51.7537 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        51.7537 E_bond   =         3.7525 E_angle  =        20.2568 
+E_dihed  =         9.3071 E_impro  =         0.0000 E_vdwl   =        18.6210 
+E_coul   =        -0.1837 E_long   =         0.0000 Press    =       965.4149 
+Volume   =       539.0176 
+---------------- Step       70 ----- CPU =      0.0175 (sec) ----------------
+TotEng   =        51.5310 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        51.5310 E_bond   =         3.7519 E_angle  =        20.2657 
+E_dihed  =         9.2218 E_impro  =         0.0000 E_vdwl   =        18.4750 
+E_coul   =        -0.1835 E_long   =         0.0000 Press    =       872.9661 
+Volume   =       539.0176 
+---------------- Step       80 ----- CPU =      0.0202 (sec) ----------------
+TotEng   =        51.3335 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        51.3335 E_bond   =         3.7455 E_angle  =        20.2842 
+E_dihed  =         9.1415 E_impro  =         0.0000 E_vdwl   =        18.3456 
+E_coul   =        -0.1832 E_long   =         0.0000 Press    =       792.2657 
+Volume   =       539.0176 
+---------------- Step       90 ----- CPU =      0.0228 (sec) ----------------
+TotEng   =        51.1471 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        51.1471 E_bond   =         3.7398 E_angle  =        20.3058 
+E_dihed  =         9.0610 E_impro  =         0.0000 E_vdwl   =        18.2235 
+E_coul   =        -0.1830 E_long   =         0.0000 Press    =       716.6844 
+Volume   =       539.0176 
+---------------- Step      100 ----- CPU =      0.0256 (sec) ----------------
+TotEng   =        50.9288 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        50.9288 E_bond   =         3.7354 E_angle  =        20.3359 
+E_dihed  =         8.9603 E_impro  =         0.0000 E_vdwl   =        18.0800 
+E_coul   =        -0.1828 E_long   =         0.0000 Press    =       628.7366 
+Volume   =       539.0176 
+---------------- Step      110 ----- CPU =      0.0282 (sec) ----------------
+TotEng   =        49.7296 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        49.7296 E_bond   =         3.7330 E_angle  =        20.6875 
+E_dihed  =         8.2567 E_impro  =         0.0000 E_vdwl   =        17.2337 
+E_coul   =        -0.1813 E_long   =         0.0000 Press    =       414.4022 
+Volume   =       539.0176 
+---------------- Step      112 ----- CPU =      0.0290 (sec) ----------------
+TotEng   =        49.7190 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        49.7190 E_bond   =         3.7409 E_angle  =        20.6786 
+E_dihed  =         8.2541 E_impro  =         0.0000 E_vdwl   =        17.2266 
+E_coul   =        -0.1812 E_long   =         0.0000 Press    =       168.8421 
+Volume   =       539.0176 
+Loop time of 0.028964 on 1 procs for 112 steps with 50 atoms
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+          3753780.2029      49.7227805207      49.7189501762
+  Force two-norm initial, final = 8.23846e+07 3.10133
+  Force max component initial, final = 4.5188e+07 0.835323
+  Final line search alpha, max atom move = 0.120293 0.100484
+  Iterations, force evaluations = 112 214
+
+Pair  time (%) = 0.0206625 (71.3386)
+Bond  time (%) = 0.00713444 (24.6321)
+Neigh time (%) = 9.20296e-05 (0.317737)
+Comm  time (%) = 3.38554e-05 (0.116888)
+Outpt time (%) = 0.000467539 (1.6142)
+Other time (%) = 0.000573635 (1.98051)
+
+Nlocal:    50 ave 50 max 50 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:    0 ave 0 max 0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1086 ave 1086 max 1086 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1086
+Ave neighs/atom = 21.72
+Ave special neighs/atom = 5.56
+Neighbor list builds = 2
+Dangerous builds = 0
+min_style       cg
+minimize        1.0e-4 1.0e-4 500 5000
+WARNING: Resetting reneighboring criteria during minimization (../min.cpp:168)
+Memory usage per processor = 1.08056 Mbytes
+---------------- Step      112 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        49.7190 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        49.7190 E_bond   =         3.7409 E_angle  =        20.6786 
+E_dihed  =         8.2541 E_impro  =         0.0000 E_vdwl   =        17.2266 
+E_coul   =        -0.1812 E_long   =         0.0000 Press    =       163.1828 
+Volume   =       557.7111 
+---------------- Step      113 ----- CPU =      0.0005 (sec) ----------------
+TotEng   =        49.7154 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        49.7154 E_bond   =         3.7419 E_angle  =        20.6769 
+E_dihed  =         8.2531 E_impro  =         0.0000 E_vdwl   =        17.2249 
+E_coul   =        -0.1813 E_long   =         0.0000 Press    =       140.2111 
+Volume   =       557.7111 
+Loop time of 0.000490189 on 1 procs for 1 steps with 50 atoms
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+         49.7189501762      49.7189501762      49.7154366189
+  Force two-norm initial, final = 3.10133 2.77817
+  Force max component initial, final = 0.835323 0.738467
+  Final line search alpha, max atom move = 0.119714 0.088405
+  Iterations, force evaluations = 1 2
+
+Pair  time (%) = 0.00028801 (58.7549)
+Bond  time (%) = 0.000102043 (20.8171)
+Neigh time (%) = 0 (0)
+Comm  time (%) = 0 (0)
+Outpt time (%) = 0 (0)
+Other time (%) = 0.000100136 (20.428)
+
+Nlocal:    50 ave 50 max 50 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:    0 ave 0 max 0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1086 ave 1086 max 1086 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1086
+Ave neighs/atom = 21.72
+Ave special neighs/atom = 5.56
+Neighbor list builds = 0
+Dangerous builds = 0
+#now minimize the entire system
+minimize        1.0e-4 1.0e-4 500 5000
+WARNING: Resetting reneighboring criteria during minimization (../min.cpp:168)
+Memory usage per processor = 1.08056 Mbytes
+---------------- Step      113 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        49.7154 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        49.7154 E_bond   =         3.7419 E_angle  =        20.6769 
+E_dihed  =         8.2531 E_impro  =         0.0000 E_vdwl   =        17.2249 
+E_coul   =        -0.1813 E_long   =         0.0000 Press    =       140.2085 
+Volume   =       557.7212 
+---------------- Step      114 ----- CPU =      0.0005 (sec) ----------------
+TotEng   =        49.7119 KinEng   =         0.0000 Temp     =         0.0000 
+PotEng   =        49.7119 E_bond   =         3.7451 E_angle  =        20.6767 
+E_dihed  =         8.2502 E_impro  =         0.0000 E_vdwl   =        17.2212 
+E_coul   =        -0.1812 E_long   =         0.0000 Press    =       124.7353 
+Volume   =       557.7212 
+Loop time of 0.000495911 on 1 procs for 1 steps with 50 atoms
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+         49.7154366189      49.7154366189      49.7119374651
+  Force two-norm initial, final = 2.77817 3.24583
+  Force max component initial, final = 0.738467 0.913716
+  Final line search alpha, max atom move = 0.135416 0.123731
+  Iterations, force evaluations = 1 2
+
+Pair  time (%) = 0.000286818 (57.8365)
+Bond  time (%) = 0.000102997 (20.7692)
+Neigh time (%) = 0 (0)
+Comm  time (%) = 1.90735e-06 (0.384615)
+Outpt time (%) = 0 (0)
+Other time (%) = 0.000104189 (21.0096)
+
+Nlocal:    50 ave 50 max 50 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:    0 ave 0 max 0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1086 ave 1086 max 1086 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1086
+Ave neighs/atom = 21.72
+Ave special neighs/atom = 5.56
+Neighbor list builds = 0
+Dangerous builds = 0
+undump          1
+
+Please see the log.cite file for references relevant to this simulation
+

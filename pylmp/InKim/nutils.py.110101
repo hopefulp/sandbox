@@ -1,0 +1,492 @@
+#!/home/noische/program/python27/bin/python
+"""
+nutils.py
+Original: Jan 01 2011 In Kim
+
+Module containing BGF-file information extraction tools including
+getAtomPairsID(class BgfFile)
+getAtomAnglePairsID(class BgfFile)
+getAtomDihedralPairsID(class BgfFile)
+"""
+
+
+import sys
+import os
+import string
+import types
+import re
+import copy
+import numpy as np
+
+version = '110101'
+
+stdout_save = sys.stdout
+
+def shutup():
+        sys.stdout = open(os.devnull, 'w')
+
+def say():
+        sys.stdout = stdout_save
+
+def removeRepeat(orig_list):
+	"""
+	removeRepeatElements(orig_list):
+	Returns a list that identical elements are omitted. [a, a, b] -> [a, b].
+	"""
+	dest_list = [];
+	for item in orig_list:
+		if not item in dest_list:
+			dest_list.append(item)
+
+	return dest_list
+
+
+def removeReverse(orig_list):
+	"""
+	removeRepeatListElements(list):
+	Returns a list that reversed lists are omitted. i.e., [a, b, c] and [c, b, a] are treated as same element.
+	"""
+	dest_list = []
+	for item in orig_list:
+		reverse_item = item[:]
+		reverse_item.reverse()
+		if not item in dest_list:
+			if not reverse_item in dest_list:
+				dest_list.append(item)
+
+	return dest_list
+
+
+def compareList(standard, input, astarisk = "X"):
+	"""
+	checks the input list and its reverse.
+	X: test pass (same as astarisk)
+	"""
+	if len(standard) != len(input):	# if the size is different
+		return 0;		# test fail
+	
+	n_item = len(standard)
+
+	for i in range(n_item):
+		if standard[i] == astarisk:
+			continue;
+		elif standard[i] == input[i]:
+			continue;
+		else:
+			return 0;
+
+	return 1;
+
+
+def compareListPattern(standard, input, astarisk = "X"):
+	"""
+	"""
+	rev_input = input[:]
+	rev_input.reverse()
+
+	### if the list matches or its reverse matches...
+	if compareList(standard, input, astarisk) or compareList(standard, rev_input, astarisk):
+		return 1;
+
+	return 0;
+
+
+def printError(message, die=0):
+	"""
+printError(message, die=0):
+	prints error message, exits run if (die != 0)
+	"""
+	if die:
+		type = 'ERROR'
+	else:
+		type = 'WARNING'
+		
+	error = os.path.basename(sys.argv[0]) + ': ' + type + ': ' + message + '\n'
+	# flush stdout:
+	sys.stdout.flush()
+	# print error
+	sys.stderr.write(error)
+
+	if die:  sys.exit(2)
+	# done
+
+
+def die(message):
+	"""
+die(message):
+	same as  printError(message, 1)
+	"""
+	printError(message, 1)
+
+	
+def warn(message):
+	"""
+warn(message):
+	same as  printError(message, 0)
+	"""
+	printError(message, 0)
+
+
+def printout(*items):
+	"""
+printout(*items):
+	writes `items` to STDOUT and flushes it
+	"""
+	sys.stdout.write( list2str(items) )
+	sys.stdout.flush()
+
+
+def flatten(array):
+	"""
+flatten(array):
+	flattens list/tuple objects
+	"""
+	flatList = []
+
+	# join all vars into a single list:
+	for element in array:
+		if type(element) is types.ListType or type(element) is types.TupleType:
+			flatList += flatten(element)
+		elif type(element) is types.DictType:
+			cu.die("flatten: Cannot flatten dictionary types!")
+		else:
+			flatList.append(element)
+
+	# return
+	return flatList
+
+
+
+def openBigFile(file, lineSize, parsing=True, silent=True):
+	"""
+openFile(file):
+	Open a lazy file stream with a known lineSize(chunk). This is considered to increase a file reading speed.
+	Returns a list split by a chunk of length lineSize.
+	"""
+	'''
+	### DO NOT DELETE THIS COMMENT ###
+	### idea from http://stackoverflow.com/questions/519633/lazy-method-for-reading-big-file-in-python
+	### introduction to 'yield' keyword: http://pyengine.blogspot.com/2010/12/python-yield.html
+
+	dumpatom = get_line()
+	chunk = [next(dumpatom) for i in range(natoms+9)]
+	print(chunk[0])
+	print(chunk[-1])
+	'''
+
+    def get_line(file):
+        """
+    getLine(file):
+        Works with openBigFile().
+        """
+        with open(file) as file:
+            for i in file:
+                yield i;
+
+	fs = []; counter = 0; DISPLAY_LINE_LIMIT = 10000;
+	dump = get_line(file)
+
+	### guess the size of the file
+	wc_cmd = "wc -l " + file
+	lenfile = os.popen(wc_cmd).read()
+	lenfile = re.split('\s*', lenfile)
+	lenfile = int(lenfile[0])
+	
+	if lenfile == 0:
+		die("Empty file: " + file)
+
+	while 1:
+		try:
+			chunk = [next(dump) for i in range(lineSize)]
+
+			if parsing:
+				### parse
+				temp = [];
+				for i in chunk:
+					parse = re.split('\s*', i)
+					for j in parse:
+						if j == '': parse.remove(j)
+					temp.append(parse)
+					
+				fs.append(temp)
+			else:
+				fs.append(chunk)
+
+			counter += 1;
+	
+		except StopIteration:
+			sys.stdout.write(" Successfully loaded: " + str(file) + "\n")
+			break;
+		except KeyboardInterrupt:
+			die("Keyboard Break while reading " + str(file) + " - Force quit.")
+		else:
+			if not silent: 
+				sys.stdout.write("\r" + "Reading part " + str(counter*lineSize) + " / "+ str(lenfile) + "..")
+				sys.stdout.flush()
+				"""
+				if lenfile >= DISPLAY_LINE_LIMIT:
+					if counter % DISPLAY_LINE_LIMIT == 0:
+						sys.stdout.write("\r" + "Reading part " + str(counter) + " / "+ str(lenfile) + "..")
+						sys.stdout.flush()
+				else:
+					sys.stdout.write("\r" + "Reading part " + str(counter) + " / "+ str(lenfile) + "..")
+					sys.stdout.flush()
+				"""
+
+	#list = copy.deepcopy(fs)
+	#return list;
+	return fs;
+
+	### end of openFile()
+
+
+def meanstdv(x):
+	from math import sqrt
+	n, mean, std = len(x), 0.0, 0.0
+
+	if n == 0:
+		return 0.0, 0.0
+
+	for a in x:
+		mean = mean + a
+	mean = mean / float(n)
+
+	for a in x:
+		std = std + (a - mean)**2
+
+	if n != 1:
+		std = sqrt(std / float(n-1))
+	else:
+		std = 0.0
+
+	return mean, std
+
+	### end of meanstdv
+
+
+def range_extract(lst):
+    """Yield 2-tuple ranges or 1-tuple single elements from list of increasing ints
+    from http://www.rosettacode.org/wiki/Range_extraction#Python
+    [-8, -7, -6, -3, -2, -1, 0, 1, 3, 4, 5, 7, 8, 9, 10, 11, 14, 15, 17, 18, 19, 20] -> [(-8, -6), (-3, 1), (3, 5), (7, 11), (14,), (15,), (17, 20)]
+    """
+
+    lenlst = len(lst)
+    i = 0
+    while i < lenlst:
+        low = lst[i]
+        while i < lenlst-1 and lst[i]+1 == lst[i+1]: i +=1
+        hi = lst[i]
+        if   hi - low >= 2:
+            yield (low, hi)
+        elif hi - low == 1:
+            yield (low,)
+            yield (hi,)
+        else:
+            yield (low,)
+        i += 1
+
+def print_range_extract(ranges):
+    """ with range_extract() function. """
+    print(' '.join( (('%i-%i' % r) if len(r) == 2 else '%i' % r) for r in ranges ))
+ 
+
+def range_expand(txt):
+    """
+    from http://www.rosettacode.org/wiki/Range_expansion#Python
+    '-6,-3--1,3-5,7-11,14,15,17-20' -> [-6, -3, -2, -1, 3, 4, 5, 7, 8, 9, 10, 11, 14, 15, 17, 18, 19, 20]
+    """
+    lst = []
+    for r in txt.split(','):
+        if '-' in r[1:]:
+            r0, r1 = r[1:].split('-', 1)
+            lst += range(int(r[0] + r0), int(r1) + 1)
+        else:
+            lst.append(int(r))
+    return lst
+
+def get_columns(inFile, delim="\t", header=0, type="float"):
+    """
+    Get columns of data from inFile. The order of the rows is respected
+    
+    :param inFile: column file separated by delim
+    :param header: the line located in the nth will be considered a header line starting from 1.
+                   ignores contents before the header
+    :param type: basic data type for column data
+    :returns: a tuple of 2 dicts (cols, indexToName). cols dict has keys that 
+    are headings in the inFile, and values are a list of all the entries in that
+    column. indexToName dict maps column index to names that are used as keys in 
+    the cols dict. The names are the same as the headings used in inFile. If
+    header is False, then column indices (starting from 0) are used for the 
+    heading names (i.e. the keys in the cols dict)
+
+    usage:
+    f = open(sys.argv[1])
+    cols, index = get_columns(f, delim=" ", header=3)
+    """
+    cols = {}
+    indexToName = {}
+    header -= 1
+
+    for lineNum, line in enumerate(inFile):
+        line = line.strip("\n")
+        #print "%s: %s" % (lineNum, line)
+
+        if header != -1 and lineNum < header:
+            continue;
+
+        if header == -1 or lineNum == header:
+            headings = line.split(delim)
+            headings = [i for i in headings if i != '']
+            i = 0
+            for heading in headings:
+                heading = heading.strip()
+                if lineNum == header:
+                    cols[heading] = []
+                    indexToName[i] = heading
+                else:
+                    # in this case the heading is actually just a cell
+                    cols[i] = [heading]
+                    indexToName[i] = i
+                i += 1
+        else:
+            cells = line.split(delim)
+            cells = [i for i in cells if i != '']
+            i = 0
+            for cell in cells:
+                cell = cell.strip()
+                if type == "":
+                    cols[indexToName[i]] += [cell]
+                else:
+                    cols[indexToName[i]] += eval("[" + type + "(cell)]")
+                i += 1
+                
+    return cols, indexToName
+
+def hash():
+    # Approach columns like a hash in perl: http://stackoverflow.com/questions/651794/whats-the-best-way-to-initialize-a-dict-of-dicts-in-python
+    # e.g.) myhash = nu.hash()
+    import collections
+    return collections.defaultdict(hash)
+
+def dist(x, y):
+    """
+def dist(x, y):
+    returns a distance between two lists.
+    this lists should be len = 3.
+    """
+    x = np.array(x); y = np.array(y)
+    delta = np.abs(x - y)
+
+    return float(np.sqrt((delta ** 2).sum(axis=-1)))
+
+    ### end of distance
+
+
+def pbc_dist(x, y, dim):
+    """
+def pbc_dist(x, y, dim):
+    returns a distance between two lists within the pbc boundary.
+    """
+    x = np.array(x); y = np.array(y); dim = np.array(dim)
+    delta = np.abs(x - y)
+    delta = np.where(delta > 0.5 * dim, dim - delta, delta)
+
+    return float(np.sqrt((delta ** 2).sum(axis=-1)))
+
+def angle(i, c, j, radians=False):
+    '''
+    returns the angle between three vectors centered on c
+    '''
+    a = i - c; b = j - c
+    theta = np.arccos(np.clip(np.dot(a, b) / np.linalg.norm(a) / np.linalg.norm(b), -1, 1))
+
+    if radians:
+        return theta
+    else:
+        return np.degrees(theta)
+
+
+#-------------------------------------
+#
+# - Print information
+#
+if __name__ == '__main__':
+
+	# get directory:
+	directory = dir()
+
+	# set imported stuff we don't want to see:
+	imported = ['sys', 'string', 'os']
+
+	# print __doc__ for the module:
+	print("\n")
+	print("-"*60)
+	if 'version' not in directory:  version = '??????'
+	print("%-45s%15s" % (os.path.basename(sys.argv[0]), 'ver: '+version))
+
+	print("-"*60)
+	print(__doc__)
+
+
+	# import types:
+	import types
+
+	# create hash-table:
+	hashtable = {}
+	for item in directory:
+		actual_item = eval(item)
+		if item in imported:
+			# don't show imported stuff:
+			pass
+		elif type(actual_item) is types.ModuleType:
+			# don't discuss other modules:
+			pass
+		elif type(actual_item) is types.FunctionType:
+			# show __doc__s for functions:
+			hashtable[item] = actual_item.__doc__
+		elif type(actual_item) is types.ClassType:
+			# show __doc__s for classes:
+			title = item+' class: '
+			hashtable[item] = title +  ( '-' * (60-len(title)) )
+			hashtable[item] += actual_item.__doc__
+
+			# show __doc__s for class elements:
+			for classItem in dir(actual_item):
+				actual_class_item = eval(item+'.'+classItem)
+				if type(actual_class_item) is types.ModuleType:
+					# don't discuss other modules:
+					pass
+				elif type(actual_class_item) is types.UnboundMethodType \
+						or type(actual_class_item) is types.MethodType:
+					# show __doc__s for functions:
+					hashtable[item] += actual_class_item.__doc__ + '\n'
+
+				elif classItem in ['__doc__','__module__']:
+					pass
+				else:
+					# for other stuff show the value:
+					hashtable[item] += '\n'+classItem+' = '+str(actual_class_item)+'\n'
+
+			hashtable[item] +=  ( '-'*60 )+'\n\n'
+			
+		elif item[0] != '_':
+			# for other stuff show the value:
+			hashtable[item] = '\n'+item+' = '+str(actual_item)+'\n'
+
+	# print info out
+	keys = hashtable.keys()
+	keys.sort()
+	
+	print("Contents:")
+	print("-"*60 )
+	for item in keys:
+		print(hashtable[item])
+
+	print("\n")
+	print("-"*60 )
+	print("contact: noische@kaist.ac.kr")
+	print("-"*60 )
+	print("\n")
+	
+	# done!
+

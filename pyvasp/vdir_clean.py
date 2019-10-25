@@ -7,13 +7,13 @@ def search_dir(pwd, dirs, i_files, f_more, L_rm):
     os.chdir(pwd)
     if f_more:
         i_files.extend(f_more)
-        print i_files
+        print(i_files)
     for dir in dirs:
         if dir != '.':
             os.chdir(dir)
-            print("####.... enter %s directory" % dir)
+            print(("####.... enter %s directory" % dir))
         p_files = os.listdir('.')
-        print p_files
+        print(p_files)
         for file in p_files:
             if os.path.isdir(file):
                 pass
@@ -22,15 +22,15 @@ def search_dir(pwd, dirs, i_files, f_more, L_rm):
                     pass
                 else:
                     cmd = 'rm  ' + file 
-                    print cmd
+                    print(cmd)
                     if L_rm:
                         os.system(cmd)
         if dir != '.':                        
             os.chdir('..')                
-            print "####.... exit %s directory" % dir
+            print("####.... exit %s directory" % dir)
 
     if not L_rm:
-        print "use -r to remove"
+        print("use -r to remove")
     return 0
 
 def main():
@@ -43,7 +43,7 @@ def main():
 
     ini_files = ['INCAR', 'POSCAR', 'POTCAR', 'KPOINTS']
 
-    print args
+    print(args)
 
     pwd = os.getcwd()
     os.chdir(pwd)
@@ -54,7 +54,7 @@ def main():
         dirs = os.listdir(pwd)
     else:
         dirs = args.dir[:]
-    print dirs
+    print(dirs)
 
     search_dir(pwd, dirs, ini_files, args.files, args.rm)
 

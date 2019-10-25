@@ -5,7 +5,7 @@ import os
 
 def search_dir(job, dir, lfile_del, lfile_exc, exe_tag):
     os.chdir(dir)
-    print("####.... enter %s directory" % dir)
+    print(("####.... enter %s directory" % dir))
     p_files = os.listdir('.')
     for file in p_files:
         if not os.path.isdir(file):
@@ -13,7 +13,7 @@ def search_dir(job, dir, lfile_del, lfile_exc, exe_tag):
                 pass
             elif file in lfile_del:
                 cmd = job + ' ' + file 
-                print cmd
+                print(cmd)
                 if exe_tag:
                     os.system(cmd)
             else:
@@ -22,7 +22,7 @@ def search_dir(job, dir, lfile_del, lfile_exc, exe_tag):
         else:
             search_dir(job, file, lfile_del, lfile_exc, exe_tag)
     os.chdir('..')                
-    print "####.... exit %s directory" % dir
+    print("####.... exit %s directory" % dir)
 def main():
 
     parser = argparse.ArgumentParser(description='remove files recursively in subdirectories')
@@ -35,7 +35,7 @@ def main():
 
     job=args.job
 
-    print args
+    print(args)
 
     pwd = os.getcwd()
     os.chdir(pwd)

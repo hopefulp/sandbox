@@ -6,8 +6,8 @@ import re
 
 #usage description
 if len(sys.argv)<3:
-	print "Usage: [prefix.in] [prefix.out]"
-	print "ex: afmn3-dos-DOS fehse"
+	print("Usage: [prefix.in] [prefix.out]")
+	print("ex: afmn3-dos-DOS fehse")
 	exit()
 
 prefixi=sys.argv[1]
@@ -57,11 +57,11 @@ for i in range(nspecies):
 	nelem.append(elem)
 
 	doi = 'sumdos2.py ' + prefixi + str(nelem[i]) + ' ' + prefixo + '-' + str(atomlist[i])
-	print 'Making PDOS for ' + str(atomlist[i])
+	print('Making PDOS for ' + str(atomlist[i]))
 	os.system(doi)
 
 for k in range(1, int(natoms)+1):
 	elem = str(elem) + ' ' + str(k)
 doi = 'sumdos2.py ' + prefixi + elem + ' ' + prefixo + '-Total'
-print 'Making Total DOS'
+print('Making Total DOS')
 os.system(doi)

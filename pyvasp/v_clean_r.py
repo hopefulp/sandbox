@@ -5,7 +5,7 @@ import os
 
 def search_dir(job, dir, lfile_save, lfile_del):
     os.chdir(dir)
-    print("####.... enter %s directory" % dir)
+    print(("####.... enter %s directory" % dir))
     p_files = os.listdir('.')
     for file in p_files:
         if not os.path.isdir(file):
@@ -13,7 +13,7 @@ def search_dir(job, dir, lfile_save, lfile_del):
                 pass
             elif file in lfile_del:
                 cmd = job + ' ' + file 
-                print cmd
+                print(cmd)
                 os.system(cmd)
             else:
                 pass
@@ -21,7 +21,7 @@ def search_dir(job, dir, lfile_save, lfile_del):
         else:
             search_dir(job, file, lfile_save, lfile_del)
     os.chdir('..')                
-    print "####.... exit %s directory" % dir
+    print("####.... exit %s directory" % dir)
 def main():
 
     parser = argparse.ArgumentParser(description='remove files except initial files')
@@ -34,7 +34,7 @@ def main():
 
     ini_files = ['INCAR', 'POSCAR', 'POTCAR', 'KPOINTS', 'IBZKPT', 'CONTCAR']
 
-    print args
+    print(args)
 
     pwd = os.getcwd()
     os.chdir(pwd)

@@ -24,7 +24,7 @@ if os.path.isfile('CONTCAR'):
 elif os.path.isfile('POSCAR'):
 	posfile = open('POSCAR')
 else:
-	print "POSCAR is not found."
+	print("POSCAR is not found.")
 	sys.exit()
 
 #ignore head
@@ -53,8 +53,8 @@ for i in range(len(force)):
 	if '-----------------------------------' in line:
 		stp = stp + 1
 		forcestep = []
-		for j in xrange((ntotal+3)*(stp-1)+3, ((ntotal+3)*stp)):
+		for j in range((ntotal+3)*(stp-1)+3, ((ntotal+3)*stp)):
 			lline = force[j].strip().split()
 			sca = math.sqrt(float(lline[3])*float(lline[3])+float(lline[4])*float(lline[4])+float(lline[5])*float(lline[5]))
 			forcestep.append(sca)
-		print "%4d  %6.3f" % (stp, max(forcestep))
+		print("%4d  %6.3f" % (stp, max(forcestep)))

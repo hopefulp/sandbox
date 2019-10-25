@@ -6,7 +6,7 @@ import re
 
 #usage description
 if len(sys.argv)<3:
-	print "Usage: [file name] [Atom #]"
+	print("Usage: [file name] [Atom #]")
 	sys.exit()
 
 chgfilename=sys.argv[1]
@@ -22,9 +22,9 @@ while 1:
 		break
 
 	if tok in line:
-		print "%s" % line,
+		print("%s" % line, end=' ')
 		for i in range(60):
 			line = chgfile.readline()
-			print '%s' % line,
+			print('%s' % line, end=' ')
 
 chgfile.close()

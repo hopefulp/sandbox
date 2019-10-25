@@ -44,10 +44,10 @@ def common_figure():
     ax.tick_params(axis='both', which='major', labelsize=23)
     #ax.tick_params(labelsize=25)
 
-    #custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
+    custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
     #custom_cycler = (cycler(color=['r','g']))                                          # Figure 8(b)
     #custom_cycler = (cycler(color=['darkcyan','b']))                                   # Figure S17(a)
-    custom_cycler = (cycler(color=['r','darkcyan']))                                    # Figure 8(b)
+    #custom_cycler = (cycler(color=['r','darkcyan']))                                    # Figure 8(b)
     #custom_cycler = (cycler(color=['orange','m','g','b']))
     ax.set_prop_cycle(custom_cycler)
     return fig, ax
@@ -187,7 +187,8 @@ def mplot_nvector(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=No
         #plt.scatter(x, y)
     elif ys.ndim == 2:
         for i in range(len(Ylabels)):
-            plt.plot(x,ys[i,:], 'o-', label=Ylabels[i] )
+            #plt.plot(x,ys[i,:], 'o-', label=Ylabels[i] )
+            plt.plot(x,ys[i,:], label=Ylabels[i] )
     else:
         print(f"Error:: obscure in y-dim {ys.ndim}")
 

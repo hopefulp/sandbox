@@ -1,0 +1,594 @@
+#!/home/noische/program/python27/bin/python
+"""
+crosslink.py
+Original: Mar 14 2011 In Kim
+
+Modifications:
+- 110810
+	now calculates primary, secondary, and tertiary amines.
+
+- 110630
+	new filter added: adjacent nitrogens cannot be crosslinked. (criteria len(shortestpath) < 5)
+- 110603
+	createLammpsInput command is modified for "within-solvent crosslink" model
+- 110602
+	new patch method with patch_crosslink is applied with pair_coeff patches.
+- 110518 
+	Added the following to prevent hydrogen branch selection error
+		if temp_list == []: continue;
+- 110420
+	MD procedure "min heat nvt" is changed to "min nvt".
+"""
+
+# Python Modules
+import sys
+import os
+import string
+import shutil
+import random
+import pprint
+import time
+import copy
+from types import *
+
+# BGF Modules
+sys.path.append("/home/noische/script")
+sys.path.append("/home/noische/scripts")
+from bgf import *
+import bgftools
+import nutils as nu
+from updateBGF import *
+from centerBGF import *
+from removeBadContacts import *
+import patch_crosslink
+import evaporatebgf
+
+# Pizza.py Modules
+sys.path.append("/home/noische/program/pizza-1Oct10")
+from dump import *
+
+# Cluster settings
+from clusterSetting import *
+
+# Globals
+version = '110630'
+
+def crosslink(bgf_file, ff_file, suffix, nodes, criteria, t, ratio, out_file):
+
+       	# initialization
+	f_out_file = open(out_file, 'w')
+	output = ""
+	
+	f_out_file.write("crosslink.py: version " + str(version) + "\n")
+	f_out_file.write("" + "\n")
+	f_out_file.write("Job started at " + time.asctime(time.gmtime()) + " on " + os.environ["HOSTNAME"] + " by " + os.environ["USER"] + "\n")
+	f_out_file.write("Command executed at " + os.getcwd() + "\n")
+	f_out_file.write("Requested options: " + str(sys.argv) + "\n")
+	f_out_file.write("" + "\n")
+	curr_dir = os.path.abspath(".")
+	temp_dir = scratch_dir + "/" + suffix
+	initial_bgf_file = bgf_file
+	f_out_file.write("Temo directory: " + str(temp_dir) + "\n")
+	temp_host = temp_dir + "/hostfile"
+	hostfile = open(temp_host, "w")
+	for i in range(0, 12): hostfile.write(os.environ["HOST"] + "\n")
+
+	#lammps_parallel = "/home/caltech/openmpi-1.3.3/bin/mpirun -np " + str(nodes) + " /home/noische/program/lammps/lammps-14Jan11/src/lmp_qch"
+	lammps_parallel = mpi_command + " -np " + str(nodes) + " " + lammps_command
+	n_crosslink = 0;
+	f_out_file.flush()
+	
+	f_out_file.write("\n* Initialization" + "\n")
+
+	# determine the initial numbers of primary, secondary, and tertiary amines
+	l_init_amines = []; l_amines = [];
+	l_init_amines = bgftools.getAmineGroupInfo(initial_bgf_file)
+	f_out_file.write("\tNumber of atoms: " + str(len(BgfFile(initial_bgf_file).a)) + "\n")
+	f_out_file.write("\tNumber of molecules: " + str(len(bgftools.getMoleculeList(initial_bgf_file))) + "\n")
+	f_out_file.write("\tNumber of primary, secondary, and tertiary amine groups: " + str(l_init_amines) + "\n")
+
+	# scratch setting and file copy
+	f_out_file.write("\tCreating scratch directory: " + temp_dir + "\n")
+	if not os.path.isdir(temp_dir):
+		os.makedirs(temp_dir)
+	shutil.copy(initial_bgf_file, temp_dir)
+	shutil.copy(ff_file, temp_dir)
+	os.chdir(temp_dir)
+	#createLammpsInput = "createLammpsInput.pl -b " + bgf_file + " -f " + ff_file + " -s " + suffix + " -o 'no shake' -t 'min /home/noische/research/dendrimer/simulation/600/tetramer_spring/in.nvt_100ps' > /dev/null"
+	createLammpsInput = "createLammpsInput.pl -b " + bgf_file + " -f " + ff_file + " -s " + suffix + " -o 'no shake' -t '/home/noische/research/dendrimer/simulation/procedures/in.initialize' > /dev/null"
+	os.system(createLammpsInput)
+	initial_in_file = "in." + suffix
+	
+	# apply a patch for initialization
+	patch_crosslink.pair_coeff_patch_wo_xlinker(initial_in_file, False)
+
+	# first run
+	runLammpsParallel = lammps_parallel + " -screen none -in " + initial_in_file + " -log " + os.path.join(temp_dir, suffix + ".log")
+	f_out_file.write("\tRunning Lammps: see " + str(os.path.join(temp_dir, suffix + ".log")) + "\n")
+	f_out_file.flush()
+	os.system(runLammpsParallel)
+	
+	# what is the last shot?
+	# managing dump file: see getAtomsDistance2.py
+	initial_trj_file = suffix + "_init.lammpstrj"
+	temp_trj_file = suffix + "_init.laststep.lammpstrj"
+	f_out_file.write("\tProcessing the trajectory file " + initial_trj_file + "\n")
+	nu.shutup();
+	dumpinfo = dump(initial_trj_file)
+	l_timestep = dumpinfo.time()
+	last_timestep = l_timestep[-1]
+	dumpinfo.tselect.one(last_timestep)	# last timestep trjectory
+	dumpinfo.unwrap()
+	dumpinfo.write(temp_trj_file)
+	nu.say();
+	update_bgf_file = suffix + "0.bgf"
+	temp_bgf_file = "_" + bgf_file
+	f_out_file.write("\tUpdating the BGF file " + initial_bgf_file + " with LAMMPS trajectory file" + "_trj_updated.bgf" + " to " + update_bgf_file + "\n")
+	updatebgf(initial_bgf_file, temp_trj_file, "_trj_updated.bgf", silent=True);
+
+	f_out_file.write("\tReassigning the origin of " + "_trj_updated.bgf" + " and saving " + "_centered.bgf" + "\n")
+	#nu.shutup(); centerbgf("_trj_updated.bgf", "_centered.bgf", ff_file, "box_origin"); nu.say()
+	nu.shutup(); os.system("centerBGF.pl -b _trj_updated.bgf -f " + ff_file + " -s _centered.bgf -c com_center"); nu.say()
+
+	bgf_file = suffix + "1.bgf"
+	shutil.copy("_centered.bgf", bgf_file)
+	f_out_file.flush()
+	
+	# repeat
+	if t == 0: t = 10;
+
+	# crosslinking start!
+	for i in range(1, t + 1):
+		print("====== " + str(i) + " ======")
+		N_prisecter = [0, 0, 0];	# N counter init.
+		f_out_file.write("\n\n====== Cycle " + str(i) + " ======" + "\n")
+	
+		sname = suffix + str(i)
+		bgf_file = sname + ".bgf"
+		input_file = "in." + sname
+
+		# create input
+		f_out_file.write("\n* Minimization, heating, and NVT dynamics for 1ps" + "\n")
+		f_out_file.write("\tCreating Lammps input for " + bgf_file + "\n")
+		################## IMPORTANT: min heat nvt -> min nvt for crosslinking ##################### 2011.4.20.
+
+		# crosslinking with spring
+		#createLammpsInput = "createLammpsInput.pl -b " + bgf_file + " -f " + ff_file + " -s " + sname + " -o 'no shake' -t 'min nvt' > /dev/null"
+		#createLammpsInput = "createLammpsInput.pl -b " + bgf_file + " -f " + ff_file + " -s " + sname + " -o 'no shake' -t 'min /home/noische/research/dendrimer/simulation/600/tetramer_spring/in.xlnk_nvt_1ps_only' > /dev/null"
+		createLammpsInput = "createLammpsInput.pl -b " + bgf_file + " -f " + ff_file + " -s " + sname + " -o 'no shake' -t 'min /home/noische/research/dendrimer/simulation/procedures/in.xlnk_nvt_1ps_k0.1_r6_10ps' > /dev/null"
+
+		# crosslinking freely
+		#createLammpsInput = "createLammpsInput.pl -b " + bgf_file + " -f " + ff_file + " -s " + sname + " -o 'no shake' -t 'min /home/noische/research/dendrimer/simulation/tetramer_spring/in.nvt_1ps' > /dev/null"
+		nu.shutup(); os.system(createLammpsInput); nu.say();
+		##### apply a patch after the first step
+		if n_crosslink != 0:
+			patch_crosslink.pair_coeff_patch_w_xlinker("in." + sname, False)
+		else:
+			patch_crosslink.pair_coeff_patch_wo_xlinker("in." + sname, False)
+
+		# run lammps
+		f_out_file.write("\tRunning LAMMPS simulation on " + sname + "\n")
+		f_out_file.write("\tRunning Lammps: see " + str(os.path.join(temp_dir, sname + ".log")) + "\n")
+		runLammpsParallel = lammps_parallel + " -screen none -in " + input_file + " -log " + sname + ".log"
+		os.system(runLammpsParallel)
+	
+		# load trajectory
+		f_out_file.write("\tLoading Trajectory." + "\n")
+		initial_trj_file = sname + "_nvt.lammpstrj"
+		temp_trj_file = sname + "_laststep.lammpstrj"
+		nu.shutup();
+		dumpinfo = dump(initial_trj_file)
+		l_timestep = dumpinfo.time()
+		last_timestep = l_timestep[-1]
+		dumpinfo.tselect.one(last_timestep)	# last timestep trjectory
+		dumpinfo.unwrap()
+		dumpinfo.write(temp_trj_file)
+		nu.say();
+	
+		# update bgf
+		f_out_file.write("\tUpdating BGF file from trajectory." + "\n")
+		updatebgf(bgf_file, temp_trj_file, "_trj_updated.bgf", silent=True)
+	
+		# align bgf periodic box	### added at 110719
+		bgftools.periodicMoleculeSort("_trj_updated.bgf", "_aligned.bgf", silent=True)
+
+		# center bgf
+		#nu.shutup(); centerbgf("_trj_updated.bgf", "_centered.bgf", ff_file, "box_origin"); nu.say()
+		nu.shutup(); os.system("centerBGF.pl -b _trj_updated.bgf -f " + ff_file + " -s _centered.bgf -c com_center"); nu.say()
+		#nu.shutup(); os.system("centerBGF.pl -b _aligned.bgf -f " + ff_file + " -s _centered.bgf -c com_center"); nu.say()
+		shutil.copy("_centered.bgf", bgf_file)
+
+		
+		# check the criteria from BGF file
+		### 1. open the BGF file 
+		f_out_file.write("\n* Crosslinking module execution" + "\n")
+
+		clusterBGF = BgfFile(bgf_file)
+		f_out_file.write("\tChecking the connectivities in " + bgf_file + "\n")
+
+		### 2. list up all N atoms
+		N_index = [];		# REMARK: actually, this is aNo
+		NN_dist_ok = [];
+	
+		for atom in clusterBGF.a:
+			if string.strip(atom.ffType) == "N_3":
+				N_index.append(atom.aNo)
+				if "PRI" in atom.rName:
+					N_prisecter[0] += 1
+				elif "SEC" in atom.rName:
+					N_prisecter[1] += 1
+				elif "TER" in atom.rName:
+					N_prisecter[2] += 1
+		#f_out_file.write("\tThe number of 1', 2', and 3' amine: " + str(N_prisecter) + "\n")	# 110816 deactivated: not correct
+		N_number = len(N_index);
+
+		if criteria == 0:
+			criteria = 4.06;
+	
+		### 3. find N-N pairs which meet
+		# 1st criteria: distance is smaller than criteria
+		# 2nd criteria: intermolecular N-N (removed)
+		# 3rd criteria: only PRI or SEC amine
+		# 4th criteria: avoid repeating (removed)
+		for x in range(N_number):
+			for y in range(x + 1, N_number):
+					# Removed condition: Intermolecular crosslinking restriction deactivated by in kim at 20110406
+					#and clusterBGF.getAtom(N_index[x]).rNo != clusterBGF.getAtom(N_index[y]).rNo \
+					# Removed condition: Avoid repeating
+					#and N_index[x] not in cu.flatten(NN_dist_ok) \
+					#and N_index[y] not in cu.flatten(NN_dist_ok):
+				if clusterBGF.distance(clusterBGF.a2i[N_index[x]], clusterBGF.a2i[N_index[y]]) < criteria \
+					and clusterBGF.getAtom(N_index[x]).rName != "TER" \
+					and clusterBGF.getAtom(N_index[y]).rName != "TER": 
+					NN_dist_ok.append([N_index[x], N_index[y]])
+
+		### Additional Filtering (appended by 110628)
+		##### This filter prevents the crosslinking of adjacent N-N pairs (self-pairing)
+		branchedoff_BGF = copy.deepcopy(clusterBGF)
+		branchedoff_BGF = evaporatebgf.evaporate(branchedoff_BGF)
+		branchedoff_BGF = bgftools.getBackbone(branchedoff_BGF)
+		atompath = [];
+
+		if NN_dist_ok != []:
+			f_out_file.write("\tInitial crosslink candidate site: " + str(NN_dist_ok) + "\n")
+			for pair in NN_dist_ok:
+				f_out_file.write("\tChecking the path of " + str(pair))
+				# if two candidate atom is in the same molecule, check the connectivity:
+				if branchedoff_BGF.getAtom(pair[0]).rNo == branchedoff_BGF.getAtom(pair[1]).rNo:
+					atompath = [];
+					try:
+						atompath = bgftools.getShortestPath(branchedoff_BGF, pair[0], pair[1])
+					except:
+						nu.die("cannot calculate atom path from " + str(pair) + " at cycle " + str(i))
+						sys.exit(0)
+	
+					if not type(atompath) is NoneType:
+						if len(atompath) < 5:
+							f_out_file.write(".. An adjacent pair.. rejected!\n")
+							NN_dist_ok.remove(pair)
+						else:
+							f_out_file.write(".. Far away.. accepted!\n")
+				else:
+					f_out_file.write(".. between separated molecule.. accepted!\n")
+
+		f_out_file.write("\tCrosslinking candidate site: " + str(NN_dist_ok) + "\n" + "\tNow filtering out the candidate.\n")
+		##### Filtering out the repeat
+		# Tested with pair_candidate = [[1, 2], [1, 3], [1, 4], [3, 4], [3, 5], [5, 6], [7, 8], [9, 10], [9, 11]]
+		if NN_dist_ok != []:
+			result = [];
+			pair_candidate = copy.deepcopy(NN_dist_ok)
+			pair_candidate_flatten = cu.flatten(pair_candidate)
+		
+			for pair in pair_candidate:
+				if pair_candidate_flatten.count(pair[0]) == 1 and pair_candidate_flatten.count(pair[1]) == 1:
+					# unique pair in the candidate list
+					result.append(pair)
+					pair_candidate.remove(pair)	# unique pairs will be deleted from pair_candidate
+		
+			if pair_candidate != []:
+				# grouping
+				x = pair_candidate[0][0]; templist = []; grouped = [];
+				for pair in pair_candidate:
+					if pair[0] == x:
+						templist.append(pair)
+					else:
+						grouped.append(templist)
+						templist = []
+						x = pair[0];
+						templist.append(pair)
+				grouped.append(templist)
+			
+				# shuffle pairs
+				for group in grouped:
+					random.shuffle(group)
+				random.shuffle(grouped)
+			
+				# selecting a pair from group
+				for group in grouped:
+					pair = random.choice(group)
+					result.append(pair)
+			
+				# removing repeats
+				temp_repeated = []
+				result_flatten = cu.flatten(result)
+				for element in result_flatten:
+					if result_flatten.count(element) != 1:	# if repeated..
+						temp_repeated.append(element)
+			
+				for element in temp_repeated:
+					templist = []
+					for pair in result:
+						if element in pair:
+							templist.append(pair)
+							result.remove(pair)
+					if templist != []:
+						selected = random.choice(templist)
+						result.append(selected)
+		
+				NN_dist_ok = result
+
+
+				##### end of filtering
+
+		f_out_file.write("\t" + str(len(NN_dist_ok)) + " N-N pairs which meets the criteria ( " + str(criteria) + "A ) are found." + "\n")
+		f_out_file.write("\t" + "The following N-N pairs will be crosslinked: " + str(NN_dist_ok) + "\n")
+		f_out_file.flush()
+
+		### 4. attach crosslinker
+		# NN_dist_ok is the list that will be get crosslinked
+		if len(NN_dist_ok) > 0:
+			f_out_file.write("\n* Attaching the crosslinker to " + bgf_file + "\n")
+			for pair in NN_dist_ok:
+				f_out_file.write("\tLinking " + str(pair) + " Nitrogens: ")
+
+				##### a) load a crosslinker
+				xlinkerBGF = BgfFile("/home/noische/research/dendrimer/structure/xlinker/xlnker.bgf")
+		
+				head_xlnk = xlinkerBGF.a[0]	# head C of xlnk
+				tail_xlnk = xlinkerBGF.a[2]	# tail C of xlnk
+		
+				##### b) select a hydrogen to be detached
+				#    /- head_detach_H(M)                               /- tail_detach_H(N)
+				# head_N(O) --- head_xlnk(J) --- tail_xlnk(K) --- tail_N(P)
+				head_N = clusterBGF.getAtom(pair[0])
+				tail_N = clusterBGF.getAtom(pair[1])
+				head_N.chain = "O"
+				tail_N.chain = "P"
+				f_out_file.write("(" + str(head_N.rName) + " and " + str(tail_N.rName) + " amines)\n")
+
+				# change the crosslinker's rNo as same as head_N
+				head_N_rNo = head_N.rNo
+				for atom in xlinkerBGF.a:
+					atom.rNo = head_N_rNo
+
+				# choose which hydrogen will be detached
+				temp_list = []
+				for ano in head_N.CONECT:
+					if clusterBGF.getAtom(ano).is_hydrogen():
+						temp_list.append(ano)
+
+				if temp_list == []: continue;
+
+				head_H_detach_candidate_id = random.choice(temp_list)
+				f_out_file.write("\tChoosing the hydrogen " + str(head_H_detach_candidate_id) + " from " + str(temp_list) + "\n")
+				temp_list = []
+				for ano in tail_N.CONECT:
+					if clusterBGF.getAtom(ano).is_hydrogen():
+						temp_list.append(ano)
+
+				if temp_list == []: continue;
+
+				tail_H_detach_candidate_id = random.choice(temp_list)
+				f_out_file.write("\tChoosing the hydrogen " + str(tail_H_detach_candidate_id) + " from " + str(temp_list) + "\n")
+
+				head_detach_H = clusterBGF.getAtom(head_H_detach_candidate_id)	# H which will be detached
+				tail_detach_H = clusterBGF.getAtom(tail_H_detach_candidate_id)	# also
+				head_detach_H.chain = "M"
+				tail_detach_H.chain = "N"
+		
+				##### c) move xlinker near to the place
+				delta = ( head_detach_H.x - head_xlnk.x, head_detach_H.y - head_xlnk.y, head_detach_H.z - head_xlnk.z )
+				moveBGF(xlinkerBGF, delta[0], delta[1], delta[2] )
+		
+				##### d) merge
+				clusterBGF = clusterBGF.merge(xlinkerBGF, True)
+				clusterBGF.saveBGF("_xlnk_temp.bgf")
+				clusterBGF = BgfFile("_xlnk_temp.bgf")
+		
+				##### e) detach head_detach_H and connect head_xlnk
+
+				# disconnect Hydrogens from Nitrogens
+				f_out_file.write("\tDisconnecting Hydrogen(aNo: " + str(head_detach_H.aNo) + ") from Nitrogen(aNo: " + str(head_N.aNo) + ") - Head" + "\n")
+				f_out_file.write("\tDisconnecting Hydrogen(aNo: " + str(tail_detach_H.aNo) + ") from Nitrogen(aNo: " + str(tail_N.aNo) + ") - Tail" + "\n")
+				clusterBGF.disconnect(clusterBGF.a2i[head_N.aNo], clusterBGF.a2i[head_detach_H.aNo])
+				clusterBGF.disconnect(clusterBGF.a2i[tail_N.aNo], clusterBGF.a2i[tail_detach_H.aNo])
+
+				# detach Hydrogens
+				if head_detach_H.aNo > tail_detach_H.aNo:
+					f_out_file.write("\tDetaching Hydrogen atom: " + str(head_detach_H.aNo) + "\n")
+					clusterBGF.delAtom(clusterBGF.a2i[head_detach_H.aNo])
+					f_out_file.write("\tDetaching Hydrogen atom: " + str(tail_detach_H.aNo) + "\n")
+					clusterBGF.delAtom(clusterBGF.a2i[tail_detach_H.aNo])
+				else:
+					f_out_file.write("\tDetaching Hydrogen atom: " + str(tail_detach_H.aNo) + "\n")
+					clusterBGF.delAtom(clusterBGF.a2i[tail_detach_H.aNo])
+					f_out_file.write("\tDetaching Hydrogen atom: " + str(head_detach_H.aNo) + "\n")
+					clusterBGF.delAtom(clusterBGF.a2i[head_detach_H.aNo])
+
+				# connect O-J
+				for atom in clusterBGF.a:
+					if atom.chain == "O":
+						head_N = atom
+					if atom.rName == "XLK":
+						if atom.chain == "J":
+							head_xlnk = atom
+		
+				clusterBGF.connect(clusterBGF.a2i[head_N.aNo], clusterBGF.a2i[head_xlnk.aNo])	# O-J connection
+
+				# connect K-P
+				for atom in clusterBGF.a:
+					if atom.chain == "P":
+						tail_N = atom
+					if atom.rName == "XLK":
+						if atom.chain == "K":
+							tail_xlnk = atom
+		
+				clusterBGF.connect(clusterBGF.a2i[tail_N.aNo], clusterBGF.a2i[tail_xlnk.aNo])	# K-P connection
+
+				# residue update
+				f_out_file.write("\tUpdating residue information." + "\n")
+				if head_N.rName == "PRI":
+					head_N.rName = "SEC"
+				elif head_N.rName == "SEC":
+					head_N.rName = "TER"
+				if tail_N.rName == "PRI":
+					tail_N.rName = "SEC"
+				elif tail_N.rName =="SEC":
+					tail_N.rName = "TER"
+
+				# chain update
+				f_out_file.write("\tUpdating chain information." + "\n")
+				head_N.chain = "V"
+				tail_N.chain = "V"
+				head_xlnk.chain = "A"
+				tail_xlnk.chain = "A"
+	
+				# charge
+				leftoverCharge = clusterBGF.charge() / 2.0
+				head_N.charge -= leftoverCharge
+				tail_N.charge -= leftoverCharge
+				f_out_file.write("\tCalculating charges.. The charge of the system is " + str("{0:8.5f}".format(clusterBGF.charge())) + "\n")
+				f_out_file.write("" + "\n")
+
+				n_crosslink += 1
+				f_out_file.flush()
+				##### The end of the crosslinking step
+
+			##### Minimization
+			clusterBGF.renumber()
+
+			f_out_file.write("\tSaving the crosslinked file to " + "_linked.bgf" + "\n")
+			clusterBGF.saveBGF("_linked.bgf")
+
+			f_out_file.write("\n* Crosslinking step is finished. Entering minimizing step." + "\n")
+
+			# remove bad contacts
+			f_out_file.write("\tRemoving bad contacts after crosslinking." + "\n")
+			nu.shutup(); removebadcontacts("_linked.bgf", "_removed.bgf", 2.0); nu.say();
+		
+			# create input for minimization
+			createLammpsInput = "createLammpsInput.pl -b _removed.bgf -f " + ff_file + " -s minimization -o 'no shake' -t 'min' > /dev/null"
+			runLammpsParallel = lammps_parallel + " -screen none -in in.minimization -log minimization.log"
+			f_out_file.write("\tMaking LAMMPS input script for minimization." + "\n")
+			nu.shutup(); os.system(createLammpsInput); nu.say();
+
+			# patch for minimization ## added at 110524
+			if n_crosslink != 0:
+				patch_crosslink.pair_coeff_patch_w_xlinker("in.minimization", False)
+			else:
+				patch_crosslink.pair_coeff_patch_wo_xlinker("in.minimization", False)
+			f_out_file.write("\tApplied a patch on in.minimization file.\n")
+		
+			# run lammps
+			f_out_file.write("\tMinimizing the structure." + "\n")
+			f_out_file.write("\tRunning Lammps: see " + str(os.path.join(temp_dir, "minimization.log")) + "\n")
+			os.system(runLammpsParallel)
+		
+			# load trajectory
+			f_out_file.write("\tLoading Trajectory from the minimization result." + "\n")
+			update_trj_file = "minimization_min.lammpstrj"
+			temp_trj_file = "_temp.lammpstrj"
+			nu.shutup();
+			dumpinfo = dump(update_trj_file)
+			l_timestep = dumpinfo.time()
+			last_timestep = l_timestep[-1]
+			dumpinfo.tselect.one(last_timestep)	# last timestep trjectory
+			dumpinfo.unwrap()
+			dumpinfo.write("_temp.lammpstrj")
+			nu.say();
+		
+			# update bgf
+			f_out_file.write("\tUpdating BGF file from the minimization result." + "\n")
+			temp_bgf_file = suffix + str(i+1) + ".bgf"
+			updatebgf("_removed.bgf", "_temp.lammpstrj", "_trj_updated.bgf", silent=True)
+		
+			# align bgf periodic box	### added at 110719
+			bgftools.periodicMoleculeSort("_trj_updated.bgf", "_aligned.bgf", silent=True)
+
+			# center bgf
+			f_out_file.write("\tAligning BGF file." + "\n")
+			#nu.shutup(); centerbgf("_trj_updated.bgf", "_centered.bgf", ff_file, "box_origin"); nu.say()
+			#nu.shutup(); os.system("centerBGF.pl -b _trj_updated.bgf -f " + ff_file + " -s _centered.bgf -c com_center"); nu.say()
+			nu.shutup(); os.system("centerBGF.pl -b _aligned.bgf -f " + ff_file + " -s _centered.bgf -c com_center"); nu.say()
+			shutil.copy("_centered.bgf", suffix + str(i+1) + ".bgf")
+
+			f_out_file.write("" + "\n")
+			f_out_file.write("--- " + str(len(NN_dist_ok)) + " times of crosslinking occured at the cycle " + str(i) + "\n")
+			f_out_file.write("--- End of the crosslinking process for cycle " + str(i) + "\n")
+			f_out_file.write("--- See " + suffix + str(i+1) + ".bgf for output. \n" + "\n")
+		else:
+			f_out_file.write("--- Passing the crosslinking step in cycle " + str(i) + "\n" + "\n")
+			shutil.copy(bgf_file, suffix + str(i+1) + ".bgf")
+			f_out_file.flush()
+			##### The end of the crosslinking cycle (1ps)
+
+		# termination criteria with respect to the ratio of amines
+		l_amines = bgftools.getAmineGroupInfo(bgf_file)
+		init_pri_sec = l_init_amines[0] + l_init_amines[1]
+		curr_pri_sec = l_amines[0] + l_amines[1]
+		curr_ratio = 1 - (curr_pri_sec / init_pri_sec)
+		f_out_file.write("\n\tRequired crosslinking ratio: " + str(ratio))
+		f_out_file.write("\tCurrent crosslinking ratio: " + "{0:>4.2f}".format(curr_ratio))
+		if curr_ratio > ratio:
+			f_out_file.write("*** Designated crosslink ratio obtained. Quitting crosslinking process. ***\n")
+			break;
+
+	f_out_file.write("\n\nJob completed at " + time.asctime(time.gmtime()) + "\n")
+	f_out_file.write("Output structure on " + suffix + "_out.bgf" + "\n")
+	f_out_file.write("The number of crosslinking through this job: " + str(n_crosslink) + "\n")
+	shutil.copy(suffix + str(i+1) + ".bgf", suffix + "_out.bgf")
+	os.system("cp -rp " + temp_dir + " " + curr_dir)
+
+
+if __name__ == '__main__':
+
+	option = ""; args = ""; bgf_file = ""; ff_file = ""; out_file = "";
+	suffix = ""; nodes = ""; criteria = 0.0; t = 0; ratio = 0.0;
+	usage = """
+Usage: crosslink.py -b bgfFile -f forcefield -s suffix -n nodes -c xlnk_dist_criteria -t n_cycles -o log_file -r ratio
+	"""
+
+	if len(sys.argv) < 2:
+		print(usage);
+		sys.exit(0)
+
+	options, args = getopt.getopt(sys.argv[1:], 'hb:f:s:n:c:t:o:r:', ['help','bgf=','forcefield=','suffix=','nodes=','criteria=','time=','output=','ratio='])
+	for option, value in options:
+		if option in ('-h', '--help'):
+			print usage; sys.exit(0)
+		elif option in ('-b', '--bgf'):
+			bgf_file = value
+		elif option in ('-f', '--forcefield'):
+			ff_file = value
+		elif option in ('-s', '--suffix'):
+			suffix = value
+		elif option in ('-n', '--nodes'):
+			nodes = value
+		elif option in ('-c', '--criteria'):
+			criteria = float(value)
+		elif option in ('-t', '--time'):
+			t = int(value)
+		elif option in ('-o', '--option'):
+			out_file = value
+		elif option in ('-r', '--ratio'):
+			ratio = float(value)
+		elif option in (''):
+			print usage; sys.exit(0)
+
+		if criteria == 0: criteria = 4.61
+		if suffix == "": suffix = "crosslink"
+		if out_file == "": out_file = suffix + "_log.out"
+		if ff_file == "": ff_file = "/home/noische/ff/dreiding-den.par"
+		if ratio == 0.0: ratio == 0.5
+
+	crosslink(bgf_file, ff_file, suffix, nodes, criteria, t, ratio, out_file)

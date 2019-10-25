@@ -1,0 +1,15 @@
+BIOGRF 200
+DESCRP tip3        
+REMARK BGF file created by Cerius2
+REMARK BGF file created by Cerius2
+FORCEFIELD DREIDING  
+FORMAT ATOM   (a6,1x,i5,1x,a5,1x,a3,1x,a1,1x,a5,3f10.5,1x,a5,i3,i2,1x,f8.5)
+HETATM     1 O1    WAT    444   -0.23900  -0.30900   0.00000 OT     2 2 -0.83400 0 0
+HETATM     2 H2    WAT    444    0.71800  -0.30900   0.00000 HT     1 0  0.41700 0 0
+HETATM     3 H3    WAT    444   -0.47900   0.61800   0.00000 HT     1 0  0.41700 0 0
+FORMAT CONECT (a6,12i6)
+FORMAT ORDER (a6,i6,13f6.3)
+CONECT     1     2     3
+CONECT     2     1
+CONECT     3     1
+END

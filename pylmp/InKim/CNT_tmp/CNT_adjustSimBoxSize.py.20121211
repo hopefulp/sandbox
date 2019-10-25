@@ -1,0 +1,106 @@
+#!/opt/applic/epd/bin/python
+
+import sys, re, string, getopt
+import os
+import bgf
+
+option = ""; args = ""; bgf_file = ""; trj_file = ""; out_file = ""; atom_type = ""; criteria_distance = 0;
+usage = """
+CNT_adjustSimBoxSize.py -b bgf_file -f ff_file
+"""
+
+#-----------------
+# adjust the simulation box size to counteract the PPPM problem during NPT
+# which is considered due to the long bond length
+# by in kim 
+# last update: 2012/06/27
+#_________________
+def adjustSimboxSize(bgf_file, ff_file, silent=False):
+
+	# init
+	radius_CNT = 0.0; height_CNT = 0.0; temp = [];
+	min_x_CNT = 0.0; max_x_CNT = 0.0; 
+	min_y_CNT = 0.0; max_y_CNT = 0.0;
+	min_z_CNT = 0.0; max_z_CNT = 0.0;
+	CNT_orientation = "";
+
+	### basic ff file
+	ff_file = "/home/noische/ff/graphite_lj.ff " + ff_file
+
+	myBGF = bgf.BgfFile(bgf_file)
+
+	# extract aNos of CNT in the BGF file
+	aNo_CNT = []
+	for atom in myBGF.a:
+		# Carbons in CNT
+		if "CNT" in atom.rName:
+			aNo_CNT.append(atom.aNo)
+
+	# for CNT atoms, calculate some properties
+	# check the orientation of CNT
+	for aNo in aNo_CNT:
+		atom = myBGF.getAtom(aNo)
+		# minimum and maximum x coord of CNT: this will be the height of CNT
+		if atom.x < min_x_CNT:
+			min_x_CNT = atom.x
+		if atom.x > max_x_CNT:
+			max_x_CNT = atom.x
+		if atom.y < min_y_CNT:
+			min_y_CNT = atom.y
+		if atom.y > max_y_CNT:
+			max_y_CNT = atom.y
+		if atom.z < min_z_CNT:
+			min_z_CNT = atom.z
+		if atom.z > max_z_CNT:
+			max_z_CNT = atom.z
+
+	x_diff = max_x_CNT - min_x_CNT
+	y_diff = max_y_CNT - min_y_CNT
+	z_diff = max_z_CNT - min_z_CNT
+
+	if x_diff > y_diff and x_diff > z_diff:
+		# CNT is aligned along x axis
+		myBGF.CRYSTX = [x_diff + 0.2, y_diff + 30.0, z_diff + 30.0, 90.0, 90.0, 90.0];
+	elif y_diff > x_diff and y_diff > z_diff:
+		# CNT is aligned along y axis
+		myBGF.CRYSTX = [x_diff + 30.0, y_diff + 0.2, z_diff + 30.0, 90.0, 90.0, 90.0];
+	elif z_diff > x_diff and z_diff > y_diff:
+		# CNT is aligned along z axis
+		myBGF.CRYSTX = [x_diff + 30.0, y_diff + 30.0, z_diff + 0.2, 90.0, 90.0, 90.0];
+
+	# write output
+	save_filename = bgf_file[:-4] + ".margined.bgf"
+	myBGF.saveBGF(save_filename)
+	centerBGF_cmd = "~tpascal/scripts/centerBGF.pl -b " + save_filename + " -f '" + ff_file + "' -c com_center "
+	os.system(centerBGF_cmd)
+
+	return 1
+
+	### end of function
+
+
+if __name__ == "__main__":
+	bgf_file = ""; ff_file = "";
+
+	options, args = getopt.getopt(sys.argv[1:], 'hb:f:', ['help', 'bgf=', 'ff='])
+
+	if len(sys.argv) < 2:
+		print(usage)
+		sys.exit(0)
+
+	print "Requested options: " + str(options)
+
+	for option, value in options:
+	        if option in ('-h', '--help'):
+	                print(usage)
+			sys.exit(0)
+	        elif option in ('-b', '--bgf'):
+	                bgf_file = value
+		elif option in ('-f', '--ff'):
+			ff_file = value
+	        elif option == NULL:
+			print(usage)
+			sys.exit(0)
+	
+	# main call
+	adjustSimboxSize(bgf_file, ff_file)

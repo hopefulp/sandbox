@@ -7,7 +7,7 @@ import math
 
 #usage description
 if len(sys.argv)<3:
-	print "Usage: [contfile] [chg file]"
+	print("Usage: [contfile] [chg file]")
 	sys.exit()
 
 confilename=sys.argv[1]

@@ -1,0 +1,102 @@
+variable        tempStart index 300 # starting temp for annealing cycle
+variable        tempStop index 600 # stopping temp for annealing cycle
+variable        c loop 6 #number of annealing cycles
+
+print                          .
+print =====================================
+print "500 step SD/CG Minimization"
+print =====================================
+print            .
+
+dump            1 all atom 25 ${sname}_min.lammpstrj
+dump_modify     1 image yes scale yes
+thermo          10
+fix             restraint solute spring/self 500.0
+min_style       sd
+minimize        1.0e-4 1.0e-4 500 5000
+min_style       cg
+minimize        1.0e-4 1.0e-4 500 5000
+#now minimize the entire system
+unfix           restraint
+minimize        1.0e-4 1.0e-4 500 5000
+undump          1
+
+print                          .
+print =====================================
+print "Heating 0K -> ${tempStart}K"
+print =====================================
+print            .
+
+reset_timestep  0
+timestep        1.0
+fix             2 all nve
+velocity        all create ${tempStart} 12345678 dist gaussian
+thermo          50
+thermo_style    multi
+restart         10 ${sname}_heat.restart1 ${sname}_heat.restart2
+dump            1 all atom 1000 ${sname}_heat.lammpstrj
+dump_modify     1 image yes scale yes
+fix             3 all langevin ${tempStart} ${tempStart} 5.0 283748
+run             25000
+unfix           3
+fix             3 all temp/rescale 2 ${tempStart} ${tempStart} 0.05 0.5
+run             25000
+unfix           3
+undump          1
+
+label           cycle
+
+print                          .
+print ===========================================================
+print "ANNEALING: Heating ${tempStart}K -> ${tempStop}K CYCLE ${c}"
+print ===========================================================
+print            .
+
+dump            1 all atom 1000 ${sname}_heat_cycle${c}.lammpstrj
+dump_modify     1 image yes scale yes
+restart         10 ${sname}_anneal_heat.restart1 ${sname}_anneal_heat.restart2
+variable        l loop 10
+variable        tIncrement equal div(${tempStart},10)
+
+label           annealHeat
+variable        t equal ${tempStart}+v_l*${tIncrement}
+print           "temperature: $t"
+fix             3 all langevin $t $t 10.0 495834
+run             5000
+unfix           3
+next            l
+jump            ${input} annealHeat
+
+fix             3 all temp/rescale 10 ${tempStop} ${tempStop} 0.05 0.5
+run             50000
+unfix           3
+undump          1
+
+print                          .
+print ==========================================================
+print "ANNEALING: Cooling ${tempStop}K -> ${tempStart}K CYCLE ${c}"
+print ==========================================================
+print            .
+
+dump            1 all atom 1000 ${sname}_cool_cycle${c}.lammpstrj
+dump_modify     1 image yes scale yes
+restart         10 ${sname}_anneal_cool.restart1 ${sname}_anneal_cool.restart2
+variable        l loop 10
+variable        tIncrement equal ${tempStart}/10
+
+label           annealCool
+variable        n equal ${tempStop}-v_l*${tIncrement}
+print           "temperature: $n"
+fix             3 all langevin $n $n 10.0 699483
+run             5000
+unfix           3
+next            l
+jump            ${input} annealCool
+
+fix             3 all temp/rescale 10 ${tempStart} ${tempStart} 0.05 0.5
+run             50000
+unfix           3
+undump          1
+
+next            c
+jump            ${input} cycle

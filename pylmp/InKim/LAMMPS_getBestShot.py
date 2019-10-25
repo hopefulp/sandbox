@@ -1,0 +1,364 @@
+#!/home/noische/program/python27/bin/python
+
+import sys, re, string, getopt, optparse, math, time, pprint, os
+from os import popen
+import bgf
+import bgftools
+import numpy
+import operator
+import copy
+import nutils as nu
+import lammpstools as lt
+from nutils import hash
+
+import LAMMPS_getLogData
+
+option = ""; args = ""; dat_file = ""; trj_file = ""; out_file = ""; atom_type = ""; criteria_distance = 0;
+usage = """
+LAMMPS_getBestShot.py 
+    Find the snapshot from the LAMMPS trajectory file which has the least deviation for the specified keyword.
+
+    -b filename Required. A BGF file
+    -t filename Required. A LAMMPS trajectory file
+    -l filename Required. A LAMMPS log file
+    -f filename Required. A CeriusII Force Field file
+    -k string   Optional. LAMMPS log keyword. 'Volume' by default.
+    -d filename Optional. Save LAMMPS data file to data.prefix.timestep if specified.
+    -n integer  Optional. Number of last snapshots for average
+    -s          Optional. Save coordinate to BGF if specified
+"""
+version = "160322"
+
+#_________________
+# 130614: applies box information from trajectory
+#_________________
+
+def sortkey(list):
+    return list[0];
+
+def sortkeymin(list):
+    return list[1];
+
+def get_line(trj_file):
+    """
+    Open a lazy file stream. This is considered to increase a file reading speed.
+    """
+    with open(trj_file) as file:
+        for i in file:
+            yield i
+
+def getBestShot(bgf_file, dat_file, trj_file, log_file, ff_file, keyword, saveBgfFlag, n_sample, silent=False):
+
+    ### init
+    timestep = 0; l_timestep = []; line = []; n_header = 0;
+    yes_velocity = False; yes_image = False
+    mode = ""
+    t1 = 0; t2 = 0; # clock
+
+    myBGF = bgf.BgfFile(bgf_file)
+    myTRJ = open(trj_file)
+    myTRJ.seek(0)
+
+
+    ### LAMMPS Trajectory
+    # how many steps to go?
+    if not silent: print("** Loading LAMMPS Trajectory **\n")
+    if not os.path.exists(trj_file):
+        nu.die("Please check the LAMMPS trajectory file.")
+    l_timestep = lt.getTrjInfo(trj_file)
+    n_timestep = len(l_timestep)
+    if not silent: print("\nThe trajectory contains " + str(n_timestep) + " timesteps.")
+
+    # Find header of the trajectory file
+    while 1:
+        templine = myTRJ.readline()
+        line.append(templine.strip('\n').strip('ITEM: '))
+        n_header += 1
+        if "ITEM: ATOMS" in templine:
+            break;
+
+    # INITIAL trajectory information
+    timestep = int(line[1])
+    natoms = int(line[3])
+    boxsize = [line[5].split(' ')[0], line[5].split(' ')[1], line[6].split(' ')[0], line[6].split(' ')[1], line[7].split(' ')[0], line[7].split(' ')[1]]
+    boxsize = [float(i) for i in boxsize]
+    keywords = line[8].strip('ATOMS ')
+
+    # Find modes
+    if 'vx' in keywords:
+        if not silent: print("Found velocities information from the trajectory.")
+        yes_velocity = True
+
+    if 'xs' in keywords or 'ys' in keywords or 'zs' in keywords:
+        mode = 'scaled'
+    elif 'x' in keywords or 'y' in keywords or 'z' in keywords:
+        mode = 'normal'
+    elif 'xu' in keywords or 'yu' in keywords or 'zu' in keywords:
+        mode = 'unwrapped'
+
+    if 'ix' in keywords or 'iy' in keywords or 'iz' in keywords:
+        yes_image = True
+
+    # scan trajectory to get timesteps
+    dumpatom = get_line(trj_file)
+
+    # get working path
+    workingpath = os.getcwd()
+
+    if not silent: print('\n** Analyzing LAMMPS Log to find the timestep closest to the average "' + keyword + '" **\n')
+
+    # read keywords from log file
+    logdata = LAMMPS_getLogData.getLogData(log_file, "", keyword, silent=False)
+
+    logdata2 = [];
+    for i in logdata:
+        if i[0] in l_timestep:
+            logdata2.append(i)
+
+    logdata2.sort(key=sortkey)
+
+    # truncate
+    if not silent: print("Only the last " + str(n_sample) + " snapshots will be used to calculate the average.")
+    logdata2 = logdata2[-n_sample:]
+
+    # average
+    temp_avg = 0;
+    for i in logdata2:
+        temp_avg += float(i[1])
+    temp_avg /= len(logdata2)
+
+    # deviation
+    dev = [];
+    for i in logdata2:
+        dev.append([i[0], abs(float(i[1]) - temp_avg)])
+
+    dev.sort(key=sortkeymin)
+    if not silent: print("Found the timestep " + str(dev[0][0]) + " has the value closest to the average " + keyword + " (value: " + str(temp_avg) + ", deviation: " + str(dev[0][1]) + ")")
+
+    ### REMARK: dev[0] has the smallest deviation from the average
+
+    # get trajectory
+    myTRJ.seek(0)
+    dumpatom = get_line(trj_file)
+
+    while 1:
+        try:
+            chunk = [next(dumpatom) for i in range(natoms+n_header)]
+        except StopIteration:
+            break;
+    
+        # only treat the designated timestep
+        timestep = int(chunk[1])
+        if timestep != int(dev[0][0]):
+            continue;
+
+        natoms = int(chunk[3])
+        boxsize = [chunk[5].split(' ')[0], chunk[5].split(' ')[1], chunk[6].split(' ')[0], chunk[6].split(' ')[1], chunk[7].split(' ')[0], chunk[7].split(' ')[1]]; 
+        boxsize = [float(i) for i in boxsize]; boxsize = [(boxsize[1] - boxsize[0]), (boxsize[3] - boxsize[2]), (boxsize[5] - boxsize[4])]
+        keywords = chunk[8].split('ATOMS ')[1].strip('\n').split(' ')
+
+        ### update myBGF with trajectory information ###
+        natom_bgf = len(myBGF.a)    # number of atoms in BGF file
+    
+        if not natom_bgf == natoms:
+            nu.die("Number of atoms in trajectory file does not match with BGF file.")
+    
+        # actual coordinate
+        coordinfo = chunk[9:]
+        info = hash()
+
+        # assume that coordinfo is similar to ['id', 'type', 'xs', 'ys', 'zs', 'ix', 'iy', 'iz']
+        for atomline in coordinfo:
+            atomcoord = atomline.split(' ')
+            atomNo = int(atomcoord[0])
+    
+            if mode == 'scaled':
+                info[atomNo]['x'] = float(atomcoord[2]) * boxsize[0]
+                info[atomNo]['y'] = float(atomcoord[3]) * boxsize[1]
+                info[atomNo]['z'] = float(atomcoord[4]) * boxsize[2]
+    
+            elif mode == 'unwrapped':
+                info[atomNo]['x'] = float(atomcoord[2])
+                info[atomNo]['y'] = float(atomcoord[3])
+                info[atomNo]['z'] = float(atomcoord[4])
+    
+            elif mode == 'normal':
+                # images
+                if yes_image:
+                    ix_index = keywords.index('ix')
+                    iy_index = keywords.index('iy')
+                    iz_index = keywords.index('iz')
+                    info[atomNo]['x'] = (int(atomcoord[ix_index]) * boxsize[0]) + float(atomcoord[2]) 
+                    info[atomNo]['y'] = (int(atomcoord[iy_index]) * boxsize[1]) + float(atomcoord[3]) 
+                    info[atomNo]['z'] = (int(atomcoord[iz_index]) * boxsize[2]) + float(atomcoord[4]) 
+                else:
+                    info[atomNo]['x'] = float(atomcoord[2])
+                    info[atomNo]['y'] = float(atomcoord[3])
+                    info[atomNo]['z'] = float(atomcoord[4])
+
+                # velocities
+                if yes_velocity:
+                    vx_index = keywords.index('vx')
+                    vy_index = keywords.index('vy')
+                    vz_index = keywords.index('vz')
+                    info[atomNo]['vx'] = float(atomcoord[vx_index])
+                    info[atomNo]['vy'] = float(atomcoord[vy_index])
+                    info[atomNo]['vz'] = float(atomcoord[vz_index])
+    
+        print("")
+        if not silent: print("** New system size: %12.6f %12.6f %12.6f" % (boxsize[0], boxsize[1], boxsize[2]) )
+        for i in range(0, 3):
+            myBGF.CRYSTX[i] = boxsize[i]
+                
+        if saveBgfFlag:
+            myBGF.REMARK.append("From the " + str(timestep) + " of " + trj_file + " in " + workingpath + " and " + bgf_file + " by " + str(sys.argv[0]))
+            myBGF.REMARK.append("n_samples: %d / %s average: %8.3f / stdev of the snapshot: %8.3f" % (n_sample, keyword, temp_avg, dev[0][1]))
+            new_bgf_filename = bgf_file[:-4] + "." + str(timestep) + ".bgf"
+            for atom in myBGF.a:
+                atom.x = info[atom.aNo]['x']
+                atom.y = info[atom.aNo]['y']
+                atom.z = info[atom.aNo]['z']
+
+            #myBGF = bgftools.periodicMoleculeSort(myBGF, 0, [], ff_file=ff_file, silent=True)  # pbc wrap
+            myBGF.saveBGF(new_bgf_filename)
+            if not silent: print("The snapshot is saved in BGF file " + new_bgf_filename)
+
+        if dat_file:
+            ### LAMMPS Data
+            dat_atoms = [];
+            if not silent: print("** Loading LAMMPS Data **\n")
+
+            if not os.path.exists(dat_file):
+                nu.die("Please check the LAMMPS data file.")
+
+            f_dat_file = open(dat_file)
+            temp = f_dat_file.read().split('\n')
+            dat_atom_start = temp.index('Atoms')
+            dat_atom_end = temp.index('Bonds')
+            dat_atoms = temp[dat_atom_start + 1:dat_atom_end]
+            f_dat_file.close()
+
+            ### update LAMMPS data file ###
+            myDAT = open(dat_file)
+            new_dat_filename = dat_file + "." + keyword + "." + str(timestep)
+            myNewDAT = open(new_dat_filename, 'w')
+            linecount = 0;
+
+            while 1:
+                line = myDAT.readline()
+
+                if not line:
+                    break;
+
+                if linecount == 0:
+                    output = line.strip("\n") + " and updated with timestep " + str(timestep) + " in " + trj_file + "\n"
+                    linecount += 1;
+                    myNewDAT.write(output)
+                    continue;
+
+                if "xlo " in line:
+                    output = "\t" + " {0:>10.6f} {1:>10.6f}".format(0.0, boxsize[0]) + " xlo xhi\n"
+                    myNewDAT.write(output)
+                    continue;
+                elif "ylo " in line:
+                    output = "\t" + " {0:>10.6f} {1:>10.6f}".format(0.0, boxsize[1]) + " ylo yhi\n"
+                    myNewDAT.write(output)
+                    continue;
+                elif "zlo " in line:
+                    output = "\t" + " {0:>10.6f} {1:>10.6f}".format(0.0, boxsize[2]) + " zlo zhi\n"
+                    myNewDAT.write(output)
+                    continue;
+
+                if not "Atoms" in line:
+                    myNewDAT.write(line)
+
+                else:
+                    myNewDAT.write("Atoms\n\n")
+
+                    for i in dat_atoms:
+                        if len(i) == 0:
+                            continue;
+
+                        parse = i.split()
+                        atomNo = int(parse[0])
+                        molNo = int(parse[1])
+                        atomTypeNo = int(parse[2])
+
+                        atom = myBGF.getAtom(atomNo)
+                        if atom.aNo != atomNo or atom.rNo != molNo:
+                            nu.die("BGF and data file mismatch. Please check both files.")
+                        else:
+                            output = "{0:>8} {1:>8} {2:>8}  {3:10.5f} {4:10.5f} {5:10.5f} {6:10.5f} {7:10.5f} {8:10.5f} {9:10.5f}".format(atom.aNo, atom.rNo, atomTypeNo, atom.charge, atom.x, atom.y, atom.z, float(parse[7]), float(parse[8]), float(parse[9])) + "\n"
+                        myNewDAT.write(output)
+
+                    # Write velocities
+                    if yes_velocity:
+                        myNewDAT.write("\n\nVelocities\n\n")
+                        for i in dat_atoms:
+                            if len(i) == 0:
+                                continue;
+                            parse = i.split()
+                            atomNo = int(parse[0])
+                            output = "{0:>8} {1:12.8f} {2:12.8f} {3:12.8f}\n".format(atomNo, info[atomNo]['vx'], info[atomNo]['vy'], info[atomNo]['vz'])
+                            myNewDAT.write(output)
+
+                    # consume
+                    for i in range(len(dat_atoms)):
+                        line = myDAT.readline()
+
+                    myNewDAT.write("\n")
+
+            if not silent: print("The snapshot is saved in LAMMPS data file " + new_dat_filename)
+    print('')
+    return 1
+
+    ### end of function
+
+
+if __name__ == "__main__":
+    bgf_file = ""; dat_file = ""; trj_file = ""; log_file = ""; ff_file = ""; keyword = ""; saveBgfFlag = False; n_sample = 0;
+
+    options, args = getopt.getopt(sys.argv[1:], 'hb:d:t:l:k:sn:f:', ['help', 'bgf', 'dat=', 'trj=', 'log=', 'keyword=', 'save', 'sample=', 'ff='])
+
+    if len(sys.argv) < 2:
+        print(usage)
+        sys.exit(0)
+
+    print "Requested options: " + str(options)
+
+    for option, value in options:
+        if option in ('-h', '--help'):
+            print(usage)
+            sys.exit(0)
+        elif option in ('-b', '--bgf'):
+            bgf_file = value
+        elif option in ('-d', '--dat'):
+            dat_file = value
+        elif option in ('-t', '--trj'):
+            trj_file = value
+        elif option in ('-l', '--log'):
+            log_file = value
+        elif option in ('-f', '--ff'):
+            ff_file = value
+        elif option in ('-k', '--keyword'):
+            keyword = value
+        elif option in ('-s', '--save'):
+            saveBgfFlag = True;
+        elif option in ('-n', '--sample'):
+            n_sample = int(value)
+        elif option == NULL:
+            print(usage)
+            sys.exit(0)
+    
+    ### default options
+    if not bgf_file:
+        nu.die("No BGF file specified.")
+    if not trj_file:
+        nu.die("No LAMMPS trajectory file specified.")
+    if not log_file:
+        nu.die("No LAMMPS log file specified.")
+    if not keyword:
+        keyword = "Volume"
+    
+    # main call
+    getBestShot(bgf_file, dat_file, trj_file, log_file, ff_file, keyword, saveBgfFlag, n_sample)

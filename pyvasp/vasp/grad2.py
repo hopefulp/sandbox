@@ -20,7 +20,7 @@
 #
 # *****************************************************************************
 
-import commands
+import subprocess
 import os
 import sys
 import math
@@ -29,10 +29,10 @@ import re
 from optparse import OptionParser
 
 def get_number_of_atoms(where):
-	return int(commands.getoutput("grep \"NIONS\" " + where).split()[11])
+	return int(subprocess.getoutput("grep \"NIONS\" " + where).split()[11])
 
 def get_ediff(where):
-	return float(commands.getoutput("grep \"  EDIFF\" " + where).split()[2])
+	return float(subprocess.getoutput("grep \"  EDIFF\" " + where).split()[2])
 
 # Some ANSI colors
 OKGREEN = '\033[92m'
@@ -69,7 +69,7 @@ if outcar != None:
 	outcarlines = outcar.readlines()
 
 	#Find max iterations
-	nelmax = int(commands.getoutput("grep NELM " + outcarfile).split()[2][0:-1])
+	nelmax = int(subprocess.getoutput("grep NELM " + outcarfile).split()[2][0:-1])
 	natoms = get_number_of_atoms(outcarfile)
 	ediff = math.log10(float(get_ediff(outcarfile)))
 
@@ -145,7 +145,7 @@ if outcar != None:
 				timestr="Time: " + ("%3.2f" % (cputime)).rjust(6)
 				volstr="Vol.: " + ("%3.1f" % (volume)).rjust(5)
 			except NameError:
-				print "Cannot understand this OUTCAR file...try to read ahead"
+				print("Cannot understand this OUTCAR file...try to read ahead")
 				continue
 
 			if iterations == nelmax:
@@ -158,9 +158,9 @@ if outcar != None:
 			if spinpolarized:
 				# sys.stdout.write(("Step %3i  Energy: %+3.6f  Log|dE|: %+1.3f  Avg|F|: %.6f  Max|F|: %.6f  SCF: %3i  Mag: %2.2f  Time: %03.2fm") % (steps,energy,dE,average,maxforce,iterations,magmom,cputime))
 				magstr="Mag: " + ("%2.2f" % (magmom)).rjust(6)
-				print "%s  %s  %s  %s  %s  %s  %s  %s  %s" % (stepstr,energystr,logdestr,iterstr,avgfstr,maxfstr,volstr,magstr,timestr)
+				print("%s  %s  %s  %s  %s  %s  %s  %s  %s" % (stepstr,energystr,logdestr,iterstr,avgfstr,maxfstr,volstr,magstr,timestr))
 			else:
-				print "%s  %s  %s  %s  %s  %s  %s  %s" % (stepstr,energystr,logdestr,iterstr,avgfstr,maxfstr,volstr,timestr)
+				print("%s  %s  %s  %s  %s  %s  %s  %s" % (stepstr,energystr,logdestr,iterstr,avgfstr,maxfstr,volstr,timestr))
 				# sys.stdout.write(("Step %3i  Energy: %+3.6f  Log|dE|: %+1.3f  Avg|F|: %.6f  Max|F|: %.6f  SCF: %3i  Time: %03.2fm") % (steps,energy,dE,average,maxforce,iterations,cputime))
 
 			sys.stdout.write(ENDC)

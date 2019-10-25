@@ -10,7 +10,7 @@ def allvasp():
 		if not os.path.isdir(dir):
 			continue
 		os.chdir(dir)
-		print 'now on '+dir
+		print('now on '+dir)
 		if os.path.isfile('INCAR') and os.path.isfile('POSCAR') and not os.path.isfile('OUTCAR'):
 			os.system('csh /qcfs/jackjack5/vasp/vaspenv.sh')
 		os.chdir('..')

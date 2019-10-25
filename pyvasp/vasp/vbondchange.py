@@ -15,12 +15,12 @@ def length(v):
 def xuniqueCombinations(items, n):
     if n==0: yield []
     else:
-        for i in xrange(len(items)):
+        for i in range(len(items)):
             for cc in xuniqueCombinations(items[i+1:],n-1):
                 yield [items[i]]+cc\
 
 if len(sys.argv) < 2:
-	print "Usage: [file1] [file2] [cutoff]"
+	print("Usage: [file1] [file2] [cutoff]")
 	sys.exit()
 
 filename1 = sys.argv[1]
@@ -33,11 +33,11 @@ cutoff = float(3)
 #	cutoffr = sys.argv[3]
 
 if not os.path.isfile(filename1):
-	print inifile + " is not found."
+	print(inifile + " is not found.")
 	sys.exit()
 
 if not os.path.isfile(filename2):
-	print finfile + " is not found."
+	print(finfile + " is not found.")
 	sys.exit()
 
 #if cutoffr.isdigit():
@@ -191,14 +191,14 @@ for c in range(l):
 			len = length(vec)
 			findist[i][j] = len
 
-	print "-------------------------------------------------------------"
-	print "  %s - %s  \t ini.distance \t fin.distance \t delta" % (species[a],species[b])
-	print "-------------------------------------------------------------"
+	print("-------------------------------------------------------------")
+	print("  %s - %s  \t ini.distance \t fin.distance \t delta" % (species[a],species[b]))
+	print("-------------------------------------------------------------")
 	for i in range (int(nspecies[a])):
 		for j in range (int(nspecies[b])):
 			if inidist[i][j] < cutoff:
 				delta = float(findist[i][j])-float(inidist[i][j])
-				print "%s%i - %s%i \t %5.8f \t %5.8f \t %5.8f" % (species[a],i,species[b],j,inidist[i][j],findist[i][j],delta)
+				print("%s%i - %s%i \t %5.8f \t %5.8f \t %5.8f" % (species[a],i,species[b],j,inidist[i][j],findist[i][j],delta))
 
 file1.close
 file2.close

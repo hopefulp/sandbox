@@ -1,0 +1,69 @@
+# this script aligns principal axes of CNT to z axes
+# and counts water molecules inside CNT
+# version 20140211
+
+### global
+source "/qcfs/noische/scripts/vmd/mathtools.tcl"
+package require Orient
+namespace import Orient::orient
+
+### initialization
+# frame
+set sel [atomselect top "resname BNT"]
+set n_frames [molinfo top get numframes]
+set result {}
+set filename [lindex [molinfo top get filename] 0 1]
+append filename ".countWater.profile"
+puts "** result will be saved at: $filename"
+set outfile [open $filename w]
+puts $outfile "fr\tcx\tcy\th\tr\tn_wat\n"
+
+
+### loop over frames
+for { set fr 1 } { $fr <= $n_frames } { incr fr } {
+	# load molecules
+	molinfo top set frame $fr
+	set cnt [atomselect top "resname BNT"]
+	set all [atomselect top "all"]
+	
+	# center of mass of cnt
+	set cm [measure center $cnt]
+	set mm [measure minmax $cnt]
+	set cx [lindex $cm 0]
+	set cy [lindex $cm 1]
+
+	# calculate MI of BNT
+	set I [draw principalaxes $cnt]
+	set A [orient $cnt [lindex $I 2] {0 0 1}]
+
+	# rotate system
+	$all move $A
+	
+	# radius of cnt
+	set radius 0.0
+	set dist_sq {}
+	foreach i [$cnt get {x y z}] {
+		set x [lindex $i 0]
+		set y [lindex $i 1]
+		set z [lindex $i 2]
+
+		# BNT radius
+		lappend dist_sq [expr "($cx-$x)**2+($cy-$y)**2"]
+		set avg_dist_sq [getAvg $dist_sq]
+		unset dist_sq
+
+	}
+	set zmax [lindex [lindex $mm 1] 2]
+	set zmin [lindex [lindex $mm 0] 2]
+	set h [expr "$zmax-$zmin"]
+
+	# select atoms in cnt
+	set inside [atomselect top "(x-$cx)**2+(y-$cy)**2 < $avg_dist_sq and z > $zmin and z < $zmax and type OW"]
+	puts $outfile "$fr\t$cx\t$cy\t$h\t[expr sqrt($avg_dist_sq)]\t[$inside num]"
+	puts -nonewline "\rprocessing $fr / $n_frames"
+	#puts "$fr $cx $cy $h [expr sqrt($avg_dist_sq)] [$inside num]"
+
+	flush stdout
+}
+puts ""
+close $outfile

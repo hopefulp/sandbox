@@ -1,0 +1,41 @@
+
+# functional
+GGA = RP
+
+# U-correction
+#LDAU = .TRUE.
+#LDAUTYPE = 2
+#LDAUL = 2 -1 -1 -1
+#LDAUU = 6.5 0 0 0
+#LDAUJ = 1 0 0 0
+
+# D2 correction
+LVDW = .TRUE.
+
+# hse06
+#GGA = PE
+#LHFCALC = .TRUE.
+#ALGO = D; TIME = 0.4
+#HFSCREEN = 0.207
+#PRECFOCK = F
+#NKRED = 2
+#LTHOMAS = .TRUE.
+#Block NPAR tag
+
+# pbe0
+#GGA = PE
+#LHFCALC = .TRUE.
+#ALGO = D; TIME = 0.4
+#ENCUTFOCK = 0
+#NKRED = 2
+#Block NPAR tag
+
+# b3lyp
+#GGA = B3
+#LHFCALC = .TRUE.
+#ALGO = D; TIME = 0.5
+#AEXX = 0.2
+#AGGAX = 0.72
+#AGGAC = 0.81
+#ALDAC = 0.19
+#Block NPAR tag

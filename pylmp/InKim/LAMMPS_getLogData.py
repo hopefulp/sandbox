@@ -1,0 +1,294 @@
+#!/home/noische/python
+
+import sys, re, string, getopt, optparse, math, time
+import os
+import copy
+
+import nutils as nu
+
+usage = """
+LAMMPS_getLogData.py: 
+	Get thermodynamic data from a LAMMPS log file
+	Parsed data will be written in out_file
+
+Usage: getLAMMPSData.py -l log_file -o out_file -k keyword (--last)
+
+	log_file: REQUIRED. LAMMPS log file which contains thermodynamic data.
+	keyword:  OPTIONAL. LAMMPS thermo keywords. --last prints out only the last step.
+	out_file: OPTIONAL. Output file. (Default: .log)
+"""
+
+version = "130614"
+
+def getLogData(log_file, out_file, requested_key, silent=True):
+	"""
+getLogData: GET thermodynamic data from a LAMMPS log file
+	If getLogData is called from the main function, then getLogData will write the parsed data into keyword.log.parsed
+	Otherwise, the list of [step, value(keyword)] will be returned.
+	"""
+
+	# initialization
+	n_count = 0; TICK = 10000;
+
+	# parse section and extract all thermodynamic data
+	#pat1 = re.compile(r"Step\s*(\S*)\s-+")	# (old) 
+	pat1 = re.compile(r"Step[-= ]*(\d*)")	# step. modified in case with /qcfs/dongshin/lis/test/reaxff/trial01/reaxtest/reaxtest.log
+	pat2 = re.compile(r"([A-z]+)\s+=\s*-*\d+\.\d+")	# keywords
+	pat3 = re.compile(r"[A-z]+\s+=\s*(-*\d+\.\d+)")	# numbers
+
+
+	# log file loading
+	myLOG = open(log_file)
+	myLOG_output = [];
+
+	# preprocessing
+	if not silent: print("\n== Step 1. Preprocessing the LAMMPS log file")
+	wc_log_file = os.popen("wc -l " + log_file).read()	# file newline counts
+	log_file_length = int(wc_log_file.split()[0]); str_log_file_length = str(log_file_length);
+	t1 = time.time(); t2 = 0;
+	while 1:
+		try:
+			line = myLOG.readline()
+
+			if not line:
+				break;
+
+			line = line.replace("\n", "")
+
+			n_count += 1;
+			if not silent:
+				if n_count % TICK == 0 or n_count == log_file_length:
+					# estimated time calculation
+					t2 = time.time()
+					elapsed = t2 - t1
+					estimated = elapsed * ((log_file_length - n_count) // TICK)	
+
+					# string conversion
+					str_n_count = str(n_count)
+					str_estimated = "{0:4.1f}".format(estimated)
+					sys.stdout.write("\rPreprocessing.. "+ str_n_count + " / " + str_log_file_length + ".. " + "(" + str_estimated + " sec remain)")
+					sys.stdout.flush()
+
+					# reassigning time
+					t1 = t2;
+
+			# keyword checking
+			"""	### ORIGINAL version
+			if "angle_coeff" in line or "angle_style" in line or "atom_modify" in line or "atom_style" in line or \
+				"bond_coeff" in line or "bond_style" in line or "boundary" in line or "change_box" in line or \
+				"variable" in line or "data" in line or "group" in line or "dump" in line or \
+				"clear" in line or "communicate" in line or "compute" in line or "compute_modify" in line or \
+				"create_atoms" in line or "create_box" in line or "delete_atoms" in line or "delete_bonds" in line or \
+				"dielectric" in line or "dihedral_coeff" in line or "dihedral_style" in line or "dimension" in line or \
+				"displace_atoms" in line or "displace_box" in line or "dump" in line or "dump" in line or "image" in line or \
+				"dump_modify" in line or "echo" in line or "fix" in line or "fix_modify" in line or \
+				"group" in line or "if" in line or "improper_coeff" in line or "improper_style" in line or \
+				"include" in line or "jump" in line or "kspace_modify" in line or "kspace_style" in line or \
+				"label" in line or "lattice" in line or "log" in line or "mass" in line or \
+				"minimize" in line or "min_modify" in line or "min_style" in line or "neb" in line or \
+				"neigh_modify" in line or "neighbor" in line or "newton" in line or "next" in line or \
+				"package" in line or "pair_coeff" in line or "pair_modify" in line or "pair_style" in line or \
+				"pair_write" in line or "partition" in line or "prd" in line or "print" in line or \
+				"processors" in line or "read_data" in line or "read_restart" in line or "region" in line or \
+				"replicate" in line or "reset_timestep" in line or "restart" in line or "run" in line or \
+				"run_style" in line or "set" in line or "shell" in line or "special_bonds" in line or \
+				"suffix" in line or "tad" in line or "temper" in line or "thermo" in line or \
+				"thermo_modify" in line or "thermo_style" in line or "timestep" in line or "uncompute" in line or \
+				"undump" in line or "unfix" in line or "units" in line or "variable" in line or \
+				"velocity" in line or "write_restart" in line:
+				pass;
+			"""
+
+			### 2nd version
+			if "coeff" in line or "modify" in line or "style" in line or \
+				"boundary" in line or "change_box" in line or \
+				"variable" in line or "data" in line or "group" in line or "dump" in line or \
+				"clear" in line or "communicate" in line or "compute" in line or \
+				"create" in line or "delete" in line or \
+				"dielectric" in line or "dimension" in line or \
+				"displace_atoms" in line or "displace_box" in line or "image" in line or \
+				"echo" in line or "fix" in line or \
+				"group" in line or "if" in line or \
+				"include" in line or "jump" in line or \
+				"label" in line or "lattice" in line or "log" in line or "mass" in line or \
+				"minimize" in line or "neb" in line or \
+				"neighbor" in line or "newton" in line or "next" in line or \
+				"package" in line or \
+				"write" in line or "partition" in line or "prd" in line or "print" in line or \
+				"processors" in line or "read" in line or "region" in line or \
+				"replicate" in line or "time" in line or "restart" in line or "run" in line or \
+				"set" in line or "shell" in line or "special_bonds" in line or \
+				"tad" in line or "temper" in line or "thermo" in line or \
+				"uncompute" in line or \
+				"units" in line or "variable" in line or \
+				"velocity" in line:
+				pass;
+
+			elif "Step" in line or "TotEng" in line or "PotEng" in line or "E_dihed" in line or "E_coul" in line or \
+				"Temp" in line or "Volume" in line:
+				myLOG_output.append(line)
+
+			elif "KinEng" in line or "E_bond" in line or "E_impro" in line or "E_long" in line or \
+				"E_angle" in line or "E_vdwl" in line or "Press" in line or  \
+				"v_" in line or "c_" in line:
+				myLOG_output.append(line)
+
+		except KeyboardInterrupt:
+			nu.die("Keyboard Break.. Exiting.")
+
+	#print(myLOG_output)	# Preprocessed data
+
+	# find the number of last step
+	templist = copy.deepcopy(myLOG_output)
+	laststep = "";
+	while 1:
+		l = templist.pop()
+		if "Step" in l:
+			laststep = l
+			break;
+	laststep = int(re.search(pat1, laststep).group(1))	# last step
+	str_laststep = str(laststep)
+
+	if not silent: sys.stdout.write("\nDone.\n")
+
+	if not silent: print("\n== Step 2. Getting Thermodynamic Properties")
+
+	if out_file != "":
+		myLOG_parse = open(out_file, "w")		# output file
+
+	section = ""; thermo_data = []; line = "";
+
+	# first line: pass!!
+	section = myLOG_output[0]
+	myLOG_output = myLOG_output[1:]
+
+	t1 = time.time(); t2 = 0;
+	try:
+		for line in myLOG_output:
+	
+			section_full = False;
+	
+			if "Step" in line:
+				section_full = True;
+	
+			# for ONE step
+			if section_full == True:
+				step = int(re.search(pat1, section).group(1)) # steps
+				keyword = re.findall(pat2, section) # keywords
+				value = re.findall(pat3, section) # numbers
+	
+				# display step progress
+				if not silent:
+					if step % TICK == 0 or step == laststep:
+						# estimated time calculation
+						t2 = time.time()
+						elapsed = t2 - t1
+						estimated = elapsed * ((laststep - step) // TICK)	
+	
+						str_step = str(step)
+						str_estimated = "{0:4.1f}".format(estimated)
+						sys.stdout.write("\rParsing the Step " + str_step + " / " + str_laststep + ".. " + "(" + str_estimated + " sec remain)")
+						sys.stdout.flush()
+	
+						# reassign time
+						t1 = t2;
+	
+				if len(keyword) != len(value):
+					nu.warn("Suspicious parsing at " + str(step) + ".. Exiting.")
+					break;
+	
+				# check if keyword is a filename
+				if out_file != "":
+					# Write thermodynamic data to a new file for further use
+					output_myLOG_parse = "Step\t" + str(step) + "\t"
+					for asdf in range(0, len(keyword)):
+						output_myLOG_parse += keyword[asdf] + "\t" + str(value[asdf]) + "\t"
+					output_myLOG_parse += "\n"
+					myLOG_parse.write(output_myLOG_parse)
+
+				# keyword check
+				if requested_key == "":
+					# no option: return the whole data [keyword value keyword value ...]
+					temp = [];
+					temp.append("Step"); temp.append(step)
+					for i in range(0, len(keyword)):
+						temp.append(keyword[i]); temp.append(value[i])
+					thermo_data.append(temp)
+				else:
+					# with keyword: append to the result list
+					try:
+						temp = keyword.index(requested_key)
+					except:
+						#nu.warn("Keyword " + str(keyword) + " is not found in the log file.. Exiting.")
+						pass;
+					else:
+						thermo_data.append([step, value[temp]])
+		
+				# empty bin
+				section = line;
+				section_full = False;
+	
+			else:
+				section += line;
+
+	except KeyboardInterrupt:
+		nu.die("Keyboard Break.. Exiting.")
+
+	if out_file != "":
+		if not silent: print("\nParsed thermodynamic data is saved on " + out_file + " ..")
+		myLOG_parse.close()
+
+	if not silent: sys.stdout.write("Done.\n")
+
+	return thermo_data;	# success
+
+	### end of getLogData
+
+
+if __name__ == "__main__":
+
+	if len(sys.argv) < 2:
+		print(usage);
+		sys.exit(1)
+
+	out_file = ""; log_file = ""; requested_key = ""; requested_laststep = False;
+
+	options, args = getopt.getopt(sys.argv[1:], 'ho:l:k:t', ['help','out=','log=','keyword=', 'last'])
+	for option, value in options:
+		if option in ('-h', '--help'):
+			print(usage)
+			sys.exit(0);
+		elif option in ('-o', '--out'):
+			out_file = value
+		elif option in ('-l', '--log'):
+			log_file = value
+		elif option in ('-k', '--keyword'):
+			requested_key = value
+		elif option in ('-t', '--last'):
+			requested_laststep = True
+		elif option == NULL:
+			print(usage)
+			sys.exit(0)
+
+	if log_file =="":
+		print("You have to specify either trajectory file or log file!")
+		sys.exit(1)
+
+	if out_file == "":
+		out_file = log_file.split(".log")[0] + ".log.parsed"
+
+	if requested_key == "":
+		print("No specified keys")
+
+	# main call
+	print(sys.argv[0] + " version " + str(version))
+	print(sys.argv)
+	a = getLogData(log_file, out_file, requested_key, silent=False)
+
+	# if keyword is directly called, then print
+	if requested_key != "":
+		if requested_laststep:
+			print("{0:<10} {1:10.6f}".format(a[-1][0], float(a[-1][1])))
+		else:	
+			for i in a:
+				print(str(i[0]) + "\t" + str(i[1]))

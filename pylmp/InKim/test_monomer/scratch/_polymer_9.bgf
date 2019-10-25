@@ -1,0 +1,178 @@
+BIOGRF 200
+DESCRP tertiary.b3lyp.opt.out
+REMARK Trajectory updated with _polymer_9.min.lammpstrj
+REMARK Trajectory updated with test.py by noische on Thu Nov 26 03:11:01 2015
+PERIOD 111
+AXES   ZYX
+SGNAME P 1                  1    1
+
+CRYSTX 13.38381   10.04387   10.71811   90.00000   90.00000   90.00000   
+CELLS  -1   1    -1   1    -1   1    
+FORMAT ATOM   (a6,1x,i5,1x,a5,1x,a3,1x,a1,1x,a5,3f10.5,1x,a5,i3,i2,1x,f8.5,i2,i4,f10.5)
+HETATM     1 C1    TER H     0  12.74251   6.62632   5.88717 C_3    4 0 -0.45170
+HETATM     2 C2    TER A     0  11.58725   5.83559   6.54035 C_3    4 0 -0.10261
+HETATM     3 H3    TER A     0  12.35564   7.34432   5.16256 H_     1 0  0.15635
+HETATM     4 H4    TER A     0  13.43012   5.94279   5.38635 H_     1 0  0.14637
+HETATM     5 H5    TER A     0  13.29200   7.17885   6.65171 H_     1 0  0.14217
+HETATM     6 N6    TER B     0  10.90707   4.84711   5.64114 N_3    3 0 -0.13058
+HETATM     7 H7    TER A     0  10.85746   6.54342   6.94012 H_     1 0  0.13451
+HETATM     8 H8    TER A     0  12.01905   5.29805   7.38967 H_     1 0  0.10549
+HETATM     9 C1    TER H     1  10.16222   3.73800   6.32197 C_3    4 0 -0.30533
+HETATM    10 C2    TER A     1   9.07177   4.17981   7.33753 C_3    4 0 -0.10261
+HETATM    11 H3    TER A     1   9.71816   3.08478   5.56994 H_     1 0  0.15635
+HETATM    12 H5    TER A     1  10.89221   3.12738   6.85865 H_     1 0  0.14217
+HETATM    13 N6    TER B     1   8.30314   3.02931   7.91854 N_3    3 0 -0.13058
+HETATM    14 H7    TER A     1   8.38490   4.88703   6.87485 H_     1 0  0.13451
+HETATM    15 H8    TER A     1   9.58048   4.72090   8.13858 H_     1 0  0.10549
+HETATM    16 C1    TER H     2  10.37857   5.31615   4.31730 C_3    4 0 -0.30533
+HETATM    17 C2    TER A     2   9.15948   6.27622   4.36576 C_3    4 0 -0.10261
+HETATM    18 H3    TER A     2  10.11372   4.44265   3.71803 H_     1 0  0.15635
+HETATM    19 H5    TER A     2  11.18563   5.80895   3.77361 H_     1 0  0.14217
+HETATM    20 N6    TER B     2   8.92320   6.97215   3.05952 N_3    3 0 -0.13058
+HETATM    21 H7    TER A     2   9.34349   7.01426   5.14770 H_     1 0  0.13451
+HETATM    22 H8    TER A     2   8.26624   5.72234   4.65127 H_     1 0  0.10549
+HETATM    23 C1    SEC H     3   7.43722   2.20052   7.01446 C_3    4 0 -0.29045
+HETATM    24 C2    SEC A     3   6.58209   2.98219   5.98414 C_3    4 0 -0.10770
+HETATM    25 H4    SEC A     3   6.77040   1.57078   7.60883 H_     1 0  0.13697
+HETATM    26 H5    SEC A     3   8.08806   1.51571   6.46762 H_     1 0  0.14336
+HETATM    27 N6    SEC B     3   5.60795   2.07650   5.33301 N_3    3 0 -0.41671
+HETATM    28 H7    SEC A     3   7.24146   3.41033   5.22687 H_     1 0  0.13858
+HETATM    29 H8    SEC A     3   6.05716   3.79446   6.48640 H_     1 0  0.10679
+HETATM    30 H10   SEC A     3   4.90183   1.81709   6.02404 H___A  1 0  0.28916
+HETATM    31 C1    TER H     4   4.91294   2.60476   4.13619 C_3    4 0 -0.30953
+HETATM    32 C2    TER A     4   3.87337   3.72590   4.39993 C_3    4 0 -0.10261
+HETATM    33 H3    TER A     4   5.65607   2.95758   3.41813 H_     1 0  0.15635
+HETATM    34 H4    TER A     4   4.39805   1.76435   3.66628 H_     1 0  0.14637
+HETATM    35 N6    TER B     4   2.64729   3.18478   5.07736 N_3    3 0 -0.13058
+HETATM    36 H7    TER A     4   3.62596   4.15950   3.42761 H_     1 0  0.13451
+HETATM    37 H8    TER A     4   4.32143   4.53852   4.97689 H_     1 0  0.10549
+HETATM    38 C1    SEC H     5   7.87656   3.16510   9.34779 C_3    4 0 -0.29045
+HETATM    39 C2    SEC A     5   6.70035   4.14218   9.60095 C_3    4 0 -0.10770
+HETATM    40 H4    SEC A     5   7.62132   2.18157   9.74990 H_     1 0  0.13697
+HETATM    41 H5    SEC A     5   8.73382   3.50519   9.93426 H_     1 0  0.14336
+HETATM    42 N6    SEC B     5   5.39420   3.52260   9.35404 N_3    3 0 -0.53171
+HETATM    43 H7    SEC A     5   6.79856   5.03059   8.97543 H_     1 0  0.13858
+HETATM    44 H8    SEC A     5   6.71476   4.46070  10.64544 H_     1 0  0.10679
+HETATM    45 H9    SEC A     5   5.39531   3.17899   8.39351 H___A  1 0  0.11500
+HETATM    46 H10   SEC A     5   5.33095   2.70254   9.96159 H___A  1 0  0.28916
+HETATM    47 C1    PRI H     6   1.33824   3.51839   4.42176 C_3    4 0 -0.27406
+HETATM    48 C2    PRI A     6   0.98510   2.52692   3.28748 C_3    4 0 -0.12755
+HETATM    49 H3    PRI A     6   1.34551   4.54167   4.03595 H_     1 0  0.13574
+HETATM    50 H5    PRI A     6   0.51782   3.46938   5.14209 H_     1 0  0.13985
+HETATM    51 N6    PRI B     6   1.87339   2.64781   2.12742 N_3    3 0 -0.70870
+HETATM    52 H7    PRI A     6  -0.03625   2.71386   2.94886 H_     1 0  0.11144
+HETATM    53 H8    PRI A     6   1.03931   1.50384   3.66469 H_     1 0  0.14044
+HETATM    54 H9    PRI A     6   1.74557   3.58846   1.74801 H___A  1 0  0.28937
+HETATM    55 H10   PRI A     6   1.53283   1.99393   1.41935 H___A  1 0  0.29347
+HETATM    56 C1    PRI H     7   2.65236   3.26346   6.57437 C_3    4 0 -0.27406
+HETATM    57 C2    PRI A     7   1.99024   2.03004   7.23255 C_3    4 0 -0.12755
+HETATM    58 H3    PRI A     7   3.67039   3.31791   6.96189 H_     1 0  0.13574
+HETATM    59 H5    PRI A     7   2.14217   4.17285   6.90409 H_     1 0  0.13985
+HETATM    60 N6    PRI B     7   2.67827   0.79124   6.85331 N_3    3 0 -0.70870
+HETATM    61 H7    PRI A     7   0.94132   1.95310   6.94411 H_     1 0  0.11144
+HETATM    62 H8    PRI A     7   2.03822   2.13008   8.31880 H_     1 0  0.14044
+HETATM    63 H9    PRI A     7   2.55492   0.67538   5.84511 H___A  1 0  0.28937
+HETATM    64 H10   PRI A     7   2.17756   0.02150   7.30254 H___A  1 0  0.29347
+HETATM    65 C1    PRI H     8   8.64605   8.44336   3.08027 C_3    4 0 -0.29815
+HETATM    66 C2    PRI A     8   7.22711   8.87559   3.52716 C_3    4 0 -0.12755
+HETATM    67 H4    PRI A     8   9.37410   8.92696   3.73692 H_     1 0  0.15983
+HETATM    68 H5    PRI A     8   8.82471   8.85499   2.08362 H_     1 0  0.13985
+HETATM    69 N6    PRI B     8   6.87901   8.39862   4.86900 N_3    3 0 -0.70870
+HETATM    70 H7    PRI A     8   6.47948   8.52430   2.81747 H_     1 0  0.11144
+HETATM    71 H8    PRI A     8   7.18210   9.96703   3.54072 H_     1 0  0.14044
+HETATM    72 H9    PRI A     8   6.75675   7.38632   4.80461 H___A  1 0  0.28937
+HETATM    73 H10   PRI A     8   5.96334   8.79125   5.09772 H___A  1 0  0.29347
+HETATM    74 C1    PRI H     9   8.48722   6.17095   1.87106 C_3    4 0 -0.29404
+HETATM    75 C2    PRI A     9   7.05913   5.58010   1.95346 C_3    4 0 -0.12755
+HETATM    76 H3    PRI A     9   8.55433   6.78652   0.97074 H_     1 0  0.13574
+HETATM    77 H4    PRI A     9   9.19133   5.34881   1.72517 H_     1 0  0.15983
+HETATM    78 N6    PRI B     9   6.77699   4.74570   0.78037 N_3    3 0 -0.70870
+HETATM    79 H7    PRI A     9   6.31427   6.37415   1.99253 H_     1 0  0.11144
+HETATM    80 H8    PRI A     9   6.95781   4.96034   2.84301 H_     1 0  0.14044
+HETATM    81 H9    PRI A     9   6.80589   5.35883  -0.03752 H___A  1 0  0.28937
+HETATM    82 H10   PRI A     9   5.81231   4.41805   0.87106 H___A  1 0  0.29347
+FORMAT CONECT (a6,14i6)
+FORMAT ORDER (a6,i6,13f6.3)
+CONECT     1     3     4     5     2
+CONECT     2     6     1     7     8
+CONECT     3     1
+CONECT     4     1
+CONECT     5     1
+CONECT     6     2     9    16
+CONECT     7     2
+CONECT     8     2
+CONECT     9    11    12    10     6
+CONECT    10    13     9    14    15
+CONECT    11     9
+CONECT    12     9
+CONECT    13    10    23    38
+CONECT    14    10
+CONECT    15    10
+CONECT    16    18    19    17     6
+CONECT    17    20    16    21    22
+CONECT    18    16
+CONECT    19    16
+CONECT    20    17    65    74
+CONECT    21    17
+CONECT    22    17
+CONECT    23    24    26    25    13
+CONECT    24    28    27    23    29
+CONECT    25    23
+CONECT    26    23
+CONECT    27    24    30    31
+CONECT    28    24
+CONECT    29    24
+CONECT    30    27
+CONECT    31    33    34    32    27
+CONECT    32    35    31    36    37
+CONECT    33    31
+CONECT    34    31
+CONECT    35    32    47    56
+CONECT    36    32
+CONECT    37    32
+CONECT    38    39    41    40    13
+CONECT    39    43    42    38    44
+CONECT    40    38
+CONECT    41    38
+CONECT    42    45    39    46
+CONECT    43    39
+CONECT    44    39
+CONECT    45    42
+CONECT    46    42
+CONECT    47    49    48    50    35
+CONECT    48    52    47    51    53
+CONECT    49    47
+CONECT    50    47
+CONECT    51    54    48    55
+CONECT    52    48
+CONECT    53    48
+CONECT    54    51
+CONECT    55    51
+CONECT    56    58    57    59    35
+CONECT    57    61    56    60    62
+CONECT    58    56
+CONECT    59    56
+CONECT    60    63    57    64
+CONECT    61    57
+CONECT    62    57
+CONECT    63    60
+CONECT    64    60
+CONECT    65    66    68    67    20
+CONECT    66    70    65    69    71
+CONECT    67    65
+CONECT    68    65
+CONECT    69    72    66    73
+CONECT    70    66
+CONECT    71    66
+CONECT    72    69
+CONECT    73    69
+CONECT    74    76    75    77    20
+CONECT    75    79    74    78    80
+CONECT    76    74
+CONECT    77    74
+CONECT    78    81    75    82
+CONECT    79    75
+CONECT    80    75
+CONECT    81    78
+CONECT    82    78
+END

@@ -14,10 +14,10 @@ normalen = 1.3
 
 #usage description
 if len(sys.argv)<3:
-	print "Usage: [rlx/opt/sp] [high/normal]"
-	print " * rlx-relax atom with fixed cell / opt-cell optimization / sp-single point"
-	print " * high/normal - accuracy level"
-	print " * non-magnetic ordering is default"
+	print("Usage: [rlx/opt/sp] [high/normal]")
+	print(" * rlx-relax atom with fixed cell / opt-cell optimization / sp-single point")
+	print(" * high/normal - accuracy level")
+	print(" * non-magnetic ordering is default")
 	sys.exit()
 
 jobtype=sys.argv[1]
@@ -98,7 +98,7 @@ poscarfile.close()
 cptemplet = 'cp '+templetdir+'/INCAR '+templetdir+'/KPOINTS .'
 os.system(cptemplet)
 if not (os.path.isfile('POTCAR')):
-	print "POTCAR file generated\n"
+	print("POTCAR file generated\n")
 	os.system('potgenerate_pbe POSCAR')
 	os.system('mv POSCAR.pot POTCAR')
 
@@ -186,23 +186,23 @@ os.system('sed -i -e \'s|_ISIF_|%s|\' INCAR' % inisif)
 os.system('sed -i -e \'s|_IBRION_|%s|\' INCAR' % inibrion)
 os.system('sed -i -e \'s|_POTIM_|%s|\' INCAR' % inpotim)
 
-print "----- POSCAR information -----"
-print "# ATOMS: Total %s atoms" % natoms
-print "LATTICE: %s x %s x %s" % (xlen, ylen, zlen)
-print ""
-print "----- KPOINT information -----"
-print "TYPE   : Monkhorst-Pack"
-print "GRID   : %s x %s x %s" % (kx, ky, kz)
-print ""
-print "----- INCAR  information -----"
-print "MAGMOM : %s" % str(magmomlist)
-print "ENCUT  : %s" % str(inencut)
-print "PREC   : %s" % str(inprec)
-print "GGA    : %s" % str(ingga)
-print "ISMEAR : %s" % str(inismear)
-print "SIGMA  : %s" % str(insigma)
-print "EDIFF  : %s" % str(inediff)
-print "EDIFFG : %s" % str(inediffg)
-print "ISIF   : %s" % str(inisif)
-print "IBRION : %s" % str(inibrion)
-print "NSW    : %s" % str(innsw)
+print("----- POSCAR information -----")
+print("# ATOMS: Total %s atoms" % natoms)
+print("LATTICE: %s x %s x %s" % (xlen, ylen, zlen))
+print("")
+print("----- KPOINT information -----")
+print("TYPE   : Monkhorst-Pack")
+print("GRID   : %s x %s x %s" % (kx, ky, kz))
+print("")
+print("----- INCAR  information -----")
+print("MAGMOM : %s" % str(magmomlist))
+print("ENCUT  : %s" % str(inencut))
+print("PREC   : %s" % str(inprec))
+print("GGA    : %s" % str(ingga))
+print("ISMEAR : %s" % str(inismear))
+print("SIGMA  : %s" % str(insigma))
+print("EDIFF  : %s" % str(inediff))
+print("EDIFFG : %s" % str(inediffg))
+print("ISIF   : %s" % str(inisif))
+print("IBRION : %s" % str(inibrion))
+print("NSW    : %s" % str(innsw))

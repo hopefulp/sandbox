@@ -9,7 +9,7 @@ import operator
 
 #usage description: nstep
 if len(sys.argv) < 3:
-	print "Usage: [step] [atom name] [outname] [last image:optional]"
+	print("Usage: [step] [atom name] [outname] [last image:optional]")
 	sys.exit()
 
 nstep=sys.argv[1]
@@ -20,10 +20,10 @@ if len(sys.argv) == 5:
 	laststep = sys.argv[4]
 
 if not os.path.isfile('POSCAR'):
-	print "POSCAR is not found."
+	print("POSCAR is not found.")
 	sys.exit()
 if not os.path.isfile('XDATCAR'):
-	print "XDATCAR is not found."
+	print("XDATCAR is not found.")
 	sys.exit()
 
 #copy XDATCAR
@@ -58,10 +58,10 @@ for i in range(len(nspecies)):
 		ntarget = int(nspecies[i])
 	ntotal = ntotal + int(nspecies[i])
 if ntarget is 0:
-	print targetname +" is not in POSCAR"
+	print(targetname +" is not in POSCAR")
 	sys.exit()
 
-print "Trajectory is generating for " + str(ntarget) + " " + targetname + " atoms"
+print("Trajectory is generating for " + str(ntarget) + " " + targetname + " atoms")
 
 #count XDATCAR
 nlxdatcar = sum(1 for line in open('XDATCAR'))
@@ -76,9 +76,9 @@ natomstr = "  ".join(nspecies[0:-1]) + "  " + numtarget + "\n"
 outputname = outhead+"_i"+str(numset)+"s"+nstep+"_POSCAR"
 numframe = str(numset / int(nstep))
 
-print " - Total " + str(numset) + " images"
-print " - Writing " + numframe + " images for each " + str(nstep) + " step"
-print " - Output file name is " + outputname
+print(" - Total " + str(numset) + " images")
+print(" - Writing " + numframe + " images for each " + str(nstep) + " step")
+print(" - Output file name is " + outputname)
 
 #write new POSCAR
 poscarfile = open('POSCAR')

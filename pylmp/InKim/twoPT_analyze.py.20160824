@@ -1,0 +1,192 @@
+#!/home/noische/python
+
+import sys
+import glob
+import pickle as pkl
+import re
+import copy
+import getopt
+import numpy as np
+import nutils as nu
+
+version = '160502'
+
+class thermo():
+
+    def __init__(self, thermo_file):
+        # class init
+        self.properties = []
+        self.thermo = nu.hash() # e.g) thermo[group_no]['Trns']['Sq']
+        self.thermo_per_mol = nu.hash()
+        self.timestep = -1
+
+        # local init
+        pat_keyw = re.compile(r'(\S+)\(\S+\)')
+        pat_cat = re.compile(r'(\S+)\[\w(\d+)\]')
+        categorys = []  # not a typo, it's a personal onvention!
+        groups = []
+        n_group = 0
+        _header = ""
+
+        # read
+        #print("Reading thermo file %s" % thermo_file)
+
+        try:
+            self.timestep = int(re.search(re.compile(r'\.(\d+)\.2pt\.mol\.grps\.thermo'), thermo_file).group(1))
+        except:
+            nu.warn('No timestep found in the filename %s' % thermo_file)
+            return 0
+
+        with open(thermo_file, 'r') as f:
+            for line in f:
+                line = line.replace('\n', '')
+
+                if "*" in line:
+                    continue
+                if "Calculation" in line:
+                    continue
+
+                if line:
+                    parse = line.split()
+
+                    # header
+                    if 'property' in parse:
+                        self._header = parse
+                    else:
+                        property = parse[0].replace('_', '')
+                        property = property.replace('/', '')
+                        if re.search(pat_keyw, property):
+                            property = re.search(pat_keyw, property).group(1)
+
+                        self.properties.append(property)
+
+                        for index, i in enumerate(parse[1:]):
+                            _ = self._header[index+1]  # e.g) Trns[G001]
+                            cat = re.search(pat_cat, _).group(1)    # Trns
+                            grp = int(re.search(pat_cat, _).group(2))   # 1
+
+                            self.thermo[grp][cat][property] = float(i)
+
+
+        # per molecule values
+        self.thermo_per_mol = copy.deepcopy(self.thermo)
+        skip_properties = ['nmolecules', 'natom', 'temperature', 'pressure', 'volume', 'Diffus', 'fluidicity']
+        for g in self.thermo.keys():
+            for c in self.thermo[g].keys():
+                for p in self.thermo[g][c].keys():
+                    if not p in skip_properties:
+                        self.thermo_per_mol[g][c][p] /= self.thermo_per_mol[g][c]['nmolecules']
+
+        
+def main(directory, nsamples, out_file, print_stdev=False, silent=True):
+    # init
+    d = nu.hash()   # d[timestep][group][category][property]
+    categories = ["Tgas", "Tsol", "Trns", "Rgas", "Rsol", "Rot", "Ivib", "Tot"]
+    properties = ["temperature", "pressure", "volume", "ZPE", "Emd", "Eq", "Sq", "Aq", "Cvq", "S(0)", "Diffus", "fluidicity"]
+    
+    # glob *thermo
+    thermos = glob.glob(directory + "/*thermo")
+
+    # read 2pt data file
+    for f in thermos:
+        _ = thermo(f)
+        d[_.timestep] = _.thermo_per_mol
+
+    # determine #timestep to average
+    timesteps = d.keys()
+    timesteps.sort()
+    if nsamples:
+        t_sample = timesteps[-nsamples:]
+    else:
+        t_sample = timesteps
+
+    print(t_sample)
+
+    # calculate average and stdev over timestep
+    sum = nu.hash(); sum_sq = nu.hash(); average = nu.hash(); stdev = nu.hash();
+
+    n = float(len(t_sample))
+    for t in d:
+        if t in t_sample:
+            for g in d[t]:
+                for c in d[t][g]:
+                    for p in d[t][g][c]:
+                        if p in sum[g][c]:
+                            sum[g][c][p] += d[t][g][c][p]
+                            sum_sq[g][c][p] += d[t][g][c][p]**2
+                        else:
+                            sum[g][c][p] = 0.0
+                            sum_sq[g][c][p] = 0.0
+                            average[g][c][p] = 0.0
+                            stdev[g][c][p] = 0.0
+                            sum[g][c][p] += d[t][g][c][p]
+                            sum_sq[g][c][p] += d[t][g][c][p]**2
+
+    for g in sum:
+        for c in sum[g]:
+            for p in sum[g][c]:
+                average[g][c][p] = sum[g][c][p] / n
+                stdev[g][c][p] = (sum_sq[g][c][p] - sum[g][c][p]**2 / n ) / n
+
+    # print
+    print("** Data averaged over %d snapshots **" % int(n))
+    if print_stdev:
+        print("** Stdev **")
+        g = stdev.keys()
+        for i in g:
+            print("Group %d" % i)
+            print("\t" + "".join("%16s" % i for i in properties))
+            for c in categories:
+                print("" + c + "\t" + "".join("%16.6f" % stdev[i][c][p] for p in properties))
+            print("")
+
+    else:
+        print("** Mean **")
+        g = average.keys()
+        for i in g:
+            print("Group %d" % i)
+            print("\t" + "".join("%16s" % i for i in properties))
+            for c in categories:
+                print("" + c + "\t" + "".join("%16.6f" % average[i][c][p] for p in properties))
+            print("")
+
+    print("Done")
+    
+
+if __name__ == "__main__":
+
+    # Initialize
+    n = 0;
+    directory = "results"
+    out_file = "2pt_analyze.profile"
+    use_stdev = False
+    usage = """
+    """
+
+    print("\n" + sys.argv[0] + " version " + str(version) + "\n")
+
+    if len(sys.argv) < 2:
+        print(usage);
+        sys.exit(1)
+
+    options, args = getopt.getopt(sys.argv[1:], 'hd:n:o:s', ['help','directory=','nsamples=','out=', 'stdev'])
+    try:
+        for option, value in options:
+            if option in ('-h', '--help'):
+                print(usage)
+                sys.exit(0);
+            elif option in ('-d', '--directory'):
+                directory = value
+            elif option in ('-n', '--nsamples'):
+                n = int(value)
+            elif option in ('-o', '--out'):
+                out_file = value
+            elif option in ('-s'):
+                use_stdev = True
+            elif not option:
+                print(usage)
+                sys.exit(0)
+    except ValueError:
+        nu.die("script cannot continue. Check input parameters.")
+
+    main(directory, n, out_file, print_stdev=use_stdev, silent=True)

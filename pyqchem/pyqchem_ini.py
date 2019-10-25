@@ -14,17 +14,30 @@ qcout = MyClass()
 qcout.qcout_geo="get optimized geometry (xyz, mol) from qc.out"
 qcout.qcout_geo_nonopt="obtain last geometry when optimzation failed from qc.out"
 qcout.qcout_mol_in="obtain input file from qcout file by option r=fname m=fname i=inputf"
+
 xyz = MyClass()
 xyz.xyz22mol="convert a.xyz to a.mol vice versa"
 xyz.xyz2inp="convert a.xyz to a.inp"
 xyz.xyz_angle="calculate angle"
 xyz.xyz_dist="calculate distance"
+
 job = MyClass()
 job.aimd="refer to py_ai_ini.py"
 
-
+install = MyClass()
+install.gcc_se="\n\tPrerequisit:: \
+                \n\t\tfftw in $QC_EXT_LIBS\
+                \n\t\tOpenBLAS in $QC_EXT_LIBS for v.4 or /usr/local/lib64(root) for v.5\
+                \n\t    Run  \"qchem -save a.in a.out savename\" works for only deprecate of $QCLOCALSCR"
+install.gcc_pa="\n\tPrerequisit:: \
+                \n\t\tfftw-mpi in $QC_EXT_LIBS\
+                \n\t\tOpenBLAS-serial in /usr/local/lib64(root) for v.5\
+                \n\t\topenmpi v.2.0.2\
+                \n\t    Run  \"mpirun -np 4 a.in $QCSCRATCH > a.out\" remaines in $QCSCRATCH with -np directories"
+install.intel_choi="locate properly\
+                \n\t\tmight be slower than gcc, check it"
 classobj_dict={'XYZ':xyz, 'QC-OUT':qcout}
-classobj_work={'JOB':job}
+classobj_qcjob={'QC-JOB':job, 'INSTALL': install}
 
 def if_usage(f):
     f_pre = f.split('.')[0]
@@ -32,7 +45,7 @@ def if_usage(f):
         print("    {}".format(f), usage[f_pre])
     else:
         print("    {}".format(f))
-def jobs(job,cclass,ifile,np):
+def jobs(job,cclass,qcjob,ifile,np):
     if job == None or re.search("cl", job):
         mdir = os.path.dirname(__file__)
         print(f"List directory of{mdir}")
@@ -79,24 +92,27 @@ def jobs(job,cclass,ifile,np):
         print("\t{:^8}::".format('serial'), com_serial)
         print("\t{:^8}::".format('parallel'), com_parallel)
     ### As for Q-Chem job
-    print("[As for Q-Chem job]")
-    for job in classobj_work.keys():
-        name_class = classobj_work[job]
+    print("[As for Q-Chem job and installation]")
+    print(f"use -q {classobj_qcjob.keys()} for detail")
+    #for job in classobj_qcjob.keys():
+    if qcjob:
+        name_class = classobj_qcjob[qcjob]
         for key in name_class.__dict__.keys():
-            print(f"{key}    \t:: {name_class.__dict__[key]}")
+            print(f"    {key}    \t:: {name_class.__dict__[key]}")
     
     
 
 def main():
 
     parser = argparse.ArgumentParser(description="explanation for /pyqchem ")
+    parser.add_argument('-q','--qcjob',  help="qchem job")
     parser.add_argument('-j','--job',  help="qchem run in chi, mlet ")
     parser.add_argument('-c','--cname',  help="detail for each class ")
     parser.add_argument('-f','--infile',  help="qchem input file")
     parser.add_argument('-np','--nprocess', default=2, type=int, help="number of parallel process")
     args = parser.parse_args()
 
-    jobs(args.job,args.cname,args.infile, args.nprocess)
+    jobs(args.job,args.cname,args.qcjob,args.infile, args.nprocess)
 
 if __name__ == "__main__":
     main()

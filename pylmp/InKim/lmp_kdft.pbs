@@ -1,0 +1,37 @@
+#PBS -N TITLE
+#PBS -l nodes=1:ppn=12
+#PBS -l walltime=120:00:00
+#PBS -o out
+#PBS -e err
+#PBS -q small
+#!/bin/tcsh
+
+set NPROC = `wc -l < ${PBS_NODEFILE}`
+set DATE = `date +%Y%m%d`
+set TIME = `date +%H%M`
+set JOB_DIR = /scratch/noische/${PBS_JOBNAME}_${DATE}
+set JOB_DIR = ${PBS_O_WORKDIR}/${PBS_JOBNAME}_${DATE}
+
+set input_file = in.${PBS_JOBNAME}
+set data_file = data.${PBS_JOBNAME}
+
+setenv LD_LIBRARY_PATH /opt/mpi/intel/mpich2-1.4/lib:/opt/intel/Compiler/11.1/059/lib/intel64:$LD_LIBRARY_PATH
+set MPI = "/opt/mpi/intel/mpich2-1.4/bin/mpirun -np $NPROC -f $PBS_NODEFILE"
+set EXEC = "/qcfs/noische/program/kdft/bin/lmp_kdft_tod "
+
+cd ${PBS_O_WORKDIR}
+touch ${PBS_JOBID}
+echo "Job started at "`date` >> ${PBS_JOBID}
+echo `cat ${PBS_NODEFILE} | head` >> ${PBS_JOBID}
+echo ${NPROC} >> ${PBS_JOBID}
+echo ${JOB_DIR} >> ${PBS_JOBID}
+echo ${MPI} >> ${PBS_JOBID}
+echo ${EXEC} >> ${PBS_JOBID}
+
+mkdir -p $JOB_DIR
+cd ${JOB_DIR}
+cp ${PBS_O_WORKDIR}/${input_file} $JOB_DIR
+cp ${PBS_O_WORKDIR}/${data_file} $JOB_DIR
+
+$MPI $EXEC -in $input_file -log $PBS_JOBNAME.log
+echo "Job finished at "`date` >> ${PBS_JOBID}
