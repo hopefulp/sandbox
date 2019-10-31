@@ -8,7 +8,7 @@ from common_p2 import *
 
 q_list=[]
 
-def f_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir):
+def d_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir):
 
     pwd = os.getcwd()
     if work == None:
@@ -34,6 +34,13 @@ def f_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_jo
         matches.append(".o"+str(w_option))
         matches.append(".pp"+str(w_option))
         f_list=get_files_match(matches, pwd)
+    
+    elif work == 'vasp':
+        f_list=os.listdir(pwd)
+        if excl_fnames:
+            for efile in excl_fnames:
+                if efile in f_list:
+                    f_list.remove(efile)
 
     f_list.sort()
     for f in f_list:
@@ -57,7 +64,7 @@ def f_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_jo
 
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
-    parser.add_argument('-w', '--work', choices=['qchem','ai'],help='remove depending on job')
+    parser.add_argument('-w', '--work', choices=['qchem','ai','vasp'],help='remove depending on job')
     parser.add_argument('-wo', '--work_option', type=int, help='Q-Chem: parallel output number')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')
@@ -72,8 +79,10 @@ def main():
         print "input -w|-p|-s|-m"
         print "use %s -h for help" % os.path.basename(__file__)
         sys.exit(0)
-
-    f_clean(args.work,args.work_option,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.mv_dir)
+    if args.work == 'vasp' and not args.excluded_files:
+        args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR']
+            
+    d_clean(args.work,args.work_option,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.mv_dir)
     return 0
 
 if __name__ == '__main__':

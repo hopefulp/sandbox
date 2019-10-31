@@ -1,4 +1,4 @@
-#!/home/joonho/anaconda3/bin/python
+#!/usr/bin/python
 
 import argparse
 import os
@@ -41,7 +41,7 @@ def search_dir(job, dir, foption, lfile_exc, exe_tag):
         else:
             search_dir(job, file, foption, lfile_exc, exe_tag)
     os.chdir('..')                
-    print("####....... exit %s directory" % dir)
+    print "####....... exit %s directory" % dir
 
 def f_clean(dirs,work,work_suffix,linux_job,mv_dir,files,option,opt_str,exclude,excluded_files):
     if not dirs:
@@ -54,7 +54,7 @@ def f_clean(dirs,work,work_suffix,linux_job,mv_dir,files,option,opt_str,exclude,
         elif option == 'm':
             get_files = get_files_match
         else:
-            print("error in option and work")
+            print "error in option and work"
         
 
             #f_list=get_files_exclude(exclude, pwd)
@@ -66,7 +66,7 @@ def f_clean(dirs,work,work_suffix,linux_job,mv_dir,files,option,opt_str,exclude,
         default_str=['\.e', '\.pe', '\.o', '\.po']
         opt_str=[]
         if not work_suffix:
-            print("input work suffix number for %s with -ws" % work)
+            print "input work suffix number for %s with -ws" % work
             sys.exit(10)
         else:
             for st in default_str:
@@ -75,7 +75,7 @@ def f_clean(dirs,work,work_suffix,linux_job,mv_dir,files,option,opt_str,exclude,
 
         get_files = get_files_match
     else:
-        print("No %s" % work)
+        print "No %s" % work
         sys.exit(1)
 
     q_list=[]
@@ -88,7 +88,7 @@ def f_clean(dirs,work,work_suffix,linux_job,mv_dir,files,option,opt_str,exclude,
         comm = "%s %s" % (linux_job, f)
         if linux_job == 'mv':
             comm += " %s" % new_dir
-        print(comm)
+        print comm
         q_list.append(comm)
 
     #print "all %s files" % len(f_list)
@@ -98,7 +98,7 @@ def f_clean(dirs,work,work_suffix,linux_job,mv_dir,files,option,opt_str,exclude,
         for comm in q_list:
             os.system(comm)
             i += 1
-        print("%s files are removed" % i)
+        print "%s files are removed" % i
 
     return 0
 
@@ -139,8 +139,8 @@ def main():
             search_dir(job, dirs, foption, args.xfiles, args.exe)
     else:
         if args.work==None and args.option==None:
-            print("input -w|-p|-s|-m")
-            print("use %s -h for help" % os.path.basename(__file__))
+            print "input -w|-p|-s|-m"
+            print "use %s -h for help" % os.path.basename(__file__)
             sys.exit(0)
         else:
             f_clean(args.dirs,args.work,args.work_suf,args.job,args.mv_dir,args.files,args.option,args.opt_str,args.exclude,args.excluded_files)

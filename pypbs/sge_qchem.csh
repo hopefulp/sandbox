@@ -9,6 +9,7 @@
 if ( ! $?qcjob ) then
     echo "variable job is not defined"
     echo "Usage:: qsub -N jobname -v ver=[4.3s|5.1p]  -v job=a(.in)  sge_qchem.sh"
+    echo "Usage:: qsub -N jobname -v iqc=[3.2|5.1] [-v opt=save] -v nc=np -v qcjob=a(.in)  sge_qchem.sh"
     exit(2)
 endif
 
