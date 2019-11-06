@@ -22,7 +22,7 @@ def main():
     parser.add_argument('-k', '--kpoints', default="IBZKPT", help='use the same KPOINTS for default')
     #parser.add_argument('-l', '--ksub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
     parser.add_argument('-i', '--incar', default='INCAR', choices=["INCAR","incar.key"], help='first run make_incar.py then use incar.key')
-    parser.add_argument('-o', '--old_dir', help='copy from old dir')
+    parser.add_argument('-d', '--old_dir', help='copy from old dir')
     args = parser.parse_args()
 
     pwd = os.getcwd()
@@ -104,8 +104,13 @@ def main():
             s = f"cp {fo} {args.dir}/KPOINTS"
             os.system(s)
         else:
-            print("make KPOINTS ")
-            sys.exit(4)
+            fo = pre_dir + "KPOINTS"
+            if os.path.isfile(fo):
+                s = f"cp {fo} {args.dir}/KPOINTS"
+                os.system(s)
+            else:
+                print("make KPOINTS ")
+                sys.exit(4)
         ### INCAR :: copy INCAR or incar.key       
         fo = pre_dir + args.incar
         if os.path.isfile(fo) :
