@@ -56,6 +56,9 @@ def make_kpoints(kp, method):
             s = 'cp %s KPOINTS' % kfile
             print('KPOINTS was copied from %s' % kfile)
             os.system(s)
+            return 0
+        else:
+            print('more info for KPOINTS')
 
     f = open(fname, 'w')
     f.write("Automatic Mesh\n")                 # 1st line, description
