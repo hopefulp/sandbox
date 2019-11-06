@@ -38,9 +38,13 @@ def d_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_jo
     elif work == 'vasp':
         f_list=os.listdir(pwd)
         if excl_fnames:
+            for f in f_list:
+                if os.access(pwd+'/'+f, os.X_OK):
+                    excl_fnames.append(f)
             for efile in excl_fnames:
                 if efile in f_list:
                     f_list.remove(efile)
+            
 
     f_list.sort()
     for f in f_list:

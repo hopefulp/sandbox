@@ -149,7 +149,7 @@ def make_incar(dic, rw, iofile):
     com1 = 'ENCUT = %d\n' % dic['cutoff']
     com1 += 'PREC = %s\n' % dic['precision']
     com1 += 'ISMEAR = 0 ; SIGMA = 0.05\n'
-    com1 += 'NELMIN = 4 ; NELM = 500\n'
+    com1 += 'NELMIN = 4 #; NELM = 500       # increase NELMIN to 4 ~ 8 in case MD|Ionic relax\n'
     if dic['crelax'] == 'atom':
         com1 += 'EDIFF = 1E-5'
     elif dic['crelax'] == 'cell':
