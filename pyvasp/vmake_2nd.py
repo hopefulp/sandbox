@@ -19,9 +19,10 @@ def main():
     parser.add_argument('-j', '--job', choices=["hybrid","dos","band","pchg"], help='inquire for each file')
     parser.add_argument('-s', '--poscar', default="CONTCAR", help='use CONTCAR for 2nd job')
     parser.add_argument('-p', '--potcar', default="POTCAR" , help='use the same POTCAR')
-    parser.add_argument('-k', '--kpoints', default="KPOINTS", help='use the same KPOINTS for default')
+    parser.add_argument('-k', '--kpoints', default="IBZKPT", help='use the same KPOINTS for default')
     #parser.add_argument('-l', '--ksub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
     parser.add_argument('-i', '--incar', default='INCAR', choices=["INCAR","incar.key"], help='first run make_incar.py then use incar.key')
+    parser.add_argument('-o', '--old_dir', help='copy from old dir')
     args = parser.parse_args()
 
     pwd = os.getcwd()
@@ -40,7 +41,13 @@ def main():
         s = f"mkdir {args.dir}"
         os.system(s)
         print(f"directory {args.dir} was made")
-    s = f"cp *.sh {args.dir}"
+    
+    if args.old_dir:
+        pre_dir =  args.old_dir+"/"
+    else:
+        pre_dir = "./"
+
+    s = f"cp {pre_dir}*.sh {args.dir}"
     os.system(s)
         
     if args.question:
@@ -75,32 +82,42 @@ def main():
             make_kpoints(kps, method)
     ### without -q            
     else:
-        if os.path.isfile(args.poscar):
-            s = f"cp {args.poscar} {args.dir}/POSCAR"
+        ### CONTCAR
+        fo = pre_dir + args.poscar
+        if os.path.isfile(fo):
+            s = f"cp {fo} {args.dir}/POSCAR"
             os.system(s)
         else:
-            print(f"There is not {args.poscar}")
+            print(f"There is not {fo}")
             sys.exit(2)
-        if os.path.isfile(args.potcar):
-            s = f"cp {args.potcar} {args.dir}"
+        ### POTCAR
+        fo = pre_dir + args.potcar
+        if os.path.isfile(fo):
+            s = f"cp {fo} {args.dir}"
             os.system(s)
         else:
-            print(f"There is not {args.potcar}")
+            print(f"There is not {fo}")
             sys.exit(3)
         ### KPOINTS
-        if args.kpoints=="KPOINTS":
-            s = f"cp {args.kpoints} {args.dir}"
+        fo = pre_dir + args.kpoints
+        if os.path.isfile(fo):
+            s = f"cp {fo} {args.dir}/KPOINTS"
             os.system(s)
         else:
             print("make KPOINTS ")
             sys.exit(4)
         ### INCAR :: copy INCAR or incar.key       
-        if os.path.isfile(args.incar) :
-            s = f"cp {args.incar} {args.dir}"
+        fo = pre_dir + args.incar
+        if os.path.isfile(fo) :
+            s = f"cp {fo} {args.dir}"
             os.system(s)
+        else:
+            print(f"There is not {fo}")
+            sys.exit(5)
     if files:
         for f in files:
-            s = f"cp {f} {args.dir}"
+            fo = pre_dir + f
+            s = f"cp {fo} {args.dir}"
             os.system(s)
                 
 if __name__ == '__main__':
