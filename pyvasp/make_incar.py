@@ -11,6 +11,7 @@ def main():
     parser = argparse.ArgumentParser(description='make incar')
     parser.add_argument('-f', '--iofile', default='incar.key', help='iofile for all arguments')
     parser.add_argument('-w', '--rw', default='w', help='read or write')
+    parser.add_argument('-sys', '--system', default='mol', choices={'mol','bulk','surface'},  help='system character')
     parser.add_argument('-m', '--mag', default='nm', choices=['nm','fm','afm'], help='ON/OFF magnetism')
     parser.add_argument('-n', '--nmag', type = int, help='number of magnetic atoms')
     parser.add_argument('-z', '--magmom', default=0.0, type=float, help='initial magnitude of magnetism')
