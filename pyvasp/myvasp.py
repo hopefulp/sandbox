@@ -123,6 +123,10 @@ def make_incar(dic, rw, iofile):
         if dic['dft'][2]=='0':
             L_hybrid=1
             dic['ini']='wav'
+    ### system character
+    if dic['system'] == 'mol':
+        isym = 0
+        #lreal = '.FALSE.'
     
     ### 0: system name
     comm = 'SYSTEM = ' + json.dumps(dic) + '\n\n'
@@ -165,23 +169,15 @@ def make_incar(dic, rw, iofile):
     f.write(comm)
 
     ### 3: precision 
-    f.write('# precision 1\n')
+    f.write('# precision \n')
     com1 = 'ENCUT = %d\n' % dic['cutoff']
     com1 += 'PREC = %s\n' % dic['precision']
     com1 += 'ISMEAR = 0 ; SIGMA = 0.05\n'
     com1 += 'NELMIN = 4 #; NELM = 500       # increase NELMIN to 4 ~ 8 in case MD|Ionic relax\n'
     if dic['relax'] == 'sp':
-        com1 += '#EDIFF = 1E-5 ; EDIFFG = -0.025\n\n'
-    elif dic['relax'] == 'atom':
         com1 += 'EDIFF = 1E-5  #; EDIFFG = -0.025\n\n'
-    elif dic['relax'] == 'cell':
-        com1 += 'EDIFF = 1E-5 ; EDIFFG = -0.025\n\n'
     else:
-        pass
-    f.write(com1)
-    f.write('# precision 2\n')
-    com1 = 'GGA_COMPAT=.FALSE.\n'
-    com1 += '#VOSKOWN = 1\n'
+        com1 += 'EDIFF = 1E-5 ; EDIFFG = -0.025\n\n'
     com1 += 'ADDGRID = .TRUE.\n\n'
     f.write(com1)
     f.write('# mixing\n')
@@ -262,6 +258,10 @@ def make_incar(dic, rw, iofile):
     comm += '#LOPTICS = .TRUE.\n\n'
     f.write(comm)
 
+    f.write('# GGA more\n')
+    com1 = '#GGA_COMPAT=.FALSE. fpr bulk symmetry\n'
+    com1 += '#VOSKOWN = 1 for PW91\n'
+    f.write(com1)
     f.write('### U-correction\n')
     if dic['uterm']:
         ldaj = 1.0
@@ -289,13 +289,14 @@ def make_incar(dic, rw, iofile):
             ibrion=2
             potim=0.3
         comm = 'NSW = %d ; ISIF = %d\n' % (nsw, isif)
-        comm += 'IBRION = %d\nPOTIM = %f\n' % (ibrion, potim)
-        comm += '#ADDGRID = .TRUE.\n\n'
+        comm += 'IBRION = %d\nPOTIM = %.1f\n' % (ibrion, potim)
         comm += '### AIMD more\n'
         if dic['dynamics']:
             comm += 'TEIN = 300; TEBEG=300; TEEND=300\n'
             comm += 'SMASS = 0.05; ISYM=0\n\n'
         else:
+            if isym in locals():
+                comm += 'ISYM = 0'       
             comm += '#TEIN = 300; TEBEG=300; TEEND=300\n'
             comm += '#SMASS = 0.05; ISYM=0\n\n'
             

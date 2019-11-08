@@ -14,15 +14,15 @@ endif
 
 #### parallel version 5.4.4 compiled by Inte
 set log_file = $dir.log
-set queue_file = job.$job
+set queue_file = job.$dir
 echo $dir > $queue_file
 echo start >> $queue_file
 date >> $queue_file
 
 cd $dir
-mpirun -np $np /gpfs/home/joonho/vasp.5.4.4/bin/vasp  > $log_file
-mv $log_file ../$dir.out
+mpirun -np $np /gpfs/home/joonho/vasp.5.4.4/bin/vasp  > ../$log_file
 cd ..
+mv $log_file $dir.out
 echo end >> $queue_file
 data >> $queue_file
 

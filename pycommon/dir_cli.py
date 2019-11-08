@@ -6,12 +6,16 @@ import os
 import sys
 from common import *
 
-def cmd(job, m_tag, pattern, exceptions, dir_destination,rn_type,new_name,run):
+def cmd(job, m_tag, pattern, exceptions, dir_out,rn_type,new_name,run):
     pwd = os.getcwd()
     # pattern should have 1 element
     print pattern
-    l_file = get_files_pattern(m_tag, pattern, pwd)
+    if m_tag != 'f':
+        l_file = get_files_pattern(m_tag, pattern, pwd)
+    else:
+        l_file = pattern
     n=0
+
     #print("\n".join(l_file))                       
     if exceptions:
         for fex in exceptions:
@@ -19,19 +23,17 @@ def cmd(job, m_tag, pattern, exceptions, dir_destination,rn_type,new_name,run):
     # run job for the file list
     #print("\n".join(l_file))
     print len(l_file), " files are selected"
+    command=[]
     if job == "ls":
         if l_file:
             print("\n".join(l_file))
     elif job == "mvdir" :
-        if not os.path.isdir(dir_destination):
-            comm = "mkdir " + dir_destination
+        if not os.path.isdir(dir_out):
+            comm = "mkdir " + dir_out
             os.system(comm)
-        for file in l_file:
-            comm = job + " " + file + " " + dir_destination
-            if run:
-                os.system(comm)
-            else:
-                print comm
+        for f in l_file:
+            comm = job + " " + f + " " + dir_out
+            print comm
     elif job == 'rename':
         if not new_name: 
             print "add new name with -a or "
@@ -48,30 +50,42 @@ def cmd(job, m_tag, pattern, exceptions, dir_destination,rn_type,new_name,run):
                 else:
                     print comm
     elif job == 'rm':
-        for file in l_file:
-            comm = job + " " + file
+        for f in l_file:
+            comm = job + " " + f
             if run :
                 os.system(comm)
             else:
                 print comm
+    elif job == 'cp':
+        
+        for f in l_file:
+            for d in dir_out:
+                com = 'cp %s %d' % (f, d)
+                commands.append(com)
+
+                
     
     if(job == 'rm' or job == 'mvdir' or job == 'rename') and run == False:
         print "use '-r' for run"
+    for com in commands:
+        print com
+    q = "will you run? "
+    if yes_or_no(q):
+        for com in commands:
+            os.system(comxm)
     return                    
 
-#def run_bool(v):
-#    if v.lower() in ('yes', '1', 'y', 't', 'true'):
-#        return True
 
 def main():
-    parser = argparse.ArgumentParser(description='directory management')
-    parser.add_argument( 'job', choices=['ls', 'mvdir', 'rm', 'rename'],  help='shell command')
+    parser = argparse.ArgumentParser(description='Command Line Interface to deal with directory')
+    parser.add_argument( 'job', choices=['ls', 'mvdir', 'rm', 'rename', 'cp'],  help='shell command')
     group = parser.add_mutually_exclusive_group()
     group.add_argument( '-p', '--prefix', nargs='*', help='prefix of filename')
     group.add_argument( '-s', '--suffix', nargs='*', help='list several suffixes')
     group.add_argument( '-m', '--match', nargs='*', help='find matching string')
+    group.add_argument( '-f', '--files', nargs='*', help='input file list')
     parser.add_argument( '-xcl', '--excluded', nargs='*', help='filename to be excluded')
-    parser.add_argument( '-d', '--directory', type=str, default='tmppy', help='target directory to move files')
+    parser.add_argument( '-d', '--directory', args='+', type=str, default='tmppy', help='target directory to move files')
     #parser.add_argument( '-rn', '--rename', help='rename filename')
     group_rn=parser.add_mutually_exclusive_group()
     group_rn.add_argument('-a', '--append', default='_new', help="add '_new' to the original filename withoug extension")
@@ -87,6 +101,9 @@ def main():
     elif args.match:
         matching=args.match
         m_tag = 'm'
+    elif args.ifile:
+        matching=args.files
+        m_tag = 'f'
     else:
         print "matching should be given"
         return 1
