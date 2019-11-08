@@ -33,7 +33,13 @@ vasp.make_incar =   "make_incar -t re0 -d d3\
                     make_incar.py -t re0 -d d3 -md nvt\
                     \n\t\t\tto run MD
                     "
-water.makevasp_ini = "vmake_ini.py -a O H -d dirname\
+vasp.make_ini = "vmake_ini.py -a O H -d dirname\
                     \n\t\t\tKPOINTS=gamma, POTCAR from VaspINI by default and use 'incar.key' for INCAR"
-water.vasp_run = "mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
+vasp.run = "mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
+
+sge.vasp = "qsub -N pe500 -v np=12 -v dir=pe500 $SB/pypbs/sge_vasp.csh"
+pbs.vasp = "qsub mpi_vsp.sh in Nurion@KISTI\
+            \n\t\t\tqsub -N dirname $SB/pypbs/pbs_vasp\
+            "
+
 
