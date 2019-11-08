@@ -73,14 +73,33 @@ def rearrange_coord_lines(lines, atoms, katoms):
         s+=line
     return s
 
-def poscar_rearrange(pos, atom_file, ftype):
-    """ get atom list from bgf file """
-    if not atom_file == None:
+def expand_atoms(atom_list, natom):
+    atoms=[]
+    times = natom / len(atom_list)
+    atoms = atom_list * int(times)
+    return atoms
+    
+### atom_list, natom || atom_file [ftype]
+def poscar_rearrange(pos, atom_list, natom, atom_file, ftype):
+    ### atom list is given repetively
+    if atom_list:
+        if natom == len(atom_list):
+            atomlist=atom_list
+        ### make full atomlist
+        else:
+            atomlist=expand_atoms(atom_list, natom)
+    ### get atom list from bgf file 
+    elif atom_file:
         if ftype == None:
             ftype = common.f_ext(atom_file)
-        atomlist = get_atomlist4file(atom_file, ftype)    
-    """ rearrange poscar """
-    outf = open("POSCAR", 'w')
+        atomlist = get_atomlist4file(atom_file, ftype)
+    else:
+        print("one of -al and -af should be given")
+        sys.exit(1)
+    
+    print(atomlist)
+    ### rearrange poscar
+    outf = open("POSCARnew", 'w')
     with open(pos, "r") as f:
         lines = f.readlines()
         i=0
@@ -111,13 +130,16 @@ def poscar_rearrange(pos, atom_file, ftype):
     return 0
 
 def main():
-    parser = argparse.ArgumentParser(description="rearange poscar atoms: vmd-poscar need to be rearranged")
+    parser = argparse.ArgumentParser(description="rearange poscar atoms: (vmd,qchem)-poscar need to be rearranged")
     parser.add_argument('poscar', help="poscar to be modified")
-    parser.add_argument('-af','--atom_file', help="atom list in the unitcell ")
-    parser.add_argument('-ft','--file_type', help="file type")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-af','--atom_file', help="atom list in the order of original coordinate file ")
+    group.add_argument('-al', '--atom_list', nargs='+', help="atom list is given directly and repetitively")
+    parser.add_argument('-na', '--natom', type=int, help="if number of atoms are known")
+    parser.add_argument('-ft','--file_type', help="original coordinate file type used with --atom_file")
     args = parser.parse_args()
 
-    poscar_rearrange(args.poscar, args.atom_file, args.file_type)
+    poscar_rearrange(args.poscar, args.atom_list, args.natom, args.atom_file, args.file_type)
 
 if __name__ == "__main__":
     main()

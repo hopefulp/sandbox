@@ -55,7 +55,8 @@ def main():
         q = 'will you use CONTCAR?'
         if yes_or_no(q):
             pass
-        else:
+        elif yes_or_no('will you use POSCAR?'):
+            args.poscar='POSCAR'    
             print("What else?")
             sys.exit(0)
         ### Use the same POTCAR

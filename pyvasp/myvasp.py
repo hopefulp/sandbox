@@ -5,19 +5,22 @@ import json
 import re
 import sys
 
-""" repository for many vasp script 
-def get_vasp_repository():
-def make_incar(dic, rw, iofile):
-def make_kpoints(kp, MH|gamma, **args=[band])
+""" 
+    repository for many vasp script 
+    def get_vasp_repository():
+    def make_incar(dic, rw, iofile):
+    def make_kpoints(kp, MH|gamma, **args=[band])
 
 """
 
 eps_H2O = 78.3
-
 ini_dvasp = '/tmp'
 
+
 def get_vasp_repository():
-    """ my vasp repository for POTCAR & KPOTINS """
+    """ 
+        my vasp repository for POTCAR & KPOTINS 
+    """
     global ini_dvasp
     hostname = os.popen('hostname').read().rstrip()
     #print 'hostname is', hostname
@@ -81,6 +84,8 @@ def make_kpoints(kp, method):
     f.close()        
     return 0            
 
+vasp_gga={'pbe': 'pe', 'rpbe': 'rp',  'revpbe': 're'}
+
 def make_incar(dic, rw, iofile):
     """ Make INCAR file from dictionary of command line arguments
         automatically write "incar.key"-json string
@@ -90,13 +95,15 @@ def make_incar(dic, rw, iofile):
     ### args list:  1. nonmag, mag(fm), afm
     ###             2. ini, cont
     ###             3. precision
-    ###             4. gga
+    ###             4. gga & parallel
     ###             5. dispersion
     ###             6.
 
     if rw == 'w':
         with open(iofile, 'w') as ofile:
             ofile.write(json.dumps(dic, indent=4))
+        print("run 'make_incar.py --rw r' after modify incar.key")
+        return 0
     elif rw == 'r':
         dic = json.load(open(iofile))
     else:
@@ -107,6 +114,16 @@ def make_incar(dic, rw, iofile):
 
     fname = 'INCAR'
     f = open(fname, 'w')
+    L_hybrid = 0
+    ### obtain gga name & hybrid
+    if len(dic['dft'])==2:
+        gga = dic['dft']
+    elif len(dic['dft'])==3:
+        gga = dic['dft'][:2]
+        if dic['dft'][2]=='0':
+            L_hybrid=1
+            dic['ini']='wav'
+    
     ### 0: system name
     comm = 'SYSTEM = ' + json.dumps(dic) + '\n\n'
     f.write(comm)
@@ -153,9 +170,11 @@ def make_incar(dic, rw, iofile):
     com1 += 'PREC = %s\n' % dic['precision']
     com1 += 'ISMEAR = 0 ; SIGMA = 0.05\n'
     com1 += 'NELMIN = 4 #; NELM = 500       # increase NELMIN to 4 ~ 8 in case MD|Ionic relax\n'
-    if dic['crelax'] == 'atom':
-        com1 += 'EDIFF = 1E-5'
-    elif dic['crelax'] == 'cell':
+    if dic['relax'] == 'sp':
+        com1 += '#EDIFF = 1E-5 ; EDIFFG = -0.025\n\n'
+    elif dic['relax'] == 'atom':
+        com1 += 'EDIFF = 1E-5  #; EDIFFG = -0.025\n\n'
+    elif dic['relax'] == 'cell':
         com1 += 'EDIFF = 1E-5 ; EDIFFG = -0.025\n\n'
     else:
         pass
@@ -169,7 +188,7 @@ def make_incar(dic, rw, iofile):
     com1 = 'LMAXMIX = 4\n'
     com1 += '#IMIX = 4; #AMIX = 0.2; #BMIX = 0.0001; #AMIX_MAG = 0.8; #BMIX_MAG = 0.0001\n\n'
     f.write(com1)
-    f.write('# parallel performance')
+    f.write('# parallel performance and gga\n')
     #com1 = 'ALGO = Fast\n'
     #com1 += '#IALGO=48\n'
     #com1 += 'NSIM = 4; NPAR = 4\n'
@@ -179,14 +198,7 @@ def make_incar(dic, rw, iofile):
     ###### 4: dft+D+U
     f.write('# functional (PE=PBE,RP=RPBE,RE=revPBE,b3=B3LYP,ML=vdw-df2, MK=rev-vdW-DF2, \n')
     f.write('# D correction if not vdW-DF (0-no, 1-d2, 11-d3_zero(Grimme), 12-de_BJ, 2-ts)\n')
-    if len(dic['dft'])==2:
-        comm = 'GGA = '+dic['dft']+'\n'
-    elif len(dic['dft'])==3:
-        comm = 'GGA = '+dic['dft'][:2]+'\n'
-        if dic['dft'][2]=='0':
-            Ladd_hybrid="YES"
-    else:
-        print("add more options in dft name")
+    comm = "GGA = " + gga + "\n"
     ### B3LYP
     if re.search('b3',dic['dft'],re.IGNORECASE):
         comm += 'LHFCALC = .TRUE.\n'
@@ -195,6 +207,7 @@ def make_incar(dic, rw, iofile):
         comm += 'AGGAX = 0.72\n'
         comm += 'AGGAC = 0.81\n'
         comm += 'ALDAC = 0.19\n'
+    ### PBE style
     elif re.search('hs',dic['dft'],re.IGNORECASE):
         comm += 'LHFCALC = .TRUE.\n'
         comm += 'ALGO = D; TIME = 0.4\n'
@@ -205,8 +218,8 @@ def make_incar(dic, rw, iofile):
     elif re.search('pe',dic['dft'],re.IGNORECASE) or re.search('re',dic['dft'],re.IGNORECASE):      # for PBE, revPBE        
         comm += 'LREAL = Auto; LPLANE = .TRUE.\n'
         comm += 'LSCALAPACK = .FALSE.\n\n'
-        if "Ladd_hybrid" not in locals():
-            comm = 'ALGO = Fast\n'
+        if not L_hybrid:
+            comm += 'ALGO = Fast\n'
             comm += '#IALGO=48\n'
             comm += 'NSIM = 4; NPAR = 4\n'
         else:                                       # PBE0 or revPBE0
@@ -222,7 +235,7 @@ def make_incar(dic, rw, iofile):
         comm += 'PRECFOCK = F\n'
         comm += 'NKRED = 2\n'
         comm += '#block the NPAR\n'
-        
+    ### dispersion included dft?
     if re.search('ML',dic['dft'],re.IGNORECASE) or re.search('MK',dic['dft'],re.IGNORECASE):
         comm += 'LUSE_VDW = .TRUE. \n'
         comm += 'Zab_vdW = 1.8867 \n'
@@ -259,10 +272,10 @@ def make_incar(dic, rw, iofile):
         f.write(comm)
     ### 5: Movement: Relaxation, MD
     f.write('# Optimization\n')
-    if dic['crelax'] == 'sp':
+    if dic['relax'] == 'sp':
         comm = '#NSW = ; ISIF = ; IBRION = ; POTIM = \n\n'
     else:
-        if dic['crelax'] == 'atom' :
+        if dic['relax'] == 'atom' :
             isif = 2
         else:
             isif = 3
@@ -279,13 +292,19 @@ def make_incar(dic, rw, iofile):
         comm += 'IBRION = %d\nPOTIM = %f\n' % (ibrion, potim)
         comm += '#ADDGRID = .TRUE.\n\n'
         comm += '### AIMD more\n'
-        comm += 'TEIN = 300; TEBEG=300; TEEND=300\n'
-        comm += 'SMASS = 0.05; ISYM=0\n\n'
+        if dic['dynamics']:
+            comm += 'TEIN = 300; TEBEG=300; TEEND=300\n'
+            comm += 'SMASS = 0.05; ISYM=0\n\n'
+        else:
+            comm += '#TEIN = 300; TEBEG=300; TEEND=300\n'
+            comm += '#SMASS = 0.05; ISYM=0\n\n'
+            
     f.write(comm)
     ### AIMD
     #f.write('# aimd - nvt:: nsw=5000; isif=0; ibrion=0;potim=2.0;tein=300;tebeg=300;teend=300;smass=0.05;isym=0\n\n')
     ### Solvent effect
     f.write('# Solvent effect::higher Ecut is required (LSOL=.TRUE. EB_K for dielectric) \n')
+    comm=""
     if dic['solvent']:
         comm = 'LSOL = .TRUE.\n'
         if dic['dielectric']:
@@ -326,13 +345,13 @@ def make_incar(dic, rw, iofile):
     laechg = '.FALSE.'
     lwave = '.FALSE.'
     lcharg = '.FALSE.'
-    if re.match('N',dic['log'],re.IGNORECASE):
-        pass
-    else:
+    ilog = dic['log']
+    if 0 < ilog:
         lwave = '.TRUE.'
+    if 1 < ilog:
         lcharg = '.TRUE.'
-        if re.match('f', dic['log'], re.IGNORECASE):
-            laechg = '.TRUE.'
+    if 2 < ilog:
+        laechg = '.TRUE.'
     comm = 'LROBIT = 11\nLAECHG = %s\nLWAVE = %s\nLCHARG = %s\n\n' % (laechg, lwave, lcharg)
     f.write(comm)
 
