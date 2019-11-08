@@ -25,8 +25,14 @@ water.vmd2poscar =         "vmd load a.bgf\
                     \n\t\t\tvmd> pbc wrap; move all atoms into the box\
                     \n\t\t\tvmd save to poscar"
 water.vmdpos2pos = "vpos_rearrange.py n64.vmdpos -af water_n64.bgf"
-water.make_incar = "make_incar.py -t re0 -d d3 -md nvt\
-                    \n\t\t\tmakes incar.key"
+water.vasp="conver vasp"
+vasp.make_incar =   "make_incar -t re0 -d d3\
+                    \n\t\t\makes incar.key\
+                    make_incar.py -t re0 -d d3\
+                    \n\t\t\hybrid runs with WAVECAR \
+                    make_incar.py -t re0 -d d3 -md nvt\
+                    \n\t\t\tto run MD
+                    "
 water.makevasp_ini = "vmake_ini.py -a O H -d dirname\
                     \n\t\t\tKPOINTS=gamma, POTCAR from VaspINI by default and use 'incar.key' for INCAR"
 water.vasp_run = "mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"

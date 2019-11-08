@@ -2,19 +2,13 @@
 # written by Joonho Park
 # read a.inp and write a.out
 
-$f_full=$ARGV[0];
-if($f_full =~ /\//){
-    @fname=split(/\//,$f_full);
-    $fname=$fname[$#fname];
-}else{ $fname=$f_full; }
-print "$fname\n";
-
+$fname=$ARGV[0];
 @fname=split(/\./,$fname);
 $fname_pre=$fname[0];
 $fout="$fname_pre.mol";
 $fxyz="$fname_pre.xyz";
 print "Overwrite mol file: $fout and $fxyz\n";
-open(IN,"<$f_full");
+open(IN,"<$fname");
 open(OUTmol,">$fout");
 open(OUTxyz,">$fxyz");
 
@@ -25,21 +19,20 @@ if($ARGV[1] eq ""){
 }
 
 $job_tag="OFF";
-$KW_job="Job";
+$keyword_job="Job";
 
-$KW_spin="molecule";
+$keyword_spin="molecule";
 $endword_spin="end";
 $flag_spin="OFF";
 $tag_spin="ON";
 
-$KW_opt="Optimization Cycle";
-$KW_atom="ATOM";
+$keyword_opt="Optimization Cycle";
 $endword_opt="OPTIMIZATION CONVERGED";
 #$flag_opt="OFF";
 $tag_opt="OFF";
 
 #$tag_geometry="GEOMETRIES";	# for MOLDEN output
-$KW_ext="Step";
+$keyword_ext="Step";
 $flag_coord="OFF";
 
 @atom_coord=();
@@ -54,8 +47,8 @@ while($line=<IN>){
     if($tag_spin eq "ON"){
         # for block reading
         if($flag_spin eq "OFF" ){
-            if($line =~ /\$$KW_spin/ ){ 
-                print "found \$$KW_spin\n";
+            if($line =~ /\$$keyword_spin/ ){ 
+                print "found \$$keyword_spin\n";
                 $flag_spin = "ON";
             }
             next;
@@ -86,7 +79,7 @@ while($line=<IN>){
             $job_tag="ON";
             next;
         }else{
-            if($line =~ /$KW_job/){
+            if($line =~ /$keyword_job/){
                 @field=split(/\s+/,$line);
                 if($field[0] eq "") {shift(@field);}
                 if($field[1] == $njob){
@@ -99,24 +92,13 @@ while($line=<IN>){
     }
     # if job_tag eq "ON", reaches here
 
-    ### Read between opt block
+    ### count num of optimization step
     if($tag_opt eq "OFF"){
-        if($line =~ /$KW_opt/) {
-            @atom_coord=();
+        if($line =~ /$keyword_opt/) {
             if($i_opt == 0) {print "Optimization job\n";}
             @field=split(/\s+/,$line);
             if($field[0] eq "") {shift(@field);}
-            $i_opt=$field[2];           # extract opt step in "Optimization Cycle: num"
-        ### get atom coordinates in Optimization Cycle step
-        }elsif($line =~ /$KW_atom/){
-            $tag_ATOM="ON";
-        }elsif($tag_ATOM eq "ON"){
-            @field=split(/\s+/,$line);
-            if($field[0] eq "") {shift(@field);}
-            $iatom=int($field[0]);
-            $str = "  ".join("   ", $field[1], $field[2], $field[3], $field[4], "\n");
-            push(@atom_coord, $str);
-            if($iatom == $natom){ $tag_ATOM="OFF";}
+            $i_opt=$field[2];
         }elsif($line =~ /$endword_opt/){
             $tag_opt = "Done";
             print "Optimization step: $i_opt\n";
@@ -124,14 +106,13 @@ while($line=<IN>){
         }
         next;
     }
-    ### extract coordinates: at MOLDEN FORMAT [GEOMETRIES] "Step"
+    ### extract coordinates
     if($flag_coord eq "OFF"){
-        if($line =~ /$KW_ext/){
+        if($line =~ /$keyword_ext/){
             @field=split(/\s+/,$line);
             if($field[0] eq "") {shift(@field);}
             if($field[1] == $n_opt){
                 $flag_coord = "ON"; 
-                @atom_coord=();      # re-initialize if there is MOLDEN
                 next;
             }
         }
@@ -148,7 +129,7 @@ close(IN);
 
 print @atom_coord;
 for($i=0;$i<=$#atom_coord;$i++){
-    if($i==0) {print OUTxyz "$natom\n"; print OUTxyz "$KW_ext $n_opt\n";}
+    if($i==0) {print OUTxyz "$natom\n"; print OUTxyz "$keyword_ext $n_opt\n";}
     print OUTxyz $atom_coord[$i];
 }
 
