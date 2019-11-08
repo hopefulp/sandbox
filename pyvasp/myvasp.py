@@ -126,7 +126,12 @@ def make_incar(dic, rw, iofile):
     ### system character
     if dic['system'] == 'mol':
         isym = 0
+        kp = 'gamma'
+        kpred = 1
+    else:
+        kpred = 2
         #lreal = '.FALSE.'
+
     
     ### 0: system name
     comm = 'SYSTEM = ' + json.dumps(dic) + '\n\n'
@@ -209,7 +214,7 @@ def make_incar(dic, rw, iofile):
         comm += 'ALGO = D; TIME = 0.4\n'
         comm += 'HFSCREEN = 0.207\n'
         comm += 'PRECFOCK = F\n'
-        comm += 'NKRED = 2\n'
+        comm += 'NKRED = %d\n' % kpred
         comm += '#block the NPAR\n'
     elif re.search('pe',dic['dft'],re.IGNORECASE) or re.search('re',dic['dft'],re.IGNORECASE):      # for PBE, revPBE        
         comm += 'LREAL = Auto; LPLANE = .TRUE.\n'
@@ -220,11 +225,11 @@ def make_incar(dic, rw, iofile):
             comm += 'NSIM = 4; NPAR = 4\n'
         else:                                       # PBE0 or revPBE0
             comm += 'LHFCALC = .TRUE.\n'
-            comm += 'ALGO = D; TIME = 0.4\n'
-            comm += 'NSIM = 4\n'
+            comm += 'ALGO = D; TIME = 0.4 # IALGO=53\n'
+            comm += '#NSIM = 4\n'
             comm += 'ENCUTFOCK = 0\n'
-            comm += 'NKRED = 2\n'
-            comm += 'Block NPAR tag\n'
+            comm += 'NKRED = %d\n' % kpred
+            comm += '#Block NPAR tag\n'
     elif re.search('e0',dic['dft'],re.IGNORECASE):
         comm += 'LHFCALC = .TRUE.\n'
         comm += 'ALGO = D; TIME = 0.4\n'

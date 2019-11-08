@@ -55,13 +55,14 @@ def d_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_jo
         q_list.append(comm)
         
     #print "all %s files" % len(f_list)
-    q = "will you %s %s files? " % (linux_job, len(f_list))
-    if yes_or_no(q):
-        i = 0
-        for comm in q_list:
-            os.system(comm)
-            i += 1
-        print "%s files are removed" % i         
+    if f_list:
+        q = "will you %s %s files? " % (linux_job, len(f_list))
+        if yes_or_no(q):
+            i = 0
+            for comm in q_list:
+                os.system(comm)
+                i += 1
+            print "%s files are removed" % i         
 
     return 0
 
