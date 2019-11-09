@@ -8,19 +8,22 @@
 
 if ( ! $?np ) then
     echo "variable job is not defined"
-    echo 'Usage:: qsub -N jobname -v np=np $SB/pypbs/sge_vasp.csh'
+    echo 'Usage:: qsub -N jobname(queue) -v np=np -v dir=dirname(log) $SB/pypbs/sge_vasp.csh'
     exit(2)
 endif
 
-#### parallel version 5.4.4 compiled by Intel
+#### parallel version 5.4.4 compiled by Inte
+set log_file = $dir.log
+set queue_file = job.$dir
+echo $dir > $queue_file
+echo start >> $queue_file
+date >> $queue_file
 
-set log_file = "job.log"
-
-echo $jobname > $log_file
-echo start >> $log_file
-date >> $log_file
-mpirun -np $np /gpfs/home/joonho/vasp.5.4.4/bin/vasp 
-echo end >> $log_file
-data >> $log_file
+cd $dir
+mpirun -np $np /gpfs/home/joonho/vasp.5.4.4/bin/vasp  > ../$log_file
+cd ..
+mv $log_file $dir.out
+echo end >> $queue_file
+data >> $queue_file
 
 
