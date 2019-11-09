@@ -85,17 +85,19 @@ def main():
     else:
         ### CONTCAR
         fo = pre_dir + args.poscar
-        if os.path.isfile(fo):
-            s = f"cp {fo} {args.dir}/POSCAR"
-            os.system(s)
-        else:
+        if not os.path.isfile(fo):
             print(f"There is not {fo}")
-            sys.exit(2)
+            fo = pre_dir + "POSCAR"
+        s = f"cp {fo} {args.dir}/POSCAR"
+        os.system(s)
+        print(f"{fo} was copied to {args.dir}/POSCAR")
+
         ### POTCAR
         fo = pre_dir + args.potcar
         if os.path.isfile(fo):
             s = f"cp {fo} {args.dir}"
             os.system(s)
+            print(f"{fo} was copied to {args.dir}")
         else:
             print(f"There is not {fo}")
             sys.exit(3)
@@ -104,11 +106,13 @@ def main():
         if os.path.isfile(fo):
             s = f"cp {fo} {args.dir}/KPOINTS"
             os.system(s)
+            print(f"{fo} was copied to {args.dir}/KPOINTS")
         else:
             fo = pre_dir + "KPOINTS"
             if os.path.isfile(fo):
                 s = f"cp {fo} {args.dir}/KPOINTS"
                 os.system(s)
+                print(f"{fo} was copied to {args.dir}/KPOINTS")
             else:
                 print("make KPOINTS ")
                 sys.exit(4)
@@ -117,9 +121,11 @@ def main():
         if os.path.isfile(fo) :
             s = f"cp {fo} {args.dir}"
             os.system(s)
+            print(f"{fo} was copied to {args.dir}")
         else:
             print(f"There is not {fo}")
-            sys.exit(5)
+        print("Modify INCAR for different Job")
+            
     if files:
         for f in files:
             fo = pre_dir + f

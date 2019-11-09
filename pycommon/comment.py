@@ -63,7 +63,7 @@ sge.vasp =          "===SGE: MLET===\
                     \n    qsub -N pe500 -v np=12 -v dir=pe500 $SB/pypbs/sge_vasp.csh"
 pbs.vasp =          "===PBS: KISTI===\
                     \n    qsub mpi_vsp.sh in Nurion@KISTI\
-                    \n\tqsub -N dirname $SB/pypbs/pbs_vasp\
+                    \n\tqsub -N dirname $SB/pypbs/pbs_vasp.sh\
                     "
 
 

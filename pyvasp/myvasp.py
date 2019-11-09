@@ -229,7 +229,7 @@ def make_incar(dic, rw, iofile):
             comm += '#NSIM = 4\n'
             comm += 'ENCUTFOCK = 0\n'
             comm += 'NKRED = %d\n' % kpred
-            comm += '#Block NPAR tag\n'
+            comm += 'NPAR = 4\n'
     elif re.search('e0',dic['dft'],re.IGNORECASE):
         comm += 'LHFCALC = .TRUE.\n'
         comm += 'ALGO = D; TIME = 0.4\n'
