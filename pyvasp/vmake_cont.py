@@ -78,7 +78,7 @@ def main():
         fo = old_dir +'/'+ args.poscar
         if not os.path.isfile(fo):
             print(f"There is not {fo}")
-            fo = od + "POSCAR"
+            fo = old_dir + '/' + "POSCAR"
         s = f"cp {fo} {new_dir}/POSCAR"
         os.system(s)
         print(f"{fo} was copied to {new_dir}/POSCAR")
