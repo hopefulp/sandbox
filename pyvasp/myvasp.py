@@ -298,7 +298,7 @@ def make_incar(dic, rw, iofile):
         comm += '### AIMD more\n'
         if dic['dynamics']:
             comm += 'TEIN = 300; TEBEG=300; TEEND=300\n'
-            comm += 'SMASS = 0.05; ISYM=0\n\n'
+            comm += 'ISYM=0; SMASS = -3     for standard NVE ensemble \n\n'
         else:
             if isym in locals():
                 comm += 'ISYM = 0'       

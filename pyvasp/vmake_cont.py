@@ -14,42 +14,33 @@ from common import *
 def main():
     global ini_dvasp, pwd
     parser = argparse.ArgumentParser(description='make directory for continous job from CONTCAR POTCAR KPOINTS and new INCAR')
-    parser.add_argument('dir', help='mkdir and cp')
+    parser.add_argument('odir', help='copy from old dir')
+    parser.add_argument('ndir', help='mkdir and cp')
     parser.add_argument('-q', '--question', action='store_true', help='inquire for each file')
-    parser.add_argument('-j', '--job', choices=["hybrid","dos","band","pchg"], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=["hybrid","dos","band","pchg","md","cont","ini"], help='inquire for each file')
     parser.add_argument('-s', '--poscar', default="CONTCAR", help='use CONTCAR for 2nd job')
     parser.add_argument('-p', '--potcar', default="POTCAR" , help='use the same POTCAR')
     parser.add_argument('-k', '--kpoints', default="IBZKPT", help='use the same KPOINTS for default')
     #parser.add_argument('-l', '--ksub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
     parser.add_argument('-i', '--incar', default='INCAR', choices=["INCAR","incar.key"], help='first run make_incar.py then use incar.key')
-    parser.add_argument('-d', '--old_dir', help='copy from old dir')
     args = parser.parse_args()
 
-    pwd = os.getcwd()
+    #pwd = os.getcwd()
+    old_dir = args.odir
+    new_dir = args.ndir 
 
     files=[]
     if args.job:
-        if args.job == "hybrid":
+        if args.job=="hybrid" or args.job=="md" or args.job=="dos":
             files.append("WAVECAR")
 
-    if not args.dir:
-        print("input directory:")
-        sys.exit(1)
-    elif os.path.isdir(args.dir):
-        print(f"overwrite {args.dir}")
+    if os.path.isdir(new_dir):
+        print(f"overwrite {new_dir}")
     else:
-        s = f"mkdir {args.dir}"
+        s = f"mkdir {new_dir}"
         os.system(s)
-        print(f"directory {args.dir} was made")
+        print(f"directory {new_dir} was made")
     
-    if args.old_dir:
-        pre_dir =  args.old_dir+"/"
-    else:
-        pre_dir = "./"
-
-    s = f"cp {pre_dir}*.sh {args.dir}"
-    os.system(s)
-        
     if args.question:
         ### Use the CONTCAR for POSCAR
         q = 'will you use CONTCAR?'
@@ -84,52 +75,52 @@ def main():
     ### without -q            
     else:
         ### CONTCAR
-        fo = pre_dir + args.poscar
+        fo = old_dir +'/'+ args.poscar
         if not os.path.isfile(fo):
             print(f"There is not {fo}")
-            fo = pre_dir + "POSCAR"
-        s = f"cp {fo} {args.dir}/POSCAR"
+            fo = od + "POSCAR"
+        s = f"cp {fo} {new_dir}/POSCAR"
         os.system(s)
-        print(f"{fo} was copied to {args.dir}/POSCAR")
+        print(f"{fo} was copied to {new_dir}/POSCAR")
 
         ### POTCAR
-        fo = pre_dir + args.potcar
+        fo = old_dir + '/'  + args.potcar
         if os.path.isfile(fo):
-            s = f"cp {fo} {args.dir}"
+            s = f"cp {fo} {new_dir}"
             os.system(s)
-            print(f"{fo} was copied to {args.dir}")
+            print(f"{fo} was copied to {new_dir}")
         else:
             print(f"There is not {fo}")
             sys.exit(3)
         ### KPOINTS
-        fo = pre_dir + args.kpoints
+        fo = old_dir + '/'  + args.kpoints
         if os.path.isfile(fo):
-            s = f"cp {fo} {args.dir}/KPOINTS"
+            s = f"cp {fo} {new_dir}/KPOINTS"
             os.system(s)
-            print(f"{fo} was copied to {args.dir}/KPOINTS")
+            print(f"{fo} was copied to {new_dir}/KPOINTS")
         else:
-            fo = pre_dir + "KPOINTS"
+            fo = old_dir + '/'  + "KPOINTS"
             if os.path.isfile(fo):
-                s = f"cp {fo} {args.dir}/KPOINTS"
+                s = f"cp {fo} {new_dir}/KPOINTS"
                 os.system(s)
-                print(f"{fo} was copied to {args.dir}/KPOINTS")
+                print(f"{fo} was copied to {new_dir}/KPOINTS")
             else:
                 print("make KPOINTS ")
                 sys.exit(4)
         ### INCAR :: copy INCAR or incar.key       
-        fo = pre_dir + args.incar
+        fo = old_dir + '/'  + args.incar
         if os.path.isfile(fo) :
-            s = f"cp {fo} {args.dir}"
+            s = f"cp {fo} {new_dir}"
             os.system(s)
-            print(f"{fo} was copied to {args.dir}")
+            print(f"{fo} was copied to {new_dir}")
         else:
             print(f"There is not {fo}")
         print("Modify INCAR for different Job")
             
     if files:
         for f in files:
-            fo = pre_dir + f
-            s = f"cp {fo} {args.dir}"
+            fo = old_dir + '/'  + f
+            s = f"cp {fo} {new_dir}"
             os.system(s)
                 
 if __name__ == '__main__':
