@@ -115,14 +115,19 @@ def make_incar(dic, rw, iofile):
     fname = 'INCAR'
     f = open(fname, 'w')
     L_hybrid = 0
+    L_vdw = 0
     ### obtain gga name & hybrid
     if len(dic['dft'])==2:
         gga = dic['dft']
-    elif len(dic['dft'])==3:
+    elif len(dic['dft'])>2:
         gga = dic['dft'][:2]
-        if dic['dft'][2]=='0':
+        odd = dic['dft'][2:]
+        if re.search('vdw', odd):
+            L_vdw = 1
+        if re.search('0', odd):
             L_hybrid=1
             dic['ini']='wav'
+    print("hybrid %d vdW-DF %d" % (L_hybrid, L_vdw))       
     ### system character
     if dic['system'] == 'mol':
         isym = 0
@@ -216,7 +221,7 @@ def make_incar(dic, rw, iofile):
         comm += 'PRECFOCK = F\n'
         comm += 'NKRED = %d\n' % kpred
         comm += '#block the NPAR\n'
-    elif re.search('pe',dic['dft'],re.IGNORECASE) or re.search('re',dic['dft'],re.IGNORECASE):      # for PBE, revPBE        
+    elif re.search('pe',dic['dft'],re.IGNORECASE) or re.search('re',dic['dft'],re.IGNORECASE):      # for PBE, revPBE
         comm += 'LREAL = Auto; LPLANE = .TRUE.\n'
         comm += 'LSCALAPACK = .FALSE.\n\n'
         if not L_hybrid:
@@ -237,11 +242,13 @@ def make_incar(dic, rw, iofile):
         comm += 'NKRED = 2\n'
         comm += '#block the NPAR\n'
     ### dispersion included dft?
-    if re.search('ML',dic['dft'],re.IGNORECASE) or re.search('MK',dic['dft'],re.IGNORECASE):
+    #if re.search('ML',dic['dft'],re.IGNORECASE) or re.search('MK',dic['dft'],re.IGNORECASE):
+    if L_vdw:
+        comm += "#vdW-DF parameter defined here: revPBE-DF, \n"
         comm += 'LUSE_VDW = .TRUE. \n'
-        comm += 'Zab_vdW = 1.8867 \n'
+        #comm += 'Zab_vdW = 1.8867 \n'
         comm += 'AGGAC = 0.0000 \n'
-        comm += 'LASPH = .TRUE. \n'
+        #comm += 'LASPH = .TRUE. \n'
         if re.search('MK',dic['dft'],re.IGNORECASE):
             comm += 'PARAM1 = 0.1234 \n'
             comm += 'PARAM2 = 0.711357 \n'

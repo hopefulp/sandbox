@@ -4,27 +4,27 @@ import argparse
 import re
 import comment
 
-def jobs(att, lkeys):
+def jobs(att, lkeys, Lall):
     keys_ = comment.__dict__[att].__dict__.keys()
     print('---------------------------------------------')
     print(f"{att} keys:: {keys_}")
     
-    if lkeys:
-        if lkeys[0] == 'a':
-            for key in keys_:
-                print(comment.__dict__[att].__dict__[key])
-        else:
-            for key in lkeys:
-                print(comment.__dict__[att].__dict__[key])
+    if Lall:
+        for key in keys_:
+            print(comment.__dict__[att].__dict__[key])
+    elif lkeys:
+        for key in lkeys:
+            print(comment.__dict__[att].__dict__[key])
     else:
-        print("Use -k a to display all keys")
+        print("Use [-a] for all keys || [-k] for some keys")
 
     return 0
 
 def main():
     parser = argparse.ArgumentParser(description="shows dictionary for all: work, system, package  ")
-    parser.add_argument('-a', '--att', help='select one attribute')
+    parser.add_argument('-j', '--job', help='select one attribute')
     parser.add_argument('-k', '--key_', nargs='*', help='select keys')
+    parser.add_argument('-a', '--all', action='store_true', help='display all keywords for the attribute')
     args = parser.parse_args()
 
     regex = re.compile('[_A-Z]')
@@ -32,10 +32,10 @@ def main():
     print("===ALL ATTributes in comment.py ===")
     print(f"  {att}")
 
-    if not args.att:
-        print("Use -a for attribute")
+    if not args.job:
+        print(f"Use -j for attribute: {att}")
     else:
-        jobs(args.att, args.key_)
+        jobs(args.job, args.key_, args.all)
 
 if __name__ == "__main__":
     main()

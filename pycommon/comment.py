@@ -45,6 +45,10 @@ vasp.make_incar =   "\n    MAKE incar.key:\
                     \n\t\thybrid runs with WAVECAR as continous job\
                     \n\t$ make_incar.py -t re0 -d d3 -md nvt\
                     \n\t\tto run MD\
+                    \n\t$ make_incar.py -t revdw\
+                    \n\t\tfor revPBE-vdW-DF\
+                    \n\t$ make_incar.py -t re0vdw\
+                    \n\t\tfor revPBE0-vdW-DF    : is this OR?\
                     \n    MAKE INCAR \
                     \n\tmake_incar.py --rw r\
                     \n\t\tmakes INCAR by reading incar.key with --read option\

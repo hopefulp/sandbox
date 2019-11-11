@@ -19,7 +19,7 @@ def main():
     parser.add_argument('-e', '--cutoff', default=450, type=int, help='cut off energy')
     parser.add_argument('-a', '--precision', default='high', choices=['high','accurate'], help='precision')
     parser.add_argument('-r', '--relax', default='atom', choices=['sp', 'atom', 'cell'], help='atom/cell relaxation')
-    parser.add_argument('-t', '--dft', default='pe', choices=['lda','gga','pe','rp','re','re0','pbe0','b3lyp','hse06','mk','ml'], help='gga method')
+    parser.add_argument('-t', '--dft', default='pe', choices=['lda','gga','pe','rp','re','re0','pbe0','b3lyp','hse06','mk','ml','revdw','re0vdw'], help='gga method')
     parser.add_argument('-k', '--kpoints', help="in case of gamma, dismiss some keys")
     parser.add_argument('-p', '--postscf', choices=['dos','pchg','band'], help='post-scf calculation')
     parser.add_argument('-d', '--dispersion', default='d3', choices=['d2', 'd3'], help='dispersion  scheme')
