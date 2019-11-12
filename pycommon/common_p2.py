@@ -41,6 +41,17 @@ def get_files_pattern(m_type, pattern,dirname):
     else:
         print("No matching for file extraction")
     return f_list
+def get_files_pattern(m_type, pattern,dirname,Ldir):
+    #print(m_type)
+    if m_type == 'p':
+        f_list = get_files_prefix(pattern, dirname,Ldir)
+    elif m_type == 's':
+        f_list = get_files_suffix(pattern, dirname,Ldir)
+    elif m_type == 'm':
+        f_list = get_files_match(pattern,dirname,Ldir)
+    else:
+        print("No matching for file extraction")
+    return f_list
 
 def get_files_type(ftype, dirname):
     matched_files=[]
@@ -63,6 +74,19 @@ def get_files_prefix(prefixes, dirname):
             if re.match(pref, fname) and not os.path.isdir(fname):
                 matched_files.append(fname)
                 #print pref, file
+    return matched_files
+def get_files_prefix(prefixes, dirname,Ldir):
+    matched_files=[]
+    for pref in prefixes:
+        for fname in os.listdir(dirname):
+            # re.match finds only prefix
+            if Ldir:
+                if re.match(pref, fname): 
+                    matched_files.append(fname)
+            else:
+                if re.match(pref, fname) and not os.path.isdir(fname):
+                    matched_files.append(fname)
+                    #print pref, file
     return matched_files
 
 def dir_files(dir_):
@@ -116,7 +140,7 @@ def get_files_suffix(suffixes, dname):
                 matched_files.append(fname)
     return matched_files                
 
-def get_files_match(matches, dname):
+def get_files_match(matches, dname, Lshow):
     """
         (not checked) receive list of patterns for match
         matches: list of match
@@ -126,7 +150,7 @@ def get_files_match(matches, dname):
         for fname in os.listdir(dname):
             if re.search(match, fname) and not os.path.isdir(fname):
                 matched_files.append(fname)
-                #print match, fname
+                if Lshow: print match, fname
     return matched_files
 
 def get_files_exclude(matches, dname):

@@ -8,7 +8,7 @@ from common_p2 import *
 
 q_list=[]
 
-def d_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir):
+def d_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir,Lshowmatch):
 
     pwd = os.getcwd()
     if work == None:
@@ -17,7 +17,7 @@ def d_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_jo
         if suffix:
             f_list=get_files_suffix(suffix, pwd)
         if matches:
-            f_list=get_files_match(matches, pwd)
+            f_list=get_files_match(matches, pwd,Lshowmatch)
         if exclude:
             f_list=get_files_exclude(exclude, pwd)
         if f_list and excl_fnames:
@@ -33,7 +33,7 @@ def d_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_jo
         matches.append(".pe"+str(w_option))
         matches.append(".o"+str(w_option))
         matches.append(".pp"+str(w_option))
-        f_list=get_files_match(matches, pwd)
+        f_list=get_files_match(matches, pwd,Lshowmatch)
     
     elif work == 'vasp':
         f_list=os.listdir(pwd)
@@ -44,6 +44,10 @@ def d_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_jo
             for efile in excl_fnames:
                 if efile in f_list:
                     f_list.remove(efile)
+
+    elif work == 'pbs':
+        matches=['\.e\d', '\.o\d']
+        f_list = get_files_match(matches, pwd, Lshowmatch)
             
 
     f_list.sort()
@@ -69,7 +73,7 @@ def d_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_jo
 
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
-    parser.add_argument('-w', '--work', choices=['qchem','ai','vasp'],help='remove depending on job')
+    parser.add_argument('-w', '--work', choices=['qchem','ai','vasp','pbs'],help='remove depending on job')
     parser.add_argument('-wo', '--work_option', type=int, help='Q-Chem: parallel output number')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')
@@ -78,6 +82,7 @@ def main():
     parser.add_argument('-ef', '--excluded_files', nargs='*', help='save this file') 
     parser.add_argument('-j', '--job', default='rm', choices=['rm','mv'], help='how to treat files')
     parser.add_argument('-jd', '--mv_dir', default='tmp', help='directory where files to move')
+    parser.add_argument('-ms', '--match_show', action='store_true')
     args = parser.parse_args()
 
     if args.work==None and args.prefix==None and args.suffix==None and args.match==None:
@@ -87,7 +92,7 @@ def main():
     if args.work == 'vasp' and not args.excluded_files:
         args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR']
             
-    d_clean(args.work,args.work_option,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.mv_dir)
+    d_clean(args.work,args.work_option,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.mv_dir,args.match_show)
     return 0
 
 if __name__ == '__main__':

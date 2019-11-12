@@ -4,6 +4,8 @@ water   = MyClass()
 vasp    = MyClass()
 sge     = MyClass()
 pbs     = MyClass()
+dir_job = MyClass()
+
 water.order = "===WATER===\
                 \n    ORDER:: calcube makecube pdb2bgf makelmp_in"
 water.calcube =     "\n    CALCULATE CUBE:\
@@ -69,5 +71,22 @@ pbs.vasp =          "===PBS: KISTI===\
                     \n    qsub mpi_vsp.sh in Nurion@KISTI\
                     \n\tqsub -N dirname $SB/pypbs/pbs_vasp.sh\
                     "
-
-
+dir_job.clean =     "===DIR: clean, modify filename, jobs for package===\
+                    \n    dir_clean_p2.py -j {rm,mv} [-p,-s,-m] -w {qchem, ai, vasp, pbs} -r 'for run'\
+                    \n\tjob=rm|mv\
+                    \n\twork=qchem|ai|vasp|pbs there will be default for each\
+                    \n\t\tpbs to remove *.o\d*, *.e\d*\
+                    \n\t-r run for execution\
+                    \n\timport common_py\
+                    "
+dir_job.mod_fname = "\n    dir_fname.py {ls,mvdir,rm,rename} [-p|-s|-m] -a s -i -r\
+                    \n\tjob={ls,mvdir,rm,rename}\
+                    \n\tmatching [-p|-s|-m]\
+                    \n\tappend letter to previous file|dir to use rename\
+                    \n\t-i to include directory also\
+                    \n\t: rename -p revdw -a s -i\
+                    \n\t\tappend -i for all file and directory\
+                    "
+dir_job.bash =      "\n    CLI_dir.sh\
+                    \n\tmodify bash script for simple technique in Command Line Interface\
+                    "
