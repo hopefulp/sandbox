@@ -1,13 +1,26 @@
-#!/usr/bin/bash
+#!/bin/bash
+### in mlet
+SB=/gpfs/home/joonho/sandboxg
 
-f=$1
+match=$1
 
-for d in $(ls -d re0*); do
+f=$2
+
+for d in $(ls -d ${match}*); do
     #echo $d
     ### REMOVE directory
     #echo "rm -rf $d"
     ### copy to multiple destinations
-    echo "cp $f $d"             # copy incar to all directories
+    #echo "cp $f $d"             # copy incar to all directories, $SB/pyvasp/src/vdw_kernel.bindat
+    #echo cp $d/CONTCAR $d/POSCAR
+
+    ### Modify INCAR
+    #echo "sed -i -e 's/Auto/.FALSE./'" $d/INCAR
+    #echo "sed -i -e 's/ISTART = 0/ISTART = 1/' $d/INCAR"
+    #echo "sed -i -e 's/ICHARG = 2/ICHARG = 0/' $d/INCAR"
+
+    ### QSUB in SGE
+    echo "qsub -N $d -pe numa 12 -v np=12 -v dir=$d $SB/pypbs/sge_vasp.csh"
     ### clean in many directoreis
     #echo "cd $d"
     #cd $d

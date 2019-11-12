@@ -66,10 +66,12 @@ vasp.run =          "\n    MPIRUN VASP:\
                     \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
 
 sge.vasp =          "===SGE: MLET===\
-                    \n    qsub -N pe500 -v np=12 -v dir=pe500 $SB/pypbs/sge_vasp.csh"
+                    \n    qsub -N pe500 -pe numa 12 -v np=12 -v dir=pe500 $SB/pypbs/sge_vasp.csh\
+                    \n\t-pe numa: take charge the number of process\
+                    "
 pbs.vasp =          "===PBS: KISTI===\
-                    \n    qsub mpi_vsp.sh in Nurion@KISTI\
-                    \n\tqsub -N dirname $SB/pypbs/pbs_vasp.sh\
+                    \n    qsub -N dirname $SB/pypbs/pbs_vasp.sh\
+                    \n\tnumber of process is confirmed in the script 'pbs_vasp.sh'\
                     "
 dir_job.clean =     "===DIR: clean, modify filename, jobs for package===\
                     \n    dir_clean_p2.py -j {rm,mv} [-p,-s,-m] -w {qchem, ai, vasp, pbs} -r 'for run'\
