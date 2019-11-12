@@ -8,7 +8,7 @@
 
 if ( ! $?np ) then
     echo "variable job is not defined"
-    echo 'Usage:: qsub -N jobname(queue) -v np=np -v dir=dirname(log) $SB/pypbs/sge_vasp.csh'
+    echo 'Usage:: qsub -N jobname(queue) -pe numa np -v np=np -v dir=dirname(log) $SB/pypbs/sge_vasp.csh'
     exit(2)
 endif
 
@@ -24,6 +24,5 @@ mpirun -np $np /gpfs/home/joonho/vasp.5.4.4/bin/vasp  > ../$log_file
 cd ..
 mv $log_file $dir.out
 echo end >> $queue_file
-data >> $queue_file
-
+date >> $queue_file
 
