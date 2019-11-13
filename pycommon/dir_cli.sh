@@ -33,7 +33,7 @@ for d in $(ls -d ${match}*); do
             ;;
         ### QSUB in SGE for DIR
         'qsub')
-            echo "qsub -N $d -pe numa 12 -v np=12 -v dir=$d $SB/pypbs/sge_vasp.csh"
+            echo "qsub -N $d -pe numa 16 -v np=16 -v dir=$d $SB/pypbs/sge_vasp.csh"
             ;;
         ### COPY to multiple DIR
         'cp')

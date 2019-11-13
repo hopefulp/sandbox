@@ -8,36 +8,38 @@ from common_p2 import *
 
 q_list=[]
 
-def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir,Lshowmatch):
+def d_clean(work,w_option,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir,Lshowmatch):
 
     pwd = os.getcwd()
-    if len(dirs) > 1:
-        print "use only one directory"
-        sys.exit(1)
-    else:
-        d = pwd + '/' + dirs[0]
-
-    matches=[]
     if work == None:
         if prefix:
-            f_list=get_files_prefix(prefix, d)
+            f_list=get_files_prefix(prefix, pwd)
         if suffix:
-            f_list=get_files_suffix(suffix, d)
+            f_list=get_files_suffix(suffix, pwd)
         if matches:
-            f_list=get_files_match(matches, d,Lshowmatch)
+            f_list=get_files_match(matches, pwd,Lshowmatch)
         if exclude:
-            f_list=get_files_exclude(exclude, d)
+            f_list=get_files_exclude(exclude, pwd)
         if f_list and excl_fnames:
             for f in excl_fnames:
                 if f in f_list:
                     f_list.remove(f)
     elif work == 'qchem':
-        pass
+        if w_option == None:
+            print "work==qchem requires pid number with -wo n"
+            sys.exit(2)
+        matches=[]
+        matches.append(".e"+str(w_option))
+        matches.append(".pe"+str(w_option))
+        matches.append(".o"+str(w_option))
+        matches.append(".pp"+str(w_option))
+        f_list=get_files_match(matches, pwd,Lshowmatch)
+    
     elif work == 'vasp':
-        f_list=os.listdir(d)
+        f_list=os.listdir(pwd)
         if excl_fnames:
             for f in f_list:
-                if os.access(d+'/'+f, os.X_OK):
+                if os.access(pwd+'/'+f, os.X_OK):
                     excl_fnames.append(f)
             for efile in excl_fnames:
                 if efile in f_list:
@@ -45,21 +47,18 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
 
     elif work == 'pbs':
         matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d']
-        f_list = get_files_match(matches, d, Lshowmatch)
+        f_list = get_files_match(matches, pwd, Lshowmatch)
             
 
     f_list.sort()
-    ### Make command list
     for f in f_list:
-        fname = d+'/'+f
-        comm = "%s %s" % (linux_job, fname)
+        comm = "%s %s" % (linux_job, f)
         if linux_job == 'mv':
             comm += " %s" % new_dir
         print comm
         q_list.append(comm)
         
     #print "all %s files" % len(f_list)
-    ### Show command list and run
     if f_list:
         q = "will you %s %s files? " % (linux_job, len(f_list))
         if yes_or_no(q):
@@ -74,8 +73,8 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
 
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
-    parser.add_argument('dirs', default='.', nargs='+', help='input work directories')
     parser.add_argument('-w', '--work', choices=['qchem','ai','vasp','pbs'],help='remove depending on job')
+    parser.add_argument('-wo', '--work_option', type=int, help='Q-Chem: parallel output number')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')
     parser.add_argument('-m', '--match', nargs='*', help='remove matching file')
@@ -93,7 +92,7 @@ def main():
     if args.work == 'vasp' and not args.excluded_files:
         args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR']
             
-    d_clean(args.dirs,args.work,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.mv_dir,args.match_show)
+    d_clean(args.work,args.work_option,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.mv_dir,args.match_show)
     return 0
 
 if __name__ == '__main__':
