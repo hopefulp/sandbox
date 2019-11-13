@@ -18,6 +18,7 @@ def main():
     parser.add_argument('ndir', help='mkdir and cp')
     parser.add_argument('-q', '--question', action='store_true', help='inquire for each file')
     parser.add_argument('-j', '--job', choices=["hybrid","dos","band","pchg","md","cont","ini"], help='inquire for each file')
+    parser.add_argument('-v', '--vdw', action='store_true', help="in case vdW-DF,copy vdw_kernel.bindat")
     parser.add_argument('-s', '--poscar', default="CONTCAR", help='use CONTCAR for 2nd job')
     parser.add_argument('-p', '--potcar', default="POTCAR" , help='use the same POTCAR')
     parser.add_argument('-k', '--kpoints', default="IBZKPT", help='use the same KPOINTS for default')
@@ -25,7 +26,7 @@ def main():
     parser.add_argument('-i', '--incar', default='INCAR', choices=["INCAR","incar.key"], help='first run make_incar.py then use incar.key')
     args = parser.parse_args()
 
-    #pwd = os.getcwd()
+    pwd = os.getcwd()
     old_dir = args.odir
     new_dir = args.ndir 
 
@@ -33,6 +34,9 @@ def main():
     if args.job:
         if args.job=="hybrid" or args.job=="md" or args.job=="dos":
             files.append("WAVECAR")
+    f_vdw = old_dir+'/'+"vdw_kernel.bindat"
+    if args.vdw or os.path.isfile(f_vdw):
+        files.append("vdw_kernel.bindat")
 
     if os.path.isdir(new_dir):
         print(f"overwrite {new_dir}")
@@ -121,6 +125,7 @@ def main():
         for f in files:
             fo = old_dir + '/'  + f
             s = f"cp {fo} {new_dir}"
+            print(f"{fo} is copied to {new_dir}")
             os.system(s)
                 
 if __name__ == '__main__':
