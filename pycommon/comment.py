@@ -5,6 +5,7 @@ vasp    = MyClass()
 sge     = MyClass()
 pbs     = MyClass()
 dir_job = MyClass()
+vmd     = MyClass()
 
 water.order = "===WATER===\
                 \n    ORDER:: calcube makecube pdb2bgf makelmp_in"
@@ -35,24 +36,26 @@ water.vmd2poscar =  "\n    VMD to POSCAR:\
                     \n\tvmd load b.traj on a.bgf (stride for skip)\
                     \n\tselect one snapshot\
                     \n\tvmd> pbc wrap; move all atoms into the box\
-                    \n\tvmd save to poscar"
+                    \n\tvmd save to poscar\
+                    \n\t\t: select only one frame in save panel\
+                    "
 water.vmdpos2pos = "\n    VMDPOS to POSCAR: vpos_rearrange.py n64.vmdpos -af water_n64.bgf"
 water.vasp =        "\n    CONTINUE:: go to 'vasp' attribute"
 vasp.order =        "===VASP Usage===\
                     \n    ORDER:: make_incar make_ini run"
 vasp.make_incar =   "\n    MAKE incar.key:\
-                    \n\t$ make_incar -d d3\
+                    \n\t$ vmake_incar -d d3\
                     \n\t\tdefault: -t(dft)=pe, -d(D)=D3\
-                    \n\t$ make_incar.py -t re0 -d d3\
+                    \n\t$ vmake_incar.py -t re0 -d d3\
                     \n\t\thybrid runs with WAVECAR as continous job\
-                    \n\t$ make_incar.py -t re0 -d d3 -md nvt\
+                    \n\t$ vmake_incar.py -t re0 -d d3 -md nvt\
                     \n\t\tto run MD\
-                    \n\t$ make_incar.py -t revdw\
+                    \n\t$ vmake_incar.py -t revdw\
                     \n\t\tfor revPBE-vdW-DF\
-                    \n\t$ make_incar.py -t re0vdw\
+                    \n\t$ vmake_incar.py -t re0vdw\
                     \n\t\tfor revPBE0-vdW-DF    : is this OR?\
                     \n    MAKE INCAR \
-                    \n\tmake_incar.py --rw r\
+                    \n\tvmake_incar.py --rw r\
                     \n\t\tmakes INCAR by reading incar.key with --read option\
                     "
 vasp.make_ini =     "\n    MAKE 1st VASP Directory:\
@@ -92,3 +95,65 @@ dir_job.mod_fname = "\n    dir_fname.py {ls,mvdir,rm,rename} [-p|-s|-m] -a s -i 
 dir_job.bash =      "\n    CLI_dir.sh\
                     \n\tmodify bash script for simple technique in Command Line Interface\
                     "
+vmd.order   =       "=== VMD ===\
+                    \n\t:install, general, get single coord(POSCAR), draw box\
+                    "
+vmd.install =       "\n    INSTALL\
+                    \n\tmodify configure\
+                    \n\t    :install at HOME\
+                    \n\t\t$install_name=\"vmd\"\
+                    \n\t\t$install_bin_dir=\"$HOME/.local/bin\"\
+                    \n\t\t$install_library_dir=\"$HOME/.local/lib/$install_name\"\
+                    \n\t$ ./configure LINUXAMD64\
+                    \n\t$ cd src\
+                    \n\t$ make install\
+                    "
+vmd.general =       "\n    General Usage\
+                    \n\tFile/New New Molecule...\
+                    \n\t    choose where to load file: as New Molecule or on a loaded molecule\
+                    \n\t    can select Frames with Stride\
+                    \n\t    Browse file and select file type if not automatically determined\
+                    "
+vmd.save    =       "\n    save one coordinate\
+                    \n\t...file/save coordinate\
+                    \n\tselect one configuration\
+                    \n\tsave as POSCAR format\
+                    "
+vmd.job_water =     "\n    Water for Lammps and VASP\
+                    \n\tLAMMPS: LOAD in 2 step\
+                    \n\t    load a.bgf for configuration\
+                    \n\tVisualization of water\
+                    \n\t    Graphics/Representations...\
+                    \n\t\tDrawing Method/DynamicBonds\
+                    \n\t\t    Bond Radius:0.1, Bond Resolution: 12\
+                    \n\tset PBC\
+                    \n\t    vmd> pbc set { a b c alpha beta gamma }\
+                    \n\t\tget values from bgf file\
+                    \n\t    vmd> pbc box\
+                    \n\t\tshow box, if a traj is loaded, this was done at the 1st frame\
+                    \n\tChange Display\
+                    \n\t    Display/Orthographic\
+                    \n\tWrapping: mapping molecule into the box\
+                    \n\t     vmd> pbc wrap\
+                    \n\tLOAD Traj(LAMMPS) or OUTCAR(VASP) on the same molecule\
+                    \n\t     use stride if so many frame\
+                    "
+vmd.pbc     =       "\n    Visualize PBC BOX\
+                    \n\tvmd> pbc set { a b c alpha beta gamma }\
+                    \n\t    get values from bgf file\
+                    \n\tvmd> pbc box\
+                    \n\t    show box, if a traj is loaded, this was done at the 1st frame\
+                    \n\tDisplay/Orthographic\
+                    \n\tWrapping: mapping molecule into the box\
+                    \n\t    vmd> pbc wrap\
+                    \n\t    vmd> pbc wrap -all -compound fragment\
+                    \n\t\tchange resid -> fragment\
+                    \n\t\twrap all the frame\
+                    \n\tWrapping all the frame\
+                    \n\t    1st: load bgf for connection\
+                    \n\t    2nd: set pbc\
+                    \n\t    3rd: load traj on loaded bgf file\
+                    \n\t    4th: pbc wrap -all -compound resid\
+                    "
+
+

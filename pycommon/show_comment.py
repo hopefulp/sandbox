@@ -24,7 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description="shows dictionary for all: work, system, package  ")
     parser.add_argument('-j', '--job', help='select one attribute')
     parser.add_argument('-k', '--key_', nargs='*', help='select keys')
-    parser.add_argument('-a', '--all', action='store_true', help='display all keywords for the attribute')
+    parser.add_argument('-a', '--all', action='store_false', help='display all keywords for the attribute')
     args = parser.parse_args()
 
     regex = re.compile('[_A-Z]')

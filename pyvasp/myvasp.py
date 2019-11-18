@@ -102,7 +102,7 @@ def make_incar(dic, rw, iofile):
     if rw == 'w':
         with open(iofile, 'w') as ofile:
             ofile.write(json.dumps(dic, indent=4))
-        print("run 'make_incar.py --rw r' after modify incar.key")
+        print("run 'vmake_incar.py --rw r' after modify incar.key")
         return 0
     elif rw == 'r':
         dic = json.load(open(iofile))
@@ -111,7 +111,7 @@ def make_incar(dic, rw, iofile):
         exit(1)
 
     print(dic)
-
+    ################# PRE DEFINE ###############################
     fname = 'INCAR'
     f = open(fname, 'w')
     L_hybrid = 0
@@ -127,7 +127,19 @@ def make_incar(dic, rw, iofile):
         if re.search('0', odd):
             L_hybrid=1
             dic['ini']='wav'
-    print("hybrid %d vdW-DF %d" % (L_hybrid, L_vdw))       
+    print("hybrid %d vdW-DF %d" % (L_hybrid, L_vdw))
+    ### ENcut vs Precision
+    if 'cutoff' in dic.keys():
+        L_encut=1
+    else:
+        L_encut=0
+    ### WRITE option
+    laechg = '.FALSE.'
+    lwave = '.FALSE.'
+    lcharg = '.FALSE.'
+    ilog = dic['log']
+    if dic['dynamics'] == 'nvt':
+        ilog = 0
     ### system character
     if dic['system'] == 'mol':
         isym = 0
@@ -137,7 +149,7 @@ def make_incar(dic, rw, iofile):
         kpred = 2
         #lreal = '.FALSE.'
 
-    
+    ########################## WRITE ############################################
     ### 0: system name
     comm = 'SYSTEM = ' + json.dumps(dic) + '\n\n'
     f.write(comm)
@@ -180,8 +192,10 @@ def make_incar(dic, rw, iofile):
 
     ### 3: precision 
     f.write('# precision \n')
-    com1 = 'ENCUT = %d\n' % dic['cutoff']
-    com1 += 'PREC = %s\n' % dic['precision']
+    if L_encut:
+        com1 = 'ENCUT = %d\n' % dic['cutoff']
+    else:
+        com1 = 'PREC = %s\n' % dic['precision']
     com1 += 'ISMEAR = 0 ; SIGMA = 0.05\n'
     com1 += 'NELMIN = 4 #; NELM = 500       # increase NELMIN to 4 ~ 8 in case MD|Ionic relax\n'
     if dic['relax'] == 'sp':
@@ -295,7 +309,7 @@ def make_incar(dic, rw, iofile):
             isif=0
             nsw=5000
             ibrion=0
-            potim=2.0
+            potim=0.5
         else:
             nsw=999
             ibrion=2
@@ -355,10 +369,6 @@ def make_incar(dic, rw, iofile):
 
     ###### 7: LOGFILE 
     f.write('###### log\n')
-    laechg = '.FALSE.'
-    lwave = '.FALSE.'
-    lcharg = '.FALSE.'
-    ilog = dic['log']
     if 0 < ilog:
         lwave = '.TRUE.'
     if 1 < ilog:
