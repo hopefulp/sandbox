@@ -69,8 +69,12 @@ vasp.run =          "\n    MPIRUN VASP:\
                     \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
 
 sge.vasp =          "===SGE: MLET===\
-                    \n    qsub -N pe500 -pe numa 12 -v np=12 -v dir=pe500 $SB/pypbs/sge_vasp.csh\
+                    \n    qsub -N pe500 -pe numa 16 -v np=16 -v dir=pe500 $SB/pypbs/sge_vasp.csh\
                     \n\t-pe numa: take charge the number of process\
+                    \n    Or Use PBS command\
+                    \n\tqsub_server.py sge \
+                    \n\tqsub_server.py sge -s vasp \
+                    \n\tqsub_server.py sge -s vasp -d dirname -n np[16]\
                     "
 pbs.vasp =          "===PBS: KISTI===\
                     \n    qsub -N dirname $SB/pypbs/pbs_vasp.sh\
@@ -114,46 +118,34 @@ vmd.general =       "\n    General Usage\
                     \n\t    can select Frames with Stride\
                     \n\t    Browse file and select file type if not automatically determined\
                     "
-vmd.save    =       "\n    save one coordinate\
+vmd.save    =       "\n    SAVE one coordinate\
                     \n\t...file/save coordinate\
                     \n\tselect one configuration\
                     \n\tsave as POSCAR format\
                     "
 vmd.job_water =     "\n    Water for Lammps and VASP\
                     \n\tLAMMPS: LOAD in 2 step\
-                    \n\t    load a.bgf for configuration\
-                    \n\tVisualization of water\
-                    \n\t    Graphics/Representations...\
-                    \n\t\tDrawing Method/DynamicBonds\
-                    \n\t\t    Bond Radius:0.1, Bond Resolution: 12\
-                    \n\tset PBC\
-                    \n\t    vmd> pbc set { a b c alpha beta gamma }\
-                    \n\t\tget values from bgf file\
-                    \n\t    vmd> pbc box\
-                    \n\t\tshow box, if a traj is loaded, this was done at the 1st frame\
-                    \n\tChange Display\
-                    \n\t    Display/Orthographic\
-                    \n\tWrapping: mapping molecule into the box\
-                    \n\t     vmd> pbc wrap\
-                    \n\tLOAD Traj(LAMMPS) or OUTCAR(VASP) on the same molecule\
-                    \n\t     use stride if so many frame\
-                    "
-vmd.pbc     =       "\n    Visualize PBC BOX\
-                    \n\tvmd> pbc set { a b c alpha beta gamma }\
-                    \n\t    get values from bgf file\
-                    \n\tvmd> pbc box\
-                    \n\t    show box, if a traj is loaded, this was done at the 1st frame\
-                    \n\tDisplay/Orthographic\
-                    \n\tWrapping: mapping molecule into the box\
-                    \n\t    vmd> pbc wrap\
-                    \n\t    vmd> pbc wrap -all -compound fragment\
-                    \n\t\tchange resid -> fragment\
-                    \n\t\twrap all the frame\
-                    \n\tWrapping all the frame\
-                    \n\t    1st: load bgf for connection\
-                    \n\t    2nd: set pbc\
-                    \n\t    3rd: load traj on loaded bgf file\
-                    \n\t    4th: pbc wrap -all -compound resid\
+                    \n\t    === STEP 1 ===\
+                    \n\t\tLOAD BGF\
+                    \n\t\t    load a.bgf for configuration\
+                    \n\t\t=== Visualization of water\
+                    \n\t\t    Graphics/Representations...\
+                    \n\t\t\tDrawing Method/DynamicBonds\
+                    \n\t\t\t    Bond Radius:0.1, Bond Resolution: 12\
+                    \n\t\t=== SET PBC\
+                    \n\t\t    vmd> pbc set { a b c alpha beta gamma }\
+                    \n\t\t\tget values from bgf file\
+                    \n\t\t    vmd> pbc box\
+                    \n\t\t\tshow box, if a traj is loaded, this was done at the 1st frame\
+                    \n\t\t===Change Display\
+                    \n\t\t    Display/Orthographic\
+                    \n\t\t===Wrapping: mapping molecule into the box\
+                    \n\t\t    vmd> pbc wrap\
+                    \n\t    === STEP 2 ===\
+                    \n\t\tLOAD Traj(LAMMPS) or OUTCAR(VASP) on the same molecule\
+                    \n\t\t    use stride if so many frame\
+                    \n\t\t    vmd> pbc wrap -all -compound fragment\
+                    \n\t\t\twrap all the frame\
                     "
 
 

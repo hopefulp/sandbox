@@ -14,7 +14,7 @@ server_dir="x1813a01@nurion.ksc.re.kr:/scratch/x1813a01"
 
 if [ $# -eq 0 ]; then
     echo "Usage:: $0 [python_dir] job_index \$2[next option]"
-    echo "job index: [0]scp_kisti "
+    echo "job index: [0]scp_kisti [1]run_python"
     exit
 fi
 
