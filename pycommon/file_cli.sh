@@ -27,7 +27,7 @@ else
 fi
 
 SBB=${SB}${dir}
-echo $SBB
+#echo $SBB
 
 ### job 0        1      2     3    4  for CASE
 job=( "scp_kisti" "run_python" )
