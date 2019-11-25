@@ -6,7 +6,8 @@ sge     = MyClass()
 pbs     = MyClass()
 dir_job = MyClass()
 vmd     = MyClass()
-
+git     = MyClass()
+ssh     = MyClass()
 water.order = "===WATER===\
                 \n    ORDER:: calcube makecube pdb2bgf makelmp_in"
 water.calcube =     "\n    CALCULATE CUBE:\
@@ -39,16 +40,26 @@ water.vmd2poscar =  "\n    VMD to POSCAR:\
                     \n\tvmd save to poscar\
                     \n\t\t: select only one frame in save panel\
                     "
-water.vmdpos2pos = "\n    VMDPOS to POSCAR: vpos_rearrange.py n64.vmdpos -af water_n64.bgf"
+water.vmdpos2pos =  "\n    VMDPOS to POSCAR: vpos_rearrange.py n64.vmdpos -af water_n64.bgf"
 water.vasp =        "\n    CONTINUE:: go to 'vasp' attribute"
+water.vasp_analysis="\n    ANALYSIS VASP\
+                    \n\tgreT a.out\
+                    \n\t    step T Etot FreeE Epot Ekin SK SP(?)\
+                    \n\tUSE VMD to read OUTCAR\
+                    \n\tUSE ASE to read OUTCAR\
+                    "
+
 vasp.order =        "===VASP Usage===\
                     \n    ORDER:: make_incar make_ini run"
 vasp.make_incar =   "\n    MAKE incar.key:\
+                    \n\t\t-sys [bulk|surface|mol]\
+                    \n\t\t-md [nve|nvt\npt], -t dft[lda,gga,pe,rp,re,re0,revdw,re0vdw,etc]\
+                    \n\t\t-d dispersion[d2:d3], \
                     \n\t$ vmake_incar -d d3\
                     \n\t\tdefault: -t(dft)=pe, -d(D)=D3\
                     \n\t$ vmake_incar.py -t re0 -d d3\
                     \n\t\thybrid runs with WAVECAR as continous job\
-                    \n\t$ vmake_incar.py -t re0 -d d3 -md nvt\
+                    \n\t$ vmake_incar.py -t re0 -d d3 -md nve\
                     \n\t\tto run MD\
                     \n\t$ vmake_incar.py -t revdw\
                     \n\t\tfor revPBE-vdW-DF\
@@ -62,8 +73,11 @@ vasp.make_ini =     "\n    MAKE 1st VASP Directory:\
                     \n\t$ vmake_ini.py -a O H -d dirname\
                     \n\t\tKPOINTS=gamma, POTCAR from VaspINI by default and use 'incar.key' for INCAR"
 vasp.make_2ndDir =  "\n    MAKE VASP Dir from Dir\
-                    \n\t$ vmake_2nd.py pe250s -d pe250 -s POSCAR\
-                    \n\t\t make pe250s from dir pe250, default=CONTCAR\
+                    \n\t$ vmake_d2d.py old_dir new_dir job_type[ini,cont,hybrid,md,dos,band,pchg]\
+                    \n\t\t make new_dir from old_dir\
+                    \n\t\t ini: copy POSCAR\
+                    \n\t\t cont: copy CONTCAR\
+                    \n\t\t hybrid: copy WAVECAR etc\
                     "
 vasp.run =          "\n    MPIRUN VASP:\
                     \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
@@ -76,6 +90,21 @@ sge.vasp =          "===SGE: MLET===\
                     \n\tqsub_server.py sge -s vasp \
                     \n\tqsub_server.py sge -s vasp -d dirname -n np[16]\
                     "
+ssh.nodes   =       "=== SSH ===\
+                    \n    Scan all the NODES for process name\
+                    \n\t$ ssh node01 ps aux | grep process_name(vasp)\
+                    \n\t    single node test for vasp\
+                    \n\t$ ssh_sge_nodes.sh process_name[default=vasp]\
+                    \n\t    to check (vasp, qcprog, etc) in all nodes\
+                    "
+ssh.node    =       "\n    Do process on ONE NODE\
+                    \n\t$ ssh_node.sh node_id process_id number_of_processes\
+                    \n\t$ ssh_node.sh node13 58412 16\
+                    \n\t    echos kill 16 process on node13\
+                    \n\t$ ssh_node.sh node13 58412 16 run\
+                    \n\t    run kill 16 process on node13\
+                    "
+                    
 pbs.vasp =          "===PBS: KISTI===\
                     \n    qsub -N dirname $SB/pypbs/pbs_vasp.sh\
                     \n\tnumber of process is confirmed in the script 'pbs_vasp.sh'\
@@ -148,4 +177,21 @@ vmd.job_water =     "\n    Water for Lammps and VASP\
                     \n\t\t\twrap all the frame\
                     "
 
+git.order       =   "=== GIT ===\
+                    \n\t:push pull pull w. force remote \
+                    "
+git.push        =   "\n    PUSH\
+                    \n\t$ git add . -A\
+                    \n\t$ git commit -m \"message\"\
+                    \n\t$ git push [origin master]\
+                    "
+git.pull        =   "\n    PULL\
+                    \n\t$ git pull\
+                    \n\tIf not working, use forced pull\
+                    "
+git.overwrite   =   "\n    FETCH & RESET\
+                    \n\toverwrite the local changes: if believe the stage in HEAD\
+                    \n\t$ git fetch --all\
+                    \n\t$ git reset --hard origin/master\
+                    "
 

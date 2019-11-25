@@ -29,7 +29,7 @@ fi
 SBB=${SB}${dir}
 #echo $SBB
 
-### job 0        1      2     3    4  for CASE
+### job      0           1      2     3    4  for CASE
 job=( "scp_kisti" "run_python" )
 
 
@@ -43,6 +43,11 @@ case $j in
         ;;
     "run_python")
         echo "python $SBB/$2 ${@:3:3}"
+        echo "Do you want to run? [y/n]"
+        read yorn
+        if [ $yorn -eq "y" ]; then
+            python $SBB/$2 ${@:3:3}
+        fi
         ;;
     ### default::
     *)

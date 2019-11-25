@@ -29,7 +29,7 @@ def main():
     parser.add_argument('-l', '--log', default=1, type=int, choices={0,1,2,3}, help='{0:No,1:WAVECAR,2:CHGCAR,3:CHG')
     parser.add_argument('-v', '--solvent', action='store_true', help='whether solvent')
     parser.add_argument('-eps', '--dielectric', default=78.3, type=float, help='dielectric constant')
-    parser.add_argument('-md', '--dynamics', choices=['nvt', 'npt'], help='molecular dynamics flavor')
+    parser.add_argument('-md', '--dynamics', choices=['nve','nvt', 'npt'], help='molecular dynamics flavor')
     args = parser.parse_args()
 
     ### 1. obtain default vasp repository

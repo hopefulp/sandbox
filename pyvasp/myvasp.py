@@ -116,7 +116,8 @@ def make_incar(dic, rw, iofile):
     f = open(fname, 'w')
     L_hybrid = 0
     L_vdw = 0
-    ### obtain gga name & hybrid
+    L_paw = 0
+    ########### DEFINE GGA name & hybrid
     if len(dic['dft'])==2:
         gga = dic['dft']
     elif len(dic['dft'])>2:
@@ -128,25 +129,33 @@ def make_incar(dic, rw, iofile):
             L_hybrid=1
             dic['ini']='wav'
     print("hybrid %d vdW-DF %d" % (L_hybrid, L_vdw))
-    ### ENcut vs Precision
+    ########### ENcut vs Precision
+    L_encut=0
     if 'cutoff' in dic.keys():
         L_encut=1
-    else:
-        L_encut=0
-    ### WRITE option
+    ########## WRITE option && MD option && SYSTEM options
     laechg = '.FALSE.'
     lwave = '.FALSE.'
     lcharg = '.FALSE.'
     ilog = dic['log']
-    if dic['dynamics'] == 'nvt':
+    L_md = 0
+    if dic['dynamics']:
         ilog = 0
-    ### system character
-    if dic['system'] == 'mol':
+        L_md = 1
         isym = 0
         kp = 'gamma'
-        kpred = 1
+        nkred = 0
+        dic['precision']='normal'
+        TK = 353
+        tebeg = TK
+        teend = TK
+    ### system character
+    elif dic['system'] == 'mol':
+        isym = 0
+        kp = 'gamma'
+        nkred = 0
     else:
-        kpred = 2
+        nkred = 2
         #lreal = '.FALSE.'
 
     ########################## WRITE ############################################
@@ -177,12 +186,16 @@ def make_incar(dic, rw, iofile):
         f.write(comm)
     ### 2: start
     f.write('# continuation\n')
-    if dic['ini'] == 'start':
-        comm = 'ISTART = 0\nICHARG = 2\n'
+    if dic['ini'] == 'start' or L_md:
+        istart = 0
+        icharg = 2
     elif dic['ini'] == 'chg':
-        comm = 'ISTART = 1\nICHARG = 1\n'
+        istart = 1
+        icharg = 1
     else:       # cont goes to wav
-        comm = 'ISTART = 1\nICHARG = 0\n'
+        istart = 1
+        icharg = 0
+    comm = 'ISTART = %d\nICHARG = %d\n' % (istart, icharg)    
             
     if dic['mag'] == 'nm':
         comm += 'ISPIN = 1\n\n'
@@ -194,19 +207,21 @@ def make_incar(dic, rw, iofile):
     f.write('# precision \n')
     if L_encut:
         com1 = 'ENCUT = %d\n' % dic['cutoff']
-    else:
-        com1 = 'PREC = %s\n' % dic['precision']
+    if L_md:
+        com1 += 'PREC = %s\n' % dic['precision']
     com1 += 'ISMEAR = 0 ; SIGMA = 0.05\n'
     com1 += 'NELMIN = 4 #; NELM = 500       # increase NELMIN to 4 ~ 8 in case MD|Ionic relax\n'
-    if dic['relax'] == 'sp':
-        com1 += 'EDIFF = 1E-5  #; EDIFFG = -0.025\n\n'
+    if dic['relax'] == 'sp' or L_md:
+        com1 += 'EDIFF = 1E-5  #; EDIFFG = -0.025 for MD or SP calc\n\n'
     else:
         com1 += 'EDIFF = 1E-5 ; EDIFFG = -0.025\n\n'
     com1 += 'ADDGRID = .TRUE.\n\n'
     f.write(com1)
     f.write('# mixing\n')
-    com1 = 'LMAXMIX = 4\n'
+    com1 = 'MAXMIX = 40 for MD or ionic relaxation: reuse\n'
     com1 += '#IMIX = 4; #AMIX = 0.2; #BMIX = 0.0001; #AMIX_MAG = 0.8; #BMIX_MAG = 0.0001\n\n'
+    if nkred:
+        com1 += 'NKRED = %d\n' % nkred
     f.write(com1)
     f.write('# parallel performance and gga\n')
     #com1 = 'ALGO = Fast\n'
@@ -233,9 +248,9 @@ def make_incar(dic, rw, iofile):
         comm += 'ALGO = D; TIME = 0.4\n'
         comm += 'HFSCREEN = 0.207\n'
         comm += 'PRECFOCK = F\n'
-        comm += 'NKRED = %d\n' % kpred
         comm += '#block the NPAR\n'
     elif re.search('pe',dic['dft'],re.IGNORECASE) or re.search('re',dic['dft'],re.IGNORECASE):      # for PBE, revPBE
+        L_paw = 1
         comm += 'LREAL = Auto; LPLANE = .TRUE.\n'
         comm += 'LSCALAPACK = .FALSE.\n\n'
         if not L_hybrid:
@@ -247,13 +262,11 @@ def make_incar(dic, rw, iofile):
             comm += 'ALGO = D; TIME = 0.4 # IALGO=53\n'
             comm += '#NSIM = 4\n'
             comm += 'ENCUTFOCK = 0\n'
-            comm += 'NKRED = %d\n' % kpred
-            comm += 'NPAR = 4\n'
+            comm += 'NPAR = 4 ! NCORE*NPAR=total core; NCORE handles one band\n'
     elif re.search('e0',dic['dft'],re.IGNORECASE):
         comm += 'LHFCALC = .TRUE.\n'
         comm += 'ALGO = D; TIME = 0.4\n'
         comm += 'PRECFOCK = F\n'
-        comm += 'NKRED = 2\n'
         comm += '#block the NPAR\n'
     ### dispersion included dft?
     #if re.search('ML',dic['dft'],re.IGNORECASE) or re.search('MK',dic['dft'],re.IGNORECASE):
@@ -277,11 +290,15 @@ def make_incar(dic, rw, iofile):
             comm += 'IVDW = 20      ! Tkatchenko-Scheffler\n\n'
     comm += '\n'
     f.write(comm)
-    ### DFT virtual orbital
-    comm = '### DFT virtual orbital\n'
+    ### DFT virtual orbital && read CHGCAR
+    comm = '### DFT virtual orbital && CHGCAR\n'
     comm += '#ALGO = Exact\n'
     comm += '#NBANDS = 64\n'
-    comm += '#LOPTICS = .TRUE.\n\n'
+    comm += '#LOPTICS = .TRUE.\n'
+    if L_paw and re.match('1',str(icharg)):
+        comm += 'LMAXMIX = 4 twice l of PP, s,p:2 l:4 f:6\n\n'
+    else:
+        comm += '#LMAXMIX = 4 for PAW && ICHARG = 1\n\n'
     f.write(comm)
 
     f.write('# GGA more\n')
@@ -305,30 +322,34 @@ def make_incar(dic, rw, iofile):
             isif = 2
         else:
             isif = 3
-        if dic['dynamics'] == 'nvt':
+        if L_md:
             isif=0
-            nsw=5000
+            nsw=1000
             ibrion=0
-            potim=0.5
+            potim=1.0
         else:
             nsw=999
             ibrion=2
             potim=0.3
         comm = 'NSW = %d ; ISIF = %d\n' % (nsw, isif)
-        comm += 'IBRION = %d\nPOTIM = %.1f\n' % (ibrion, potim)
+        comm += 'IBRION = %d\nPOTIM = %.1f in femto second\n' % (ibrion, potim)
         comm += '### AIMD more\n'
-        if dic['dynamics']:
-            comm += 'TEIN = 300; TEBEG=300; TEEND=300\n'
-            comm += 'ISYM=0; SMASS = -3     for standard NVE ensemble \n\n'
+        if L_md:                #dic['dynamics']:
+            comm += 'TEBEG=%d; TEEND=%d\n' % (tebeg, teend)
+            if tebeg == teend:
+                smass = -3
+            else:
+                smass = -1
+            comm += 'ISYM=0; SMASS = %d     for standard NVE ensemble w. const T \n\n' % smass
         else:
             if isym in locals():
                 comm += 'ISYM = 0'       
-            comm += '#TEIN = 300; TEBEG=300; TEEND=300\n'
-            comm += '#SMASS = 0.05; ISYM=0\n\n'
+            comm += '#TEBEG = %d; TEEND = %d\n' %(tebeg, teend)
+            comm += '#ISYM=0; SMASS = 0.05 ! -3\-1 for NVE, >=0 for NVT \n\n'
             
     f.write(comm)
     ### AIMD
-    #f.write('# aimd - nvt:: nsw=5000; isif=0; ibrion=0;potim=2.0;tein=300;tebeg=300;teend=300;smass=0.05;isym=0\n\n')
+    #f.write('# aimd - nve:: nsw=5000; isif=0; ibrion=0;potim=2.0;tein=300;tebeg=300;teend=300;smass=0.05;isym=0\n\n')
     ### Solvent effect
     f.write('# Solvent effect::higher Ecut is required (LSOL=.TRUE. EB_K for dielectric) \n')
     comm=""
