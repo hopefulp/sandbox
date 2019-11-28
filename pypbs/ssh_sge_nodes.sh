@@ -6,6 +6,10 @@ nodes=$(qstat -f | sed -e '/---/d' -e '/adus/d' | awk '/@/ { print $1 }' | awk -
 jobs=( mkdir vasp qchem )
 job=${1:-"vasp"}
 #echo $job
+if [ $# -eq 0 ]; then
+    echo "This runs $0 $job"
+fi
+
 
 for node in $nodes; do
     echo $node

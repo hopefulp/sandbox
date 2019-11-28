@@ -29,13 +29,20 @@ def print_sge(software,dname,np):
             os.system(com)
     elif software == 'vasp':
         if not dname:
-            print "qsub -N pe500 -pe numa 16 -v np=16 -v dir=pe500 $SB/pypbs/sge_vasp.csh"
+            print "qsub -N pe500 -pe numa %d -v np=%d -v dir=pe500 $SB/pypbs/sge_vasp.csh" % (np)
             print "use -d dname -n np"
         else:
             com = "qsub -N %s -pe numa %d -v np=%d -v dir=%s $SB/pypbs/sge_vasp.csh" % (dname,np,np,dname)
             print com
-            if yes_or_no("would you want to run?"):
-                os.system(com)
+    elif software == 'sleep':
+        com = "qsub -pe numa %d $SB/pypbs/sge_sleep.csh" % (np)
+        print com
+    else:
+        print "No software defined"
+
+    if yes_or_no("would you want to run?"):
+        os.system(com)
+
     return 0
 
 def print_chi(software):
@@ -60,7 +67,7 @@ def job_description(server, software, dname, np):
 def main():
     parser = argparse.ArgumentParser(description='how to use qsub')
     parser.add_argument('server', default='sge', choices=['sge', 'chi'], help='jobname in pbs file')
-    parser.add_argument('-s', '--software', choices=['qchem', 'grmx', 'vasp'], help='number of processor per node in the server')
+    parser.add_argument('-s', '--software', choices=['qchem', 'grmx', 'vasp','sleep'], help='number of processor per node in the server')
     parser.add_argument('-d', '--dirname', help='job directory name')
     parser.add_argument('-n', '--np', default=16, type=int, help='number of process')
     args = parser.parse_args()

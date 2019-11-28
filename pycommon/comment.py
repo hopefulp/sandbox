@@ -8,6 +8,7 @@ dir_job = MyClass()
 vmd     = MyClass()
 git     = MyClass()
 ssh     = MyClass()
+awk     = MyClass()
 water.order = "===WATER===\
                 \n    ORDER:: calcube makecube pdb2bgf makelmp_in"
 water.calcube =     "\n    CALCULATE CUBE:\
@@ -194,4 +195,6 @@ git.overwrite   =   "\n    FETCH & RESET\
                     \n\t$ git fetch --all\
                     \n\t$ git reset --hard origin/master\
                     "
-
+awk.vasp_logfile =  "=== AWK ===\
+                    \n    more job.remdk | awk '{ if($4) {split($4,arr,\":\"); print arr[1]-hour, arr[2]-min;} {hour=arr[1]; min=arr[2];}}'\
+                    "
