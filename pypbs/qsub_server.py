@@ -35,7 +35,10 @@ def print_sge(software,dname,np):
             com = "qsub -N %s -pe numa %d -v np=%d -v dir=%s $SB/pypbs/sge_vasp.csh" % (dname,np,np,dname)
             print com
     elif software == 'sleep':
-        com = "qsub -pe numa %d $SB/pypbs/sge_sleep.csh" % (np)
+        if dname:
+            com = "qsub -N %s -pe numa %d $SB/pypbs/sge_sleep.csh" % (dname, np)
+        else:
+            com = "qsub -pe numa %d $SB/pypbs/sge_sleep.csh" % (np)
         print com
     else:
         print "No software defined"
@@ -68,7 +71,7 @@ def main():
     parser = argparse.ArgumentParser(description='how to use qsub')
     parser.add_argument('server', default='sge', choices=['sge', 'chi'], help='jobname in pbs file')
     parser.add_argument('-s', '--software', choices=['qchem', 'grmx', 'vasp','sleep'], help='number of processor per node in the server')
-    parser.add_argument('-d', '--dirname', help='job directory name')
+    parser.add_argument('-d', '--dirname', help='job directory name|job name for qsub')
     parser.add_argument('-n', '--np', default=16, type=int, help='number of process')
     args = parser.parse_args()
 

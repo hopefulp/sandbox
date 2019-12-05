@@ -84,12 +84,24 @@ vasp.run =          "\n    MPIRUN VASP:\
                     \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
 
 sge.vasp =          "===SGE: MLET===\
-                    \n    qsub -N pe500 -pe numa 16 -v np=16 -v dir=pe500 $SB/pypbs/sge_vasp.csh\
-                    \n\t-pe numa: take charge the number of process\
-                    \n    Or Use PBS command\
-                    \n\tqsub_server.py sge \
-                    \n\tqsub_server.py sge -s vasp \
-                    \n\tqsub_server.py sge -s vasp -d dirname -n np[16]\
+                    \n    VASP::\
+                    \n\tqsub -N pe500 -pe numa 16 -v np=16 -v dir=pe500 $SB/pypbs/sge_vasp.csh\
+                    \n\t    -pe numa: take charge the number of process\
+                    \n\tOr Use PBS command\
+                    \n\t    qsub_server.py sge \
+                    \n\t    qsub_server.py sge -s vasp \
+                    \n\t    qsub_server.py sge -s vasp -d dirname -n np[16]\
+                    \n\tIN CASE hybrid functional job, it might be killed in 8 hr\
+                    \n\t    get node by sleep 'sge.sleep', run at node\
+                    "
+sge.sleep   =       "\n    SLEEP::\
+                    \n\t$ qsub_server.py sge -s sleep -n 36\
+                    \n\t    qsub -pe numa 36 $SB/pypbs/sge_sleep.csh\
+                    \n\t$ qsub_server.py sge -s sleep -n 36 -N sleep2\
+                    \n\t    qsub -N sleep2 -pe numa 36 $SB/pypbs/sge_sleep.csh\
+                    "
+sge.at_node =       "\n    RUN @NODE VASP::\
+                    \n\t$ sge_vasp_node.csh re0D3mdk_high 36\
                     "
 ssh.nodes   =       "=== SSH ===\
                     \n    Scan all the NODES for process name\
@@ -105,7 +117,10 @@ ssh.node    =       "\n    Do process on ONE NODE\
                     \n\t$ ssh_node.sh node13 58412 16 run\
                     \n\t    run kill 16 process on node13\
                     "
-                    
+ssh.check_nod =     "\n    CHECK node for vasp\
+                    \n\t$ ssh node08 ps aux | grep vasp | wc -l \
+                    "
+
 pbs.vasp =          "===PBS: KISTI===\
                     \n    qsub -N dirname $SB/pypbs/pbs_vasp.sh\
                     \n\tnumber of process is confirmed in the script 'pbs_vasp.sh'\
