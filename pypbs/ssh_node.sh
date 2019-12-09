@@ -19,5 +19,5 @@ while [ $i -lt $nprocess ]; do
     i=$(($i + 1))
     done
 if [ -z $4 ]; then
-    echo "this will run if \$4"
+    echo "this will run if \$4 exists"
 fi
