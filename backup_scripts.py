@@ -4,7 +4,7 @@ import os
 import argparse
 
 d_search=['/home/joonho/bin', '/home/joonho/sandbox_gl']
-d_backup='/shared/share_win/backup_script'
+d_backup='/Shared_win/shared_win/backup_script'
 
 def search_dir(d,Lrun):
     ### change directory to current directory

@@ -2,12 +2,14 @@ from common import MyClass
 
 water   = MyClass()
 vasp    = MyClass()
-sge     = MyClass()
-pbs     = MyClass()
+server  = MyClass()
+server.sge     = MyClass()
+server.pbs     = MyClass()
+server.ssh     = MyClass()
+backup  = MyClass()
 dir_job = MyClass()
 vmd     = MyClass()
 git     = MyClass()
-ssh     = MyClass()
 awk     = MyClass()
 water.order = "===WATER===\
                 \n    ORDER:: calcube makecube pdb2bgf makelmp_in"
@@ -83,7 +85,7 @@ vasp.make_2ndDir =  "\n    MAKE VASP Dir from Dir\
 vasp.run =          "\n    MPIRUN VASP:\
                     \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
 
-sge.vasp =          "===SGE: MLET===\
+server.sge.vasp =          "===SGE: MLET===\
                     \n    VASP::\
                     \n\tqsub -N pe500 -pe numa 16 -v np=16 -v dir=pe500 $SB/pypbs/sge_vasp.csh\
                     \n\t    -pe numa: take charge the number of process\
@@ -94,34 +96,34 @@ sge.vasp =          "===SGE: MLET===\
                     \n\tIN CASE hybrid functional job, it might be killed in 8 hr\
                     \n\t    get node by sleep 'sge.sleep', run at node\
                     "
-sge.sleep   =       "\n    SLEEP::\
+server.sge.sleep   =       "\n    SLEEP::\
                     \n\t$ qsub_server.py sge -s sleep -n 36\
                     \n\t    qsub -pe numa 36 $SB/pypbs/sge_sleep.csh\
                     \n\t$ qsub_server.py sge -s sleep -n 36 -N sleep2\
                     \n\t    qsub -N sleep2 -pe numa 36 $SB/pypbs/sge_sleep.csh\
                     "
-sge.at_node =       "\n    RUN @NODE VASP::\
+server.sge.at_node =       "\n    RUN @NODE VASP::\
                     \n\t$ sge_vasp_node.csh re0D3mdk_high 36\
                     "
-ssh.nodes   =       "=== SSH ===\
+server.ssh.nodes   =       "=== SSH ===\
                     \n    Scan all the NODES for process name\
                     \n\t$ ssh node01 ps aux | grep process_name(vasp)\
                     \n\t    single node test for vasp\
                     \n\t$ ssh_sge_nodes.sh process_name[default=vasp]\
                     \n\t    to check (vasp, qcprog, etc) in all nodes\
                     "
-ssh.node    =       "\n    Do process on ONE NODE\
+server.ssh.node    =       "\n    Do process on ONE NODE\
                     \n\t$ ssh_node.sh node_id process_id number_of_processes\
                     \n\t$ ssh_node.sh node13 58412 16\
                     \n\t    echos kill 16 process on node13\
                     \n\t$ ssh_node.sh node13 58412 16 run\
                     \n\t    run kill 16 process on node13\
                     "
-ssh.check_nod =     "\n    CHECK node for vasp\
+server.ssh.check_nod =     "\n    CHECK node for vasp\
                     \n\t$ ssh node08 ps aux | grep vasp | wc -l \
                     "
 
-pbs.vasp =          "===PBS: KISTI===\
+server.pbs.vasp =          "===PBS: KISTI===\
                     \n    qsub -N dirname $SB/pypbs/pbs_vasp.sh\
                     \n\tnumber of process is confirmed in the script 'pbs_vasp.sh'\
                     "
@@ -213,3 +215,44 @@ git.overwrite   =   "\n    FETCH & RESET\
 awk.vasp_logfile =  "=== AWK ===\
                     \n    more job.remdk | awk '{ if($4) {split($4,arr,\":\"); print arr[1]-hour, arr[2]-min;} {hour=arr[1]; min=arr[2];}}'\
                     "
+backup.crontab  =   "=== BACKUP ===\
+                    \n    CRONTAB to backup hd: \
+                    \n\toptions: \
+                    \n\t    :: -e for edit\
+                    \n\t    :: -l for list\
+                    \n\te.g.\
+                    \n\t    ::min hr dat mon day command\
+                    \n\t    :: 0  1   *   *   *   rsync -avz --delete /home/joonho/ /NAS1/home_joonho\
+                    \n\t    :: 0  5   1   *   *   rsync -avz --delete /NAS1/home_joonho/ /NAS2/bak_home/\
+                    "
+onedrive="/c/Users/hopef/OneDrive"
+remote_dir="joonho@chi.kaist.ac.kr:/Shared_win/shared_win/Windows10_backup"
+backup.windows  =   f"\n    Windows10 BACKUP to Linux\
+                    \n\tInstall::\
+                    \n\t    Git Bash\
+                    \n\t    rsync\
+                    \n\t\tuse -avzz for compression option\
+                    \n\tWORK::\
+                    \n\t    open Git Bash\
+                    \n\t    $ cd /c/WinData\
+                    \n\t    $ ./rsync_win.sh\
+                    \n\trsync error\
+                    \n\t    protocol version mismatch -- is your shell clean?\
+                    \n\t\t\"turn off anaconda in server chi\" \
+                    \n\trsync_win.sh\
+                    \n\t    rsync -avzz --delete /c/WinData/            {remote_dir}/WinData\
+                    \n\t    rsync -avzz --delete {onedrive}/Documents/   {remote_dir}/win_docu\
+                    \n\t    rsync -avzz --delete {onedrive}/Pictures/    {remote_dir}/win_pic\
+                    "
+backup.hard     =   "\n    BACKUP to External hd:\
+                    \n\t    backup script file\
+                    \n\t\t/home/joonho/sandbox_gl/backup_scripts.py\
+                    \n\t    rsync home\
+                    \n\t\trsync -avz --delete /home/joonho/ /run/media/joonho/Seagate\ Backup\ Plus\ Drive/Chi_CentOS/home_joonho\
+                    \n\t    rsync share_win\
+                    \n\t\trsync -avz --delete /shared/share_win/ /run/media/joonho/Seagate\ Backup\ Plus\ Drive/Chi_CentOS/share_win/\
+                    \n\t    backup KAIST server: EEWS\
+                    \n\t\trsync -avz --delete /Data/EEWS_dat/  /run/media/joonho/Seagate\ Backup\ Plus\ Drive/Chi_CentOS/EEWS_server/\
+                    \n\t\trsync -avz --delete /Data/Repository/  /run/media/joonho/Seagate\ Backup\ Plus\ Drive/Chi_CentOS/Repository_chi\
+                    "
+                    
