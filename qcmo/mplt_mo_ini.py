@@ -38,7 +38,7 @@ XMIN =  0
 XMAX =  1
 
 class YvalueModel():
-    def __init__(self, ymin3=-0.36,ymin5=-0.40, ymax=0.05):
+    def __init__(self, ymin3=-0.36,ymin5=-0.40, ymax=0.20):         
         self.ymin3=ymin3
         self.ymin5=ymin5
         self.ymax=ymax
@@ -47,8 +47,8 @@ Model1 = YvalueModel()
 Model2 = YvalueModel()
 Model3 = YvalueModel()
 Model4 = YvalueModel(ymax=0.20)
-Model5 = YvalueModel(ymin3=-0.30)
-Model6 = YvalueModel(ymin3=-0.30)
+Model5 = YvalueModel(ymin3=-0.36)
+Model6 = YvalueModel(ymin3=-0.36)
 
 model_ydic={1:Model1, 2:Model2, 3:Model3, 4:Model4, 5:Model5, 6:Model6}
 ########## Control Y-limit here

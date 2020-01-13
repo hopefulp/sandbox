@@ -2,11 +2,10 @@
 
 import argparse
 import re
-import importlib
-#import comment
-#import comment_subj
+import comment
+import comment_subj
 
-def jobs(comment, att, subkey):
+def jobs(att, subkey):
     subkeys = comment.__dict__[att].__dict__.keys()
     print('---------------------------------------------')
     print(f"{att} sub_keys:: {subkeys}")
@@ -34,25 +33,20 @@ def jobs(comment, att, subkey):
 
 def main():
     parser = argparse.ArgumentParser(description="shows dictionary for all: work, system, package  ")
-    parser.add_argument('-m', '--mod', default='general', choices=['general', 'subjects'], help='which branch: general|subject')
+    parser.add_argument('-c', '--classify', default='general', choices=['general', 'subjects'], help='which branch: general|subject')
     parser.add_argument('-j', '--job', help='select one attribute')
     parser.add_argument('-k', '--subkey', help='select one key for subkeys')
     args = parser.parse_args()
 
     regex = re.compile('[a-z]')    # only detect it starts with lower case
-    if args.mod == 'general':
-        mod_name = 'comment'
-    else:
-        mod_name = 'comment_subj'
-    my_module = importlib.import_module(mod_name)
-    att = [ x for x in dir(my_module) if regex.match(x) ]
-    print(f"===ALL ATTributes in {mod_name}.py ===")
+    att = [ x for x in dir(comment) if regex.match(x) ]
+    print("===ALL ATTributes in comment.py ===")
     print(f"  {att}")
 
     if not args.job:
         print(f"Use -j for attribute: {att}")
     else:
-        jobs(my_module, args.job, args.subkey)
+        jobs(args.job, args.subkey)
 
 if __name__ == "__main__":
     main()

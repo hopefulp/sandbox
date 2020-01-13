@@ -20,7 +20,7 @@ ax=plt.subplot(111)
 
 ax.set_xlim([XMIN,XMAX])
 ax.set_ylim([YMIN,YMAX])
-ax.yaxis.set_major_locator(ticker.MultipleLocator(0.05))
+ax.yaxis.set_major_locator(ticker.MultipleLocator(0.10))
 ax.xaxis.set_major_locator(plt.NullLocator())
 ax.tick_params(labelsize=25)
 plt.ylabel('E(Hr)', fontsize=35)

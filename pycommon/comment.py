@@ -255,4 +255,11 @@ backup.hard     =   "\n    BACKUP to External hd:\
                     \n\t\trsync -avz --delete /Data/EEWS_dat/  /run/media/joonho/Seagate\ Backup\ Plus\ Drive/Chi_CentOS/EEWS_server/\
                     \n\t\trsync -avz --delete /Data/Repository/  /run/media/joonho/Seagate\ Backup\ Plus\ Drive/Chi_CentOS/Repository_chi\
                     "
-                    
+mountp="/run/user/1000/gvfs/"
+backup.camera   =   "\n    BACKUP Phone to Linux Home:\
+                    \n\tSamsung galaxy mount point:\
+                    \n\t    $mountp\
+                    \n\t    mtp is changing whenever connect: /mtp\:host\=%5Busb%3A005%2C004%5D/ \
+                    \n\t    $mountp/mtp\:host\=%5Busb%3A005%2C004%5D\
+                    \n\t$ rsync -avz /run/user/1000/gvfs/mtp\:host\=%5Busb%3A005%2C004%5D/Card/DCIM/Camera/ /home/joonho/Pictures\
+                    "

@@ -86,7 +86,7 @@ def get_yv_scale(yscale):
         val = convert2value(ys)
         values.append(val)
     return values
-def draw_twinx(fs,icx,x_val,icy,job,title,xt,yt,yl,Lsave,yscale,colors):
+def draw_twinx(fs,icx,icy,job,title,xt,yt,yl,Lsave,yscale,colors):
     """
     This works for several files with only one y-value
     if x is included in file, modify
@@ -113,7 +113,7 @@ def draw_twinx(fs,icx,x_val,icy,job,title,xt,yt,yl,Lsave,yscale,colors):
     for f1 in fs:
         with open(f1,"r") as f:
             lines=f.readlines()
-            x = []     
+            x_val = []     
             y_val = []     # y as 2d [ [y1], [y2], ...] 
             i = 0
             for line in lines:
@@ -134,21 +134,16 @@ def draw_twinx(fs,icx,x_val,icy,job,title,xt,yt,yl,Lsave,yscale,colors):
                         y_val.append(float(items[0]))    # make 1D array
                         #y.append(y_line)                # make 2D array
                 i+=1
-            y_2d.append(y_val)
-    if not x:
-        if x_val:
-            x = x_val
-        else:
-            x=Ni_6x
-    #x=Ni_6x
+            y_2d.append(y_val)                    
+    x=Ni_6x
     ### y.ndim can be 1 or 2
     if len(fs) == 1:
         y = y_val
     else:
         y = y_2d
+
     yscale = get_yv_scale(yscale)           # get_yv_scale returns list
     y=np.array(y)*np.array(yscale)[:,None]
-    print(f"{x} {y}")
     if tag_title:
         print(f"title = {title} xt = {xt}")
         mplot_twinx(x, y, Title=title, Xtitle=xt, Ytitle=yt, Lsave=Lsave,Ylabels=yl, Colors=colors)
@@ -290,7 +285,6 @@ def main():
     parser.add_argument('-j', '--job', help='job of qcmo|ai|gromacs')
     parser.add_argument('-t', '--title', help='title of figure would be filename')
     parser.add_argument('-xt', '--xtitle', help='X title')
-    parser.add_argument('-xv', '--xvalues', nargs='*', help='X values')
     parser.add_argument('-yt', '--ytitle', help='Y title')
     parser.add_argument('-yl', '--ylabel', nargs='*', help='Y label for legend')
     parser.add_argument('-c', '--colors', nargs='*', help='Y label for legend')
@@ -304,7 +298,7 @@ def main():
     elif args.files:
         ### use twin y-axis
         if args.twinx:
-            draw_twinx(args.files,args.icolumn_x,args.xvalues,args.icolumn_y,args.job,args.title,args.xtitle,args.ytitle,args.ylabel,args.save,args.y_scale,args.colors)
+            draw_twinx(args.files,args.icolumn_x,args.icolumn_y,args.job,args.title,args.xtitle,args.ytitle,args.ylabel,args.save,args.y_scale,args.colors)
         ### user one y-axis
         else:
             draw_f(args.files,args.icolumn_x,args.x_col,args.icolumn_y,args.job,args.title,args.xtitle,args.ytitle,args.ylabel,args.save,args.y_scale, args.colors)

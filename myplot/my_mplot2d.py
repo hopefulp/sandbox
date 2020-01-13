@@ -38,7 +38,8 @@ def my_font(pack):
     return
 
 def common_figure():
-    fig = plt.figure(figsize=(15,10))
+    #fig = plt.figure(figsize=(15,10))
+    fig = plt.figure(figsize=(8,8))
     ax = plt.axes()
     mpl.rcParams.update({'font.size':30})
     ax.tick_params(axis='both', which='major', labelsize=23)
