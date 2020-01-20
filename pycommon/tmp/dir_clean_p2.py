@@ -1,10 +1,10 @@
-#!/home/joonho/anaconda3/bin/python
+#!/usr/bin/python
 
 import argparse
 import os
 import re
 import sys
-from common import *
+from common_p2 import *
 
 q_list=[]
 
@@ -12,7 +12,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
 
     pwd = os.getcwd()
     if len(dirs) > 1:
-        print("use only one directory")
+        print "use only one directory"
         sys.exit(1)
     else:
         d = pwd + '/' + dirs[0]
@@ -46,9 +46,6 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
     elif work == 'pbs':
         matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d']
         f_list = get_files_match(matches, d, Lshowmatch)
-    elif work == 'ai':
-        matches=['amp']
-        f_list = get_files_match(matches, d)
             
 
     f_list.sort()
@@ -58,7 +55,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
         comm = "%s %s" % (linux_job, fname)
         if linux_job == 'mv':
             comm += " %s" % new_dir
-        print(comm)
+        print comm
         q_list.append(comm)
         
     #print "all %s files" % len(f_list)
@@ -70,7 +67,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
             for comm in q_list:
                 os.system(comm)
                 i += 1
-            print("%s files are removed" % i)         
+            print "%s files are removed" % i         
 
     return 0
 
@@ -90,8 +87,8 @@ def main():
     args = parser.parse_args()
 
     if args.work==None and args.prefix==None and args.suffix==None and args.match==None:
-        print("input -w|-p|-s|-m")
-        print("use %s -h for help" % os.path.basename(__file__))
+        print "input -w|-p|-s|-m"
+        print "use %s -h for help" % os.path.basename(__file__)
         sys.exit(0)
     if args.work == 'vasp' and not args.excluded_files:
         args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR']

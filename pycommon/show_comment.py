@@ -34,7 +34,7 @@ def jobs(comment, att, subkey):
 
 def main():
     parser = argparse.ArgumentParser(description="shows dictionary for all: work, system, package  ")
-    parser.add_argument('-m', '--mod', default='general', choices=['general', 'subjects'], help='which branch: general|subject')
+    parser.add_argument('-m', '--mod', default='general', choices=['general', 'subj'], help='which branch: general|subject')
     parser.add_argument('-j', '--job', help='select one attribute')
     parser.add_argument('-k', '--subkey', help='select one key for subkeys')
     args = parser.parse_args()
@@ -50,7 +50,10 @@ def main():
     print(f"  {att}")
 
     if not args.job:
-        print(f"Use -j for attribute: {att}")
+        #print(f"Use -j for attribute: {att}")
+        print(f"Use -j for attribute")
+        if args.mod == 'general':
+            print(f"Use -m subj for 'comment_subj.py' if attribute you find is not here")
     else:
         jobs(my_module, args.job, args.subkey)
 

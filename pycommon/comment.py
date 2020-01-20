@@ -1,6 +1,7 @@
 from common import MyClass
 
-water   = MyClass()
+start   = MyClass()
+
 vasp    = MyClass()
 server  = MyClass()
 server.sge     = MyClass()
@@ -11,46 +12,35 @@ dir_job = MyClass()
 vmd     = MyClass()
 git     = MyClass()
 awk     = MyClass()
-water.order = "===WATER===\
-                \n    ORDER:: calcube makecube pdb2bgf makelmp_in"
-water.calcube =     "\n    CALCULATE CUBE:\
-                    \n\t$ chem_math.py -m H2O -d 1.0 -n 64"
-water.makecube =    "\n    MAKE CUBE:\
-                    \n\t$ packmol < water_n64.inp\
-                    \n\t\tmakes a.pdb\
-                    \n\t\tgopack to see input file"
-water.pdb2bgf =     "\n    PDB to BGF:\
-                    \n\t$ babel -ipdb water_n64.pdb -obgf water_n64.bgf"
-water.modify_bgf = "\n    Modify BGF:\
-                    \n\tinclude pbc(CRYSTX); change FF; change charge\
-                    \n\tNB: pbc FF coord's bond(CONNECT) are important\
-                    \n\tcheck: vmd\
+
+start.order     =   "===START Usage===\
+                    \n    ORDER:: ~/.bashrc backup ~/bin ...\
                     "
-water.makelmp_in = "\n    Make Lammps Input: \
-                    \n\t$ LammpsInput.pl -b water_n64.bgf -f $FF/spcew.ff -s water_n64 -t full\
-                    \n\t\tmakes in.water_n64 data.water_n64\
-                    \n\t\tcp in.water_n64 data.water_n64 water_n64.bgf to lammps_work_dir"
-water.run_lmp =     "\n    RUN Lammps: \
-                    \n\t$ mpirun -n 4 ~/.local/bin/lmp -in in.asps -log water.log\
+start.bashrc    =   "\n    .bashrc\
+                    \n\tturn ON/OFF modules and VM-anaconda\
+                    \n\tenvironment modules: intel lammps vasp qchem and so on\
+                    \n\tswitch on for anaconda activation\
                     "
-water.vmd2poscar =  "\n    VMD to POSCAR:\
-                    \n\tvmd load a.bgf\
-                    \n\tvmd> pbc set { }\
-                    \n\tvmd> pbc box\
-                    \n\tvmd load b.traj on a.bgf (stride for skip)\
-                    \n\tselect one snapshot\
-                    \n\tvmd> pbc wrap; move all atoms into the box\
-                    \n\tvmd save to poscar\
-                    \n\t\t: select only one frame in save panel\
+start.bin       =   "\n    ~/bin\
+                    \n\t$ chi_sys.py\
+                    \n\t$ chi_ini.py\
+                    \n\t$ research_ini.py\
+                    \n\t$ sciwares_ini.py\
                     "
-water.vmdpos2pos =  "\n    VMDPOS to POSCAR: vpos_rearrange.py n64.vmdpos -af water_n64.bgf"
-water.vasp =        "\n    CONTINUE:: go to 'vasp' attribute"
-water.vasp_analysis="\n    ANALYSIS VASP\
-                    \n\tgreT a.out\
-                    \n\t    step T Etot FreeE Epot Ekin SK SP(?)\
-                    \n\tUSE VMD to read OUTCAR\
-                    \n\tUSE ASE to read OUTCAR\
+start.menu      =   "\n     comment.py for all system works\
+                    \n\t$ show_comment.py\
                     "
+start.jobs      =   "\n     comment_subj.py for all jobs\
+                    \n\t$ show_comment.py -m subj\
+                    "
+start.usage     =   "===USAGE of show_comment.py [-h] \
+                    \n    $ show_comment.py -m {default:general}\
+                    \n    $ show_comment.py -m [general|subj]\
+                    \n\tshows all keys\
+                    \n    $ show_comment.py -m [general|subj] -j key\
+                    \n\tshows details of the key\
+                    "
+
 
 vasp.order =        "===VASP Usage===\
                     \n    ORDER:: make_incar make_ini run"
@@ -245,8 +235,9 @@ backup.windows  =   f"\n    Windows10 BACKUP to Linux\
                     \n\t    rsync -avzz --delete {onedrive}/Pictures/    {remote_dir}/win_pic\
                     "
 backup.hard     =   "\n    BACKUP to External hd:\
+                    \n\t$ ~/bin/backup.sh\
                     \n\t    backup script file\
-                    \n\t\t/home/joonho/sandbox_gl/backup_scripts.py\
+                    \n\t\t $SB/backup_scripts.py\
                     \n\t    rsync home\
                     \n\t\trsync -avz --delete /home/joonho/ /run/media/joonho/Seagate\ Backup\ Plus\ Drive/Chi_CentOS/home_joonho\
                     \n\t    rsync share_win\

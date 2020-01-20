@@ -38,11 +38,11 @@ def my_font(pack):
     return
 
 def common_figure():
-    #fig = plt.figure(figsize=(15,10))
-    fig = plt.figure(figsize=(8,8))
+    fig = plt.figure(figsize=(8,6))
+    #fig = plt.figure(figsize=(8,8))
     ax = plt.axes()
-    mpl.rcParams.update({'font.size':30})
-    ax.tick_params(axis='both', which='major', labelsize=23)
+    mpl.rcParams.update({'font.size':10})
+    ax.tick_params(axis='both', which='major', labelsize=10)
     #ax.tick_params(labelsize=25)
 
     custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
@@ -55,15 +55,16 @@ def common_figure():
 
 def common_figure_after():
     plt.legend(loc=2)
-
     return 0
-def draw_dots_two(y, h, title, suptitle,escale=my_chem.ev2kj):
+
+### ddraw_dots_two was upgraded to twinx
+def draw_dots_two(y, h, title, suptitle,escale=1.0,Colors=['r','b','o']):
     '''
     this makes error in serial plotting
     '''
-    fig = plt.figure(figsize=(15,10))
-    ax = plt.axes()
-
+    #fig = plt.figure(figsize=(15,10))
+    #ax = plt.axes()
+    fig, ax = common_figure()
     nlen = len(y)
     h_conv = np.array(h) * escale        # escale = my_chem.ev2kj
     y_conv = np.array(y) * escale
@@ -73,27 +74,39 @@ def draw_dots_two(y, h, title, suptitle,escale=my_chem.ev2kj):
     #max_res = max(diff, key=abs)
     #print("{:10.3f} {:10.3f}".format(rmse,max_res))
     ### input text inside figure
-    text_pos_x = nlen*0.85
+    text_pos_x = nlen*0.85                  # 0.85, 0.2
     text_pos_y = max(y_conv)*0.2
     text="E_rms(test) = {:7.3f}\nE_maxres = {:7.3f}".format(rmse, max_res)
-    plt.text(text_pos_x, text_pos_y,text, fontsize=20)
+    plt.text(0, 0,text, fontsize=10)
 
 
+    if Colors:  color = Colors.pop(0)       #'tab:' + Colors.pop(0)
+    else:       color='tab:green'
     ones = np.zeros((len(y_conv)))
     #my_font('amp')
-    mpl.rcParams.update({'font.size':22})
-    plt.title(title, fontsize=40)
+    #mpl.rcParams.update({'font.size':22})
+    plt.title(title, fontsize=20)
 #    plt.suptitle(suptitle, x=0.5, y=0.92, va='top', fontsize=18)
-    plt.suptitle(suptitle, fontsize=18)
-    plt.ylabel('PE(kJ/mol)', fontsize=20)
-    plt.xlabel('data', fontsize=20)
-    ax.tick_params(axis='both', which='major', labelsize=15)
+    plt.suptitle(suptitle, fontsize=10)
+    if escale == 1.0:
+        ax.set_ylabel('PE(eV)', color='b', fontsize=15)
+    elif escale == my_chem.ev2kj:
+        ax.set_ylabel('PE(kJ/mol)', fontsize=15)
+    plt.xlabel('data', fontsize=15)
+    #ax.tick_params(axis='y', labelsize=10)
+    ax.tick_params(axis='y', labelcolor='b', labelsize=10)
+    #ax.tick_params(axis='both', which='major', labelsize=10)
+    ax2=ax.twinx()
+    ax2.set_ylabel("Difference(eV)", color='g')
+    #ax2.plot(x, ys[1,:], 'o-', color=color)
+    ax2.tick_params(axis='y', labelcolor='g', labelsize=10)
     #plt.scatter(x, y, 'r', x, y_bar, 'b')
-    p1  = plt.scatter(range(nlen), y_conv, c='r', marker='o', label='true value')
-    p2  = plt.scatter(range(nlen), h_conv, c='b', marker='^', label='hypothesis')
-    p3, = plt.plot(range(nlen), diff, label='difference')
+    p1  = ax.scatter(range(nlen), y_conv, c='r', marker='o', label='true value')
+    p2  = ax.scatter(range(nlen), h_conv, c='b', marker='^', label='hypothesis')
+    p3, = ax2.plot(range(nlen), diff, c='g', label='difference')
     plt.plot(range(nlen), ones)
-    plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.0, 0.1))
+    #plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.0, 0.1))
+    plt.legend([p1,p2],['true value', 'hypothesis'],loc=(0.0, 0.1))
     plt.show()
     return rmse, max_res
 def xtitle_font(tit):
@@ -109,7 +122,7 @@ def mplot_twinx(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None
     x:: [] or [size]
     y:: [size] or [[multi],[multi],...size]
     '''
-    fig, ax1 = common_figure()
+    fig, ax = common_figure()
     ys = np.array(y)
     if len(x) != 0:
         xsize = len(x)
@@ -120,17 +133,17 @@ def mplot_twinx(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None
 
     plt.title(Title)
     if Xtitle:
-        plt.xlabel(Xtitle, fontsize=30)
-    plt.ylabel(Ytitle, fontsize=30)
+        plt.xlabel(Xtitle, fontsize=15)
+    plt.ylabel(Ytitle, fontsize=15)
     #ax.xaxis.set_major_locator(plt.NullLocator())
     #print(f"x, y shape:: {np.array(x).shape} {y.shape}")
     if Colors:  color = Colors.pop(0)       #color = 'tab:' + Colors.pop(0)
     else:       color = 'tab:red'
-    ax1.set_ylabel(Ylabels.pop(0), color=color)
-    ax1.plot(x, ys[0,:], 'o-', color=color)
-    ax1.tick_params(axis='y', labelcolor=color)
+    ax.set_ylabel(Ylabels.pop(0), color=color)
+    ax.plot(x, ys[0,:], 'o-', color=color)
+    ax.tick_params(axis='y', labelcolor=color)
 
-    ax2=ax1.twinx()
+    ax2=ax.twinx()
     if Colors:  color = Colors.pop(0)       #'tab:' + Colors.pop(0)
     else:       color='tab:green'
     ax2.set_ylabel(Ylabels.pop(0), color=color)
@@ -146,7 +159,7 @@ def mplot_twinx(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None
     #    print(f"Error:: obscure in y-dim {ys.ndim}")
 
     #plt.legend(loc=2)                   # locate after plot
-    common_figure_after()
+    #common_figure_after()              # legend box location
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)
@@ -179,8 +192,8 @@ def mplot_nvector(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=No
 
     plt.title(Title)
     if Xtitle:
-        plt.xlabel(Xtitle, fontsize=30)
-    plt.ylabel(Ytitle, fontsize=35)
+        plt.xlabel(Xtitle, fontsize=15)
+    plt.ylabel(Ytitle, fontsize=15)
     #ax.xaxis.set_major_locator(plt.NullLocator())
     #print(f"x, y shape:: {np.array(x).shape} {y.shape}")
     if ys.ndim == 1:
@@ -194,7 +207,7 @@ def mplot_nvector(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=No
         print(f"Error:: obscure in y-dim {ys.ndim}")
 
     #plt.legend(loc=2)                   # locate after plot
-    common_figure_after()
+    #common_figure_after()              # comment to remove legend box 
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)

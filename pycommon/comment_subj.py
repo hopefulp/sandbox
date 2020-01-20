@@ -73,11 +73,18 @@ nico2.eda       =   "\n    EDA: Plot gragh\
                     "
 myplot.order    =   "===My PLOT===\
                     \n    ORDER:: mplot_ini amp_md nico2"
-myplot.ini      =   nico2.mpl_ini
+myplot.ini      =   "\n    INITIAL SETTING: refer to nico2.mpl_ini\
+                    \n\tmy_mplot2d.py:\
+                    \n\t    def common_figure():\
+                    \n\t\tfigsize: size of figure\
+                    \n\t\tfont.size: rcParams.update()\
+                    \n\t\ttick_params: labelsize\
+                    \n\t\tcustom_cycler: colors of cyclic order\
+                    "
 myplot.md       =   "\n    MD w. AMP\
                     \n\t$ myplot.py md.ene -x -t MD-Ethylene -yt \"E(eV)\" -xt \"time (10fs)\" \
                     "
-myplot.nico2    =   nico2.myplot
+myplot.nico2    =   "\n    For NiCO2: refer to nico2.myplot"
 
 
 water.order =       "===WATER===\
@@ -113,7 +120,10 @@ water.vmd2poscar =  "\n    VMD to POSCAR:\
                     \n\t\t: select only one frame in save panel\
                     "
 water.vmdpos2pos =  "\n    VMDPOS to POSCAR: vpos_rearrange.py n64.vmdpos -af water_n64.bgf"
-water.vasp =        "\n    CONTINUE:: go to 'vasp' attribute"
+water.vasp      =   "\n    CONTINUE:: go to 'vasp' attribute"
+water.vasp_job  =   "\n    VASP JOB for Water\
+                    \n\trevPBE+D3 RevPBE0+D3\
+                    "
 water.vasp_analysis="\n    ANALYSIS VASP\
                     \n\tgreT a.out\
                     \n\t    step T Etot FreeE Epot Ekin SK SP(?)\
