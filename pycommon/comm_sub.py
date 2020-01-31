@@ -27,8 +27,8 @@ amp.amp_ene     =   "\n    USAGE::\
                     \n\t\trefer to myplot\
                     "
 amp.water       =   "\n    RUN in Chi\
-                    \n\tamp_ene.py OUTCAR tr -nc 4\
-                    \n\tamp_ene.py OUTCAR te -tx\
+                    \n\tamp_ene.py OUTCAR tr -nc 4 -tx -hl 4 4 4 -el 0.0001\
+                    \n\tamp_ene.py OUTCAR te -js all [show all fig] -tx -hl 4 4 4 -el 0.0001\
                     "
 amp.md_anal     =   "\n    MD Analysis\
                     \n\tMD.ene:\

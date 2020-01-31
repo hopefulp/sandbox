@@ -46,7 +46,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
     elif work == 'pbs':
         matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d']
         f_list = get_files_match(matches, d, Lshowmatch)
-    elif work == 'ai':
+    elif work == 'amp':
         matches=['amp']
         f_list = get_files_match(matches, d)
             
@@ -78,7 +78,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
     parser.add_argument('dirs', default='.', nargs='+', help='input work directories')
-    parser.add_argument('-w', '--work', choices=['qchem','ai','vasp','pbs'],help='remove depending on job')
+    parser.add_argument('-w', '--work', choices=['qchem','amp','vasp','pbs'],help='remove depending on job')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')
     parser.add_argument('-m', '--match', nargs='*', help='remove matching file')
@@ -95,7 +95,8 @@ def main():
         sys.exit(0)
     if args.work == 'vasp' and not args.excluded_files:
         args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR']
-            
+    #if args.work == 'amp' and not args.excluded_files:
+    #    args.excluded
     d_clean(args.dirs,args.work,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.mv_dir,args.match_show)
     return 0
 
