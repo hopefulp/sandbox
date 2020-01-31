@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from my_mplot2d import *
+from myplot2D import *
 import my_chem
 from my_arith import rmse
 from my_images import Images
@@ -75,7 +75,7 @@ def run_md(atoms):
         traj.write(atoms)
     f.close()        
 
-def exe_test_images(job, test_images, amp_pes, title, suptitle,ncore, Lgraph,val_id=None,nmol=1):
+def exe_test_images(job, test_images, amp_pes, title, suptitle,ncore, Lgraph,val_id=None,nmol=1,Ltwinx=None):
     try:
         calc = Amp.load(amp_pes)
     except FileNotFoundError:
@@ -94,7 +94,7 @@ def exe_test_images(job, test_images, amp_pes, title, suptitle,ncore, Lgraph,val
         y_bar.append(mol.get_potential_energy()/nmol)
 
     if Lgraph:
-        err, res_max = draw_dots_two(y, y_bar, title, suptitle)
+        err, res_max = draw_dots_two(y, y_bar, title, suptitle,Ltwinx=Ltwinx)
     else:
         h_conv = np.array(y_bar) * escale
         y_conv = np.array(y) * escale
@@ -113,7 +113,7 @@ def f_write(fname, HL, E_conv, err, max_res, job, job_index=None):
             f.write("{}: {:5.3f} {:5.3f}\n".format(job_index,err,max_res))
     return 0            
     
-def amp_jobs(fdata, job, job_s, amp_pes, nsets, HL, E_conv, Lgraph,ival_set,ncore,n_mol):
+def amp_jobs(fdata, job, job_s, amp_pes, nsets, HL, E_conv, Lgraph,ival_set,ncore,n_mol,Ltwinx):
     total_images = ase.io.read(fdata, index=':')    # can read extxyz, OUTCAR, 
     images_sets = Images(total_images, nsets)
     #if not os.path.isfile(amp_pes):
@@ -135,7 +135,7 @@ def amp_jobs(fdata, job, job_s, amp_pes, nsets, HL, E_conv, Lgraph,ival_set,ncor
         images = images_sets.get_test_images()
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
-        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore,)
+        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore,Ltwinx=Ltwinx)
         f_write(fdata, HL, E_conv, rmserr, max_res, job)
     ### only test
     elif re.search("te",job):
@@ -146,7 +146,7 @@ def amp_jobs(fdata, job, job_s, amp_pes, nsets, HL, E_conv, Lgraph,ival_set,ncor
             
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
-        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore,nmol=n_mol)
+        rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore,nmol=n_mol,Ltwinx=Ltwinx)
         f_write(fdata, HL, E_conv, rmserr, max_res, job)
     ### job == validation
     elif re.search("va",job):
@@ -199,6 +199,7 @@ def main():
     parser.add_argument('-nm','--nmol',default=1,type=int,help='num of molecules in the system to normalize error')
     parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     parser.add_argument('-el', '--e_convergence', default=0.001, type=float, help='energy convergence limit')
+    parser.add_argument('-tx', '--twinx', action="store_true", help='turn on to use twinx of two y-axes')
     parser.add_argument('-g', action="store_false", help='if val default is False, otherwise True')
     parser.add_argument('+g', action="store_true", help='if val default is False, otherwise True')
     group_valid = parser.add_argument_group()
@@ -208,7 +209,7 @@ def main():
 
     #if re.search("tr", args.job):
     #    args.g = True
-    amp_jobs(args.fin,args.job,args.job_sub,args.pot,args.nsets,args.hidden_layer,args.e_convergence,args.g,args.index_val_set,args.ncore,args.nmol)
+    amp_jobs(args.fin,args.job,args.job_sub,args.pot,args.nsets,args.hidden_layer,args.e_convergence,args.g,args.index_val_set,args.ncore,args.nmol,args.twinx)
     return
 
 if __name__ == '__main__':

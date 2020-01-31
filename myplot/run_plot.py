@@ -4,8 +4,8 @@ import argparse
 import re
 import sys
 import numpy as np
-from my_mplot2d import mplot_nvector, mplot_twinx
-from plot_job import get_jobtitle, Ni_6x
+from myplot2D import mplot_nvector, mplot_twinx
+#from plot_job import get_jobtitle, Ni_6x
 from my_chem import *
 from common import *
 import parsing 
@@ -146,9 +146,11 @@ def draw_twinx(fs,icx,x_val,icy,job,title,xt,yt,yl,Lsave,yscale,colors):
         y = y_val
     else:
         y = y_2d
-    yscale = get_yv_scale(yscale)           # get_yv_scale returns list
+    #yscale = get_yv_scale(yscale)           # get_yv_scale returns list
+    yscale=[0.01,0.01,1.0]
     y=np.array(y)*np.array(yscale)[:,None]
-    print(f"{x} {y}")
+    print("before draw mplot_twinx")
+    print(f"{x} ")
     if tag_title:
         print(f"title = {title} xt = {xt}")
         mplot_twinx(x, y, Title=title, Xtitle=xt, Ytitle=yt, Lsave=Lsave,Ylabels=yl, Colors=colors)
@@ -159,11 +161,12 @@ def draw_twinx(fs,icx,x_val,icy,job,title,xt,yt,yl,Lsave,yscale,colors):
 
 
 """
-    This works for several files with only one y-value
+    This works for several files with only one y-value and
+    one file with several y-values
     if x is included in file, modify
     if 1st line is label, modify
 """    
-def draw_f(fs,icx,x_col,icy,job,title,xt,yt,yl,Lsave,yscale,colors):
+def draw_f(fs,icx,x_col,icy,job,title,xt,yt,yl,Lsave,yscale,colors,Ltwinx):
     if x_col:
         x=Ni_6x
     else:
@@ -247,14 +250,16 @@ def draw_f(fs,icx,x_col,icy,job,title,xt,yt,yl,Lsave,yscale,colors):
         print(f"shape of y-data {np.array(y).shape}")
     else:
         y = y_2d
-
-    yscale = get_yv_scale(yscale)
-    y=np.array(y)*np.array(yscale)[:,None]
+    ### scaling with 0-th axis: y shape was ready for [y1, y2, ...,yn]
+    ### scaling canbe *|+ for view in plot
+    #yscale = get_yv_scale(yscale)
+    yscale = [4158.65, 4158.65, 0]
+    y=np.array(y)+np.array(yscale)[:,None]
     if tag_title:
         print(f"title = {title} xt = {xt}")
-        mplot_nvector(x, y, Title=title, Xtitle=xt, Ytitle=yt, Lsave=Lsave,Ylabels=yl,Colors=colors)
+        mplot_nvector(x, y, Title=title, Xtitle=xt, Ytitle=yt, Lsave=Lsave,Ylabels=yl,Colors=colors,Ltwinx=Ltwinx)
     else:
-        mplot_nvector(x, y, Title=job_title.title, Xtitle=job_title.xtitle, Ytitle=job_title.ytitle, Lsave=Lsave,Ylabels=yl,Colors=colors)
+        mplot_nvector(x, y, Title=job_title.title, Xtitle=job_title.xtitle, Ytitle=job_title.ytitle, Lsave=Lsave,Ylabels=yl,Colors=colors,Ltwinx=Ltwinx)
     return 0
 
 def draw_v(y_val, job, title, xtitle, ytitle, Lsave,yscale):
@@ -303,11 +308,11 @@ def main():
     ### use input files
     elif args.files:
         ### use twin y-axis
-        if args.twinx:
-            draw_twinx(args.files,args.icolumn_x,args.xvalues,args.icolumn_y,args.job,args.title,args.xtitle,args.ytitle,args.ylabel,args.save,args.y_scale,args.colors)
+        #if args.twinx:
+        #    draw_twinx(args.files,args.icolumn_x,args.xvalues,args.icolumn_y,args.job,args.title,args.xtitle,args.ytitle,args.ylabel,args.save,args.y_scale,args.colors)
         ### user one y-axis
-        else:
-            draw_f(args.files,args.icolumn_x,args.x_col,args.icolumn_y,args.job,args.title,args.xtitle,args.ytitle,args.ylabel,args.save,args.y_scale, args.colors)
+        #else:
+        draw_f(args.files,args.icolumn_x,args.x_col,args.icolumn_y,args.job,args.title,args.xtitle,args.ytitle,args.ylabel,args.save,args.y_scale, args.colors, args.twinx)
             #draw_1file(args.files[0],args.icolumn_x,args.icolumn_y,args.title,args.xtitle,args.ytitle,args.save)
     else:
         print("Error:: Turn on -v for values or -f files")

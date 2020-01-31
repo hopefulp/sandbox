@@ -4,8 +4,107 @@ water   = MyClass()
 qcmo    = MyClass()
 nico2   = MyClass()
 myplot  = MyClass()
+amp     = MyClass()
 #server.sge     = MyClass()
 
+amp.order       =   "=== AMP ===\
+                    \n    ORDER:: amp_ene.py\
+                    "
+amp.amp_ene     =   "\n    USAGE::\
+                    \n\tamp_ene.py input_file job=['tr','te','pr','va']\
+                    \n\t    Input_file : extxyz, OUTCAR w. coord and PE\
+                    \n\t    Job        : one of training, test, profile, validation\
+                    \n\t\ttraining uses 4/5 parts\
+                    \n\t\ttest uses 5th/5 part\
+                    \n\t\tprofile draws all PE\
+                    \n\t    More Options:\
+                    \n\t\t-nc N for number of core for parallel calculation\
+                    \n\t\t-tx for use twinx for plot\
+                    \n\t    import myplot2D for plot:\
+                    \n\t\tdef draw_dots_two:\
+                    \n\t\t   option single y-axis|twinx\
+                    \n\t\t   modify color option\
+                    \n\t\trefer to myplot\
+                    "
+amp.water       =   "\n    RUN in Chi\
+                    \n\tamp_ene.py OUTCAR tr -nc 4\
+                    \n\tamp_ene.py OUTCAR te -tx\
+                    "
+amp.md_anal     =   "\n    MD Analysis\
+                    \n\tMD.ene:\
+                    \n\t    1st line: \"time    Etot    Epot    Ekin\"\
+                    \n\tUsage:\
+                    \n\t    $ myplot.py md.ene -x -t MD-Ethylene -yt \"E(eV)\" -xt \"time (10fs)\"\
+                    "
+                    #\n\t\t    import myplot_default\
+
+myplot.order    =   "===My PLOT===\
+                    \n    ORDER:: mplot_start amp_md nico2"
+myplot.start    =   "\n    INITIAL SETTING: refer to nico2.mpl_ini\
+                    \n\tmyplot_default: moved from myplot2D.py def common_figure():\
+                    "
+myplot.ini      =   "\n    DEFAULT\
+                    \n\tmyplot_default.py\
+                    \n\t    figsize: size of figure\
+                    \n\t    font.size: rcParams.update()\
+                    \n\t    tick_params: labelsize\
+                    \n\t    custom_cycler: colors of cyclic order\
+                    \n\t    position of text\
+                    \n\t\tsingle y-axis: text_x, text_y\
+                    \n\t\ttwinx: text_twinx_x, text_twinx_y\
+                    "
+myplot.md       =   "\n    MD w. AMP\
+                    \n\t$ run_plot.py md.ene -x -t MD-Ethylene -yt \"E(eV)\" -xt \"time (10fs)\" \
+                    "
+myplot.nico2    =   "\n    For NiCO2: refer to nico2.myplot"
+
+
+water.order =       "===WATER===\
+                    \n    ORDER:: calcube makecube pdb2bgf makelmp_in"
+water.calcube =     "\n    CALCULATE CUBE:\
+                    \n\t$ chem_math.py -m H2O -d 1.0 -n 64"
+water.makecube =    "\n    MAKE CUBE:\
+                    \n\t$ packmol < water_n64.inp\
+                    \n\t\tmakes a.pdb\
+                    \n\t\tgopack to see input file"
+water.pdb2bgf =     "\n    PDB to BGF:\
+                    \n\t$ babel -ipdb water_n64.pdb -obgf water_n64.bgf"
+water.modify_bgf = "\n    Modify BGF:\
+                    \n\tinclude pbc(CRYSTX); change FF; change charge\
+                    \n\tNB: pbc FF coord's bond(CONNECT) are important\
+                    \n\tcheck: vmd\
+                    "
+water.makelmp_in = "\n    Make Lammps Input: \
+                    \n\t$ LammpsInput.pl -b water_n64.bgf -f $FF/spcew.ff -s water_n64 -t full\
+                    \n\t\tmakes in.water_n64 data.water_n64\
+                    \n\t\tcp in.water_n64 data.water_n64 water_n64.bgf to lammps_work_dir"
+water.run_lmp =     "\n    RUN Lammps: \
+                    \n\t$ mpirun -n 4 ~/.local/bin/lmp -in in.asps -log water.log\
+                    "
+water.vmd2poscar =  "\n    VMD to POSCAR:\
+                    \n\tvmd load a.bgf\
+                    \n\tvmd> pbc set { }\
+                    \n\tvmd> pbc box\
+                    \n\tvmd load b.traj on a.bgf (stride for skip)\
+                    \n\tselect one snapshot\
+                    \n\tvmd> pbc wrap; move all atoms into the box\
+                    \n\tvmd save to poscar\
+                    \n\t\t: select only one frame in save panel\
+                    "
+water.vmdpos2pos =  "\n    VMDPOS to POSCAR: vpos_rearrange.py n64.vmdpos -af water_n64.bgf"
+water.vasp      =   "\n    CONTINUE:: go to 'vasp' attribute"
+water.vasp_job  =   "\n    VASP JOB for Water\
+                    \n\trevPBE+D3 RevPBE0+D3\
+                    "
+water.vasp_analysis="\n    ANALYSIS VASP\
+                    \n\tgreT a.out\
+                    \n\t    step T Etot FreeE Epot Ekin SK SP(?)\
+                    \n\tUSE VMD to read OUTCAR\
+                    \n\tUSE ASE to read OUTCAR\
+                    "
+
+
+########### PAST WORK ##########################################################################################
 qcmo.order      =   "===QCMO===\
                     \n    ORDER:: mplot_mo      "
 qcmo.mplot_mo   =   "\n    Plot MO using Q-Chem output (job = sp)::\
@@ -71,62 +170,8 @@ nico2.eda       =   "\n    EDA: Plot gragh\
                     \n\t$ myplot.py -f chg-nbo.dat BE.dat -ys -1 j- -yl 'NAO Charge of CO2 (e$^-$)' 'BE (kcal/mol)' -tx -c r darkcyan\
                     \n\t$ myplot.py -f CTene.dat scf.dat -ys 'j-' 'j-' -yl 'CT (kcal/mol)' 'SCF (kcal/mol)' -tx -c red blue\
                     "
-myplot.order    =   "===My PLOT===\
-                    \n    ORDER:: mplot_ini amp_md nico2"
-myplot.ini      =   "\n    INITIAL SETTING: refer to nico2.mpl_ini\
-                    \n\tmy_mplot2d.py:\
-                    \n\t    def common_figure():\
-                    \n\t\tfigsize: size of figure\
-                    \n\t\tfont.size: rcParams.update()\
-                    \n\t\ttick_params: labelsize\
-                    \n\t\tcustom_cycler: colors of cyclic order\
-                    "
-myplot.md       =   "\n    MD w. AMP\
-                    \n\t$ myplot.py md.ene -x -t MD-Ethylene -yt \"E(eV)\" -xt \"time (10fs)\" \
-                    "
-myplot.nico2    =   "\n    For NiCO2: refer to nico2.myplot"
 
 
-water.order =       "===WATER===\
-                    \n    ORDER:: calcube makecube pdb2bgf makelmp_in"
-water.calcube =     "\n    CALCULATE CUBE:\
-                    \n\t$ chem_math.py -m H2O -d 1.0 -n 64"
-water.makecube =    "\n    MAKE CUBE:\
-                    \n\t$ packmol < water_n64.inp\
-                    \n\t\tmakes a.pdb\
-                    \n\t\tgopack to see input file"
-water.pdb2bgf =     "\n    PDB to BGF:\
-                    \n\t$ babel -ipdb water_n64.pdb -obgf water_n64.bgf"
-water.modify_bgf = "\n    Modify BGF:\
-                    \n\tinclude pbc(CRYSTX); change FF; change charge\
-                    \n\tNB: pbc FF coord's bond(CONNECT) are important\
-                    \n\tcheck: vmd\
-                    "
-water.makelmp_in = "\n    Make Lammps Input: \
-                    \n\t$ LammpsInput.pl -b water_n64.bgf -f $FF/spcew.ff -s water_n64 -t full\
-                    \n\t\tmakes in.water_n64 data.water_n64\
-                    \n\t\tcp in.water_n64 data.water_n64 water_n64.bgf to lammps_work_dir"
-water.run_lmp =     "\n    RUN Lammps: \
-                    \n\t$ mpirun -n 4 ~/.local/bin/lmp -in in.asps -log water.log\
-                    "
-water.vmd2poscar =  "\n    VMD to POSCAR:\
-                    \n\tvmd load a.bgf\
-                    \n\tvmd> pbc set { }\
-                    \n\tvmd> pbc box\
-                    \n\tvmd load b.traj on a.bgf (stride for skip)\
-                    \n\tselect one snapshot\
-                    \n\tvmd> pbc wrap; move all atoms into the box\
-                    \n\tvmd save to poscar\
-                    \n\t\t: select only one frame in save panel\
-                    "
-water.vmdpos2pos =  "\n    VMDPOS to POSCAR: vpos_rearrange.py n64.vmdpos -af water_n64.bgf"
-water.vasp      =   "\n    CONTINUE:: go to 'vasp' attribute"
-water.vasp_job  =   "\n    VASP JOB for Water\
-                    \n\trevPBE+D3 RevPBE0+D3\
-                    "
-water.vasp_analysis="\n    ANALYSIS VASP\
-                    \n\tgreT a.out\
-                    \n\t    step T Etot FreeE Epot Ekin SK SP(?)\
-                    \n\tUSE VMD to read OUTCAR\
-                    \n\tUSE ASE to read OUTCAR\
-                    "
+
+
+

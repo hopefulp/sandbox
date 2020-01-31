@@ -10,21 +10,20 @@ from cycler import cycler
 import sys
 import my_chem 
 import numpy as np
+from myplot_default import *
 
-### do not open figure here
-#fig = plt.figure(figsize=(15,10))
-#ax = plt.axes()
+### functions
+#   my_font
+#   common_figure: will be moved to myplot_default and deleted
+#   common_figure_after: needed after plt.plot()
+#   draw_dots_two: option: twinx
+#   xtitle_font
+#   mplot_twinx
+#   mplot_nvector
+#   draw_histogram
+#
 
-#ax = plt.subplot(111)
-#ax = fig.gca()
 
-### font size
-#font = {'size': 15}
-
-#mpl.rcParams['legend.fontsize'] = 10
-#mpl.rc('font', **font)
-#font_size=15
-#mpl.rcParams.update({'font.size':22})
 
 def my_font(pack):
     if pack == 'amp':
@@ -36,12 +35,11 @@ def my_font(pack):
         sys.exit(0)
     mpl.rc('font', **font)
     return
-
+### choice between "import myplot_default"|call common_figure
 def common_figure():
     fig = plt.figure(figsize=(8,6))
-    #fig = plt.figure(figsize=(8,8))
-    ax = plt.axes()
     mpl.rcParams.update({'font.size':10})
+    ax = plt.axes()
     ax.tick_params(axis='both', which='major', labelsize=10)
     #ax.tick_params(labelsize=25)
 
@@ -58,13 +56,11 @@ def common_figure_after():
     return 0
 
 ### ddraw_dots_two was upgraded to twinx
-def draw_dots_two(y, h, title, suptitle,escale=1.0,Colors=['r','b','o']):
+def draw_dots_two(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b','o']):
     '''
     this makes error in serial plotting
     '''
-    #fig = plt.figure(figsize=(15,10))
-    #ax = plt.axes()
-    fig, ax = common_figure()
+    #fig, ax = common_figure()
     nlen = len(y)
     h_conv = np.array(h) * escale        # escale = my_chem.ev2kj
     y_conv = np.array(y) * escale
@@ -77,8 +73,6 @@ def draw_dots_two(y, h, title, suptitle,escale=1.0,Colors=['r','b','o']):
     text_pos_x = nlen*0.85                  # 0.85, 0.2
     text_pos_y = max(y_conv)*0.2
     text="E_rms(test) = {:7.3f}\nE_maxres = {:7.3f}".format(rmse, max_res)
-    plt.text(0, 0,text, fontsize=10)
-
 
     if Colors:  color = Colors.pop(0)       #'tab:' + Colors.pop(0)
     else:       color='tab:green'
@@ -96,17 +90,24 @@ def draw_dots_two(y, h, title, suptitle,escale=1.0,Colors=['r','b','o']):
     #ax.tick_params(axis='y', labelsize=10)
     ax.tick_params(axis='y', labelcolor='b', labelsize=10)
     #ax.tick_params(axis='both', which='major', labelsize=10)
-    ax2=ax.twinx()
-    ax2.set_ylabel("Difference(eV)", color='g')
-    #ax2.plot(x, ys[1,:], 'o-', color=color)
-    ax2.tick_params(axis='y', labelcolor='g', labelsize=10)
+    if Ltwinx:
+        ax2=ax.twinx()
+        ax2.set_ylabel("Difference(eV)", color='g')
+        #ax2.plot(x, ys[1,:], 'o-', color=color)
+        ax2.tick_params(axis='y', labelcolor='g', labelsize=10)
     #plt.scatter(x, y, 'r', x, y_bar, 'b')
     p1  = ax.scatter(range(nlen), y_conv, c='r', marker='o', label='true value')
     p2  = ax.scatter(range(nlen), h_conv, c='b', marker='^', label='hypothesis')
-    p3, = ax2.plot(range(nlen), diff, c='g', label='difference')
+    if Ltwinx:
+        p3, = ax2.plot(range(nlen), diff, c='g', label='difference')
+        plt.legend([p1,p2],['true value', 'hypothesis'],loc=(0.0, 0.1))
+        plt.text(text_twinx_x, text_twinx_y, text, fontsize=10, transform=ax.transAxes)
+    else:
+        p3, = plt.plot(range(nlen), diff, c='g', label='difference')
+        plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.0, 0.1))
+        plt.text(text_x, text_y, text, fontsize=10, transform=ax.transAxes)
     plt.plot(range(nlen), ones)
-    #plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.0, 0.1))
-    plt.legend([p1,p2],['true value', 'hypothesis'],loc=(0.0, 0.1))
+
     plt.show()
     return rmse, max_res
 def xtitle_font(tit):
@@ -165,16 +166,17 @@ def mplot_twinx(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None
         plt.savefig(figname, dpi=150)
     return 0
 
-
-
-
-def mplot_nvector(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None):
+def mplot_nvector(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None, Ltwinx=None):
     '''
     call with x=[] and y=[ [...
     x:: [] or [size]
     y:: [size] or [[multi],[multi],...size]
     '''
-    fig, ax = common_figure()
+    if Ltwinx:
+        ax2 = ax.twinx()
+        ax2.set_ylabel("Kinetic energy(kJ/mol)")
+        ax2.tick_params(axis='y', labelcolor='g', labelsize=10)
+
     ys = np.array(y)
     if len(x) != 0:
         xsize = len(x)
@@ -182,7 +184,7 @@ def mplot_nvector(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=No
         xsize = ys.shape[0]
         x=range(xsize)
     #print("hmm: {}".format(xsize))
-    print(f"{x}-{ys}")
+    print(f"{x} :: {ys}")
     #plt.xticks(np.arange(min(x), max(x)+1, int(max(x)/dx)))
     #plt.xticks(np.arange(min(x), max(x)+1))
     #if tag=='x-sub':
@@ -205,9 +207,9 @@ def mplot_nvector(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=No
             plt.plot(x,ys[i,:], label=Ylabels[i] )
     else:
         print(f"Error:: obscure in y-dim {ys.ndim}")
-
-    #plt.legend(loc=2)                   # locate after plot
-    #common_figure_after()              # comment to remove legend box 
+    ### ADD LEGEND
+    plt.legend(loc=2)                   # locate after plot
+    common_figure_after()              # comment to remove legend box 
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)

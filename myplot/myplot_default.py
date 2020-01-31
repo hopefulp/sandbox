@@ -1,10 +1,24 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from cycler import cycler
+### to use below: from myplot_default import *
 
-mpl.rcParams["figure.figsize"] = (15, 10)
-mpl.rcParams.update({'font.size':30})           # 22
+### setting:: 2020.1.20 after system update, for AMP
 
+mpl.rcParams["figure.figsize"] = (8,6)          
+mpl.rcParams.update({'font.size':10})           
 
+fig = plt.figure()
+ax = plt.axes()
+ax.tick_params(axis='both', which='major', labelsize=10)
+
+custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))
+ax.set_prop_cycle(custom_cycler)
+
+text_x = 0.75
+text_y = 0.8
+text_twinx_x = 0.5
+text_twinx_y = 0.9
 
 #plt.title('AMP model error test-set')
 #plt.ylabel('PE(kJ/mol)', fontsize=20)
