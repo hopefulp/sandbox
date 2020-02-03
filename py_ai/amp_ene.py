@@ -113,7 +113,7 @@ def f_write(fname, HL, E_conv, err, max_res, job, job_index=None):
             f.write("{}: {:5.3f} {:5.3f}\n".format(job_index,err,max_res))
     return 0            
     
-def amp_jobs(fdata, job, job_s, amp_pes, nsets, HL, E_conv, Lgraph,ival_set,ncore,n_mol,Ltwinx):
+def amp_jobs(fdata, job, Lall_fig, amp_pes, nsets, HL, E_conv, Lgraph,ival_set,ncore,n_mol,Ltwinx):
     total_images = ase.io.read(fdata, index=':')    # can read extxyz, OUTCAR, 
     images_sets = Images(total_images, nsets)
     #if not os.path.isfile(amp_pes):
@@ -139,10 +139,10 @@ def amp_jobs(fdata, job, job_s, amp_pes, nsets, HL, E_conv, Lgraph,ival_set,ncor
         f_write(fdata, HL, E_conv, rmserr, max_res, job)
     ### only test
     elif re.search("te",job):
-        if job_s == None:
-            images = images_sets.get_test_images()
-        elif job_s == 'all':
+        if Lall_fig:
             images = total_images
+        else:
+            images = images_sets.get_test_images()
             
         title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
@@ -193,7 +193,7 @@ def main():
     parser = argparse.ArgumentParser(description='run amp with extxyz ', prefix_chars='-+/')
     parser.add_argument('fin', help='ASE readible file: extxyz, OUTCAR(VASP) ')
     parser.add_argument('job', default='tr', help='job option:"train","test","md","validation","profile"')
-    parser.add_argument('-js', '--job_sub', help='in case job==te, it can include all data for plot with -js all')
+    parser.add_argument('-a', '--all_fig', action="store_true", help='if job==te, include all figures')
     parser.add_argument('-p', '--pot', default="amp.amp", help="input amp potential")
     parser.add_argument('-n','--nsets',default=5,type=int,help='num of sets:1 train all sets, otherwise, last set is for test')
     parser.add_argument('-nm','--nmol',default=1,type=int,help='num of molecules in the system to normalize error')
@@ -209,7 +209,7 @@ def main():
 
     #if re.search("tr", args.job):
     #    args.g = True
-    amp_jobs(args.fin,args.job,args.job_sub,args.pot,args.nsets,args.hidden_layer,args.e_convergence,args.g,args.index_val_set,args.ncore,args.nmol,args.twinx)
+    amp_jobs(args.fin,args.job,args.all_fig,args.pot,args.nsets,args.hidden_layer,args.e_convergence,args.g,args.index_val_set,args.ncore,args.nmol,args.twinx)
     return
 
 if __name__ == '__main__':
