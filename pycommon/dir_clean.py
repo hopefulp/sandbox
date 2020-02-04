@@ -77,7 +77,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
 
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
-    parser.add_argument('dirs', default='.', nargs='+', help='input work directories')
+    parser.add_argument('dirs', default='.', nargs='*', help='input work directories')
     parser.add_argument('-w', '--work', choices=['qchem','amp','vasp','pbs'],help='remove depending on job')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')
