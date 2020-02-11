@@ -26,10 +26,31 @@ amp.amp_ene     =   "\n    USAGE::\
                     \n\t\t   modify color option\
                     \n\t\trefer to myplot\
                     "
-amp.water       =   "\n    RUN in Chi\
+amp.water       =   "\n    CHI\
                     \n\tamp_ene.py OUTCAR tr -tx -nc 4 -hl 4 4 4 -el 0.0001\
                     \n\tamp_ene.py OUTCAR te -a -tx -hl 4 4 4 -el 0.0001\
                     \n\t    : -a [show all fig] \
+                    \n    MLET\
+                    \n\tFor plot error\
+                    \n\t    do not queue-submit matplotlib\
+                    \n\tTraining:\
+                    \n\t    $ qsub -pe numa 12 $SGE_HOME/sge_amp.csh\
+                    \n\t    SCAN in pbs script for consecutive work\
+                    \n\t\t$ qsub -N reD3 -pe numa 12 -v fname=OUTCAR -v pyjob=tr -v nc=12 $SGE_HOME/sge_amp.csh\
+                    \n\t\t$ qsub -N reD3 -pe numa 12 -v fname=OUTCAR -v pyjob=tr -v nc=12 -v scan=scan $SGE_HOME/sge_amp.csh\
+                    \n\t\t    sge_amp.sh\
+                    \n\t\t\t$PYTHON $EXE $fname $pyjob -nc $nc -hl 4 4 4 -el 0.0001 -g\
+                    \n\t    SCAN and submit with many qsub\
+                    \n\t\t$ sge_amp_scan.py -hl 3 3 3 -nc 12\
+                    \n\tPlot:\
+                    \n\t    $ amp_ene.py OUTCAR te -a -tx -hl 5 5 5 -el 0.0001 (-Y master node)\
+                    \n\tRUN:\
+                    \n\t    $ qsub_server.py -s amp -d dirname\
+                    \n\t\t: -d dirname == qsub jobname\
+                    \n\t\t: print\
+                    \n\t\t$ qsub -N reD3 -pe numa 16 -v fname=OUTCAR -v nc=16 -v py_job=tr $SB/pypbs/sge_amp.csh\
+                    \n\t\t    sge_amp.csh\
+                    \n\t\t\t$PYTHON $EXE $fname $py_job -n $np -hl 4 4 4 -el 0.001 -g\
                     "
 amp.md_anal     =   "\n    MD Analysis\
                     \n\tMD.ene:\

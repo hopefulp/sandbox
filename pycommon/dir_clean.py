@@ -48,7 +48,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
         f_list = get_files_match(matches, d, Lshowmatch)
     elif work == 'amp':
         matches=['amp']
-        f_list = get_files_match(matches, d)
+        f_list = get_files_match(matches, d, Lshowmatch)
             
 
     f_list.sort()
@@ -70,7 +70,11 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
             for comm in q_list:
                 os.system(comm)
                 i += 1
-            print("%s files are removed" % i)         
+            if linux_job == 'rm':
+                job_str = 'removed'
+            elif linux_job == 'mv':
+                job_str = 'moved'
+            print(f"{i} files will be {job_str}")         
 
     return 0
 

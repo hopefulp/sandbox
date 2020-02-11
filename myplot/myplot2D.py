@@ -11,6 +11,7 @@ import sys
 import my_chem 
 import numpy as np
 from myplot_default import *
+#plt.switch_backend('agg')
 
 ### functions
 #   my_font

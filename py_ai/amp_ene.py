@@ -9,16 +9,12 @@ from amp.model.neuralnetwork import NeuralNetwork
 from amp.model import LossFunction
 
 import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-
-from myplot2D import *
+#from myplot2D import *    $ for mlet 
 import my_chem
 from my_arith import rmse
 from my_images import Images
 import re
 import sys
-
 
 def get_title(job, fname, HL, E_conv, ntotal, ndata):
     title = fname.split(".")[0] + "\n"
@@ -94,7 +90,10 @@ def exe_test_images(job, test_images, amp_pes, title, suptitle,ncore, Lgraph,val
         y_bar.append(mol.get_potential_energy()/nmol)
 
     if Lgraph:
-        err, res_max = draw_dots_two(y, y_bar, title, suptitle,Ltwinx=Ltwinx)
+        modulename='myplot2D'   # for mlet
+        if modulename not in sys.modules:
+            import myplot2D
+        err, res_max = myplot2D.draw_dots_two(y, y_bar, title, suptitle,Ltwinx=Ltwinx)
     else:
         h_conv = np.array(y_bar) * escale
         y_conv = np.array(y) * escale
@@ -181,7 +180,10 @@ def amp_jobs(fdata, job, Lall_fig, amp_pes, nsets, HL, E_conv, Lgraph,ival_set,n
                     pot = atoms.get_potential_energy()
                     x_draw.append(n)
                     y_draw.append(pot)
-                mplot_vector_two(x_draw,y_draw, Title="Extracted Training Set %d" % i, Xtitle="serial number", Ytitle="Epot")
+                modulename='myplot2D'   # for mlet
+                if modulename not in sys.modules:
+                    import myplot2D
+                myplot2D.mplot_vector_two(x_draw,y_draw, Title="Extracted Training Set %d" % i, Xtitle="serial number", Ytitle="Epot")
 
     elif re.search('md',job):
         # use first geometry 

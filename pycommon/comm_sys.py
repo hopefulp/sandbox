@@ -75,8 +75,17 @@ vasp.make_2ndDir =  "\n    MAKE VASP Dir from Dir\
 vasp.run =          "\n    MPIRUN VASP:\
                     \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
 
-server.sge.vasp =          "===SGE: MLET===\
-                    \n    VASP::\
+server.sge.plot =   "=== MLET (SGE) ===\
+                    \n  --PLOT Figure\
+                    \n\t$ ssh -Y mlet (in login)\
+                    \n\t    for drawing in master node\
+                    \n\t    not qsub job including plot (matplotlib)\
+                    \n  --MORE Comment\
+                    \n\t$ comment.py -s -j {'amp', etc}\
+                    \n  --Running Job\
+                    \n\t$ qsub_server.py sge -s {amp, vasp, etc}\
+                    "
+server.sge.vasp =   "\n    VASP::\
                     \n\tqsub -N pe500 -pe numa 16 -v np=16 -v dir=pe500 $SB/pypbs/sge_vasp.csh\
                     \n\t    -pe numa: take charge the number of process\
                     \n\tOr Use PBS command\

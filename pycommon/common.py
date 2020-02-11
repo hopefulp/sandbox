@@ -73,6 +73,10 @@ def yes_or_no(question):
     else:
         return False
 
+def list2str(li):
+    st = "".join(str(x) for x in li)
+    return st
+
 def get_answers(question):
     reply = str(input(question)).strip()
     #print reply
@@ -165,15 +169,17 @@ def get_files_suffix(suffixes, dname):
                 matched_files.append(fname)
     return matched_files                
 
-def get_files_match(matches, dname):
+def get_files_match(matches, dname, Lshow):
     """
-        (not checked) receive list of patterns for match
+        receive list of patterns for match
         matches: list of match
     """
     matched_files=[]
     for match in matches:
         for fname in os.listdir(dname):
             if re.search(match, fname) and not os.path.isdir(fname):
+                if Lshow:
+                    print("detect {fname}")
                 matched_files.append(fname)
     return matched_files
 

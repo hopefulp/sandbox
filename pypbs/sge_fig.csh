@@ -8,7 +8,7 @@
 
 if ( ! $?fname || ! $?pyjob ) then
     echo "variable fname, pyjob is not defined"
-    echo "use:: qsub -N jobname -pe numa $nc -v fname=a.extxyz(OUTCAR) -v pyjob=tr -v nc=$nc $SB/pypbs/sge_amp.sh"
+    echo "use:: qsub -N jobname -pe numa $np -v fname=a.extxyz(OUTCAR) -v pyjob=tr -v np=$np $SB/pypbs/sge_amp.sh"
     exit(1)
 endif    
 
@@ -18,12 +18,8 @@ setenv PYTHONPATH $sandbox/pycommon:$sandbox/myplot:$sandbox/acpype:$sandbox/py_
 set PYTHON = "$HOME/anaconda3/bin/python"
 set EXE = "$sandbox/py_ai/amp_ene.py"
 
-### $EXE is not working 
 if ( ! $?scan ) then
-    #$PYTHON $EXE $fname $pyjob -nc $nc -hl 7 7 7 -el 0.0001 -g
-    $PYTHON $EXE $fname $pyjob -nc $nc -hl $hl -el $el -g
-    #$PYTHON $EXE OUTCAR tr -nc 12 -hl 4 4 4 -el 0.0001 -g
-### scan and consecutive work in 1 qsub
+    $PYTHON $EXE $fname $pyjob -tx -nc $np -hl 4 4 4 -el 0.0001 -g
 else
     foreach i (`seq 2 2 10`)
         echo $i >> a.log
