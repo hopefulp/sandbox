@@ -103,6 +103,16 @@ server.sge.vasp =   "\n    VASP::\
                     \n\tIN CASE hybrid functional job, it might be killed in 8 hr\
                     \n\t    get node by sleep 'sge.sleep', run at node\
                     "
+server.sge.qchem =  "\n    Q-Chem::\
+                    \n\tSetup: .bashrc\
+                    \n\t    INTEL: source $INTEL/parallel_studio_xe_2019.3.062/bin/psxevars.sh intel64\
+                    \n\t    Qchem: source $QC/bin/qchem.setup.sh\
+                    \n\t\t$QCAUX = $QCAUX/basis, ~/sciwares/basis for ver5.0 \
+                    \n\tRun\
+                    \n\t    qsub_server.py sge qchem -d CO2M06 -j CO2M06 -n 16\
+                    \n\t$ qsub -N NiCO2 -pe numa 16 -v np=16 -v qcjob=a(.in) $SB/pypbs/sge_qchem.csh\
+                    \n\t$ qsub -N jobname -pe numa np  -v np=np -v qcjob=a(.in) [-v iqc=5.1p -v save=ok]  $SB/sge_qchem.csh\
+                    "
 server.sge.sleep   =       "\n    SLEEP::\
                     \n\t$ qsub_server.py sge -s sleep -n 36\
                     \n\t    qsub -pe numa 36 $SB/pypbs/sge_sleep.csh\
