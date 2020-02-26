@@ -3,6 +3,7 @@ from common import MyClass
 start   = MyClass()
 
 vasp    = MyClass()
+qchem   = MyClass()
 server  = MyClass()
 server.sge     = MyClass()
 server.pbs     = MyClass()
@@ -74,6 +75,13 @@ vasp.make_2ndDir =  "\n    MAKE VASP Dir from Dir\
                     "
 vasp.run =          "\n    MPIRUN VASP:\
                     \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
+
+qchem.run =         "=== Q-Chem ===\
+                    \n    CHI::\
+                    \n\tsetup .bashrc\
+                    \n\t(parallel) $ mpirun -np 4 $QC/exe/qcprog a.in $QCSCRATCH/savename > a.out\
+                    \n\t\tmakes 4 scratch folder in $QCSCRATCH\
+                    "
 
 server.sge.plot =   "=== MLET (SGE) ===\
                     \n  --PLOT Figure\

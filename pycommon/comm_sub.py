@@ -2,6 +2,7 @@ from common import MyClass
 
 water   = MyClass()
 qcmo    = MyClass()
+qchem   = MyClass()
 nico2   = MyClass()
 myplot  = MyClass()
 amp     = MyClass()
@@ -124,6 +125,15 @@ water.vasp_analysis="\n    ANALYSIS VASP\
                     \n\tUSE VMD to read OUTCAR\
                     \n\tUSE ASE to read OUTCAR\
                     "
+qchem.TM        =   "=== Q-Chem ===\
+                    \n    TM: transition metal\
+                    \n\tbasis: triple zeta: def2-TZVP, triple zeta valance shell with polarization\
+                    \n\tdispersion: Exchange B3LYP\
+                    \n\t\t    DFT_D   EMPIRICAL_GRIMME3 \
+                    \n\t          : Method wB97X-D3\
+                    \n\tUNRESTRICTED    true\
+                    "
+
 
 
 ########### PAST WORK ##########################################################################################
