@@ -3,11 +3,11 @@ from common import MyClass
 start   = MyClass()
 
 vasp    = MyClass()
-qchem   = MyClass()
 server  = MyClass()
-server.sge     = MyClass()
-server.pbs     = MyClass()
-server.ssh     = MyClass()
+server.sge  = MyClass()
+server.chi  = MyClass()
+server.pbs  = MyClass()
+server.ssh  = MyClass()
 backup  = MyClass()
 dir_job = MyClass()
 vmd     = MyClass()
@@ -76,11 +76,19 @@ vasp.make_2ndDir =  "\n    MAKE VASP Dir from Dir\
 vasp.run =          "\n    MPIRUN VASP:\
                     \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
 
-qchem.run =         "=== Q-Chem ===\
-                    \n    CHI::\
+server.chi =         "=== CHI (HOME) ===\
+                    \n    Q-Chem::\
                     \n\tsetup .bashrc\
-                    \n\t(parallel) $ mpirun -np 4 $QC/exe/qcprog a.in $QCSCRATCH/savename > a.out\
-                    \n\t\tmakes 4 scratch folder in $QCSCRATCH\
+                    \n\t    activate: INTEL\
+                    \n\t\tsource ...\
+                    \n\t\t\tQ-Chem\
+                    \n\t\tsource $QC/bin/...\
+                    \n\t$ qchem -np 2 CO2blyp.in CO2blyp.out\
+                    \n\t    parallel, but serial run\
+                    \n\t$ mpirun -np 4 $QC/exe/qcprog.exe a.in $QCSCRATCH/savename > a.out\
+                    \n\t    parallel running with error message\
+                    \n\t    check with more number of atoms than nprocess\
+                    \n\t    makes 4 scratch folder in $QCSCRATCH\
                     "
 
 server.sge.plot =   "=== MLET (SGE) ===\
