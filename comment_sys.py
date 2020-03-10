@@ -4,9 +4,10 @@ start   = MyClass()
 
 vasp    = MyClass()
 server  = MyClass()
-server.sge     = MyClass()
-server.pbs     = MyClass()
-server.ssh     = MyClass()
+server.sge  = MyClass()
+server.chi  = MyClass()
+server.pbs  = MyClass()
+server.ssh  = MyClass()
 backup  = MyClass()
 dir_job = MyClass()
 vmd     = MyClass()
@@ -75,6 +76,24 @@ vasp.make_2ndDir =  "\n    MAKE VASP Dir from Dir\
 vasp.run =          "\n    MPIRUN VASP:\
                     \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
 
+<<<<<<< HEAD:pycommon/comment_sys.py
+=======
+server.chi =         "=== CHI (HOME) ===\
+                    \n    Q-Chem::\
+                    \n\tsetup .bashrc\
+                    \n\t    activate: INTEL\
+                    \n\t\tsource ...\
+                    \n\t\t\tQ-Chem\
+                    \n\t\tsource $QC/bin/...\
+                    \n\t$ qchem -np 2 CO2blyp.in CO2blyp.out\
+                    \n\t    parallel, but serial run\
+                    \n\t$ mpirun -np 4 $QC/exe/qcprog.exe a.in $QCSCRATCH/savename > a.out\
+                    \n\t    parallel running with error message\
+                    \n\t    check with more number of atoms than nprocess\
+                    \n\t    makes 4 scratch folder in $QCSCRATCH\
+                    "
+
+>>>>>>> 056fc5f2d951b207e48ed1c764c3da11aa15d737:pycommon/comm_sys.py
 server.sge.plot =   "=== MLET (SGE) ===\
                     \n  --PLOT Figure\
                     \n\t$ ssh -Y mlet (in login)\
