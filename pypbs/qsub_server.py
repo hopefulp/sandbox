@@ -5,7 +5,7 @@ import re
 import os
 from common import *
 
-def print_sge(software,dname,jobname,np,Lscan_saver):
+def print_sge(software,qjobname,inf,np,Lscan_saver):
     _HOME = os.getenv('HOME')
     if not software:
         print("Use:: qfree - to check freed node")
@@ -18,9 +18,9 @@ def print_sge(software,dname,jobname,np,Lscan_saver):
 
     elif software == 'qchem':
         print("SGE(Rhee's group): Q-Chem")
-        print("Usage:: qsub -N jobname -v qcjob=qchem_input -v ver='3.2p' /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.tcsh")
-        print("        -N jobname: listed in 'qstat', jobname should be alphanumeric, use -d")
-        print("        -v job: variable in 'qchem job.in job.out' in script sge_qchem.csh, use -j")
+        print("Usage:: qsub -N qjob -v qcjob=infile -v ver='3.2p' -l mem=3G /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh")
+        print("        -N qjob: queue job name -j")
+        print("        -v qcjob: qchem input file, use -i")
         print("        -v ver: version ['3.2p','4.3s', '5.1p'] parallel and serial")
         print("        -v save=ok: for save option for qchem")
         q = "Do you want to see sge_qchem script?"
@@ -28,29 +28,31 @@ def print_sge(software,dname,jobname,np,Lscan_saver):
         #    sandbox = _HOME + '/sandbox_gl/pypbs/sge_qchem.csh'
         #    com = "more %s" % sandbox
         #    os.system(com)
+        if inf.endswith('.in'):
+            inf = inf[:-3]
         if not Lscan_saver:
-            com = f"qsub -N {dname} -pe numa {np} -v qcjob={jobname} -v np={np} $SB/pypbs/sge_qchem.csh"
+            com = f"qsub -N {qjobname} -pe numa {np} -l mem=3G -v qcjob={inf} -v np={np} $SB/pypbs/sge_qchem.csh"
         else:
-            com = f"qsub -N {dname} -pe numa {np} -v qcjob={jobname} -v np={np} -v scan=ok $SB/pypbs/sge_qchem.csh"
+            com = f"qsub -N {qjobname} -pe numa {np} -l mem=3G -v qcjob={inf} -v np={np} -v scan=ok $SB/pypbs/sge_qchem.csh"
 
     elif software == 'vasp':
-        if not dname:
+        if not qjobname:
             print("qsub -N pe500 -pe numa %d -v np=%d -v dir=pe500 $SB/pypbs/sge_vasp.csh" % (np))
-            print("use -d dname -n np")
+            print("use -d qjobname -n np")
         else:
-            com = "qsub -N %s -pe numa %d -v np=%d -v dir=%s $SB/pypbs/sge_vasp.csh" % (dname,np,np,dname)
+            com = "qsub -N %s -pe numa %d -v np=%d -v dir=%s $SB/pypbs/sge_vasp.csh" % (qjobname,np,np,qjobname)
             print(com)
     elif software == 'sleep':
-        if dname:
-            com = "qsub -N %s -pe numa %d $SB/pypbs/sge_sleep.csh" % (dname, np)
+        if qjobname:
+            com = "qsub -N %s -pe numa %d $SB/pypbs/sge_sleep.csh" % (qjobname, np)
         else:
             com = "qsub -pe numa %d $SB/pypbs/sge_sleep.csh" % (np)
         print(com)
     elif software == 'amp':
         if Lscan_saver:
-            com = f"qsub -N {dname} -pe numa {np} -v fname=OUTCAR -v np={np} -v pyjob=tr $SB/pypbs/sge_amp.csh"
+            com = f"qsub -N {qjobname} -pe numa {np} -v fname=OUTCAR -v np={np} -v pyjob=tr $SB/pypbs/sge_amp.csh"
         else:
-            com = f"qsub -N {dname} -pe numa {np} -v fname=OUTCAR -v np={np} -v pyjob=tr $SB/pypbs/sge_amp.csh"
+            com = f"qsub -N {qjobname} -pe numa {np} -v fname=OUTCAR -v np={np} -v pyjob=tr $SB/pypbs/sge_amp.csh"
         print(com) 
     if 'com' in locals():
         print(com)
@@ -76,17 +78,17 @@ def job_description(server, software, dname, jname, np, amp_Lscan):
     return 0        
 
 def main():
-    parser = argparse.ArgumentParser(description='how to use qsub')
+    parser = argparse.ArgumentParser(description="how to use qsub:\n Usage:: qsub_server.py sge qchem -j qjobname(dirname) -i file.in -n np")
     parser.add_argument('server', default='sge', nargs='?', choices=['sge', 'chi'], help='jobname in pbs file')
     parser.add_argument('software', choices=['qchem', 'grmx', 'vasp','sleep','amp'], help='kind of software')
-    parser.add_argument('-d', '--dirname', help='job directory name|job name for qsub')
-    parser.add_argument('-j', '--jobname', help='additional job name for qchem')
+    parser.add_argument('-j', '--qjobname', help='qjob name for qsub|directory name')
+    parser.add_argument('-i', '--inf', help='input filename')
     parser.add_argument('-n', '--np', default=16, type=int, help='number of process')
     gr_amp = parser.add_argument_group()
     gr_amp.add_argument('-sc', '--scan', action='store_true', help='scan amp for several Hidden Layer|save for qchem')
     args = parser.parse_args()
 
-    job_description(args.server, args.software, args.dirname, args.jobname, args.np, args.scan) 
+    job_description(args.server, args.software, args.qjobname, args.inf, args.np, args.scan) 
 
 if __name__ == '__main__':
     main()

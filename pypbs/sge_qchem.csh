@@ -13,17 +13,23 @@ if ( ! $?qcjob ) then
     exit(2)
 endif
 
-set iqc = '5.1p'
+# '5.1p' '3.2'
+set iqc = '3.2p'    
 set save = no
+
 #### parallel version 5.1 (keyword) && 3.2 (Jmol)
 if ( $iqc == '5.1p' ) then
+    set QCHEM = /gpfs/home/joonho/sciwares/qchem5.1p/bin/qchem
     if ( $save == 'ok') then
-        /gpfs/home/joonho/sciwares/qchem5.1p/bin/qchem -save -np $np $qcjob.in $qcjob.out $qcjob
+        mpirun -np $np $QCHEM -save $qcjob.in $qcjob.out $qcjob
     else
-        /gpfs/home/joonho/sciwares/qchem5.1p/bin/qchem -np $np $qcjob.in $qcjob.out
+        #mpirun -np $np $QCHEM       $qcjob.in $qcjob.out    # looks like running the same process at each process
+        mpirun -np $np $QCHEM       $qcjob.in $qcjob.out
+        #$QCHEM -np $np $qcjob.in $qcjob.out         # run only 1 process
     endif
-else if ( $iqc == '3.2' ) then
-    /gpfs/opt/qchem/bin/qchem -np $np $qcjob.in $qcjob.out
+else if ( $iqc == '3.2p' ) then
+    set QCHEM = /gpfs/opt/qchem/bin/qchem
+    $QCHEM -np $np $qcjob.in $qcjob.out             # this is working
 endif    
 
 

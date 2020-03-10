@@ -40,9 +40,9 @@ def main():
 
     regex = re.compile('[a-z]')    # only detect it starts with lower case
     if args.switch==False and args.mod == 'sys':
-        mod_name = 'comm_sys'
+        mod_name = 'comment_sys'
     else:
-        mod_name = 'comm_sub'
+        mod_name = 'comment_subj'
     my_module = importlib.import_module(mod_name)
     att = [ x for x in dir(my_module) if regex.match(x) ]
     print(f"===ALL ATTributes in \"{mod_name}.py\" ===")
@@ -52,7 +52,7 @@ def main():
         #print(f"Use -j for attribute: {att}")
         print(f"Use -j for attribute")
         if mod_name == 'comm_sys':
-            print(f"Use -m sub or -s for 'comm_sub.py' if attribute you find is not here")
+            print(f"Use -m sub or -s for 'comm_subj.py' if attribute you find is not here")
     else:
         jobs(my_module, args.job, args.subkey)
 

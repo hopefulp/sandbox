@@ -125,6 +125,7 @@ water.vasp_analysis="\n    ANALYSIS VASP\
                     \n\tUSE VMD to read OUTCAR\
                     \n\tUSE ASE to read OUTCAR\
                     "
+
 qchem.TM        =   "=== Q-Chem ===\
                     \n    TM: transition metal\
                     \n\tbasis: triple zeta: def2-TZVP, triple zeta valance shell with polarization\
@@ -133,7 +134,26 @@ qchem.TM        =   "=== Q-Chem ===\
                     \n\t          : Method wB97X-D3\
                     \n\tUNRESTRICTED    true\
                     "
-
+qchem.run       =   "\n    RUN: \
+                    \n\tSGE::   \
+                    \n\t    $ qrun.sh qjobname[dname] filename nprocess\
+                    \n\t    $ qsub_server.py sge qchem -j CO2M06 -i CO2M06 -n 16\
+                    \n\t    qsub -N qjob -v qcjob=inf -pe numa np -l mem=3G -v ver='3.2p' -v np=np  $SB/pypbs/sge_qchem.csh\
+                    \n\t    sge_qchem.csh:\
+                    \n\t\tv3.2p: $QCHEM -np $np $qcjob.in $qcjob.out\
+                    \n\tCHI::   \
+                    \n\t    setup .bashrc\
+                    \n\t    $ (parallel) mpirun -np 4 $QC/exe/qcprog a.in $QCSCRATCH/savename > a.out\
+                    \n\t\tmakes 4 scratch folder in $QCSCRATCH\
+                    \n\tKISTI-Nurioin::\
+                    \n\t    how\
+                    "
+qchem.out       =   "\n    QCOUT: deal qchem.out file\
+                    \n\t$ qcget_georem.pl   -> qcget_in.pl\
+                    \n\t$ qcout_geo.pl      a.out : obtain .mol from job=opt\
+                    \n\t$ qcget_in.pl       a.out : obtain .mol from job=sp, opt\
+                    \n\t$ qcout_mol_in.pl r=a.out m=b.out i=outf? : scratch rem from a.out, mol from b.out(job=sp) make b.in\
+                    "
 
 
 ########### PAST WORK ##########################################################################################
