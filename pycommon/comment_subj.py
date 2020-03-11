@@ -143,7 +143,7 @@ qchem.run       =   "\n    RUN: \
                     \n\t\tv3.2p: $QCHEM -np $np $qcjob.in $qcjob.out\
                     \n\tCHI::   \
                     \n\t    setup .bashrc\
-                    \n\t    $ (parallel) mpirun -np 4 $QC/exe/qcprog a.in $QCSCRATCH/savename > a.out\
+                    \n\t    $ (parallel) mpirun -np 4 $QC/exe/qcprog.exe a.in $QCSCRATCH/savename > a.out\
                     \n\t\tmakes 4 scratch folder in $QCSCRATCH\
                     \n\tKISTI-Nurioin::\
                     \n\t    how\

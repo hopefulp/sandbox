@@ -28,8 +28,8 @@ def print_sge(software,qjobname,inf,np,Lscan_saver):
         #    sandbox = _HOME + '/sandbox_gl/pypbs/sge_qchem.csh'
         #    com = "more %s" % sandbox
         #    os.system(com)
-        if inf.endswith('.in'):
-            inf = inf[:-3]
+        #if inf.endswith('.in'):
+        #    inf = inf[:-3]
         if not Lscan_saver:
             com = f"qsub -N {qjobname} -pe numa {np} -l mem=3G -v qcjob={inf} -v np={np} $SB/pypbs/sge_qchem.csh"
         else:
@@ -60,21 +60,28 @@ def print_sge(software,qjobname,inf,np,Lscan_saver):
             os.system(com)
     return 0
 
-def print_chi(software):
+def print_chi(software, inf, np, Lscan_saver):
     _HOME = os.getenv('HOME')
+
     if software == 'qchem':
         print("Check for library: ")
         com = "module li"
         os.system(com)
-        print("If serial   is loaded: $qchem a.in a.out")
-        print("If parallel is loaded: $mpirun -np n_process $QC/exe/qcprog a.in $QCSCRATCH > a.out &")
+        print("Serial::\n\t$ qchem a.in a.out")
+        print("Parallel::\n\t$ mpirun -np n_process $QC/exe/qcprog.exe a.in $QCSCRATCH/{inf} > a.out &")
+
+        com = f"mpirun -np {np} $QC/exe/qcprog.exe {inf}.in $QCSCRATCH/{inf} > {inf}.out &"
+        if yes_or_no("Do you want to run:\n " + com):
+            os.system(com)
     return 0
 
-def job_description(server, software, dname, jname, np, amp_Lscan):
+def job_description(server, software, qjobname, infname, np, scan_saver):
+    if infname.endswith('.in'):
+        infname = infname[:-3]
     if server == 'sge':
-        print_sge(software,dname,jname, np, amp_Lscan) 
+        print_sge(software, qjobname, infname, np, scan_saver) 
     elif server == 'chi':
-        print_chi(software)
+        print_chi(software, infname, np, scan_saver)
     return 0        
 
 def main():
