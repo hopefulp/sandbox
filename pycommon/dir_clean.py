@@ -44,7 +44,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
                     f_list.remove(efile)
 
     elif work == 'pbs':
-        matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d']
+        matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
         f_list = get_files_match(matches, d, Lshowmatch)
     elif work == 'amp':
         matches=['amp']

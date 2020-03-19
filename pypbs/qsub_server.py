@@ -5,7 +5,7 @@ import re
 import os
 from common import *
 
-def print_sge(software,qjobname,inf,np,Lscan_saver):
+def print_sge(software,qjobname,inf,np,mem,Lscan_saver):
     _HOME = os.getenv('HOME')
     if not software:
         print("Use:: qfree - to check freed node")
@@ -31,10 +31,9 @@ def print_sge(software,qjobname,inf,np,Lscan_saver):
         #if inf.endswith('.in'):
         #    inf = inf[:-3]
         if not Lscan_saver:
-            com = f"qsub -N {qjobname} -pe numa {np} -l mem=3G -v qcjob={inf} -v np={np} $SB/pypbs/sge_qchem.csh"
+            com = f"qsub -N {qjobname} -pe numa {np} -l mem={mem}G -v qcjob={inf} -v np={np} $SB/pypbs/sge_qchem.csh"
         else:
-            com = f"qsub -N {qjobname} -pe numa {np} -l mem=3G -v qcjob={inf} -v np={np} -v scan=ok $SB/pypbs/sge_qchem.csh"
-
+            com = f"qsub -N {qjobname} -pe numa {np} -l mem=2G -v qcjob={inf} -v np={np} -v scan=ok $SB/pypbs/sge_qchem.csh"
     elif software == 'vasp':
         if not qjobname:
             print("qsub -N pe500 -pe numa %d -v np=%d -v dir=pe500 $SB/pypbs/sge_vasp.csh" % (np))
@@ -75,11 +74,11 @@ def print_chi(software, inf, np, Lscan_saver):
             os.system(com)
     return 0
 
-def job_description(server, software, qjobname, infname, np, scan_saver):
+def job_description(server, software, qjobname, infname, np, mem, scan_saver):
     if infname.endswith('.in'):
         infname = infname[:-3]
     if server == 'sge':
-        print_sge(software, qjobname, infname, np, scan_saver) 
+        print_sge(software, qjobname, infname, np, mem, scan_saver) 
     elif server == 'chi':
         print_chi(software, infname, np, scan_saver)
     return 0        
@@ -90,12 +89,13 @@ def main():
     parser.add_argument('software', choices=['qchem', 'grmx', 'vasp','sleep','amp'], help='kind of software')
     parser.add_argument('-j', '--qjobname', help='qjob name for qsub|directory name')
     parser.add_argument('-i', '--inf', help='input filename')
+    parser.add_argument('-m', '--mem', default=5, type=float, help='memory size for qsub')
     parser.add_argument('-n', '--np', default=16, type=int, help='number of process')
     gr_amp = parser.add_argument_group()
     gr_amp.add_argument('-sc', '--scan', action='store_true', help='scan amp for several Hidden Layer|save for qchem')
     args = parser.parse_args()
 
-    job_description(args.server, args.software, args.qjobname, args.inf, args.np, args.scan) 
+    job_description(args.server, args.software, args.qjobname, args.inf, args.np, args.mem, args.scan) 
 
 if __name__ == '__main__':
     main()

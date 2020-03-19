@@ -4,8 +4,9 @@ start   = MyClass()
 
 vasp    = MyClass()
 server  = MyClass()
-server.sge  = MyClass()
-server.chi  = MyClass()
+server.MLET  = MyClass()
+server.CHI  = MyClass()
+server.KISTI = MyClass()
 server.pbs  = MyClass()
 server.ssh  = MyClass()
 backup  = MyClass()
@@ -76,9 +77,7 @@ vasp.make_2ndDir =  "\n    MAKE VASP Dir from Dir\
 vasp.run =          "\n    MPIRUN VASP:\
                     \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
 
-<<<<<<< HEAD:pycommon/comment_sys.py
-=======
-server.chi =         "=== CHI (HOME) ===\
+server.CHI =         "=== CHI (HOME) ===\
                     \n    Q-Chem::\
                     \n\tsetup .bashrc\
                     \n\t    activate: INTEL\
@@ -93,18 +92,20 @@ server.chi =         "=== CHI (HOME) ===\
                     \n\t    makes 4 scratch folder in $QCSCRATCH\
                     "
 
->>>>>>> 056fc5f2d951b207e48ed1c764c3da11aa15d737:pycommon/comm_sys.py
-server.sge.plot =   "=== MLET (SGE) ===\
+server.MLET.plot =   "=== MLET (SGE) ===\
                     \n  --PLOT Figure\
                     \n\t$ ssh -Y mlet (in login)\
                     \n\t    for drawing in master node\
-                    \n\t    not qsub job including plot (matplotlib)\
+                    \n\t    not queue-submit job including plot (matplotlib)\
                     \n  --MORE Comment\
-                    \n\t$ comment.py -s -j {'amp', etc}\
-                    \n  --Running Job\
-                    \n\t$ qsub_server.py sge -s {amp, vasp, etc}\
+                    \n\t$ comment.py -s -j {'amp', etc} for subject\
+                    \n  --Running Job:: qrun.sh\
+                    \n\t    e.g.: qrun.sh qname inputfile np\
+                    \n\t    fix job inside, qchem or vasp\
+                    \n\t    call qsub_server.py\
+                    \n\t$ qsub_server.py sge qchem -i input -n np\
                     "
-server.sge.vasp =   "\n    VASP::\
+server.MLET.vasp =   "\n    VASP::\
                     \n\tqsub -N pe500 -pe numa 16 -v np=16 -v dir=pe500 $SB/pypbs/sge_vasp.csh\
                     \n\t    -pe numa: take charge the number of process\
                     \n\tOr Use PBS command\
@@ -114,23 +115,23 @@ server.sge.vasp =   "\n    VASP::\
                     \n\tIN CASE hybrid functional job, it might be killed in 8 hr\
                     \n\t    get node by sleep 'sge.sleep', run at node\
                     "
-server.sge.qchem =  "\n    Q-Chem::\
+server.MLET.qchem =  "\n    Q-Chem::\
                     \n\tSetup: .bashrc\
-                    \n\t    INTEL: source $INTEL/parallel_studio_xe_2019.3.062/bin/psxevars.sh intel64\
-                    \n\t    Qchem: source $QC/bin/qchem.setup.sh\
-                    \n\t\t$QCAUX = $QCAUX/basis, ~/sciwares/basis for ver5.0 \
-                    \n\tRun\
-                    \n\t    qsub_server.py sge qchem -d CO2M06 -j CO2M06 -n 16\
-                    \n\t$ qsub -N NiCO2 -pe numa 16 -v np=16 -v qcjob=a(.in) $SB/pypbs/sge_qchem.csh\
-                    \n\t$ qsub -N jobname -pe numa np  -v np=np -v qcjob=a(.in) [-v iqc=5.1p -v save=ok]  $SB/sge_qchem.csh\
+                    \n\t    v5.1\
+                    \n\t\tCompilation Method::\
+                    \n\t\t    INTEL in server\
+                    \n\t\t    MPICH_HOME in /gpfs/opt/openmpi\
+                    \n\t\t    $QC=$SCI/qchem5.1p\
+                    \n\t\t    $QCAUX = $SCI/qcaux for basis irr. of version \
                     "
-server.sge.sleep   =       "\n    SLEEP::\
+server.MLET.sleep   =       "\n    SLEEP::\
                     \n\t$ qsub_server.py sge -s sleep -n 36\
                     \n\t    qsub -pe numa 36 $SB/pypbs/sge_sleep.csh\
                     \n\t$ qsub_server.py sge -s sleep -n 36 -N sleep2\
                     \n\t    qsub -N sleep2 -pe numa 36 $SB/pypbs/sge_sleep.csh\
+                    \n\t$ qsub -N sleep2 -pe numa 36 -q skylake@node16 $SB/pypbs/sge_sleep.csh\
                     "
-server.sge.at_node =       "\n    RUN @NODE VASP::\
+server.MLET.at_node =       "\n    RUN @NODE VASP::\
                     \n\t$ sge_vasp_node.csh re0D3mdk_high 36\
                     "
 server.ssh.nodes   =       "=== SSH ===\
@@ -151,10 +152,28 @@ server.ssh.check_nod =     "\n    CHECK node for vasp\
                     \n\t$ ssh node08 ps aux | grep vasp | wc -l \
                     "
 
-server.pbs.vasp =          "===PBS: KISTI===\
+server.pbs.start=   "=== SGE: grid-engine (MLET) ===\
+                    \n    Overwrite \#$ -option in script\
+                    \n    Options::\
+                    \n\t -N qname (listed in $qstat)\
+                    \n\t -pe numa $np (number of process)\
+                    \n\t -l mem=10G (memory per process)\
+                    \n\t    mem * $np is charged on the node\
+                    \n\t -q skylake@node11 (define node)\
+                    \n\t -v vname=value (CLI input can't overwrite the same vname in script)\
+                    \n    e.g.\
+                    \n\t(Q-Chem) $ qsub -N qname -v qcjob=infile -pe numa np -l mem=3G -v np=np -q skylake@node11 $SB/pypbs/sge_qchem.csh\
+                    "
+server.pbs.pbs  =   "=== PBS (KISTI) ===\
+                    \n    Overwrite \# -option in script\
+                    \n    e.g.\
+                    \n\t(Q-Chem) $ qsub -N CCC6A -v fname=6-CCC-NiFe-A.in qchem_knl.sh\
+                    "
+server.pbs.vasp =   "===KISTI===\
                     \n    qsub -N dirname $SB/pypbs/pbs_vasp.sh\
                     \n\tnumber of process is confirmed in the script 'pbs_vasp.sh'\
                     "
+
 dir_job.clean =     "===DIR: clean, modify filename, jobs for package===\
                     \n    dir_clean_p2.py -j {rm,mv} [-p,-s,-m] -w {qchem, ai, vasp, pbs} -r 'for run'\
                     \n\tjob=rm|mv\

@@ -3,10 +3,10 @@
 nodes=$(qstat -f | sed -e '/---/d' -e '/adus/d' | awk '/@/ { print $1 }' | awk -F@ '{print $2}'  )
 #echo $nodes
 
-jobs=( ls mkdir vasp qchem )
+jobs=( ls rm mkdir vasp qchem )
 job=${1:-"vasp"}
 #echo $job
-if [ $job == "ls" -o $job == "mkdir" ]; then
+if [ $job == "ls" -o $job == "mkdir" -o $job == "rm" ]; then
     dir=$2
     if [ -z $dir ]; then
         echo "input directory as $2"
@@ -31,6 +31,11 @@ for node in $nodes; do
             if [ $? -eq 0 ]; then
                 njob=$(expr $njob + 1)
             fi
+            ;;
+        "rm")
+            for f in $(ssh $node ls $dir); do
+                ssh $node rm -r $dir/$f
+                done
             ;;
         "mkdir")
             ssh $node mkdir $dir
