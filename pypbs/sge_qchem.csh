@@ -17,9 +17,9 @@ endif
 set iqc = '5.1p'    
 set save = no
 
-#if ( $qcjob =~ 'in' ) then
-#    set qcjob = `cut -d. -f1 <<< $qcjob`
-#endif
+if ( $qcjob =~ *'in' ) then
+    set qcjob = `cut -d. -f1 <<< $qcjob`
+endif
 
 #### parallel version 5.1 (keyword) && 3.2 (Jmol)
 if ( $iqc == '5.1p' ) then

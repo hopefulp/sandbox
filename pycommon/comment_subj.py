@@ -145,6 +145,9 @@ qchem.server.MLET   =  "=== Q-Chem ===\
                     \n\t\tset QCMPI=openmpi in .bashrc\
                     \n\t    Running:\
                     \n\t\t$ qrun.sh qname[dname] fname[.in] nprocess [mem] \
+                    \n\t\tfull mem:\
+                    \n\t\t    qrun.sh NiFe5    a.in 16 11.7 for full mem 188G\
+                    \n\t\t    qrun.sh NiFe5vtz a.in 12 8    for full mem 96G\
                     \n\t\t$ qsub_server.py sge qchem -j CO2M06 -i CO2M06 -n 16 -m 5(G)\
                     \n\t\t$ qsub -N qname -v qcjob=infile -pe numa np -l mem=3G -v np=np -q skylake@node11 $SB/pypbs/sge_qchem.csh\
                     \n\t\tsubmit \"sge_qchem.csh\":\
@@ -173,7 +176,7 @@ qchem.out       =   "\n    QCOUT: deal qchem.out file\
                     \n\t$ qcget_georem.pl   -> qcget_in.pl\
                     \n\t$ qcout_geo.pl      a.out : obtain .mol from job=opt\
                     \n\t$ qcget_in.pl       a.out : obtain .mol from job=sp, opt\
-                    \n\t$ qcout_mol_in.pl r=a.out m=b.out i=outf? : scratch rem from a.out, mol from b.out(job=sp) make b.in\
+                    \n\t$ qcin_mol_rem.pl r=remfile m=molfile [i=outf?] : scratch rem from a.out, mol from b.out(job=sp) make b.in\
                     "
 
 

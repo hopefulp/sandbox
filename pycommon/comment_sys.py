@@ -93,17 +93,20 @@ server.CHI =         "=== CHI (HOME) ===\
                     "
 
 server.MLET.plot =   "=== MLET (SGE) ===\
+                    \n  --System:\
+                    \n\tmem 188: node11, 15, 16, 20, 21\
+                    \n\t\t16 node * 11.7 G mem\
+                    \n\tmem 128: opt07 others 96\
+                    \n\tmim  96: almost, 12 node * 8G mem\
                     \n  --PLOT Figure\
                     \n\t$ ssh -Y mlet (in login)\
                     \n\t    for drawing in master node\
                     \n\t    not queue-submit job including plot (matplotlib)\
-                    \n  --MORE Comment\
-                    \n\t$ comment.py -s -j {'amp', etc} for subject\
-                    \n  --Running Job:: qrun.sh\
-                    \n\t    e.g.: qrun.sh qname inputfile np\
-                    \n\t    fix job inside, qchem or vasp\
-                    \n\t    call qsub_server.py\
-                    \n\t$ qsub_server.py sge qchem -i input -n np\
+                    \n  --qrun.sh: Running job\
+                    \n\te.g.: qrun.sh qname inputfile np nmem\
+                    \n\tfix job inside, qchem or vasp\
+                    \n\tcall qsub_server.py\
+                    \n\t    $ qsub_server.py sge qchem -i input -n np -m mem\
                     "
 server.MLET.vasp =   "\n    VASP::\
                     \n\tqsub -N pe500 -pe numa 16 -v np=16 -v dir=pe500 $SB/pypbs/sge_vasp.csh\
@@ -134,7 +137,28 @@ server.MLET.sleep   =       "\n    SLEEP::\
 server.MLET.at_node =       "\n    RUN @NODE VASP::\
                     \n\t$ sge_vasp_node.csh re0D3mdk_high 36\
                     "
-server.ssh.nodes   =       "=== SSH ===\
+server.KISTI.pbs  = "=== KISTI ===\
+                    \n    System::\
+                    \n\tnode(queue)\
+                    \n\t    KNL: massive parallel\
+                    \n\t\t-l select=4:ncpus=40:mpiprocs=40:ompthreads=1\
+                    \n\t    SKL: fast as normal\
+                    \n\t\t-l select=1:ncpus=40:mpiprocs=40:ompthreads=1\
+                    \n\tLocation: PBS scripts\
+                    \n\t    Q-Chem:/apps/commercial/test_samples/Q-Chem/qchem_skl.sh, qchem_knl.sh (KNL)\
+                    \n    PBS::\
+                    \n\tCLI-Options:\
+                    \n\t    -N jobname\
+                    \n\t    -v fname=fname\
+                    \n\t    -v np (N/A)\
+                    \n\t    $ qsub -N qjobname -v fname=a[.in] pbs_script.sh\
+                    \n\tQ-Chem\
+                    \n\t    $ qsub -N CCC6A -v fname=6-CCC-NiFe-A.in qchem_knl.sh\
+                    \n\tVASP\
+                    \n\t    $ qsub -N dirname $SB/pypbs/pbs_vasp.sh\
+                    \n\t\tnumber of process is confirmed in the script 'pbs_vasp.sh'\
+                    "
+server.ssh.nodes  = "=== SSH ===\
                     \n    Scan all the NODES for process name\
                     \n\t$ ssh node01 ps aux | grep process_name(vasp)\
                     \n\t    single node test for vasp\
@@ -163,15 +187,6 @@ server.pbs.start=   "=== SGE: grid-engine (MLET) ===\
                     \n\t -v vname=value (CLI input can't overwrite the same vname in script)\
                     \n    e.g.\
                     \n\t(Q-Chem) $ qsub -N qname -v qcjob=infile -pe numa np -l mem=3G -v np=np -q skylake@node11 $SB/pypbs/sge_qchem.csh\
-                    "
-server.pbs.pbs  =   "=== PBS (KISTI) ===\
-                    \n    Overwrite \# -option in script\
-                    \n    e.g.\
-                    \n\t(Q-Chem) $ qsub -N CCC6A -v fname=6-CCC-NiFe-A.in qchem_knl.sh\
-                    "
-server.pbs.vasp =   "===KISTI===\
-                    \n    qsub -N dirname $SB/pypbs/pbs_vasp.sh\
-                    \n\tnumber of process is confirmed in the script 'pbs_vasp.sh'\
                     "
 
 dir_job.clean =     "===DIR: clean, modify filename, jobs for package===\
