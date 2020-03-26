@@ -2,7 +2,6 @@ from common import MyClass
 
 start   = MyClass()
 
-vasp    = MyClass()
 server  = MyClass()
 server.MLET  = MyClass()
 server.CHI  = MyClass()
@@ -42,40 +41,6 @@ start.usage     =   "===USAGE of show_comment.py [-h] \
                     \n    $ show_comment.py -m [general|subj] -j key\
                     \n\tshows details of the key\
                     "
-
-
-vasp.order =        "===VASP Usage===\
-                    \n    ORDER:: make_incar make_ini run"
-vasp.make_incar =   "\n    MAKE incar.key:\
-                    \n\t\t-sys [bulk|surface|mol]\
-                    \n\t\t-md [nve|nvt\npt], -t dft[lda,gga,pe,rp,re,re0,revdw,re0vdw,etc]\
-                    \n\t\t-d dispersion[d2:d3], \
-                    \n\t$ vmake_incar -d d3\
-                    \n\t\tdefault: -t(dft)=pe, -d(D)=D3\
-                    \n\t$ vmake_incar.py -t re0 -d d3\
-                    \n\t\thybrid runs with WAVECAR as continous job\
-                    \n\t$ vmake_incar.py -t re0 -d d3 -md nve\
-                    \n\t\tto run MD\
-                    \n\t$ vmake_incar.py -t revdw\
-                    \n\t\tfor revPBE-vdW-DF\
-                    \n\t$ vmake_incar.py -t re0vdw\
-                    \n\t\tfor revPBE0-vdW-DF    : is this OR?\
-                    \n    MAKE INCAR \
-                    \n\tvmake_incar.py --rw r\
-                    \n\t\tmakes INCAR by reading incar.key with --read option\
-                    "
-vasp.make_ini =     "\n    MAKE 1st VASP Directory:\
-                    \n\t$ vmake_ini.py -a O H -d dirname\
-                    \n\t\tKPOINTS=gamma, POTCAR from VaspINI by default and use 'incar.key' for INCAR"
-vasp.make_2ndDir =  "\n    MAKE VASP Dir from Dir\
-                    \n\t$ vmake_d2d.py old_dir new_dir job_type[ini,cont,hybrid,md,dos,band,pchg]\
-                    \n\t\t make new_dir from old_dir\
-                    \n\t\t ini: copy POSCAR\
-                    \n\t\t cont: copy CONTCAR\
-                    \n\t\t hybrid: copy WAVECAR etc\
-                    "
-vasp.run =          "\n    MPIRUN VASP:\
-                    \n\t$ mpirun -n 4 ~/sciwares/VASP/vasp.5.4.4/bin/vasp"
 
 server.CHI =         "=== CHI (HOME) ===\
                     \n    Q-Chem::\

@@ -8,6 +8,9 @@ qchem.server = MyClass()
 qchem.server.MLET  = MyClass()
 qchem.server.CHI   = MyClass()
 qchem.server.KISTI = MyClass()
+vasp    = MyClass()
+vasp.server = MyClass()
+vasp.scripts = MyClass()
 nico2   = MyClass()
 myplot  = MyClass()
 amp     = MyClass()
@@ -124,14 +127,58 @@ water.vasp      =   "\n    CONTINUE:: go to 'vasp' attribute"
 water.vasp_job  =   "\n    VASP JOB for Water\
                     \n\trevPBE+D3 RevPBE0+D3\
                     "
-water.vasp_analysis="\n    ANALYSIS VASP\
+water.vasp_analysis = "\n    ANALYSIS VASP\
                     \n\tgreT a.out\
                     \n\t    step T Etot FreeE Epot Ekin SK SP(?)\
                     \n\tUSE VMD to read OUTCAR\
                     \n\tUSE ASE to read OUTCAR\
                     "
+vasp.server         = "=== VASP ===\
+                    \n    Structure\
+                    \n\t$VASP_HOME/version/bin/vasp, vasp_gam, vasp_std, vasp_ncl\
+                    \n\t    : select one following K-points\
+                    \n    SERVER\
+                    \n\tMLET    \
+                    \n\tCHI\
+                    \n\t    activate: /opt/intel/compilers_and_libraries_2019.3.199/\
+                    \n\t    run: mpirun -n[p] 4 $VASP_HOME/vasp.5.4.4/bin/vasp_std > sidos.out\
+                    \n\tKISTI\
+                    "
+vasp.scripts.make_incar = "\n    === Usage ===\
+                    \n\tMAKE incar.key:\
+                    \n\t    -sys [bulk|surface|mol]\
+                    \n\t    -md [nve|nvt|npt], -t dft[lda,gga,pe,rp,re,re0,revdw,re0vdw,etc]\
+                    \n\t    -d dispersion[d2:d3], \
+                    \n\t    $ vmake_incar -d d3\
+                    \n\t\tdefault: -t(dft)=pe, -d(D)=D3\
+                    \n\t    $ vmake_incar.py -t re0 -d d3\
+                    \n\t\thybrid runs with WAVECAR as continous job\
+                    \n\t    $ vmake_incar.py -t re0 -d d3 -md nve\
+                    \n\t\tto run MD\
+                    \n\t    $ vmake_incar.py -t revdw\
+                    \n\t\tfor revPBE-vdW-DF\
+                    \n\t    $ vmake_incar.py -t re0vdw\
+                    \n\t\tfor revPBE0-vdW-DF    : is this OR?\
+                    \n\tMAKE INCAR \
+                    \n\t    vmake_incar.py --rw r\
+                    \n\t\tmakes INCAR by reading incar.key with --read option\
+                    "
+vasp.scripts.make_ini = "\n\tMAKE 1st VASP Directory:\
+                    \n\t    $ vmake_ini.py -a O H -d dirname\
+                    \n\t\tKPOINTS=gamma, POTCAR from VaspINI by default and use 'incar.key' for INCAR"
+vasp.scripts.make_2ndDir =  "\n\tMAKE VASP Dir from Dir\
+                    \n\t    $ vmake_d2d.py old_dir new_dir job_type[ini,cont,hybrid,md,dos,band,pchg]\
+                    \n\t\t make new_dir from old_dir\
+                    \n\t\t ini: copy POSCAR\
+                    \n\t\t cont: copy CONTCAR\
+                    \n\t\t hybrid: copy WAVECAR etc\
+                    " 
+vasp.scripts.etc =  "\n\t ase_fconvert.py\
+                    \n\t ase_vasp.py\
+                    \n\t ase_zpe.py\
+                    "
 
-qchem.server.MLET   =  "=== Q-Chem ===\
+qchem.server.MLET   = "=== Q-Chem ===\
                     \n    SERVER: \
                     \n\tMLET::   \
                     \n\t    Install:\
