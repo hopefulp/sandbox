@@ -11,6 +11,7 @@ qchem.server.KISTI = MyClass()
 vasp    = MyClass()
 vasp.server = MyClass()
 vasp.scripts = MyClass()
+vasp.postproc = MyClass()
 nico2   = MyClass()
 myplot  = MyClass()
 amp     = MyClass()
@@ -133,7 +134,7 @@ water.vasp_analysis = "\n    ANALYSIS VASP\
                     \n\tUSE VMD to read OUTCAR\
                     \n\tUSE ASE to read OUTCAR\
                     "
-vasp.server         = "=== VASP ===\
+vasp.run            = "=== VASP ===\
                     \n    Structure\
                     \n\t$VASP_HOME/version/bin/vasp, vasp_gam, vasp_std, vasp_ncl\
                     \n\t    : select one following K-points\
@@ -141,7 +142,7 @@ vasp.server         = "=== VASP ===\
                     \n\tMLET    \
                     \n\tCHI\
                     \n\t    activate: /opt/intel/compilers_and_libraries_2019.3.199/\
-                    \n\t    run: mpirun -n[p] 4 $VASP_HOME/vasp.5.4.4/bin/vasp_std > sidos.out\
+                    \n\t    run: mpirun -np 4 $VASP_HOME/vasp.5.4.4/bin/vasp_std > sidos.out\
                     \n\tKISTI\
                     "
 vasp.scripts.make_incar = "\n    === Usage ===\
@@ -177,7 +178,13 @@ vasp.scripts.etc =  "\n\t ase_fconvert.py\
                     \n\t ase_vasp.py\
                     \n\t ase_zpe.py\
                     "
-
+vasp.postproc.p4vasp = "\n    === VASP Post Processig ===\
+                    \n\t = P4VASP\
+                    \n\t    executable: p4v\
+                    "
+vasp.postproc.vaspkit = "\n\t = VASP KIT =\
+                    \n\t    executable: \
+                    "
 qchem.server.MLET   = "=== Q-Chem ===\
                     \n    SERVER: \
                     \n\tMLET::   \
