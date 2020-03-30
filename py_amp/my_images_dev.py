@@ -3,47 +3,7 @@
 from my_arith import divide_int
 import sys
 
-
 class Images:
-    """
-    get total images,
-    divide total images into train-test sets ('t-t' type)
-    or train-validation-test sets ('t-v-t' type)
-    """
-    def __init__(self, total_images, nsets=None):
-        self.total_images = total_images
-        self.nsets=nsets
-        ### in case nsets is defined
-        if isinstance(nsets, int):
-            if self.nsets == 1:
-                self.train_all=self.total_images[:]
-            else:
-                ### defin self.parts
-                self.parts = divide_int(len(self.total_images), self.nsets)
-
-    # these method works independently
-    def get_training_images(self, d_list=None):
-        print(d_list)
-        if d_list:
-            return self.total_images[d_list[0]:d_list[1]]
-        elif self.nsets == 1:
-            return self.train_all
-        else:
-            print(self.parts, len(self.total_images))
-            return self.total_images[:self.parts[-2]]
-
-    def get_test_images(self, d_list=None):
-        if d_list:
-            return self.total_images[d_list[0]:d_list[1]]
-        elif self.nsets == 1:
-            print("error: the whole set cann't be test sets")
-            sys.exit(10)
-        else:
-            print(self.parts, len(self.total_images))
-            return self.total_images[self.parts[-2]:]
-
-
-class Images1:
     """
     get total images,
     divide total images into train-test sets ('t-t' type)
@@ -51,7 +11,10 @@ class Images1:
     """
     def __init__(self, total_images, nsets, job):
         self.total_images = total_images
-        self.nsets=nsets
+        if isinstance(nsets, int):
+            self.nsets=nsets
+        else if isinstance(nsets, list):
+            if
         if self.nsets == 1:
             self.train_all=self.total_images[:]
         else:
