@@ -13,8 +13,10 @@ import numpy as np
 import my_chem
 from my_arith import rmse
 from my_images import Images
+from common import yes_or_no
 import re
 import sys
+import os
 
 def get_title(job, fname, HL, E_conv, ntotal, ndata):
     title = fname.split(".")[0] + "\n"
@@ -170,8 +172,8 @@ def amp_jobs(fdata, job, data_int, amp_pes, HL, E_conv, Lgraph, ncore, n_mol, Lt
 
 def main():
     parser = argparse.ArgumentParser(description='run amp with extxyz, OUTCAR: validation is removed ', prefix_chars='-+/')
-    parser.add_argument('fin', help='ASE readible file: extxyz, OUTCAR(VASP) ')
-    parser.add_argument('job', default='tr', help='job option:"train","test","md","profile"')
+    parser.add_argument('-f', '--infile', help='ASE readible file: extxyz, OUTCAR(VASP) ')
+    parser.add_argument('-j', '--job', default='tr', help='job option:"train","test","md","profile"')
     #parser.add_argument('-a', '--all_fig', action="store_true", help='if job==te, include all figures')
     parser.add_argument('-p', '--pot', default="amp.amp", help="input amp potential")
     ### data selection
@@ -194,7 +196,24 @@ def main():
     else:
         data_int = args.dnsets
 
-    amp_jobs(args.fin,args.job,data_int,args.pot,args.hidden_layer,args.e_convergence,args.g,args.ncore,args.nmol,args.twinx)
+    pwd = os.getcwd()
+    if args.infile:
+        fname=args.infile
+    else:
+        if os.path.isfile('OUTCAR'):
+            fname = 'OUTCAR'
+        else:
+            for f in os.listdir(pwd):
+                if f.endswith('extxyz'):
+                    fname = f
+                    break
+        quest = f"file {fname} will be read with job='{args.job}' ?"
+        if yes_or_no(quest):
+            pass
+        else:
+            sys.exit(1)
+        
+    amp_jobs(fname,args.job,data_int,args.pot,args.hidden_layer,args.e_convergence,args.g,args.ncore,args.nmol,args.twinx)
     return
 
 if __name__ == '__main__':
