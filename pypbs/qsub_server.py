@@ -3,9 +3,10 @@
 import argparse
 import re
 import os
+import socket
 from common import *
 
-def print_sge(software,qjobname,inf,np,mem,Lscan_saver):
+def print_sge(inf,software,qjobname,sub_job,np,mem,Lscan_saver,data_int,hl,el):
     _HOME = os.getenv('HOME')
     if not software:
         print("Use:: qfree - to check freed node")
@@ -24,12 +25,6 @@ def print_sge(software,qjobname,inf,np,mem,Lscan_saver):
         print("        -v ver: version ['3.2p','4.3s', '5.1p'] parallel and serial")
         print("        -v save=ok: for save option for qchem")
         q = "Do you want to see sge_qchem script?"
-        #if yes_or_no(q):
-        #    sandbox = _HOME + '/sandbox_gl/pypbs/sge_qchem.csh'
-        #    com = "more %s" % sandbox
-        #    os.system(com)
-        #if inf.endswith('.in'):
-        #    inf = inf[:-3]
         if not Lscan_saver:
             com = f"qsub -N {qjobname} -pe numa {np} -l mem={mem}G -v qcjob={inf} -v np={np} $SB/pypbs/sge_qchem.csh"
         else:
@@ -47,19 +42,30 @@ def print_sge(software,qjobname,inf,np,mem,Lscan_saver):
         else:
             com = "qsub -pe numa %d $SB/pypbs/sge_sleep.csh" % (np)
         print(com)
+
     elif software == 'amp':
+        com = f"qsub -N {qjobname} -pe numa {np} -v fname=OUTCAR -v np={np} -v pyjob={sub_job} "
+        if mem > 2.0:
+            com += f"-l mem={mem}G "
+        if data_int:
+            st = " ".join(data_int)
+            com += f"-v di=\"{st}\" "
+        if hl:
+            st = " ".join(hl)
+            com += f"-v hl=\"{st}\" "
+        if el:
+            com += f"-v el={el} "
         if Lscan_saver:
-            com = f"qsub -N {qjobname} -pe numa {np} -v fname=OUTCAR -v np={np} -v pyjob=tr $SB/pypbs/sge_amp.csh"
-        else:
-            com = f"qsub -N {qjobname} -pe numa {np} -v fname=OUTCAR -v np={np} -v pyjob=tr $SB/pypbs/sge_amp.csh"
-        print(com) 
+            com += "-v scan=ok "
+        com += "$SB/pypbs/sge_amp.csh"
+        #print(com) 
     if 'com' in locals():
         print(com)
         if yes_or_no("would you want to run?"):
             os.system(com)
     return 0
 
-def print_chi(software, inf, np, Lscan_saver):
+def print_chi(inf, software, np, Lscan_saver):
     _HOME = os.getenv('HOME')
 
     if software == 'qchem':
@@ -74,28 +80,40 @@ def print_chi(software, inf, np, Lscan_saver):
             os.system(com)
     return 0
 
-def job_description(server, software, qjobname, infname, np, mem, scan_saver):
-    if infname.endswith('.in'):
-        infname = infname[:-3]
-    if server == 'sge':
-        print_sge(software, qjobname, infname, np, mem, scan_saver) 
+def job_description(fname, software, qjobname, sub_job, np, mem, scan_saver, data_int, hl, el):
+    server =  socket.gethostname()
+    if server == 'login':
+        print_sge(fname, software, qjobname, sub_job, np, mem, scan_saver,data_int,hl,el) 
     elif server == 'chi':
-        print_chi(software, infname, np, scan_saver)
+        print_chi(fname, software, np, scan_saver)
+    else:
+        print(f"hostname error {server}")
+        sys.exit(1)
     return 0        
 
 def main():
     parser = argparse.ArgumentParser(description="how to use qsub:\n Usage:: qsub_server.py sge qchem -j qjobname(dirname) -i file.in -n np")
-    parser.add_argument('server', default='sge', nargs='?', choices=['sge', 'chi'], help='jobname in pbs file')
+    #parser.add_argument('-s'. '--server', default='sge', choices=['sge', 'chi'], help='jobname in pbs file')
     parser.add_argument('software', choices=['qchem', 'grmx', 'vasp','sleep','amp'], help='kind of software')
-    parser.add_argument('-j', '--qjobname', help='qjob name for qsub|directory name')
+    parser.add_argument('-qj', '--qjobname', help='qjob name for qsub|directory name')
+    parser.add_argument('-js', '--sub_job', default='tr', help='for amp, [tr, te]')
     parser.add_argument('-i', '--inf', help='input filename')
-    parser.add_argument('-m', '--mem', default=5, type=float, help='memory size for qsub')
+    parser.add_argument('-m', '--mem', default=2.0, type=float, help='memory size for qsub')
     parser.add_argument('-n', '--np', default=16, type=int, help='number of process')
     gr_amp = parser.add_argument_group()
     gr_amp.add_argument('-sc', '--scan', action='store_true', help='scan amp for several Hidden Layer|save for qchem')
-    args = parser.parse_args()
+    gr_amp.add_argument('-di', '--data_interval', nargs="*", help='data selection for training and test')
+    gr_amp.add_argument('-hl', '--hidden_layer', nargs="*", help='hidden layer')
+    gr_amp.add_argument('-el', '--e_limit', type=float, help='training energy accuracy')
 
-    job_description(args.server, args.software, args.qjobname, args.inf, args.np, args.mem, args.scan) 
+    args = parser.parse_args()
+    
+    if args.inf.endswith('.in'):
+        fname = args.inf[:-3]
+    else:
+        fname = args.inf
+
+    job_description(fname, args.software, args.qjobname, args.sub_job, args.np, args.mem, args.scan, args.data_interval, args.hidden_layer, args.e_limit) 
 
 if __name__ == '__main__':
     main()

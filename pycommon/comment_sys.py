@@ -62,7 +62,8 @@ server.MLET.plot =   "=== MLET (SGE) ===\
                     \n\tmem 188: node11, 15, 16, 20, 21\
                     \n\t\t16 node * 11.7 G mem\
                     \n\tmem 128: opt07 others 96\
-                    \n\tmim  96: almost, 12 node * 8G mem\
+                    \n\tmem  96: almost, 12 node * 8G mem\
+                    \n\tmem/proc: 2G default, -l mem=nG for qsub\
                     \n  --PLOT Figure\
                     \n\t$ ssh -Y mlet (in login)\
                     \n\t    for drawing in master node\

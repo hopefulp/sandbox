@@ -16,13 +16,16 @@ set sandbox = "$HOME/sandboxg"
 
 setenv PYTHONPATH $sandbox/pycommon:$sandbox/myplot:$sandbox/acpype:$sandbox/py_ai:$sandbox/chem_mod
 set PYTHON = "$HOME/anaconda3/bin/python"
-set EXE = "$sandbox/py_ai/amp_ene.py"
+set EXE = "$sandbox/py_amp/amp_run.py"
 
 ### $EXE is not working 
 if ( ! $?scan ) then
-    #$PYTHON $EXE $fname $pyjob -nc $nc -hl 7 7 7 -el 0.0001 -g
-    $PYTHON $EXE $fname $pyjob -nc $nc -hl $hl -el $el -g
-    #$PYTHON $EXE OUTCAR tr -nc 12 -hl 4 4 4 -el 0.0001 -g
+    if ( $?di ) then
+        $PYTHON $EXE -f $fname -j $pyjob -di $di -nc $np -hl $hl -el $el -g
+    else
+        $PYTHON $EXE -f $fname -j $pyjob -nc $np -hl $hl -el $el -g
+    endif    
+    #$PYTHON $EXE -f OUTCAR -j tr -nc $nc -hl 10 10 -el 0.001 -g
 ### scan and consecutive work in 1 qsub
 else
     foreach i (`seq 2 2 10`)

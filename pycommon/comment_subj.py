@@ -15,52 +15,66 @@ vasp.postproc = MyClass()
 nico2   = MyClass()
 myplot  = MyClass()
 amp     = MyClass()
+amp.server  = MyClass()
+amp.scripts = MyClass()
 #server.sge     = MyClass()
 
-amp.order       =   "=== AMP ===\
-                    \n    ORDER:: amp_ene.py\
-                    "
-amp.amp_ene     =   "\n    USAGE::\
-                    \n\tamp_ene.py input_file job=['tr','te','pr','va']\
-                    \n\t    Input_file : extxyz, OUTCAR w. coord and PE\
-                    \n\t    Job        : one of training, test, profile, validation\
-                    \n\t\ttraining uses 4/5 parts\
-                    \n\t\ttest uses 5th/5 part\
+amp.scripts.run  =  "\n  --Scripts--\
+                    \n\tamp_run.py -f fname -j job -di 1 2 3 4 -nc 4\
+                    \n\t    -f : input file=[OUTCAR, extxyz]\
+                    \n\t    -j : job=['tr','te','pr'] for training, test, profile; validation was deprecated\
                     \n\t\tprofile draws all PE\
+                    \n\t    -di: data index [d1,d2[,d3,d4]] for data region for training and test\
+                    \n\t\t-ns: number of data sets are deprecated\
+                    \n\t    -ns: training uses n-1/n parts (default n=5)\
+                    \n\t         test uses 5th/5 part\
+                    \n\t    -nc: Ncore (parallel runs for fingerprints only\
                     \n\t    More Options:\
                     \n\t\t-nc N for number of core for parallel calculation\
-                    \n\t\t-tx for use twinx for plot\
+                    \n\t\t-tx for use twinx for plot: default=True\
                     \n\t    import myplot2D for plot:\
                     \n\t\tdef draw_dots_two:\
                     \n\t\t   option single y-axis|twinx\
                     \n\t\t   modify color option\
                     \n\t\trefer to myplot\
                     "
-amp.water       =   "\n    CHI\
-                    \n\tamp_ene.py OUTCAR tr -tx -nc 4 -hl 4 4 4 -el 0.0001\
-                    \n\tamp_ene.py OUTCAR te -a -tx -hl 4 4 4 -el 0.0001\
-                    \n\t    : -a [show all fig] \
-                    \n    MLET\
-                    \n\tFor plot error\
-                    \n\t    do not queue-submit matplotlib\
-                    \n\tTraining:\
-                    \n\t    $ qsub -pe numa 12 $SGE_HOME/sge_amp.csh\
-                    \n\t    SCAN in pbs script for consecutive work\
-                    \n\t\t$ qsub -N reD3 -pe numa 12 -v fname=OUTCAR -v pyjob=tr -v nc=12 $SGE_HOME/sge_amp.csh\
-                    \n\t\t$ qsub -N reD3 -pe numa 12 -v fname=OUTCAR -v pyjob=tr -v nc=12 -v scan=scan $SGE_HOME/sge_amp.csh\
-                    \n\t\t    sge_amp.sh\
-                    \n\t\t\t$PYTHON $EXE $fname $pyjob -nc $nc -hl 4 4 4 -el 0.0001 -g\
-                    \n\t    SCAN and submit with many qsub\
+amp.scripts.mlet =  "\n\t$ qsub sge_amp.csh\
+                    \n\t    qsub script\
+                    \n\t    -v scan=ok will run consecutively\
+                    \n\t$ sge_amp_scan.py -hl 3 3 3 -nc 12\
+                    \n\t    will run scan parallelly\
+                    \n\t$ qsub_server.py\
+                    \n\t    make qsub command line\
+                    \n\t    usage: $qsub_server.py amp -i OUTCAR -qj qname -hl 10 10 -el 0.001 -di 0 1500 1500 2000\
+                    \n\t    amp positional argument for software\
+                    \n\t    -i input file of PES-force\
+                    \n\t    -hl hidden layer, -el energy convergence limit\
+                    "
+amp.server.chi =   "=== AMP ===\
+                    \n  --SERVER--\
+                    \n\tCHI::\
+                    \n\t    amp_ene.py OUTCAR tr -nc 4 -hl 4 4 4 -el 0.0001\
+                    \n\t\t-a [show all fig - deprecated] \
+                    "
+amp.server.mlet =   "\n\tMLET::\
+                    \n\t    NB. PLOT ERROR\
+                    \n\t\tDo not queue-submit matplotlib\
+                    \n\t    Plot:\
+                    \n\t\t$ amp_ene.py OUTCAR te -a -tx -hl 5 5 5 -el 0.0001 (-Y master node)\
+                    \n\t    QSUB:\
+                    \n\t\t$ qrun.sh amp N1000 OUTCAR 16 4 \"10 10\" 0.001 \"0 1500 1500 2000\"\
+                    \n\t\t    : software_name qname fname np mem=3(G) hl el di\
+                    \n\t\t    : water N64 mem>3G
+                    \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -hl 10 10 -el 0.001 -di 0 1500 1500 2000\
+                    \n\t\t    -qj qname -> qsub -N qname\
+                    \n\t\t    -i inputfile\
+                    \n\t\t    prints:\
+                    \n\t\t    $ qsub -N qname -pe numa 16 -v fname=OUTCAR -v np=16 -v pyjob=tr -v di=\"0 1500 1500 2000\" -v hl=\"10 10\" -v el=0.001 $SB/pypbs/sge_amp.csh\
+                    \n\t\t\t -v scan=ok for scan in consecutive way not parallel\
+                    \n\t\t:sge_amp.csh\
+                    \n\t\t    $PYTHON $EXE -f $fname -j $pyjob -di $di -nc $np -hl $hl -el $el -g\
+                    \n\t    submit several jobs with scan\
                     \n\t\t$ sge_amp_scan.py -hl 3 3 3 -nc 12\
-                    \n\tPlot:\
-                    \n\t    $ amp_ene.py OUTCAR te -a -tx -hl 5 5 5 -el 0.0001 (-Y master node)\
-                    \n\tRUN:\
-                    \n\t    $ qsub_server.py -s amp -d dirname\
-                    \n\t\t: -d dirname == qsub jobname\
-                    \n\t\t: print\
-                    \n\t\t$ qsub -N reD3 -pe numa 16 -v fname=OUTCAR -v nc=16 -v py_job=tr $SB/pypbs/sge_amp.csh\
-                    \n\t\t    sge_amp.csh\
-                    \n\t\t\t$PYTHON $EXE $fname $py_job -n $np -hl 4 4 4 -el 0.001 -g\
                     "
 amp.md_anal     =   "\n    MD Analysis\
                     \n\tMD.ene:\
