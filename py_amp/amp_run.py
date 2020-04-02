@@ -22,7 +22,8 @@ def get_title(job, fname, HL, E_conv,f_conv, ntotal, ndata):
     title = fname.split(".")[0] + "\n"
     hl = '$\\times$'.join(str(x) for x in HL) 
     suptitle = "\n\nAMP Model(HL={}".format(hl) + ", "
-    suptitle += "E_rms={}):".format(E_conv) + " "
+    suptitle += "E_rms={} ".format(E_conv) + " "
+    suptitle += "F_err={}):".format(f_conv) + " "
     if re.search("te", job):
         suptitle += "test/train={}/{}".format(ndata, ntotal-ndata)
     elif re.search("va", job):
@@ -168,7 +169,7 @@ def amp_jobs(fdata, job, data_int, amp_pes, HL, E_conv, f_conv, Lgraph, ncore, n
         title, suptitle = get_title(job, fdata, HL, E_conv, f_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
         rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore,nmol=n_mol,Ltwinx=Ltwinx)
-        f_write(fdata, HL, E_conv, rmserr, max_res, job)
+        f_write(fdata, HL, E_conv, f_conv, rmserr, max_res, job)
 
     elif re.search('md',job):
         # use first geometry 

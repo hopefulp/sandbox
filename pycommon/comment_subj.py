@@ -53,8 +53,8 @@ amp.scripts.mlet =  "\n\t$ qsub sge_amp.csh\
 amp.server.chi =   "=== AMP ===\
                     \n  --SERVER--\
                     \n\tCHI::\
-                    \n\t    amp_ene.py OUTCAR tr -nc 4 -hl 4 4 4 -el 0.0001\
-                    \n\t\t-a [show all fig - deprecated] \
+                    \n\t    amp_run.py -f OUTCAR -j tr -nc 4 -di 800 1000 -hl 8 8 -el 0.001 -fl 0.01 +g\
+                    \n\t\tdetail in amp.scripts\
                     "
 amp.server.mlet =   "\n\tMLET::\
                     \n\t    NB. PLOT ERROR\
