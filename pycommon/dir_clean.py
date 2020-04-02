@@ -57,7 +57,13 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
         fname = d+'/'+f
         comm = "%s %s" % (linux_job, fname)
         if linux_job == 'mv':
-            comm += " %s" % new_dir
+            ndir = pwd + '/' + new_dir
+            if os.path.isdir(ndir):
+                print(f"Dir {new_dir} exists")
+            else:
+                os.mkdir(ndir)
+                print(f"Dir {new_dir} was made")
+            comm += " %s" % ndir
         print(comm)
         q_list.append(comm)
         

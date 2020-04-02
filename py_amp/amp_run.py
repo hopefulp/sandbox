@@ -18,7 +18,7 @@ import re
 import sys
 import os
 
-def get_title(job, fname, HL, E_conv, ntotal, ndata):
+def get_title(job, fname, HL, E_conv,f_conv, ntotal, ndata):
     title = fname.split(".")[0] + "\n"
     hl = '$\\times$'.join(str(x) for x in HL) 
     suptitle = "\n\nAMP Model(HL={}".format(hl) + ", "
@@ -29,13 +29,15 @@ def get_title(job, fname, HL, E_conv, ntotal, ndata):
         suptitle += "train:validation:test=3:1:1\n"
     return title, suptitle
 
-def exe_train_images(images, HL, E_conv,ncore):
+def exe_train_images(images, HL, E_conv, f_conv, ncore):
     Hidden_Layer=tuple(HL)
     print("Hidden Layer: {}".format(Hidden_Layer))
     print("Energy convergence: {}".format(E_conv))
     calc = Amp(descriptor=Gaussian(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=ncore)
-    #calc.model.lossfunction = LossFunction(convergence={'energy_rmse': E_conv})
-    calc.model.lossfunction = LossFunction(convergence={'energy_rmse': E_conv},force_coefficient=0.1)
+    if f_conv <= 0.0:
+        calc.model.lossfunction = LossFunction(convergence={'energy_rmse': E_conv})
+    else:
+        calc.model.lossfunction = LossFunction(convergence={'energy_rmse': E_conv},force_coefficient=f_conv)
     #calc.model.lossfunction = LossFunction(force_coefficient=-0.1)
     calc.train(images=images, overwrite=True)
     return
@@ -105,7 +107,7 @@ def exe_test_images(job, test_images, amp_pes, title, suptitle,ncore, Lgraph,val
         #err = rmse(y, y_bar)*escale
     return err, res_max
 
-def f_write(fname, HL, E_conv, err, max_res, job, job_index=None):
+def f_write(fname, HL, E_conv, f_conv, err, max_res, job, job_index=None):
     outf = fname.split(".")[0] + ''.join(str(x) for x in HL) + str(E_conv) + "." + job
     with open(outf, "a") as f:
         if job_index == None:
@@ -114,7 +116,7 @@ def f_write(fname, HL, E_conv, err, max_res, job, job_index=None):
             f.write("{}: {:5.3f} {:5.3f}\n".format(job_index,err,max_res))
     return 0            
     
-def amp_jobs(fdata, job, data_int, amp_pes, HL, E_conv, Lgraph, ncore, n_mol, Ltwinx):
+def amp_jobs(fdata, job, data_int, amp_pes, HL, E_conv, f_conv, Lgraph, ncore, n_mol, Ltwinx):
     total_images = ase.io.read(fdata, index=':')    # can read extxyz, OUTCAR, 
     images_sets = Images(total_images, nsets=data_int)
     #if not os.path.isfile(amp_pes):
@@ -135,7 +137,7 @@ def amp_jobs(fdata, job, data_int, amp_pes, HL, E_conv, Lgraph, ncore, n_mol, Lt
             d_list =  data_int[:2]
             images = images_sets.get_training_images(d_list=d_list)
         print("data training:total sets %d/%d" % (len(images), len(total_images)))
-        exe_train_images(images, HL, E_conv,ncore)
+        exe_train_images(images, HL, E_conv, f_conv, ncore)
         ### test after training 
         if isinstance(data_int, int):
             images = images_sets.get_test_images()
@@ -145,10 +147,10 @@ def amp_jobs(fdata, job, data_int, amp_pes, HL, E_conv, Lgraph, ncore, n_mol, Lt
                 images = images_sets.get_test_images(d_list=d_list)
             else:
                 print("There is no test set region in -di ")
-        title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
+        title, suptitle = get_title(job, fdata, HL, E_conv,f_conv,len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
         rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore,Ltwinx=Ltwinx)
-        f_write(fdata, HL, E_conv, rmserr, max_res, job)
+        f_write(fdata, HL, E_conv, f_conv, rmserr, max_res, job)
     ### job == test
     elif re.search("te",job):
         if isinstance(data_int, int):
@@ -184,7 +186,8 @@ def main():
     ### others
     parser.add_argument('-nm','--nmol',default=1,type=int,help='num of molecules in the system to normalize error')
     parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
-    parser.add_argument('-el', '--e_convergence', default=0.001, type=float, help='energy convergence limit')
+    parser.add_argument('-el', '--e_conv', default=0.001, type=float, help='energy convergence limit')
+    parser.add_argument('-fl', '--f_conv', default=0.01, type=float, help='force convergence limit')
     parser.add_argument('-tx', '--twinx', action="store_false", help='turn off to use twinx of two y-axes')
     parser.add_argument('-g', action="store_false", help='if val default is False, otherwise True')
     parser.add_argument('+g', action="store_true", help='if val default is False, otherwise True')
@@ -213,7 +216,7 @@ def main():
         else:
             sys.exit(1)
         
-    amp_jobs(fname,args.job,data_int,args.pot,args.hidden_layer,args.e_convergence,args.g,args.ncore,args.nmol,args.twinx)
+    amp_jobs(fname,args.job,data_int,args.pot,args.hidden_layer,args.e_conv,args.f_conv,args.g,args.ncore,args.nmol,args.twinx)
     return
 
 if __name__ == '__main__':
