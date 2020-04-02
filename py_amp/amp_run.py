@@ -129,7 +129,7 @@ def amp_jobs(fdata, job, data_int, amp_pes, HL, E_conv, f_conv, Lgraph, ncore, n
             mplot_nvector([],y,fdata.split(".")[0],'sample','E(eV)')
         elif fdata == "OUTCAR":
             mplot_nvector([],y,Xtitle='sample',Ytitle='E(eV)')
-    ### job == training
+    ### JOB == TRAINING
     elif re.search("tr",job):
         if isinstance(data_int, int):
             images = images_sets.get_training_images()
@@ -143,7 +143,10 @@ def amp_jobs(fdata, job, data_int, amp_pes, HL, E_conv, f_conv, Lgraph, ncore, n
             images = images_sets.get_test_images()
         else:
             if len(data_int) >= 3:
-                d_list = data_int[2:]
+                if len(data_int) == 3:
+                    d_list = data_int[1:]
+                else:
+                    d_list = data_int[2:]
                 images = images_sets.get_test_images(d_list=d_list)
             else:
                 print("There is no test set region in -di ")
@@ -151,17 +154,18 @@ def amp_jobs(fdata, job, data_int, amp_pes, HL, E_conv, f_conv, Lgraph, ncore, n
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
         rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore,Ltwinx=Ltwinx)
         f_write(fdata, HL, E_conv, f_conv, rmserr, max_res, job)
-    ### job == test
+    ### JOB == TEST
     elif re.search("te",job):
         if isinstance(data_int, int):
             if data_int == 0:
                 images = total_images
             else:
                 images = images_sets.get_test_images()
+        ### for data interval
         else:
             images = images_sets.get_test_images(d_list=data_int)
             
-        title, suptitle = get_title(job, fdata, HL, E_conv, len(total_images), len(images))
+        title, suptitle = get_title(job, fdata, HL, E_conv, f_conv, len(total_images), len(images))
         print("data test:total sets %d/%d" % (len(images), len(total_images)))
         rmserr, max_res = exe_test_images(job, images, amp_pes, title, suptitle,Lgraph,ncore,nmol=n_mol,Ltwinx=Ltwinx)
         f_write(fdata, HL, E_conv, rmserr, max_res, job)

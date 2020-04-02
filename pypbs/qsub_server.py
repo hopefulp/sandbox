@@ -6,7 +6,7 @@ import os
 import socket
 from common import *
 
-def print_sge(inf,software,qjobname,sub_job,np,mem,Lscan_saver,data_int,hl,el):
+def print_sge(inf,software,qjobname,sub_job,np,mem,Lscan_saver,data_int,hl,el,fl):
     _HOME = os.getenv('HOME')
     if not software:
         print("Use:: qfree - to check freed node")
@@ -55,6 +55,8 @@ def print_sge(inf,software,qjobname,sub_job,np,mem,Lscan_saver,data_int,hl,el):
             com += f"-v hl=\"{st}\" "
         if el:
             com += f"-v el={el} "
+        if fl:
+            com += f"-v fl={fl} "
         if Lscan_saver:
             com += "-v scan=ok "
         com += "$SB/pypbs/sge_amp.csh"
@@ -80,10 +82,10 @@ def print_chi(inf, software, np, Lscan_saver):
             os.system(com)
     return 0
 
-def job_description(fname, software, qjobname, sub_job, np, mem, scan_saver, data_int, hl, el):
+def job_description(fname, software, qjobname, sub_job, np, mem, scan_saver, data_int, hl, el, fl):
     server =  socket.gethostname()
     if server == 'login':
-        print_sge(fname, software, qjobname, sub_job, np, mem, scan_saver,data_int,hl,el) 
+        print_sge(fname, software, qjobname, sub_job, np, mem, scan_saver,data_int,hl,el,fl) 
     elif server == 'chi':
         print_chi(fname, software, np, scan_saver)
     else:
@@ -105,6 +107,7 @@ def main():
     gr_amp.add_argument('-di', '--data_interval', nargs="*", help='data selection for training and test')
     gr_amp.add_argument('-hl', '--hidden_layer', nargs="*", help='hidden layer')
     gr_amp.add_argument('-el', '--e_limit', type=float, help='training energy accuracy')
+    gr_amp.add_argument('-fl', '--f_limit', type=float, help='training force accuracy')
 
     args = parser.parse_args()
     
@@ -113,7 +116,7 @@ def main():
     else:
         fname = args.inf
 
-    job_description(fname, args.software, args.qjobname, args.sub_job, args.np, args.mem, args.scan, args.data_interval, args.hidden_layer, args.e_limit) 
+    job_description(fname, args.software, args.qjobname, args.sub_job, args.np, args.mem, args.scan, args.data_interval, args.hidden_layer, args.e_limit,args.f_limit) 
 
 if __name__ == '__main__':
     main()

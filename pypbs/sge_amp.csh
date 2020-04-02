@@ -21,9 +21,9 @@ set EXE = "$sandbox/py_amp/amp_run.py"
 ### $EXE is not working 
 if ( ! $?scan ) then
     if ( $?di ) then
-        $PYTHON $EXE -f $fname -j $pyjob -di $di -nc $np -hl $hl -el $el -g
+        $PYTHON $EXE -f $fname -j $pyjob -di $di -nc $np -hl $hl -el $el -fl $fl -g
     else
-        $PYTHON $EXE -f $fname -j $pyjob -nc $np -hl $hl -el $el -g
+        $PYTHON $EXE -f $fname -j $pyjob -nc $np -hl $hl -el $el -fl $fl -g
     endif    
     #$PYTHON $EXE -f OUTCAR -j tr -nc $nc -hl 10 10 -el 0.001 -g
 ### scan and consecutive work in 1 qsub

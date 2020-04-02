@@ -47,23 +47,24 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
         matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
         f_list = get_files_match(matches, d, Lshowmatch)
     elif work == 'amp':
-        matches=['amp']
+        matches=['amp','convergence']
         f_list = get_files_match(matches, d, Lshowmatch)
-            
 
+    ### Make directory for 'cp', 'mv'        
+    if linux_job == 'mv' or linux_job == 'cp':
+        ndir = pwd + '/' + new_dir
+    if os.path.isdir(ndir):
+        print(f"Dir {new_dir} exists")
+    else:
+        os.mkdir(new_dir)
+        print(f"Dir {new_dir} was made")
     f_list.sort()
     ### Make command list
     for f in f_list:
-        fname = d+'/'+f
-        comm = "%s %s" % (linux_job, fname)
-        if linux_job == 'mv':
-            ndir = pwd + '/' + new_dir
-            if os.path.isdir(ndir):
-                print(f"Dir {new_dir} exists")
-            else:
-                os.mkdir(ndir)
-                print(f"Dir {new_dir} was made")
-            comm += " %s" % ndir
+        #fname = d+'/'+f
+        comm = "%s %s" % (linux_job, f)
+        if linux_job == 'mv' or linux_job == 'cp':
+            comm += " %s" % new_dir
         print(comm)
         q_list.append(comm)
         
@@ -80,6 +81,8 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
                 job_str = 'removed'
             elif linux_job == 'mv':
                 job_str = 'moved'
+            elif linux_job == 'cp':
+                job_str = 'saved'
             print(f"{i} files will be {job_str}")         
 
     return 0
@@ -94,8 +97,8 @@ def main():
     parser.add_argument('-m', '--match', nargs='*', help='remove matching file')
     parser.add_argument('-e', '--exclude', nargs='*', help='remove all files except list') 
     parser.add_argument('-ef', '--excluded_files', nargs='*', help='save this file') 
-    parser.add_argument('-j', '--job', default='rm', choices=['rm','mv'], help='how to treat files')
-    parser.add_argument('-jd', '--mv_dir', default='tmp', help='directory where files to move')
+    parser.add_argument('-j', '--job', default='rm', choices=['rm','mv','cp'], help='how to treat files [rm|cp|mv]')
+    parser.add_argument('-jd', '--new_dir', default='tmp', help='directory where files to move')
     parser.add_argument('-ms', '--match_show', action='store_true')
     args = parser.parse_args()
 
@@ -107,7 +110,7 @@ def main():
         args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR']
     #if args.work == 'amp' and not args.excluded_files:
     #    args.excluded
-    d_clean(args.dirs,args.work,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.mv_dir,args.match_show)
+    d_clean(args.dirs,args.work,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.new_dir,args.match_show)
     return 0
 
 if __name__ == '__main__':

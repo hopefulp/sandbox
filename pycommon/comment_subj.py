@@ -64,8 +64,8 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t    QSUB:\
                     \n\t\t$ qrun.sh amp N1000 OUTCAR 16 4 \"10 10\" 0.001 \"0 1500 1500 2000\"\
                     \n\t\t    : software_name qname fname np mem=3(G) hl el di\
-                    \n\t\t    : water N64 mem>3G
-                    \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -hl 10 10 -el 0.001 -di 0 1500 1500 2000\
+                    \n\t\t    : water N64 mem == 6G\
+                    \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -j tr -hl 10 10 -el 0.001 -di 0 1500 1500 2000\
                     \n\t\t    -qj qname -> qsub -N qname\
                     \n\t\t    -i inputfile\
                     \n\t\t    prints:\
