@@ -11,11 +11,18 @@ q_list=[]
 def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir,Lshowmatch):
 
     pwd = os.getcwd()
-    if len(dirs) > 1:
-        print("use only one directory")
-        sys.exit(1)
-    else:
-        d = pwd + '/' + dirs[0]
+    if isinstance(dirs, str):
+        if dirs == pwd:
+            d = dirs
+        else:
+            d = pwd + '/' + dirs
+    elif isinstance(dirs, list):
+        if len(dirs) > 1:
+            print("use only one directory in list: {dirs}")
+            print_list(dirs)
+            sys.exit(1)
+        else:
+            d = pwd + '/' + dirs[0]
 
     matches=[]
     if work == None:
@@ -47,17 +54,17 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
         matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
         f_list = get_files_match(matches, d, Lshowmatch)
     elif work == 'amp':
-        matches=['amp','convergence']
+        matches=['amp','pdf']
         f_list = get_files_match(matches, d, Lshowmatch)
 
     ### Make directory for 'cp', 'mv'        
     if linux_job == 'mv' or linux_job == 'cp':
         ndir = pwd + '/' + new_dir
-    if os.path.isdir(ndir):
-        print(f"Dir {new_dir} exists")
-    else:
-        os.mkdir(new_dir)
-        print(f"Dir {new_dir} was made")
+        if os.path.isdir(ndir):
+            print(f"Dir {new_dir} exists")
+        else:
+            os.mkdir(new_dir)
+            print(f"Dir {new_dir} was made")
     f_list.sort()
     ### Make command list
     for f in f_list:
@@ -90,7 +97,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
 
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
-    parser.add_argument('dirs', default='.', nargs='*', help='input work directories')
+    parser.add_argument('dirs', default=os.getcwd(), nargs='?', help='input work directories')
     parser.add_argument('-w', '--work', choices=['qchem','amp','vasp','pbs'],help='remove depending on job')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')

@@ -1,5 +1,6 @@
 import re
 import os
+import sys
 import inspect
 import numpy as np
 
@@ -75,6 +76,11 @@ def yes_or_no(question):
 
 def list2str(li):
     st = "".join(str(x) for x in li)
+    return st
+
+def print_list(li):
+    st = list2str(li)
+    print(st)
     return st
 
 def get_answers(question):
@@ -215,9 +221,6 @@ def fname_decom(fname):
         exit(1)
     return lname[0], lname[1]        
 
-
-
-
 def fname_parsing(fname):
     lname = fname.split('.')
     if not len(lname) == 2:
@@ -238,4 +241,27 @@ def expand_dim_str(lstring):
             new_2d.append(new_list)
     return new_2d
 
-        
+def f_parsing(fname, sep='num'):
+    with open(fname, 'r') as f:
+        lines = f.readlines()
+        i=0
+        y=[]
+        for line in lines:
+            if re.search('[a-zA-Z]', line):
+                pass
+            else:
+                i += 1
+                line = line.strip()
+                ele = line.split()
+                if i == 1:
+                    n = len(ele)
+                    for j in range(n):
+                        y.append([])         # declare list as many as the number of column
+                for j in range(n):
+                    y[j].append(float(ele[j]))
+    for j in range(n):
+        if j > 0:
+            if len(y[j-1]) != len(y[j]):
+                print("in zip file to column, Error: length of colums are different")
+                sys.exit(1)
+    return y

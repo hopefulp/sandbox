@@ -19,7 +19,7 @@ amp.server  = MyClass()
 amp.scripts = MyClass()
 #server.sge     = MyClass()
 
-amp.scripts.run  =  "\n  --Scripts--\
+amp.scripts.run  =  "\n  == Scripts ==\
                     \n\tamp_run.py -f fname -j job -di 1 2 3 4 -nc 4\
                     \n\t    -f : input file=[OUTCAR, extxyz]\
                     \n\t    -j : job=['tr','te','pr'] for training, test, profile; validation was deprecated\
@@ -51,28 +51,29 @@ amp.scripts.mlet =  "\n\t$ qsub sge_amp.csh\
                     \n\t    -hl hidden layer, -el energy convergence limit\
                     "
 amp.server.chi =   "=== AMP ===\
-                    \n  --SERVER--\
+                    \n  == SERVER ==\
                     \n\tCHI::\
-                    \n\t    amp_run.py -f OUTCAR -j tr -nc 4 -di 800 1000 -hl 8 8 -el 0.001 -fl 0.01 +g\
+                    \n\t    amp_run.py -f OUTCAR -j tr -nc 4 -di 0 800 1000 -hl 8 8 -el 0.001 -fl 0.01 +g\
                     \n\t\tdetail in amp.scripts\
                     "
 amp.server.mlet =   "\n\tMLET::\
-                    \n\t    NB. PLOT ERROR\
+                    \n\t    N.B. PLOT ERROR\
                     \n\t\tDo not queue-submit matplotlib\
-                    \n\t    Plot:\
-                    \n\t\t$ amp_ene.py OUTCAR te -a -tx -hl 5 5 5 -el 0.0001 (-Y master node)\
-                    \n\t    QSUB:\
-                    \n\t\t$ qrun.sh amp N1000 OUTCAR 16 4 \"10 10\" 0.001 \"0 1500 1500 2000\"\
-                    \n\t\t    : software_name qname fname np mem=3(G) hl el di\
+                    \n\t    PLOT [AMP-Test]:\
+                    \n\t\t$ amp_run.py -f OUTCAR -j te -di 1500 2000 -hl 10 10 -el 0.001 -fl 0.1 (-Y master node)\
+                    \n\t\t$ amp_plot.py amp_test.txt -f OUTCAR -hl 10 10 -el 0.001 -fl 0.01 -nt 1000 -n 500\
+                    \n\t    QSUB [AMP-Training]:\
+                    \n\t\t$ qrun.sh amp N1000 OUTCAR 16 4 \"10 10\" 0.001 0.01 \"0 1500 2000\"\
+                    \n\t\t    : software_name qname fname np mem=3(G) hl el fl di\
                     \n\t\t    : water N64 mem == 6G\
-                    \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -j tr -hl 10 10 -el 0.001 -di 0 1500 1500 2000\
+                    \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -js te -hl 10 10 -el 0.001 -fl 0.01 -di 0 1500 2000 -m 4\
                     \n\t\t    -qj qname -> qsub -N qname\
                     \n\t\t    -i inputfile\
                     \n\t\t    prints:\
-                    \n\t\t    $ qsub -N qname -pe numa 16 -v fname=OUTCAR -v np=16 -v pyjob=tr -v di=\"0 1500 1500 2000\" -v hl=\"10 10\" -v el=0.001 $SB/pypbs/sge_amp.csh\
+                    \n\t\t    $ qsub -N qname -pe numa 16 -v fname=OUTCAR -v np=16 -v pyjob=tr -v di=\"0 1500 1500 2000\" -v hl=\"10 10\" -v el=0.001 -v fl=0.01 $SB/pypbs/sge_amp.csh\
                     \n\t\t\t -v scan=ok for scan in consecutive way not parallel\
                     \n\t\t:sge_amp.csh\
-                    \n\t\t    $PYTHON $EXE -f $fname -j $pyjob -di $di -nc $np -hl $hl -el $el -g\
+                    \n\t\t    $PYTHON $EXE -f $fname -j $pyjob -di $di -nc $np -hl $hl -el $el -fl $fl -g\
                     \n\t    submit several jobs with scan\
                     \n\t\t$ sge_amp_scan.py -hl 3 3 3 -nc 12\
                     "
