@@ -162,6 +162,19 @@ def dir_all(dir_):
 
 def f_ext(fname):
     return fname.split('.')[-1]
+def f_root(fname):
+    return fname.split('.')[0]
+fname_root = f_root
+fname_ext  = f_ext
+
+def fname_decom(fname):
+    lname = fname.split('.')
+    if not len(lname) == 2:
+        print("Error: %s has more than 1 dot in file name" % fname)
+        exit(1)
+    return lname[0], lname[1]        
+
+fname_parsing = fname_decom
 
 def get_files_suffix(suffixes, dname):
     """
@@ -214,19 +227,6 @@ def get_files_exclude(matches, dname):
         all_files.remove(fname)
     return all_files
 
-def fname_decom(fname):
-    lname = fname.split('.')
-    if not len(lname) == 2:
-        print("Error: %s has more than 1 dot in file name" % fname)
-        exit(1)
-    return lname[0], lname[1]        
-
-def fname_parsing(fname):
-    lname = fname.split('.')
-    if not len(lname) == 2:
-        print("Error: %s has more than 1 dot in file name" % fname)
-        exit(1)
-    return lname[0], lname[1]
 
 
 def expand_dim_str(lstring):

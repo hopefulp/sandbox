@@ -145,14 +145,22 @@ myplot.md       =   "\n    MD w. AMP\
 myplot.nico2    =   "\n    For NiCO2: refer to nico2.myplot"
 
 
-water.order =       "===WATER===\
+water.order     =   "===WATER===\
                     \n    ORDER:: calcube makecube pdb2bgf makelmp_in"
-water.calcube =     "\n    CALCULATE CUBE:\
-                    \n\t$ chem_math.py -m H2O -d 1.0 -n 64"
+water.calcube   =   "\n    CALCULATE CUBE:\
+                    \n\t$ chem_math.py -m H2O -d 1.0 -n 64\
+                    \n\t    :get cube lattice vector\
+                    "
 water.makecube =    "\n    MAKE CUBE:\
                     \n\t$ packmol < water_n64.inp\
-                    \n\t\tmakes a.pdb\
-                    \n\t\tgopack to see input file"
+                    \n\t    :makes a.pdb\
+                    \n\tpackmol.inp\
+                    \n\t    input(1mol), output with the same type\
+                    "
+water.xyz2data =    "\n    XYZ to data.lammps\
+                    \n\t$ xyz2lmpdata.py water_n768.xyz lattice_a(28.42819)\
+                    \n\t    make data.lammps\
+                    "
 water.pdb2bgf =     "\n    PDB to BGF:\
                     \n\t$ babel -ipdb water_n64.pdb -obgf water_n64.bgf"
 water.modify_bgf = "\n    Modify BGF:\
@@ -195,6 +203,13 @@ packmol.start       ="\n    PACKMOL\
                     "
 packmol.calcube     = water.calcube
 packmol.makecube    = water.makecube
+packmol.inp         ="\n    XYZ:: Different file format\
+                    \n\tTo make xyz, prepare water.xyz file of single molecule\
+                    \n\t$ packmol < water_n128.inp\
+                    \n\twater_n128.inp::\
+                    \n\t    output water_n128.xyz\
+                    \n\t    structure water.xyz\
+                    "
 
 vasp.run            = "=== VASP ===\
                     \n    Structure\
