@@ -7,7 +7,6 @@ from amp import Amp
 from amp.descriptor.gaussian import Gaussian
 from amp.model.neuralnetwork import NeuralNetwork
 from amp.model import LossFunction
-from amp.utilities import Annealer
 
 import numpy as np
 #from myplot2D import *                 ### FOR MLET 
@@ -23,23 +22,19 @@ import socket
 
 Ldebug = False
 
-### Train Images 
 def calc_train_images(images, HL, E_conv, f_conv, f_coeff, ncore):
     Hidden_Layer=tuple(HL)
     print("Hidden Layer: {}".format(Hidden_Layer))
     print("Energy convergence: {}".format(E_conv))
     cores={'localhost':ncore}   # 'localhost' depress SSH, communication between nodes
     calc = Amp(descriptor=Gaussian(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-    ### Global Search in Param Space
-    Annealer(calc=calc, images=images, Tmax=20, Tmin=1, steps=4000)
-
     if f_conv <= 0.0:
-        E_maxresid = E_conv*3
         convergence={'energy_rmse': E_conv}
-        #convergence={'energy_rmse': E_conv, 'energy_maxresid': E_maxresid}
     else:
         convergence={'energy_rmse': E_conv, 'force_rmse':f_conv}
-    calc.model.lossfunction = LossFunction(convergence=convergence, force_coefficient=f_coeff)  # setting
+    calc.model.lossfunction = LossFunction(convergence=convergence, force_coefficient=f_coeff)
+        
+    #calc.model.lossfunction = LossFunction(force_coefficient=-0.1)
     calc.train(images=images, overwrite=True)
     return
 

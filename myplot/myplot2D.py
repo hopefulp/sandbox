@@ -56,12 +56,14 @@ def common_figure_after():
     plt.legend(loc=2)
     return 0
 
-### ddraw_dots_two was upgraded to twinx
-def draw_dots_two(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b','o']):
+
+### draw_dots_two was upgraded to twinx
+def draw_2subdots(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b','o'], Ldiff=True):
     '''
     this makes error in serial plotting
     '''
     #fig, ax = common_figure()
+    escale = 1.0
     nlen = len(y)
     h_conv = np.array(h) * escale        # escale = my_chem.ev2kj
     y_conv = np.array(y) * escale
@@ -100,17 +102,91 @@ def draw_dots_two(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b'
     p1  = ax.scatter(range(nlen), y_conv, c='r', marker='o', label='true value')
     p2  = ax.scatter(range(nlen), h_conv, c='b', marker='^', label='hypothesis')
     if Ltwinx:
-        p3, = ax2.plot(range(nlen), diff, c='g', label='difference')
-        plt.legend([p1,p2],['true value', 'hypothesis'],loc=(0.0, 0.1))
+        if Ldiff:
+            p3, = ax2.plot(range(nlen), diff, c='g', label='difference')
+            plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.0, 0.1))
+        else:
+            plt.legend([p1,p2],['true value', 'hypothesis'],loc=(0.0, 0.1))
         plt.text(text_twinx_x, text_twinx_y, text, fontsize=10, transform=ax.transAxes)
     else:
-        p3, = plt.plot(range(nlen), diff, c='g', label='difference')
-        plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.0, 0.1))
+        #p3, = plt.plot(range(nlen), diff, c='g', label='difference')
+        #plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.0, 0.1))
+        plt.legend([p1,p2],['true value', 'hypothesis'],loc=(0.0, 0.1))
         plt.text(text_x, text_y, text, fontsize=10, transform=ax.transAxes)
     plt.plot(range(nlen), ones)
 
     plt.show()
     return rmse, max_res
+### draw_dots_two was upgraded to twinx
+def draw_dots_two(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b','o'], Ldiff=True):
+    '''
+    this makes error in serial plotting
+    '''
+    #fig, ax = common_figure()
+    escale = 1.0
+    nlen = len(y)
+    h_conv = np.array(h) * escale        # escale = my_chem.ev2kj
+    y_conv = np.array(y) * escale
+    ymin = min(y_conv)
+    ymax = max(y_conv)
+    y_width = ymax - ymin
+    diff =  np.subtract(h_conv,y_conv)
+    rmse = np.sqrt((diff**2).mean())
+    max_res = abs(max(diff, key=abs))
+    #print("{:10.3f} {:10.3f}".format(rmse,max_res))
+    ### input text inside figure
+    text_pos_x = nlen*0.85                  # 0.85, 0.2
+    text_pos_y = max(y_conv)*0.2
+    text="E_rms(test) = {:7.3f}\nE_maxres   = {:7.3f}".format(rmse, max_res)
+
+    if Colors:  color = Colors.pop(0)       #'tab:' + Colors.pop(0)
+    else:       color='tab:green'
+    ones = np.zeros((len(y_conv)))
+    #my_font('amp')
+    #mpl.rcParams.update({'font.size':22})
+    plt.title(title, fontsize=size_title)
+#    plt.suptitle(suptitle, x=0.5, y=0.92, va='top', fontsize=18)
+    suptitle="\n"+suptitle
+    plt.suptitle(suptitle, fontsize=size_tick)
+    if escale == 1.0:
+        ax.set_ylabel('PE(eV)', color='b', fontsize=size_label)
+        ax.set_ylim(ymin-1, ymax+0.25)
+    elif escale == my_chem.ev2kj:
+        ax.set_ylabel('PE(kJ/mol)', fontsize=size_tick)
+    plt.xlabel('data', fontsize=size_label)
+    #ax.tick_params(axis='y', labelsize=10)
+    ax.tick_params(axis='y', labelcolor='b', labelsize=size_tick)
+    #ax.tick_params(axis='both', which='major', labelsize=10)
+    if Ltwinx:
+        ax2=ax.twinx()
+        ax2.set_ylabel("Difference(eV)", color='g')
+        ax2.set_ylim(-0.5, 3.0)
+        #ax2.plot(x, ys[1,:], 'o-', color=color)
+        ax2.tick_params(axis='y', labelcolor='g', labelsize=size_tick)
+    #plt.scatter(x, y, 'r', x, y_bar, 'b')
+    p1  = ax.scatter(range(nlen), y_conv, c='r', marker='o', label='true value')
+    p2  = ax.scatter(range(nlen), h_conv, c='b', marker='^', label='hypothesis')
+    if Ltwinx:
+        if Ldiff:
+            p3, = ax2.plot(range(nlen), diff, c='g', label='difference')
+            plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.45, 0.85))
+        else:
+            plt.legend([p1,p2],['true value', 'hypothesis'],loc=(0.0, 0.1))
+        plt.text(text_twinx_x, text_twinx_y, text, fontsize=size_tick, transform=ax.transAxes)
+    else:
+        #p3, = plt.plot(range(nlen), diff, c='g', label='difference')
+        #plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.0, 0.1))
+        plt.legend([p1,p2],['true value', 'hypothesis'],loc=(0.0, 0.1))
+        plt.text(text_x, text_y, text, fontsize=10, transform=ax.transAxes)
+    plt.plot(range(nlen), ones)
+
+    plt.show()
+    return rmse, max_res
+
+
+
+
+
 def xtitle_font(tit):
     st = "\'{}\', fontsize=20".format(tit)
     print(st)

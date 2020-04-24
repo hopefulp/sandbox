@@ -3,7 +3,7 @@
 nodes=$(qstat -f | sed -e '/---/d' -e '/adus/d' | awk '/@/ { print $1 }' | awk -F@ '{print $2}'  )
 #echo $nodes
 
-jobs=( ls rm mkdir vasp qchem )
+jobs=( ls rm mkdir vasp qchem ln )
 job=${1:-"vasp"}
 #echo $job
 if [ $job == "ls" -o $job == "mkdir" -o $job == "rm" ]; then
@@ -42,6 +42,10 @@ for node in $nodes; do
             if [ $? -eq 0 ]; then
                 njob=$(expr $njob + 1)
             fi
+            ;;
+        "ln")
+            echo "ssh $node ln -s /gpfs/home/joonho /home/joonho"
+            #ssh $node ln -s /gpfs/home/joonho /home/joonho
             ;;
         *)
             echo "Job is not in case"

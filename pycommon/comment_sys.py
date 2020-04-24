@@ -59,11 +59,11 @@ server.CHI =         "=== CHI (HOME) ===\
 
 server.MLET.plot =   "=== MLET (SGE) ===\
                     \n  --System:\
-                    \n\tmem 188: node11, 15, 16, 20, 21\
-                    \n\t\t16 node * 11.7 G mem\
-                    \n\tmem 128: opt07 others 96\
+                    \n\tmem 188: node11, 15, 16, 20, 21, 22, 23; 16 nproc * 11.7 G mem\
+                    \n\tmem 128: opt07\
                     \n\tmem  96: almost, 12 node * 8G mem\
                     \n\tmem/proc: 2G default, -l mem=nG for qsub\
+                    \n\tNode 17, 18, 19 no root passwd, can't run amp\
                     \n  --PLOT Figure\
                     \n\t$ ssh -Y mlet (in login)\
                     \n\t    for drawing in master node\
@@ -98,11 +98,14 @@ server.MLET.sleep   =       "\n    SLEEP::\
                     \n\t    qsub -pe numa 36 $SB/pypbs/sge_sleep.csh\
                     \n\t$ qsub_server.py sge -s sleep -n 36 -N sleep2\
                     \n\t    qsub -N sleep2 -pe numa 36 $SB/pypbs/sge_sleep.csh\
-                    \n\t$ qsub -N sleep2 -pe numa 36 -q skylake@node16 $SB/pypbs/sge_sleep.csh\
+                    \n\t$ qsub -N amplog -pe numa 36 -q skylake@node11 $SB/pypbs/sge_sleep.csh\
                     "
 server.MLET.at_node =       "\n    RUN @NODE VASP::\
                     \n\t$ sge_vasp_node.csh re0D3mdk_high 36\
                     "
+server.sleep        = server.MLET.sleep
+
+
 server.KISTI.pbs  = "=== KISTI ===\
                     \n    System::\
                     \n\tnode(queue)\
@@ -125,6 +128,12 @@ server.KISTI.pbs  = "=== KISTI ===\
                     \n\t\tnumber of process is confirmed in the script 'pbs_vasp.sh'\
                     "
 server.ssh.nodes  = "=== SSH ===\
+                    \n    alias::\
+                    \n\t$ checknodesamp\
+                    \n\t    to check amp_run.sh in running nodes in qstat\
+                    \n\t$ checknode $1\
+                    \n\t    to check 'python' in running nodes in qstat, defined alias.sh as function\
+                    \n\t    $1 can be 'python', 'amp_run.py', 'qchem', etc\n\
                     \n    Scan all the NODES for process name\
                     \n\t$ ssh node01 ps aux | grep process_name(vasp)\
                     \n\t    single node test for vasp\
@@ -141,10 +150,14 @@ server.ssh.node    =       "\n    Do process on ONE NODE\
 server.ssh.check_nod =     "\n    CHECK node for vasp\
                     \n\t$ ssh node08 ps aux | grep vasp | wc -l \
                     "
+server.ssh.scripts = "\n    Scripts::\
+                    \n\tsee server.pbs.scripts u. -j server -k pbs\
+                    "
 
-server.pbs.start=   "=== SGE: grid-engine (MLET) ===\
-                    \n    Overwrite \#$ -option in script\
-                    \n    Options::\
+server.pbs.sge=     "=== SGE: grid-engine (MLET) ===\
+                    \n    QSUB\
+                    \n\tOverwrite \#$ -option in script\
+                    \n\tOptions::\
                     \n\t -N qname (listed in $qstat)\
                     \n\t -pe numa $np (number of process)\
                     \n\t -l mem=10G (memory per process)\
@@ -153,6 +166,27 @@ server.pbs.start=   "=== SGE: grid-engine (MLET) ===\
                     \n\t -v vname=value (CLI input can't overwrite the same vname in script)\
                     \n    e.g.\
                     \n\t(Q-Chem) $ qsub -N qname -v qcjob=infile -pe numa np -l mem=3G -v np=np -q skylake@node11 $SB/pypbs/sge_qchem.csh\
+                    "
+server.pbs.qstat=   "\n    SGE command in MLET\
+                    \n\t$ qstat\
+                    \n\t    -f\
+                    \n\t    qstatf is aliased\
+                    \n\tPATH /gpfs/opt/util\
+                    \n\t$ qhist\
+                    \n\t$ qfree\
+                    \n\t$ qmem\
+                    "
+server.pbs.scripts  = "\n    Scripts::\
+                    \n\tSSH\
+                    \n\t    ssh_node.sh\
+                    \n\t\t...\
+                    \n\t    ssh_sge_nodes.sh\
+                    \n\t\tmlet node scan and run (ls rm mkdir vasp qchem ln )\
+                    \n\tPBS\
+                    \n\t    qstat_ssh.sh\
+                    \n\t\tscan qstat s. status r/ then run ps aux/ grep to find execution\
+                    \n\t    qrun.sh\
+                    \n\t\tto qsub qchem, vasp, amp in MLET\
                     "
 
 dir_job.clean =     "===DIR: clean, modify filename, jobs for package===\

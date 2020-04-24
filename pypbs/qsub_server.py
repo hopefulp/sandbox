@@ -6,7 +6,7 @@ import os
 import socket
 from common import *
 
-def print_sge(inf,software,qjobname,sub_job,np,mem,Lscan_saver,data_int,hl,el,fl):
+def print_sge(inf,ndata,software,qjobname,sub_job,np,mem,Lscan_saver,dtype,dlist,hl,el,fl):
     _HOME = os.getenv('HOME')
     if not software:
         print("Use:: qfree - to check freed node")
@@ -47,15 +47,20 @@ def print_sge(inf,software,qjobname,sub_job,np,mem,Lscan_saver,data_int,hl,el,fl
         com = f"qsub -N {qjobname} -pe numa {np} -v fname=OUTCAR -v np={np} -v pyjob={sub_job} "
         if mem > 2.0:
             com += f"-l mem={mem}G "
-        if data_int:
-            st = " ".join(data_int)
-            com += f"-v di=\"{st}\" "
+        if ndata:
+            com += f"-v ndata={ndata} "
+        if dtype:
+            com += f"-v dtype={dtype} "
+        if dlist:
+            st = " ".join(dlist)
+            com += f"-v dlist=\"{st}\" "
         if hl:
             st = " ".join(hl)
             com += f"-v hl=\"{st}\" "
         if el:
             com += f"-v el={el} "
-        if fl:
+        ### in case fl=0.0, it becomes False, it should be alive for sge_amp.csh
+        if fl != None:
             com += f"-v fl={fl} "
         if Lscan_saver:
             com += "-v scan=ok "
@@ -82,10 +87,10 @@ def print_chi(inf, software, np, Lscan_saver):
             os.system(com)
     return 0
 
-def job_description(fname, software, qjobname, sub_job, np, mem, scan_saver, data_int, hl, el, fl):
+def job_description(fname, ndata, software, qjobname, sub_job, np, mem, scan_saver,dtype,dmine, hl, el, fl):
     server =  socket.gethostname()
     if server == 'login':
-        print_sge(fname, software, qjobname, sub_job, np, mem, scan_saver,data_int,hl,el,fl) 
+        print_sge(fname, ndata, software, qjobname, sub_job, np, mem, scan_saver,dtype,dmine,hl,el,fl) 
     elif server == 'chi':
         print_chi(fname, software, np, scan_saver)
     else:
@@ -96,15 +101,17 @@ def job_description(fname, software, qjobname, sub_job, np, mem, scan_saver, dat
 def main():
     parser = argparse.ArgumentParser(description="how to use qsub:\n Usage:: qsub_server.py sge qchem -j qjobname(dirname) -i file.in -n np")
     #parser.add_argument('-s'. '--server', default='sge', choices=['sge', 'chi'], help='jobname in pbs file')
-    parser.add_argument('software', choices=['qchem', 'grmx', 'vasp','sleep','amp'], help='kind of software')
+    parser.add_argument('software', nargs='?', default='amp', choices=['qchem', 'grmx', 'vasp','sleep','amp'], help='kind of software')
+    parser.add_argument('-nd','--data_total', help='cut data region ')
     parser.add_argument('-qj', '--qjobname', help='qjob name for qsub|directory name')
     parser.add_argument('-js', '--sub_job', default='tr', help='for amp, [tr, te]')
-    parser.add_argument('-i', '--inf', help='input filename')
+    parser.add_argument('-i', '--inf', default='OUTCAR', help='input filename')
     parser.add_argument('-m', '--mem', default=2.0, type=float, help='memory size for qsub')
     parser.add_argument('-n', '--np', default=16, type=int, help='number of process')
     gr_amp = parser.add_argument_group()
     gr_amp.add_argument('-sc', '--scan', action='store_true', help='scan amp for several Hidden Layer|save for qchem')
-    gr_amp.add_argument('-di', '--data_interval', nargs="*", help='data selection for training and test')
+    parser.add_argument('-dt','--data_type', default='set', choices=['set','div','interval','pick'], help='data interval list')
+    parser.add_argument('-dl','--data_mine', nargs='*', help='data selection')
     gr_amp.add_argument('-hl', '--hidden_layer', nargs="*", help='hidden layer')
     gr_amp.add_argument('-el', '--e_limit', type=float, help='training energy accuracy')
     gr_amp.add_argument('-fl', '--f_limit', type=float, help='training force accuracy')
@@ -116,7 +123,7 @@ def main():
     else:
         fname = args.inf
 
-    job_description(fname, args.software, args.qjobname, args.sub_job, args.np, args.mem, args.scan, args.data_interval, args.hidden_layer, args.e_limit,args.f_limit) 
+    job_description(fname,args.data_total, args.software, args.qjobname, args.sub_job, args.np, args.mem, args.scan, args.data_type, args.data_mine, args.hidden_layer, args.e_limit,args.f_limit) 
 
 if __name__ == '__main__':
     main()

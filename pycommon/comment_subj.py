@@ -14,20 +14,28 @@ vasp.scripts = MyClass()
 vasp.postproc = MyClass()
 nico2   = MyClass()
 myplot  = MyClass()
+packmol = MyClass()
 amp     = MyClass()
 amp.server  = MyClass()
 amp.scripts = MyClass()
+amp.run     = MyClass()
 #server.sge     = MyClass()
 
 amp.scripts.run  =  "\n  == Scripts ==\
-                    \n\tamp_run.py -f fname -j job -di 1 2 3 4 -nc 4\
+                    \n\t== AMP direct Run Test\
+                    \n\tamp_run.py -f OUTCAR -nd 200 -j tr -dt interval -dl 0 150 200 -nc 4 -hl 4 4 -el 0.1 -fl 0.0 +g\
+                    \n\tamp_run.py -f OUTCAR -nd 1000 -j tr -dt div -dl 5 0 3 -nc 4 -hl 4 4 -el 0.1 -fl 0.0 +g\
+                    \n\tamp_run.py -f OUTCAR -nd 1000 -j tr -dt div -dl 5 0   -nc 4 -hl 4 4 -el 0.1 -fl 0.0 ! for tr test\
                     \n\t    -f : input file=[OUTCAR, extxyz]\
+                    \n\t    -nd: cut ndata from reading input file\
                     \n\t    -j : job=['tr','te','pr'] for training, test, profile; validation was deprecated\
                     \n\t\tprofile draws all PE\
-                    \n\t    -di: data index [d1,d2[,d3,d4]] for data region for training and test\
-                    \n\t\t-ns: number of data sets are deprecated\
-                    \n\t    -ns: training uses n-1/n parts (default n=5)\
-                    \n\t         test uses 5th/5 part\
+                    \n\t    -dt: data selection type ['npart','interval','divide','pick']\
+                    \n\t    -dl: data selection list\
+                    \n\t\tinterval: [d1,d2[,d3,d4]] for data region for training and test\
+                    \n\t\tnpart: number of data sets: training uses n-1/n parts (default n=5) test uses 5th/5 part\
+                    \n\t\tdivide: divider, remainer for training, remainer for test\
+                    \n\t\tpick: [2, 1] == [ntrain, ntest]\
                     \n\t    -nc: Ncore (parallel runs for fingerprints only\
                     \n\t    More Options:\
                     \n\t\t-nc N for number of core for parallel calculation\
@@ -59,11 +67,20 @@ amp.server.chi =   "=== AMP ===\
 amp.server.mlet =   "\n\tMLET::\
                     \n\t    N.B. PLOT ERROR\
                     \n\t\tDo not queue-submit matplotlib\
-                    \n\t    PLOT [AMP-Test]:\
-                    \n\t\t$ amp_run.py -f OUTCAR -j te -di 1500 2000 -hl 10 10 -el 0.001 -fl 0.1 (-Y master node)\
+                    \n\t    PLOT [AMP-Test] +g or Unplot at NODE w. -g\
+                    \n\t\t$ \"amp_run.py\" shows all\
+                    \n\t\t    case 1: amp_run.py -f OUTCAR -nd 5000 -j tr -dt div -dl 5 0 3 -nc 4 -hl 10 10 -el 0.01 -fl 0.1 +g\
+                    \n\t\t    case 2: amp_run.py -f OUTCAR -nd 5000 -j tr -dt interval -dl 0 1500 2000 -nc 4 -hl 10 10 -el 0.001 -fl 0.1 (-Y master node)\
                     \n\t\t$ amp_plot.py amp_test.txt -f OUTCAR -hl 10 10 -el 0.001 -fl 0.01 -nt 1000 -n 500\
                     \n\t    QSUB [AMP-Training]:\
-                    \n\t\t$ qrun.sh amp N1000 OUTCAR 16 4 \"10 10\" 0.001 0.01 \"0 1500 2000\"\
+                    \n\t\t$ \"qrun.sh\" shows all\
+                    \n\t\t    qrun.sh sub_Node $ampjob $sub_dir $qjob     $fin    $np   $mem   \"$hl\"   $el     $fl      ntotal ntrain int \"$data\"\
+                    \n\t\t    case 1: qsub training data-interval\
+                    \n\t\t\t$ qrun.sh qsub tr  dir   N1500      OUTCAR  16    4  \"10 10\" 0.001   0.01    5000   1500   int  \"0 1500\"\
+                    \n\t\t\t  run qsub_server.py\
+                    \n\t\t    case 2: direct-run te data-division\
+                    \n\t\t\t$ qrun.sh di tr    dir   N1500div32 OUTCAR  16    4  \"10 10\" 0.001   0.00    5000   1500   div  \"3 2\"\
+                    \n\t\t\t  run amp_run.py\
                     \n\t\t    : software_name qname fname np mem=3(G) hl el fl di\
                     \n\t\t    : water N64 mem == 6G\
                     \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -js te -hl 10 10 -el 0.001 -fl 0.01 -di 0 1500 2000 -m 4\
@@ -76,6 +93,28 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\t    $PYTHON $EXE -f $fname -j $pyjob -di $di -nc $np -hl $hl -el $el -fl $fl -g\
                     \n\t    submit several jobs with scan\
                     \n\t\t$ sge_amp_scan.py -hl 3 3 3 -nc 12\
+                    "                    
+amp.run         =   "\n\tRUN::\
+                    \n\t    qsub\
+                    \n\t\t$ qrun.sh tr pa N2000F1 N2000F1 OUTCAR 16 5 \"10 10\" 0.001 0.1 5000 interval \"0 2000\"\
+                    \n\t    ssh node\
+                    \n\t\tmake subdir using qrun.sh\
+                    \n\t\tcd subdir\
+                    \n\t\tamp_run.py -j tr -f OUTCAR -nc 16 -hl 10 10 -el 0.001 -nd 5000 -dt interval -dl 0 1500 2000 -fl 0.1\
+                    \n\tTRNINING::\
+                    \n\t    qrun.sh\
+                    \n\t\tbla\
+                    \n\tTEST::\
+                    \n\t    qrun.sh\
+                    \n\t\t$ qrun.sh di tr N1500divE4 N1500div32 OUTCAR 16 4 '10 10' 0.0001 0.00 4500 1500 div '3 0'\
+                    \n\t\t$ qrun.sh di te test N1500 OUTCAR 4 4 '10 10' 0.001 0.00 4500 1500 div '3 0'\
+                    \n\t\t$ qrun.sh di te test N1500 OUTCAR 4 4 '10 10' 0.001 0.00 '5000 5455' 1500 int '0 455'\
+                    \n\t\t$ qrun.sh di tr N1000divE3F1 N1500div32 OUTCAR 16 4 '10 10' 0.001   0.1  4000  1000   div  '4 0'\
+                    \n\t    amp_run.py\
+                    \n\t\t$ amp_run.py -f OUTCAR -j te -nt 4500 -ntr 1500 -dt div -dl 3 0 -nc 4 -hl 10 10 -el 0.001 -fl 0.00\
+                    \n\t\t$ amp_run.py -f OUTCAR -j te -nt 5000 5455 -ntr 1500 -dt int -dl 0 455 -nc 4 -hl 10 10 -el 0.001 -fl 0.00\
+                    \n\t\t$ amp_run.py -f OUTCAR -j tr -nt 4500 -dt div -dl 3 0 -nc 16 -hl 10 10 -el 0.0001 -fl 0.00\
+                    \n\t\t$ amp_run.py -f OUTCAR -j tr -nt 4000 -dt div -dl 4 0 -nc 16 -hl 10 10 -el 0.001 -fl 0.1\
                     "
 amp.md_anal     =   "\n    MD Analysis\
                     \n\tMD.ene:\
@@ -149,6 +188,14 @@ water.vasp_analysis = "\n    ANALYSIS VASP\
                     \n\tUSE VMD to read OUTCAR\
                     \n\tUSE ASE to read OUTCAR\
                     "
+packmol.start       ="\n    PACKMOL\
+                    \n\tcf. water\
+                    \n\t    water.calcube\
+                    \n\t    water.makecube\
+                    "
+packmol.calcube     = water.calcube
+packmol.makecube    = water.makecube
+
 vasp.run            = "=== VASP ===\
                     \n    Structure\
                     \n\t$VASP_HOME/version/bin/vasp, vasp_gam, vasp_std, vasp_ncl\
