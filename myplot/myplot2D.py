@@ -1,8 +1,8 @@
 """
     2d plot library
-    function
-        draw_2d
-        fdraw   where f == "file"
+    draw_2d
+    fdraw   where f == "file"
+    barplot
 """    
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -397,4 +397,16 @@ def _mplot_2f3c(x, y1, y2,f1, f2, figname, Title, Xtitle, Ytitle, Lsave):
         plt.savefig(figname, dpi=150)
             
     return 0
- 
+
+
+def barplot(hash, name, title):
+    """Makes a barplot of the fingerprint about the O atom."""
+    fp = descriptor.fingerprints[hash][0]
+    fig, ax = pyplot.subplots()
+    ax.bar(range(len(fp[1])), fp[1])
+    ax.set_title(title)
+    ax.set_ylim(0., 2.)
+    ax.set_xlabel('fingerprint')
+    ax.set_ylabel('value')
+    fig.savefig(name)
+

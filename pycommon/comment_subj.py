@@ -1,24 +1,28 @@
 from common import MyClass
 import comment_sys as mod_sys
 
-water   = MyClass()
-qcmo    = MyClass()
-qchem   = MyClass()
-qchem.server = MyClass()
-qchem.server.MLET  = MyClass()
-qchem.server.CHI   = MyClass()
-qchem.server.KISTI = MyClass()
-vasp    = MyClass()
-vasp.server = MyClass()
-vasp.scripts = MyClass()
-vasp.postproc = MyClass()
-nico2   = MyClass()
-myplot  = MyClass()
-packmol = MyClass()
-amp     = MyClass()
-amp.server  = MyClass()
-amp.scripts = MyClass()
-amp.run     = MyClass()
+amp         = MyClass()
+amp.server      = MyClass()
+amp.scripts     = MyClass()
+amp.run         = MyClass()
+lammps          = MyClass()
+lammps.start        = MyClass()
+lammps.lamphet      = MyClass()
+lammps.kim          = MyClass()
+myplot      = MyClass()
+nico2       = MyClass()
+packmol     = MyClass()
+qcmo        = MyClass()
+qchem               = MyClass()
+qchem.server            = MyClass()
+qchem.server.MLET       = MyClass()
+qchem.server.CHI        = MyClass()
+qchem.server.KISTI      = MyClass()
+vasp                = MyClass()
+vasp.server             = MyClass()
+vasp.scripts            = MyClass()
+vasp.postproc           = MyClass()
+water       = MyClass()
 #server.sge     = MyClass()
 
 amp.scripts.run  =  "\n  == Scripts ==\
@@ -123,7 +127,34 @@ amp.md_anal     =   "\n    MD Analysis\
                     \n\t    $ myplot.py md.ene -x -t MD-Ethylene -yt \"E(eV)\" -xt \"time (10fs)\"\
                     "
                     #\n\t\t    import myplot_default\
+lammps.start.install ="=== LAMMPS ===\
+                    \n    install LAMPHET(gcc), KIM(intel), bare-lammps\
+                    \n\tCall different 'mpirun'\
+                    \n\t    LAMPHET compiled by gcc:      mpirun(gcc) ...\
+                    \n\t    KIM     compiled by intel:    mpirun(intel) ...\
+                    \n\tcan't set PATH at the same time\
+                    "
 
+lammps.lamphet.install ="=== LAMPHET ===\
+                    \n   Installation:\
+                    \n\tCHI::\
+                    \n\t    GCC: Using gcc v 4.8.xxx with CFLAGS <- -std=c++11\
+                    \n\t    Intel - cannot add -std=c++11, or try newest version\
+                    \n\tMELT::\
+                    \n\tKISTI::\
+                    "
+lammps.lamphet.run  ="\n    RUN::\
+                    \n\tPrerequisite\
+                    \n\t    lammps input file\
+                    \n\t    lammps data file\
+                    \n\t    amp.amp - Amp potential\
+                    \n\tGenerate PROPhet potential\
+                    \n\t    generate_lammps.py\
+                    \n\t\tmakes potential_O, potential_H, etc\
+                    \n\tRun Lammps\
+                    \n\t    Parallel:\
+                    \n\t\tmpirun -n 4 $LAMMPS_DIR/lmp_mpi[_shlib] -in in.system -log system.log\
+                    "
 myplot.order    =   "===My PLOT===\
                     \n    ORDER:: mplot_start amp_md nico2"
 myplot.start    =   "\n    INITIAL SETTING: refer to nico2.mpl_ini\
