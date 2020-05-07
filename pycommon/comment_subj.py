@@ -248,6 +248,7 @@ vasp.run            = "=== VASP ===\
                     \n\t    : select one following K-points\
                     \n    SERVER\
                     \n\tMLET    \
+                    \n\t    $ qsub -N jobname(queue) -pe numa np -l mem=5G -v np=np -v dir=dirname(log) $SB/pypbs/sge_vasp.csh\
                     \n\tCHI\
                     \n\t    activate: /opt/intel/compilers_and_libraries_2019.3.199/\
                     \n\t    run: mpirun -np 4 $VASP_HOME/vasp.5.4.4/bin/vasp_std > sidos.out\
