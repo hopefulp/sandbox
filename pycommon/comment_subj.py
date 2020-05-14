@@ -62,7 +62,8 @@ amp.scripts.mlet =  "\n\t$ qsub sge_amp.csh\
                     \n\t    will run scan parallelly\
                     \n\t$ qsub_server.py\
                     \n\t    make qsub command line\
-                    \n\t    usage: $qsub_server.py amp -i OUTCAR -qj qname -hl 10 10 -el 0.001 -di 0 1500 1500 2000\
+                    \n\t    For making all fingerprints\
+                    \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -js tr -hl 10 10 -el 0.001 -dt interval -dl 0 3000 4000 -m 4\
                     \n\t    amp positional argument for software\
                     \n\t    -i input file of PES-force\
                     \n\t    -hl hidden layer, -el energy convergence limit\
@@ -85,6 +86,10 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\t    case 2: amp_run.py -f OUTCAR -nd 5000 -j tr -dt interval -dl 0 1500 2000 -nc 4 -hl 10 10 -el 0.001 -fl 0.1 (-Y master node)\
                     \n\t\t$ amp_plot.py amp_test.txt -f OUTCAR -hl 10 10 -el 0.001 -fl 0.01 -nt 1000 -n 500\
                     \n\t    QSUB [AMP-Training]:\
+                    \n\t\t1. Make a copy from VASP to amp\
+                    \n\t\t    $ make_dir.py dname_new -w amp -j vasp -od vasp_dir\
+                    \n\t\t2. First make fingerprints using datatype interval\
+                    \n\t\t    $ qsub_server.py amp -i OUTCAR -qj qname -js tr -hl 10 10 -el 0.001 -fl 0.01 -nd 4000 -dt int -dl 0 3000 4000 -m 4\
                     \n\t\t$ \"qrun.sh\" shows all\
                     \n\t\t    qrun.sh sub_Node $ampjob $sub_dir $qjob     $fin    $np   $mem   \"$hl\"   $el     $fl      ntotal ntrain int \"$data\"\
                     \n\t\t    case 1: qsub training data-interval\
@@ -95,11 +100,11 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\t\t  run amp_run.py\
                     \n\t\t    : software_name qname fname np mem=3(G) hl el fl di\
                     \n\t\t    : water N64 mem == 6G\
-                    \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -js te -hl 10 10 -el 0.001 -fl 0.01 -di 0 1500 2000 -m 4\
+                    \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -js tr -hl 10 10 -el 0.001 -fl 0.01 -nd 4000 -dt int -dl 0 3000 4000 -m 4\
                     \n\t\t    -qj qname -> qsub -N qname\
                     \n\t\t    -i inputfile\
                     \n\t\t    prints:\
-                    \n\t\t    $ qsub -N qname -pe numa 16 -v fname=OUTCAR -v np=16 -v pyjob=tr -v di=\"0 1500 1500 2000\" -v hl=\"10 10\" -v el=0.001 -v fl=0.01 $SB/pypbs/sge_amp.csh\
+                    \n\t\t    $ qsub -N qname -pe numa 16 -v fname=OUTCAR -v np=16 -v pyjob=tr -v di=\"0 3000 4000\" -v hl=\"10 10\" -v el=0.001 -v fl=0.01 $SB/pypbs/sge_amp.csh\
                     \n\t\t\t -v scan=ok for scan in consecutive way not parallel\
                     \n\t\t:sge_amp.csh\
                     \n\t\t    $PYTHON $EXE -f $fname -j $pyjob -di $di -nc $np -hl $hl -el $el -fl $fl -g\

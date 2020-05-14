@@ -110,7 +110,7 @@ def main():
     parser.add_argument('-n', '--np', default=16, type=int, help='number of process')
     gr_amp = parser.add_argument_group()
     gr_amp.add_argument('-sc', '--scan', action='store_true', help='scan amp for several Hidden Layer|save for qchem')
-    parser.add_argument('-dt','--data_type', default='set', choices=['set','div','interval','pick'], help='data interval list')
+    parser.add_argument('-dt','--data_type', default='set', choices=['set','div','int','pick'], help='data interval list')
     parser.add_argument('-dl','--data_mine', nargs='*', help='data selection')
     gr_amp.add_argument('-hl', '--hidden_layer', nargs="*", help='hidden layer')
     gr_amp.add_argument('-el', '--e_limit', type=float, help='training energy accuracy')

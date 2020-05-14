@@ -16,12 +16,12 @@ set sandbox = "$HOME/sandboxg"
 
 setenv PYTHONPATH $sandbox/pycommon:$sandbox/myplot:$sandbox/acpype:$sandbox/py_ai:$sandbox/chem_mod
 set PYTHON = "$HOME/anaconda3/bin/python"
-set EXE = "$sandbox/py_amp/amp_run.py"
+set EXE = "$sandbox/pyamp/amp_run.py"
 
 ### $EXE is not working 
 if ( ! $?scan ) then
     if ( $?dtype ) then
-        $PYTHON $EXE -f $fname -nd $ndata -j $pyjob -dt $dtype -dl $dlist -nc $np -hl $hl -el $el -fl $fl -g
+        $PYTHON $EXE -f $fname -nt $ndata -j $pyjob -dtype $dtype -dl $dlist -nc $np -hl $hl -el $el -fl $fl -g
     else
         $PYTHON $EXE -f $fname -j $pyjob -nc $np -hl $hl -el $el -fl $fl -g
     endif    
