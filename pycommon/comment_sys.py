@@ -1,7 +1,9 @@
 from common import MyClass
 
 start   = MyClass()
-
+system  = MyClass()
+sys_install = MyClass()
+sys_manage  = MyClass()
 server  = MyClass()
 server.MLET  = MyClass()
 server.CHI  = MyClass()
@@ -41,7 +43,55 @@ start.usage     =   "===USAGE of show_comment.py [-h] \
                     \n    $ show_comment.py -m [general|subj] -j key\
                     \n\tshows details of the key\
                     "
-
+system.start    =   "=== SYSTEM: CHI ==="
+system.board    =   "\n    Mother Board::\
+                    \n\t# dmidecode | grep 'Product Name'\t#to find out motherboard model"
+system.cpu      =   "\n    CPU::\
+                    \n\t$ cat /proc/cpuinfo/ \
+                    \n\t    Temperature:: sensors \
+                    \n\t\t\tinstalled through \"yum install lm_sensors\" \
+                    \n\t\t\tconfigured by \"sensors-detect\" \
+                    \n\t\t\twhenever check Temperature, command \"sudo sensors-detect\" with \"YES\" for every query, then $sensors\
+                    "
+system.mem      =   "\n    Memory::\
+                    \n\t# dmidecode -t 17 | grep 'Locator\|Size' | grep -v Bank\
+                    \n\t    ECC for SERVER\
+                    \n\t    4 DDR3 16G equipped\
+                    "
+system.hdd      =   "\n    HDD::\
+                    \n\t# smartctl -a /dev/sd{label}\
+                    \n\t# smartctl -t short /dev/sd{label}\twait until calculation done\
+                    \n\t# smartctl -l selftest /dev/sd{label}\tcheck the result of selftest\
+                    "
+system.vga      =   "\n    VGA::\
+                    \n\tversion\
+                    \n\t    vidia-smi\
+                    \n\tmodel\
+                    \n\t    lspci –nn | grep VGA\
+                    "
+sys_install.hdd =   "== HDD install ==\
+                    \n    Connected: detected in /dev/sd[a|b|c...] \
+                    \n    Not Installed: if there is not /dev/sd{label}1, need to make partition    \
+                    \n    Install\
+                    \n\t     make partition\
+                    \n\t\tgdisk /dev/sd{label}\tusing GPT, ext4\
+                    \n\t     make filesystem (format)\
+                    \n\t\tmkfs -t ext4 /dev/sd{label}\tFormatted\
+                    \n\t     manually upload uuid of new partition with mount point in \"/etc/fstab\" \
+                    \n\t\tls -al /dev/disk/by-uuid\tThe partitioned hard appear in uuid\
+                    \n\t\tvi /etc/fstab\twrite uuid of new partition following the syntax\
+                    \n\t\tmount -a\twill read all the mounting points and partitions"
+sys_install.qchem = "== Q-Chem ==\
+                    \n    Installed:: \
+                    \n\tv.5 :: /home/joonho/sciwares/archvies/qchem.5.1.tar\
+                    "
+sys_install.intel = "== INTEL ==\
+                    \n     Installed:: /opt/intel \
+                    \n\tsource /opt/intel/parallel_studio_xe_2019.3.062/bin/psxevars.sh \
+                    \n\tCompilation:: \
+                    \n\t    serial: $QCHEM_HOME:./configure intel mkl\
+                    "
+sys_manage.user =   "$getent passwd | grep ‘/home’ | cut -d: -f1"
 server.CHI =         "=== CHI (HOME) ===\
                     \n    Q-Chem::\
                     \n\tsetup .bashrc\

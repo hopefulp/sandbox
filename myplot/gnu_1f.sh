@@ -14,7 +14,8 @@ fi
 #extens='png'
 RANGE='[0:] [:]'
 #STYLE1=" u ((\$1-$asymp)*$hkj)  w lp lt 1 lw 3 "
-STYLE1=" u (\$1):(\$2)  w l lt 1 lw 1 "
+#STYLE1=" u (\$1):(\$8)  w l lt 1 lw 1 "
+STYLE1=" u (\$8)  w l lt 1 lw 1 "
 STYLE2=" u 1 w lp lt 29 lw 3 "
 gnuplot -persist << EOF
 set xlabel 'E(eV)'

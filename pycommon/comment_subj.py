@@ -25,14 +25,15 @@ vasp.postproc           = MyClass()
 water       = MyClass()
 #server.sge     = MyClass()
 
-amp.scripts.run  =  "\n  == Scripts ==\
+amp.scripts.run  =  "\n    == Scripts ==\
                     \n\t== AMP direct Run Test\
-                    \n\tamp_run.py -f OUTCAR -nd 200 -j tr -dt interval -dl 0 150 200 -nc 4 -hl 4 4 -el 0.1 -fl 0.0 +g\
-                    \n\tamp_run.py -f OUTCAR -nd 1000 -j tr -dt div -dl 5 0 3 -nc 4 -hl 4 4 -el 0.1 -fl 0.0 +g\
-                    \n\tamp_run.py -f OUTCAR -nd 1000 -j tr -dt div -dl 5 0   -nc 4 -hl 4 4 -el 0.1 -fl 0.0 ! for tr test\
+                    \n\t$ amp_run.py -f OUTCAR -nd 200 -j tr -dt interval -dl 0 150 200 -nc 4 -hl 4 4 -el 0.1 -fl 0.0 +g\
+                    \n\t$ amp_run.py -f OUTCAR -nd 1000 -j tr -dt div -dl 5 0 3 -nc 4 -hl 4 4 -el 0.1 -fl 0.0 +g\
+                    \n\t$ amp_run.py -f OUTCAR -nd 1000 -j tr -dt div -dl 5 0   -nc 4 -hl 4 4 -el 0.1 -fl 0.0 ! for tr test\
+                    \n\t$ amp_run.py -j md -i 0 -ns 50 -f OUTCAR -dt 0.5\
                     \n\t    -f : input file=[OUTCAR, extxyz]\
                     \n\t    -nd: cut ndata from reading input file\
-                    \n\t    -j : job=['tr','te','pr'] for training, test, profile; validation was deprecated\
+                    \n\t    -j : job=['tr','te','pr','md'] for training, test, profile, MD; validation was deprecated\
                     \n\t\tprofile draws all PE\
                     \n\t    -dt: data selection type ['npart','interval','divide','pick']\
                     \n\t    -dl: data selection list\
@@ -41,7 +42,11 @@ amp.scripts.run  =  "\n  == Scripts ==\
                     \n\t\tdivide: divider, remainer for training, remainer for test\
                     \n\t\tpick: [2, 1] == [ntrain, ntest]\
                     \n\t    -nc: Ncore (parallel runs for fingerprints only\
-                    \n\t    More Options:\
+                    \n\t    MD\
+                    \n\t    -i : select the start image from loaded 'OUTCAR'\
+                    \n\t    -ns: number of time step\
+                    \n\t    -dt: time interval in fs\
+                    \n\t    MORE:\
                     \n\t\t-nc N for number of core for parallel calculation\
                     \n\t\t-tx for use twinx for plot: default=True\
                     \n\t    import myplot2D for plot:\
@@ -63,10 +68,13 @@ amp.scripts.mlet =  "\n\t$ qsub sge_amp.csh\
                     \n\t    -hl hidden layer, -el energy convergence limit\
                     "
 amp.server.chi =   "=== AMP ===\
-                    \n  == SERVER ==\
+                    \n    == SERVER ==\
                     \n\tCHI::\
-                    \n\t    amp_run.py -f OUTCAR -j tr -nc 4 -di 0 800 1000 -hl 8 8 -el 0.001 -fl 0.01 +g\
-                    \n\t\tdetail in amp.scripts\
+                    \n\t    TR -\
+                    \n\t\t$ amp_run.py -f OUTCAR -j tr -nc 4 -di 0 800 1000 -hl 8 8 -el 0.001 -fl 0.01 +g\
+                    \n\t\t    detail in amp.scripts\
+                    \n\t    MD -\
+                    \n\t\t$ amp_run.py -j md -i 0 -ns 50 -f OUTCAR -dt 0.5\
                     "
 amp.server.mlet =   "\n\tMLET::\
                     \n\t    N.B. PLOT ERROR\
@@ -128,18 +136,17 @@ amp.md_anal     =   "\n    MD Analysis\
                     "
                     #\n\t\t    import myplot_default\
 lammps.start.install ="=== LAMMPS ===\
-                    \n    install LAMPHET(gcc), KIM(intel), bare-lammps\
-                    \n\tCall different 'mpirun'\
-                    \n\t    LAMPHET compiled by gcc:      mpirun(gcc) ...\
-                    \n\t    KIM     compiled by intel:    mpirun(intel) ...\
-                    \n\tcan't set PATH at the same time\
+                    \n    install LAMPHET, KIM, bare-lammps\
+                    \n\tLAMPHET compiled by intel_2019: mpirun in $INTEL ...\
+                    \n\tKIM     compiled by intel_2019: mpirun in $INTEL ...\
                     "
 
 lammps.lamphet.install ="=== LAMPHET ===\
                     \n   Installation:\
                     \n\tCHI::\
-                    \n\t    GCC: Using gcc v 4.8.xxx with CFLAGS <- -std=c++11\
-                    \n\t    Intel - cannot add -std=c++11, or try newest version\
+                    \n\t    Intel_2019 [or gcc]\
+                    \n\t    after configure, modify Makefile\
+                    \n\t\tC[C]FLAGS= ... -fPIC -std=c++11\
                     \n\tMELT::\
                     \n\tKISTI::\
                     "
@@ -153,7 +160,9 @@ lammps.lamphet.run  ="\n    RUN::\
                     \n\t\tmakes potential_O, potential_H, etc\
                     \n\tRun Lammps\
                     \n\t    Parallel:\
-                    \n\t\tmpirun -n 4 $LAMMPS_DIR/lmp_mpi[_shlib] -in in.system -log system.log\
+                    \n\t\tmpirun -n 4 $LAMMPS_DIR/lmp_mpi[_shlib] -in in.input -log system.log\
+                    \n\tOUTPUT:\
+                    \n\t   system.min[heat].lammpstrj, system.log\
                     "
 myplot.order    =   "===My PLOT===\
                     \n    ORDER:: mplot_start amp_md nico2"
@@ -171,7 +180,13 @@ myplot.ini      =   "\n    DEFAULT\
                     \n\t\ttwinx: text_twinx_x, text_twinx_y\
                     "
 myplot.md       =   "\n    MD w. AMP\
-                    \n\t$ run_plot.py md.ene -x -t MD-Ethylene -yt \"E(eV)\" -xt \"time (10fs)\" \
+                    \n\t$ run_fplot.py -f md.ene -icx 1 -t AMP-MD -yt \"E(eV)\" -xt \"time (0.2 fs)\" \
+                    \n\t    -f/-v   : for files or value option\
+                    \n\t    -icx    : index of x-value if in file\
+                    \n\t    -x      : external input of x-value \
+                    \n\t    -tx     : if scale of y-values are different\
+                    \n\t    -ity    : for y index for left y-axis\
+                    \n\t$ run_fplot.py md.ene -icx 1 -t AMP-MD -yt 'E(eV)' -xt 'time (0.2fs)' -tx -ity 3\
                     "
 myplot.nico2    =   "\n    For NiCO2: refer to nico2.myplot"
 

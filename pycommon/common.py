@@ -8,10 +8,14 @@ import numpy as np
     version dependency included
     common functions gathering
     yes_or_no(question) : to obtain y/n for next command
-    dir_files(): returns files with execution|module
-    get_files_prefix(list_prefix, directory) : returns list
-    get_files_suffix(list_suffix, directory) : returns list
-    fname_decom(fname): returns prefix, extension
+    FILES
+        find_file(dir,kw): search dir & find fname with kw in front or end
+        dir_files(): returns files with execution|module
+        get_files_prefix(list_prefix, directory) : returns list
+        get_files_suffix(list_suffix, directory) : returns list
+        fname_decom(fname): returns prefix, extension
+        f_ext(fname): get extension
+        f_root(fname): get root
     whereami(): returns function name
 """
 
@@ -175,6 +179,15 @@ def fname_decom(fname):
     return lname[0], lname[1]        
 
 fname_parsing = fname_decom
+
+def find_file(dname, f_root):
+    files = os.listdir(dname)
+    for f in files:
+        if f.endswith(f_root):
+            return f
+        elif f.startswith(f_root):
+            return f
+    return None
 
 def get_files_suffix(suffixes, dname):
     """

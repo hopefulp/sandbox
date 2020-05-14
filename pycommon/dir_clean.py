@@ -56,6 +56,9 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
     elif work == 'amp':
         matches=['amp','pdf']
         f_list = get_files_match(matches, d, Lshowmatch)
+    elif work == 'lmp':
+        matches=['trj', 'log']
+        f_list = get_files_match(matches, d, Lshowmatch)
 
     ### Make directory for 'cp', 'mv'        
     if linux_job == 'mv' or linux_job == 'cp':
@@ -98,7 +101,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
     parser.add_argument('dirs', default=os.getcwd(), nargs='?', help='input work directories')
-    parser.add_argument('-w', '--work', choices=['qchem','amp','vasp','pbs'],help='remove depending on job')
+    parser.add_argument('-w', '--work', choices=['qchem','amp','vasp','pbs','lmp'],help='remove depending on job')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')
     parser.add_argument('-m', '--match', nargs='*', help='remove matching file')

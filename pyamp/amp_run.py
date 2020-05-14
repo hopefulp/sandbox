@@ -43,7 +43,7 @@ def calc_train_images(images, HL, E_conv, f_conv, f_coeff, ncore):
     calc.train(images=images, overwrite=True)
     return
 
-def run_md(atoms):
+def amp_md(atoms, nstep, dt):
     from ase import units
     from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
     from ase.md import VelocityVerlet
@@ -63,17 +63,17 @@ def run_md(atoms):
     atoms.get_potential_energy()
     MaxwellBoltzmannDistribution(atoms, 300 * units.kB)
     traj.write(atoms)
-    dyn = VelocityVerlet(atoms, dt=1. * units.fs)
+    dyn = VelocityVerlet(atoms, dt=dt * units.fs)
     f = open("md.ene", "w")
-    f.write("{:^5s}{:^10s}{:^10s}{:^10s}\n".format("time","Etot","Epot","Ekin"))
-    for step in range(3):
+    f.write("{:^5s} {:^10s} {:^10s} {:^10s}\n".format("time","Etot","Epot","Ekin"))
+    for step in range(nstep):
         pot = atoms.get_potential_energy()  # 
         kin = atoms.get_kinetic_energy()
         tot = pot + kin
         f.write("{:5d}{:10.5f}{:10.5f}{:10.5f}\n".format(step, tot, pot, kin))
         print("{}: Total Energy={}, POT={}, KIN={}".format(step, tot, pot, kin))
-        dyn.run(10)
-        traj.write(atoms)
+        dyn.run(2)
+        traj.write(atoms)                   # write kinetic energy, but pot is not seen in ase
     f.close()        
 
 def calc_test_images(test_images, amp_pes, title, suptitle,ncore, Lgraph,val_id=None,nmol=1,Ltwinx=None):
@@ -103,7 +103,7 @@ def calc_test_images(test_images, amp_pes, title, suptitle,ncore, Lgraph,val_id=
         modulename='myplot2D'   ### FOR MLET
         if modulename not in sys.modules:
             import myplot2D
-        err, res_max = myplot2D.draw_dots_two(y, y_bar, title, suptitle,Ltwinx=Ltwinx,Ldiff=True)
+        err, res_max = myplot2D.draw_amp_twinx(y, y_bar, title, suptitle,Ltwinx=Ltwinx,Ldiff=True)
     else:
         h_conv = np.array(y_bar)                # * escale
         y_conv = np.array(y)                    # * escale
@@ -268,10 +268,6 @@ def amp_jobs(fdata,ndata,ntrain,job, dstype, dslist, amp_pes, HL, E_conv, f_conv
         rmserr, max_res = calc_test_images(te_images, amp_pes, title, suptitle,ncore,Lgraph,nmol=n_mol,Ltwinx=Ltwinx)
         f_write(outf, HL, E_conv, f_conv,f_coeff, ntotal,dstype, dslist, err=rmserr, max_res=max_res)
 
-    elif re.search('md',job):
-        # use first geometry 
-        atoms = ase.io.read(fdata, index='0')
-        run_md(atoms)
     return
 
 def find_inputfile(pwd, job):
@@ -292,18 +288,10 @@ def find_inputfile(pwd, job):
 def main():
     parser = argparse.ArgumentParser(description='run amp with extxyz, OUTCAR: validation is removed ', prefix_chars='-+/')
     parser.add_argument('-f', '--infile', help='ASE readible file: extxyz, OUTCAR(VASP) ')
-    parser.add_argument('-j', '--job', default='tr', choices=['tr','te','pr','pt'], help='job option:"train","test","md","profile","plot"')
-    #parser.add_argument('-a', '--all_fig', action="store_true", help='if job==te, include all figures')
+    parser.add_argument('-j', '--job', default='tr', choices=['tr','te','pr','pt','md'], help='job option:"train","test","md","profile","plot"')
+    ### Neural Network
+    parser.add_argument('-nc', '--ncore', default=1, type=int, help='number of core needs to be defined')
     parser.add_argument('-p', '--pot', default="amp.amp", help="input amp potential")
-    ### data selection
-    #data_group = parser.add_argument_group()
-    parser.add_argument('-nt', '--ndata_total', type=int, nargs='*', help='cut total data: it requires two value for region')
-    parser.add_argument('-ntr', '--ndata_train', type=int, help='in case of te, define ND_train, ND_test is calculated')
-    parser.add_argument('-dt','--data_s_type',default='pick',choices=['npart','int','div','pick'], help='data selection type: div-divide by dl[0] and remainder dl[1] for train, dl[2] for test ')
-    parser.add_argument('-dl','--data_s_list', type=int, nargs='+', help='data selection list')
-    #data_group.add_argument('-ds','--dnsets',default=5,type=int, help='num of sets:1 train all sets, otherwise, last set is for test')
-
-    ### others
     parser.add_argument('-nm','--nmol',default=1,type=int,help='num of molecules in the system to normalize error')
     parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     parser.add_argument('-el', '--e_conv', default=0.001, type=float, help='energy convergence limit')
@@ -312,18 +300,35 @@ def main():
     parser.add_argument('-tx', '--twinx', action="store_false", help='turn off to use twinx of two y-axes')
     parser.add_argument('-g', action="store_false", help='if val default is False, otherwise True')
     parser.add_argument('+g', action="store_true", help='if val default is False, otherwise True')
-    parser.add_argument('-nc', '--ncore', default=1, type=int, help='number of core needs to be defined')
+    #parser.add_argument('-a', '--all_fig', action="store_true", help='if job==te, include all figures')
+    ### DATA group
+    data_group = parser.add_argument_group(title='Data')
+    data_group.add_argument('-nt', '--ndata_total', type=int, nargs='*', help='cut total data: it requires two value for region')
+    data_group.add_argument('-ntr', '--ndata_train', type=int, help='in case of te, define ND_train, ND_test is calculated')
+    data_group.add_argument('-dtype','--data_s_type',default='pick',choices=['npart','int','div','pick'], help='data selection type: div-divide by dl[0] and remainder dl[1] for train, dl[2] for test ')
+    data_group.add_argument('-dl','--data_s_list', type=int, nargs='+', help='data selection list')
+    ### MD group
+    md_group = parser.add_argument_group(title='MD')
+    md_group.add_argument('-i','--index', default=0, help='select start configuration from input file')
+    md_group.add_argument('-ns','--nstep', default=100, type=int, help='number of step with dt')
+    md_group.add_argument('-dt','--dt', default=1.0, type=float, help='time interval in fs')
+
     args = parser.parse_args()
 
     pwd = os.getcwd()
     if args.infile:
         fname=args.infile
     else:
-        fname=search_dir(pwd, args.job)
+        fname=find_inputfile(pwd, args.job)
     if not fname:
         sys.exit(1)
 
-    amp_jobs(fname,args.ndata_total,args.ndata_train,args.job,args.data_s_type,args.data_s_list,args.pot,args.hidden_layer,args.e_conv,args.f_conv,args.f_coeff,args.g,args.ncore,args.nmol,args.twinx)
+    if args.job == 'md':
+        index = args.index
+        atoms = ase.io.read(fname, index=index)      # index = string
+        amp_md(atoms, args.nstep, args.dt)
+    else:
+        amp_jobs(fname,args.ndata_total,args.ndata_train,args.job,args.data_s_type,args.data_s_list,args.pot,args.hidden_layer,args.e_conv,args.f_conv,args.f_coeff,args.g,args.ncore,args.nmol,args.twinx)
     return
 
 if __name__ == '__main__':
