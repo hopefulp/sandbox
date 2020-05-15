@@ -89,7 +89,9 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\t1. Make a copy from VASP to amp\
                     \n\t\t    $ make_dir.py dname_new -w amp -j vasp -od vasp_dir\
                     \n\t\t2. First make fingerprints using datatype interval\
-                    \n\t\t    $ qsub_server.py amp -i OUTCAR -qj qname -js tr -hl 10 10 -el 0.001 -fl 0.01 -nd 4000 -dt int -dl 0 3000 4000 -m 4\
+                    \n\t\t    $ qsub_server.py amp -i OUTCAR -qj qname -js tr -hl 10 10 -el 0.001 -fl 0.01 -nd 4000 -dt int -dl 0 3000 4000 -m 10\
+                    \n\t\t\t-m 10 : more than 12G is required\
+                    \n\t\t\t-nd ndata_total=4000, -dt data_type=interval -dl data_list=d1~d2 training and d2~d3 test\
                     \n\t\t$ \"qrun.sh\" shows all\
                     \n\t\t    qrun.sh sub_Node $ampjob $sub_dir $qjob     $fin    $np   $mem   \"$hl\"   $el     $fl      ntotal ntrain int \"$data\"\
                     \n\t\t    case 1: qsub training data-interval\
@@ -133,11 +135,14 @@ amp.run         =   "\n\tRUN::\
                     \n\t\t$ amp_run.py -f OUTCAR -j tr -nt 4500 -dt div -dl 3 0 -nc 16 -hl 10 10 -el 0.0001 -fl 0.00\
                     \n\t\t$ amp_run.py -f OUTCAR -j tr -nt 4000 -dt div -dl 4 0 -nc 16 -hl 10 10 -el 0.001 -fl 0.1\
                     "
-amp.md_anal     =   "\n    MD Analysis\
+amp.md_anal     =   "\n    == MD Analysis ==\
                     \n\tMD.ene:\
                     \n\t    1st line: \"time    Etot    Epot    Ekin\"\
                     \n\tUsage:\
-                    \n\t    $ myplot.py md.ene -x -t MD-Ethylene -yt \"E(eV)\" -xt \"time (10fs)\"\
+                    \n\t    $ run_fplot.py -f md.ene -ity 3 -t AMP-MD -yl \"E(eV)\" -yl2 \"E_kin(eV)\" -xl \"time (10fs)\" -tx \
+                    \n\t\t-icx: x-column, default=1\
+                    \n\t\t-tx : twinx\
+                    \n\t\t-ity: index for right-y among y-columns\
                     "
                     #\n\t\t    import myplot_default\
 lammps.start.install ="=== LAMMPS ===\
@@ -307,12 +312,12 @@ vasp.scripts.etc =  "\n\t ase_fconvert.py\
                     \n\t ase_vasp.py\
                     \n\t ase_zpe.py\
                     "
-vasp.postproc.p4vasp = "\n    === VASP Post Processig ===\
-                    \n\t = P4VASP\
-                    \n\t    executable: p4v\
+vasp.postproc.p4vasp = "\n    == VASP Post Processig ==\
+                    \n\t = P4VASP + deactivate anaconda to use python2\
+                    \n\t    p4v\
                     "
-vasp.postproc.vaspkit = "\n\t = VASP KIT =\
-                    \n\t    executable: \
+vasp.postproc.vaspkit = "\n\t = VASP KIT\
+                    \n\t    vaspkit \
                     "
 qchem.server.MLET   = "=== Q-Chem ===\
                     \n    SERVER: \

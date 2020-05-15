@@ -195,7 +195,7 @@ def xtitle_font(tit):
 
 ### used for md.ene, normal data file
 #def mplot_twinx(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None):
-def mplot_twinx(x, y, iy_right_y, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None):
+def mplot_twinx(x, y, iy_right_y, Title=None, Xtitle=None, Ytitle=None, Ytitle2=None, Ylabels=None, Lsave=False, Colors=None):
     '''
     call with x=[] and y=[ [...
     x:: [] or [size]
@@ -217,6 +217,7 @@ def mplot_twinx(x, y, iy_right_y, Title=None, Xtitle=None, Ytitle=None, Ylabels=
     #ax.xaxis.set_major_locator(plt.NullLocator())
     print(f"x, y shape:: {np.array(x).shape} {np.array(y).shape} and Ylabel {Ylabels} in {whereami()}")
     ax2=ax.twinx()
+    ax2.set_ylabel(Ytitle2)
     pls=[]
     if Ytitle:
         ax.set_ylabel(Ytitle)
@@ -231,11 +232,12 @@ def mplot_twinx(x, y, iy_right_y, Title=None, Xtitle=None, Ytitle=None, Ylabels=
             #if Colors:  color = Colors.pop(i)       #'tab:' + Colors.pop(0)
             #else:       color='tab:green'
             #ax2.set_ylabel(Ylabels[i])
-            ax2.set_ylabel("Ekin (eV)")
-            p2, = ax2.plot(x, ys[i,:], 'o-', label=Ylabels[i])
+            p2, = ax2.plot(x, ys[i,:], 'x-', label=Ylabels[i])
             pls.append(p2)
             #ax2.tick_params(axis='y')
-    plt.legend(pls, Ylabels, loc=2)
+    #plt.legend(pls, Ylabels, loc=2)
+    ax.legend(loc=2)
+    ax2.legend(loc=1)
     #plt.legend()
     #common_figure_after()
     plt.show()

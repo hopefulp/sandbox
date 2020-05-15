@@ -1,6 +1,8 @@
 ###### plot params following jobs
-
-from Ni_CO2red import *
+try:
+    from Ni_CO2red import *
+except:
+    print("import module python/qchem")
 
 class JobParams():
     def __init__(self, title=None, xtitle=None, ytitle=None):
