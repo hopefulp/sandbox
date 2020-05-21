@@ -53,10 +53,10 @@ def print_sge(inf,ndata,software,qjobname,sub_job,np,mem,Lscan_saver,dtype,dlist
             com += f"-v dtype={dtype} "
         if dlist:
             st = " ".join(dlist)
-            com += f"-v dlist='{st}' "
+            com += f"-v dlist=\"{st}\" "
         if hl:
             st = " ".join(hl)
-            com += f"-v hl='{st}' "
+            com += f"-v hl=\"{st}\" "
         if el:
             com += f"-v el={el} "
         ### in case fl=0.0, it becomes False, it should be alive for sge_amp.csh

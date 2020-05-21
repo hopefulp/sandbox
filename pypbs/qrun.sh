@@ -105,9 +105,9 @@ if [[ $hname != 'chi' &&  $software == 'amp' ]]; then
     elif [[ $qsub =~ 'di' ]]; then
         if [ $ampjob == 'tr' ]; then
             ### -nt total for training, -ntr ntrain for test
-            st="amp_run.py -f $fin -j tr -nt $ndata -dt $dtype -dl $dlist -nc $np -hl $hl -el $el -fl $fl "
+            st="amp_run.py -f $fin -j tr -nt $ndata -dtype $dtype -dl $dlist -nc $np -hl $hl -el $el -fl $fl "
         else
-            st="amp_run.py -f $fin -j te -nt $ndata -ntr $ndatatre -dt $dtype -dl $dlist -nc $np -hl $hl -el $el -fl $fl "
+            st="amp_run.py -f $fin -j te -nt $ndata -ntr $ndatatre -dtype $dtype -dl $dlist -nc $np -hl $hl -el $el -fl $fl "
         fi
         read -p "$st | will you run? [enter/no]" var
         if [ -z $var ]; then

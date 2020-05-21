@@ -21,7 +21,7 @@ set EXE = "$sandbox/pyamp/amp_run.py"
 ### $EXE is not working 
 if ( ! $?scan ) then
     if ( $?dtype ) then
-        $PYTHON $EXE -f $fname -nt $ndata -j $pyjob -dtype $dtype -dl $dlist -nc $np -hl $hl -el $el -fl $fl -g
+        $PYTHON $EXE -f $fname -j $pyjob -hl $hl -el $el -fl $fl -nc $nc -nt $ndata -dtype $dtype -dl $dlist  -g
     else
         $PYTHON $EXE -f $fname -j $pyjob -nc $np -hl $hl -el $el -fl $fl -g
     endif    

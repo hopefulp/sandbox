@@ -223,7 +223,7 @@ def get_total_image(fdata, ndata):
     #print(st)
     return ase.io.read(fdata, index=st)    # can read extxyz, OUTCAR, 
 
-def amp_jobs(fdata,ndata,ntrain,job, dstype, dslist, amp_pes, HL, E_conv, f_conv_list, Lgraph, ncore, n_mol, Ltwinx):
+def amp_jobs(fdata,ndata,ntrain,job, dstype, dslist, amp_pes, HL, E_conv, f_conv, f_coeff, Lgraph, ncore, n_mol, Ltwinx):
     ### parameter file
     outf = "hyperparam_" + job + ".dat"     # to write input info
     total_images = get_total_image(fdata,ndata)    # can read extxyz, OUTCAR, 
@@ -234,11 +234,6 @@ def amp_jobs(fdata,ndata,ntrain,job, dstype, dslist, amp_pes, HL, E_conv, f_conv
         ntrain = len(tr_images)     # ntrain is redefined in case of job==train
     ntest  = len(te_images)
     print(f"{ntest} test images")
-    ### Force input in training
-    f_conv = f_conv_list[0]
-    f_coeff = 0.1 # default
-    if len(f_conv_list) == 2:
-        f_coeff = f_conv_list[1]
     ### AMP running parts
     if re.search("pr", job):
         y=[]
@@ -293,16 +288,15 @@ def find_inputfile(pwd, job):
 def main():
     parser = argparse.ArgumentParser(description='run amp with extxyz, OUTCAR: validation is removed ', prefix_chars='-+/')
     parser.add_argument('-f', '--infile', help='ASE readible file: extxyz, OUTCAR(VASP) ')
-    ### tef for test w. force
-    parser.add_argument('-j', '--job', default='tr', choices=['tr','te','tef','pr','pt','md','chk'], help='job option:"train","test","md","profile","plot","check"')
+    parser.add_argument('-j', '--job', default='tr', choices=['tr','te','pr','pt','md'], help='job option:"train","test","md","profile","plot"')
     ### Neural Network
     parser.add_argument('-nc', '--ncore', default=1, type=int, help='number of core needs to be defined')
     parser.add_argument('-p', '--pot', default="amp.amp", help="input amp potential")
     parser.add_argument('-nm','--nmol',default=1,type=int,help='num of molecules in the system to normalize error')
     parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     parser.add_argument('-el', '--e_conv', default=0.001, type=float, help='energy convergence limit')
-    parser.add_argument('-fl', '--f_conv', nargs='+', type=float, help='force convergence limit, [force coefficient]')
-    #parser.add_argument('-fc', '--f_coeff', default=0.1, type=float, help='weight of force training')
+    parser.add_argument('-fl', '--f_conv', default=0.0, type=float, help='force convergence limit')
+    parser.add_argument('-fc', '--f_coeff', default=0.1, type=float, help='weight of force training')
     parser.add_argument('-tx', '--twinx', action="store_false", help='turn off to use twinx of two y-axes')
     parser.add_argument('-g', action="store_false", help='if val default is False, otherwise True')
     parser.add_argument('+g', action="store_true", help='if val default is False, otherwise True')
@@ -333,11 +327,8 @@ def main():
         index = args.index
         atoms = ase.io.read(fname, index=index)      # index = string
         amp_md(atoms, args.nstep, args.dt)
-    elif args.job == 'chk':
-        pass
-    ### if not MD, it's training/test
     else:
-        amp_jobs(fname,args.ndata_total,args.ndata_train,args.job,args.data_s_type,args.data_s_list,args.pot,args.hidden_layer,args.e_conv,args.f_conv,args.g,args.ncore,args.nmol,args.twinx)
+        amp_jobs(fname,args.ndata_total,args.ndata_train,args.job,args.data_s_type,args.data_s_list,args.pot,args.hidden_layer,args.e_conv,args.f_conv,args.f_coeff,args.g,args.ncore,args.nmol,args.twinx)
     return
 
 if __name__ == '__main__':

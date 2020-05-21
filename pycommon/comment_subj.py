@@ -3,8 +3,8 @@ import comment_sys as mod_sys
 
 amp         = MyClass()
 amp.server      = MyClass()
-amp.scripts     = MyClass()
 amp.run         = MyClass()
+amp_scripts     = MyClass()
 lammps          = MyClass()
 lammps.start        = MyClass()
 lammps.lamphet      = MyClass()
@@ -25,7 +25,7 @@ vasp.postproc           = MyClass()
 water       = MyClass()
 #server.sge     = MyClass()
 
-amp.scripts.run  =  "\n    == Scripts ==\
+amp_scripts.run  =  "\n    == Scripts ==\
                     \n\t== AMP direct Run Test\
                     \n\t$ amp_run.py -f OUTCAR -nd 200 -j tr -dt interval -dl 0 150 200 -nc 4 -hl 4 4 -el 0.1 -fl 0.0 +g\
                     \n\t$ amp_run.py -f OUTCAR -nd 1000 -j tr -dt div -dl 5 0 3 -nc 4 -hl 4 4 -el 0.1 -fl 0.0 +g\
@@ -55,11 +55,15 @@ amp.scripts.run  =  "\n    == Scripts ==\
                     \n\t\t   modify color option\
                     \n\t\trefer to myplot\
                     "
-amp.scripts.mlet =  "\n\t$ qsub sge_amp.csh\
+amp_scripts.mlet =  "\n\t=== AMP Qsub scripts \
+                    \n\t$ sge_amp.py -db -i OUTCAR -qj dt15 -m 12 -nc 1 -j tr -hl 8 8 -el 0.001 -fl 0.01 -nt 4766 -ntr 4766 -dt int -dl 0 4766 \
+                    \t    : work option\
+                    \n\t\t-s for scan\
+                    \n\t\t-db for .ampdb\
+                    \n\t\tnothing for one-job training in subdirectory\
+                    \n\t$ qsub sge_amp.csh\
                     \n\t    qsub script\
                     \n\t    -v scan=ok will run consecutively\
-                    \n\t$ sge_amp_scan.py -hl 3 3 3 -nc 12\
-                    \n\t    will run scan parallelly\
                     \n\t$ qsub_server.py\
                     \n\t    make qsub command line\
                     \n\t    For making all fingerprints\
@@ -73,6 +77,8 @@ amp.server.chi =   "=== AMP ===\
                     \n\tCHI::\
                     \n\t    TR -\
                     \n\t\t$ amp_run.py -f OUTCAR -j tr -nc 4 -di 0 800 1000 -hl 8 8 -el 0.001 -fl 0.01 +g\
+                    \n\t    TEST -\
+                    \n\t\t$ amp_run.py -f OUTCAR -j te -hl 8 8 -el 0.001 -fl 0.01 +g\
                     \n\t\t    detail in amp.scripts\
                     \n\t    MD -\
                     \n\t\t$ amp_run.py -j md -i 0 -ns 50 -f OUTCAR -dt 0.5\
@@ -83,15 +89,33 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t    PLOT [AMP-Test] +g or Unplot at NODE w. -g\
                     \n\t\t$ \"amp_run.py\" shows all\
                     \n\t\t    case 1: amp_run.py -f OUTCAR -nd 5000 -j tr -dt div -dl 5 0 3 -nc 4 -hl 10 10 -el 0.01 -fl 0.1 +g\
-                    \n\t\t    case 2: amp_run.py -f OUTCAR -nd 5000 -j tr -dt interval -dl 0 1500 2000 -nc 4 -hl 10 10 -el 0.001 -fl 0.1 (-Y master node)\
+                    \n\t\t    case 2: amp_run.py -f OUTCAR -nd 5000 -j tr -dt int -dl 0 1500 2000 -nc 4 -hl 10 10 -el 0.001 -fl 0.1 (-Y master node)\
                     \n\t\t$ amp_plot.py amp_test.txt -f OUTCAR -hl 10 10 -el 0.001 -fl 0.01 -nt 1000 -n 500\
                     \n\t    QSUB [AMP-Training]:\
                     \n\t\t1. Make a copy from VASP to amp\
                     \n\t\t    $ make_dir.py dname_new -w amp -j vasp -od vasp_dir\
                     \n\t\t2. First make fingerprints using datatype interval\
-                    \n\t\t    $ qsub_server.py amp -i OUTCAR -qj qname -js tr -hl 10 10 -el 0.001 -fl 0.01 -nd 4000 -dt int -dl 0 3000 4000 -m 10\
-                    \n\t\t\t-m 10 : more than 12G is required\
+                    \n\t\t    $ sge_amp.py -db -i OUTCAR -qj dt15 -nc 8 -j tr -hl 8 8 -el 0.001 -fl 0.01 -nt 4000 -ntr 4000 -dt int -dl 0 4000 -m 12 \
+                    \t\t\tMake amp.db on pwd\
+                    \n\t\t\t-m 12 : more than 12G is required include force calculation\
+                    \n\t\t\t-m 4  : for energy calculation\
                     \n\t\t\t-nd ndata_total=4000, -dt data_type=interval -dl data_list=d1~d2 training and d2~d3 test\
+                    \n\t\t\tN.B. in nodes, amp_job=tr doesnot runs test; test runs only in master node (login)\
+                    \n\t\t2.1 qsub:\
+                    \n\t\t    $ qsub -N qname -pe numa 16 -l mem=12G -v fname=OUTCAR -v pyjob=tr -v hl='10 10' -v el=0.001 -v fl=0.01 -v np=16 -v ndata=3000 -v dtype=div -v dl='2 0' $SB/pypbs/sge_amp.csh\
+                    \n\t\t3. Training\
+                    \n\t\t    Making sub-directory w. single job or scanning\
+                    \n\t\t    :single job\
+                    \n\t\t    $ sge_amp.py -qj NC1 -m 12G -nc 8 -hl 4 4 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0 \
+                    \n\t\t    :scanning\
+                    \n\t\t    $ sge_amp.py -s -qj Emaxres -m 12G -nc 8 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0 -mh 10 \
+                    \t\t\t-mh int for max number of node in each layer\
+                    \n\t\t4. Test\
+                    \n\t\t   test in sub-directory\
+                    \n\t\t   run in master node\
+                    \n\t\t   $ qrun.sh di te test qname OUTCAR 4 4 "8 8" 0.001 0.00 4000 1500 int '3000 3500' \
+                    \n\t\t   $ amp_run.py -f OUTCAR -j te -nc 4 -hl 8 8 -el 0.001 -fl 0.00 -nt 4000 -ntr 1500 -dtype int -dl 3000 3500 \
+                    \n\t\t\t    \
                     \n\t\t$ \"qrun.sh\" shows all\
                     \n\t\t    qrun.sh sub_Node $ampjob $sub_dir $qjob     $fin    $np   $mem   \"$hl\"   $el     $fl      ntotal ntrain int \"$data\"\
                     \n\t\t    case 1: qsub training data-interval\
