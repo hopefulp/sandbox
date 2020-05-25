@@ -62,8 +62,12 @@ def submit(qjobname,ncore,infile,amp_job,nHL,elimit,f_list,mem,ntotal,ntr,ntype,
             #os.system(f"cp {pwd}/OUTCAR {new_dir}")
             print("amp- directories and OUTCAR were copied")
         else:
-            print("exit")
-            sys.exit(10)
+            com = "will you continue in here ?"
+            if yes_or_no(com):
+                pass
+            else:
+                print("exit")
+                sys.exit(10)
         comm = amp_command(qjobname, ncore, mem, infile, amp_job, str_hl, elimit, f_list, ntotal, ntype, nlist)
         str1 = f"will you run: \n{comm}"
         if yes_or_no(str1):

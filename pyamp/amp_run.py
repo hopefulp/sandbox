@@ -24,11 +24,14 @@ import socket
 Ldebug = False
 
 ### Train Images 
-def calc_train_images(images, HL, E_conv, f_conv, f_coeff, ncore):
+def calc_train_images(images, HL, E_conv, f_conv, f_coeff, ncore, amp_pot=None):
     Hidden_Layer=tuple(HL)
     print("Hidden Layer: {}".format(Hidden_Layer))
     print("Energy convergence: {}".format(E_conv))
     cores={'localhost':ncore}   # 'localhost' depress SSH, communication between nodes
+    ### load "amp.amp"
+    if amp_pot:
+        calc = Amp.load(amp_pot)
     calc = Amp(descriptor=Gaussian(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
     ### Global Search in Param Space
     Annealer(calc=calc, images=images, Tmax=20, Tmin=1, steps=4000)
@@ -223,7 +226,7 @@ def get_total_image(fdata, ndata):
     #print(st)
     return ase.io.read(fdata, index=st)    # can read extxyz, OUTCAR, 
 
-def amp_jobs(fdata,ndata,ntrain,job, dstype, dslist, amp_pes, HL, E_conv, f_conv_list, Lgraph, ncore, n_mol, Ltwinx):
+def amp_jobs(fdata,ndata,ntrain,job, dstype, dslist, amp_pes, Lload_amp, HL, E_conv, f_conv_list, Lgraph, ncore, n_mol, Ltwinx):
     ### parameter file
     outf = "hyperparam_" + job + ".dat"     # to write input info
     total_images = get_total_image(fdata,ndata)    # can read extxyz, OUTCAR, 
@@ -252,12 +255,16 @@ def amp_jobs(fdata,ndata,ntrain,job, dstype, dslist, amp_pes, HL, E_conv, f_conv
     elif re.search("tr",job):
         pwd = os.getcwd()
         ### prevent running tr in tr-directory
+        amp_pot = None
         if os.path.isfile(amp_pes):
-            print(f"There is {amp_pes}, can't run training")
-            sys.exit(10)
+            if not Lload_amp:
+                print(f"There is {amp_pes}, can't run training")
+                sys.exit(10)
+            else:
+                amp_pot = amp_pes
         print("data training:total sets %d/%d" % (ntrain, ntotal))
         f_write(outf, HL, E_conv, f_conv, f_coeff, ntotal, dstype, dslist)
-        calc_train_images(tr_images, HL, E_conv, f_conv, f_coeff, ncore)
+        calc_train_images(tr_images, HL, E_conv, f_conv, f_coeff, ncore, amp_pot=amp_pot)
         ### Test after training:: not run in QSUB
         server =  socket.gethostname()
         if server == 'chi' or server == 'login':
@@ -298,6 +305,7 @@ def main():
     ### Neural Network
     parser.add_argument('-nc', '--ncore', default=1, type=int, help='number of core needs to be defined')
     parser.add_argument('-p', '--pot', default="amp.amp", help="input amp potential")
+    parser.add_argument('-pl', '--load_pot', action='store_true', help="load potential")
     parser.add_argument('-nm','--nmol',default=1,type=int,help='num of molecules in the system to normalize error')
     parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     parser.add_argument('-el', '--e_conv', default=0.001, type=float, help='energy convergence limit')
@@ -337,7 +345,7 @@ def main():
         pass
     ### if not MD, it's training/test
     else:
-        amp_jobs(fname,args.ndata_total,args.ndata_train,args.job,args.data_s_type,args.data_s_list,args.pot,args.hidden_layer,args.e_conv,args.f_conv,args.g,args.ncore,args.nmol,args.twinx)
+        amp_jobs(fname,args.ndata_total,args.ndata_train,args.job,args.data_s_type,args.data_s_list,args.pot,args.load_pot,args.hidden_layer,args.e_conv,args.f_conv,args.g,args.ncore,args.nmol,args.twinx)
     return
 
 if __name__ == '__main__':

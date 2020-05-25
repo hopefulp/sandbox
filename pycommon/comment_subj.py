@@ -113,7 +113,7 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\t4. Test\
                     \n\t\t   test in sub-directory\
                     \n\t\t   run in master node\
-                    \n\t\t   $ qrun.sh di te test qname OUTCAR 4 4 "8 8" 0.001 0.00 4000 1500 int '3000 3500' \
+                    \n\t\t   $ qrun.sh di te test qname OUTCAR 4 4 '8 8' 0.001 0.00 4000 1500 int '3000 3500' \
                     \n\t\t   $ amp_run.py -f OUTCAR -j te -nc 4 -hl 8 8 -el 0.001 -fl 0.00 -nt 4000 -ntr 1500 -dtype int -dl 3000 3500 \
                     \n\t\t\t    \
                     \n\t\t$ \"qrun.sh\" shows all\
