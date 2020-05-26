@@ -88,8 +88,8 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\tDo not queue-submit matplotlib\
                     \n\t    PLOT [AMP-Test] +g or Unplot at NODE w. -g\
                     \n\t\t$ \"amp_run.py\" shows all\
-                    \n\t\t    case 1: amp_run.py -f OUTCAR -nd 5000 -j tr -dt div -dl 5 0 3 -nc 4 -hl 10 10 -el 0.01 -fl 0.1 +g\
-                    \n\t\t    case 2: amp_run.py -f OUTCAR -nd 5000 -j tr -dt int -dl 0 1500 2000 -nc 4 -hl 10 10 -el 0.001 -fl 0.1 (-Y master node)\
+                    \n\t\t    case 1: amp_run.py -f OUTCAR -j tr -nc 4 -hl 10 10 -el 0.01  -fl 0.1 -nt 5000 -dtype div -dl 5 0 3 +g\
+                    \n\t\t    case 2: amp_run.py -f OUTCAR -j tr -nc 4 -hl 10 10 -el 0.001 -fl 0.1 -nt 5000 -dtype int -dl 0 1500 2000 (-Y master node)\
                     \n\t\t$ amp_plot.py amp_test.txt -f OUTCAR -hl 10 10 -el 0.001 -fl 0.01 -nt 1000 -n 500\
                     \n\t    QSUB [AMP-Training]:\
                     \n\t\t1. Make a copy from VASP to amp\
