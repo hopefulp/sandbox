@@ -22,45 +22,59 @@ import os
 import socket
 
 Ldebug = False
+amp_amp = [ "amp.amp", "amp-untrained-parameters.amp" ] 
+
 
 ### Train Images 
-def calc_train_images(images, HL, E_conv, f_conv, f_coeff, ncore, amp_pot=None):
+def calc_train_images(images, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, amp_pot=None):
     Hidden_Layer=tuple(HL)
     print("Hidden Layer: {}".format(Hidden_Layer))
+    E_conv = Elist[0]
+    if len(Elist) == 2:
+        E_maxresid = Elist[1]
+    else:
+        E_maxresid = E_conv*3
     print("Energy convergence: {}".format(E_conv))
+    print("Energy maxresidue: {}".format(E_maxresid))
     cores={'localhost':ncore}   # 'localhost' depress SSH, communication between nodes
     ### load "amp.amp"
-    if amp_pot:
+    if Lload_amp:
         calc = Amp.load(amp_pot)
     calc = Amp(descriptor=Gaussian(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
     ### Global Search in Param Space
     Annealer(calc=calc, images=images, Tmax=20, Tmin=1, steps=4000)
 
-    if f_conv <= 0.0:
-        E_maxresid = E_conv*3
-        #convergence={'energy_rmse': E_conv}
-        convergence={'energy_rmse': E_conv, 'energy_maxresid': E_maxresid}
-    else:
-        convergence={'energy_rmse': E_conv, 'force_rmse':f_conv}
+    if E_conv:
+        convergence['energy_rmse'] = E_conv
+    if E_maxresid:
+        convergence['energy_maxresid'] = E_maxresid
+    if f_conv > 0.0:
+        if f_conv:
+            convergence['force_rmse'] = f_conv
+        if not f_coeff:
+            f_coeff = 0.02
     calc.model.lossfunction = LossFunction(convergence=convergence, force_coefficient=f_coeff)  # setting
     calc.train(images=images, overwrite=True)
     return
 
-def amp_md(atoms, nstep, dt):
+def amp_md(atoms, nstep, dt, amp_pot):
     from ase import units
     from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
     from ase.md import VelocityVerlet
 
     traj = ase.io.Trajectory("traj.traj", 'w')
 
-    try:
-        calc = Amp.load("amp.amp")
-    except FileNotFoundError:
+    if amp_pot:
+        calc = Amp.load(amp_pot)
+    else:
         try:
-            calc = Amp.load("amp-untrained-parameters.amp") 
+            calc = Amp.load("amp.amp")
         except FileNotFoundError:
-            print("Error: amp-pes.amp file does not exist, input amp-pot file by -p")
-            sys.exit(1)
+            try:
+                calc = Amp.load("amp-untrained-parameters.amp") 
+            except FileNotFoundError:
+                print("Error: amp-pes.amp file does not exist, input amp-pot file by -p")
+                sys.exit(1)
 
     atoms.set_calculator(calc)
     atoms.get_potential_energy()
@@ -79,34 +93,68 @@ def amp_md(atoms, nstep, dt):
         traj.write(atoms)                   # write kinetic energy, but pot is not seen in ase
     f.close()        
 
-def calc_test_images(test_images, amp_pes, title, suptitle,ncore, Lgraph,val_id=None,nmol=1,Ltwinx=None):
-    try:
+def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgraph,val_id=None,na_mol=1,Ltwinx=None):
+    if amp_pes:
         calc = Amp.load(amp_pes)
-    except FileNotFoundError:
+    else:
         try:
-            calc = Amp.load("amp-untrained-parameters.amp")
+            calc = Amp.load("amp.amp")
         except FileNotFoundError:
-            print("Error: amp-pes.amp file does not exist, input amp-pot file by -p")
-            sys.exit(1)
+            try:
+                calc = Amp.load("amp-untrained-parameters.amp")
+            except FileNotFoundError:
+                print("Error: amp-pes.amp file does not exist, input amp-pot file by -p")
+                sys.exit(1)
     escale = 1                  # my_chem.ev2kj
     y=[]
     y_bar=[]
+    if Ltest_f:
+        yf=[]
+        yf_bar=[]
+        f_rmses=[]
     #return         # this runs
+    ### as for all the same molecule
+    natom = len(test_images[0])
     for mol in test_images:
-        y.append(mol.get_potential_energy()/nmol)
+        y.append(mol.get_potential_energy()/natom*na_mol)
+        ### Force
+        if Ltest_f:
+            y_forces = mol.get_forces()              # 2D list
+            if not yf:
+                yf.append(y_forces)            # return 2D list of forces
         mol.set_calculator(calc)
-        y_bar.append(mol.get_potential_energy()/nmol)
-    
+        y_bar.append(mol.get_potential_energy()/natom*na_mol)
+        if Ltest_f:
+            ybar_forces = mol.get_forces()
+            if not yf_bar:
+                yf_bar.append(ybar_forces)
+            yf_arr = np.array(y_forces).flatten()
+            yfbar_arr = np.array(ybar_forces).flatten()
+            f_rmse = np.sqrt(((yfbar_arr-yf_arr)**2).mean())
+            f_rmses.append(f_rmse)
+    if Ltest_f:
+        with open('f_rmse.dat', 'w') as f:
+            f.write(f"{np.array(f_rmses).mean():10.5f} \n")
+            for rmse in f_rmses:
+                f.write(f"{rmse:10.5f} \n")
+
     with open("amp_test.txt",'w') as f:
         f.write("\ttrue\t\thypothesis\n")
         for y1, ybar1 in zip(y, y_bar):
             f.write(f"{y1:15.5f} {ybar1:15.5f}\n")
-    
+    if Ltest_f:            
+        with open("forces.dat",'w') as f:
+            f.write("\tx true\thypo\t\ty true\thypo\t\tz true\thypo\n")
+            for f_image, fbar_image in zip(yf, yf_bar):
+                for f1, fbar1 in zip(f_image, fbar_image):
+                    for i in range(3):
+                        f.write(f"{f1[i]:10.5f} {fbar1[i]:10.5f}\t")
+                    f.write("\n")
     if Lgraph:
         modulename='myplot2D'   ### FOR MLET
         if modulename not in sys.modules:
             import myplot2D
-        err, res_max = myplot2D.draw_amp_twinx(y, y_bar, title, suptitle,Ltwinx=Ltwinx,Ldiff=True)
+        err, res_max = myplot2D.draw_amp_twinx(y, y_bar, title, suptitle, natom=natom, Ltwinx=Ltwinx,Ldiff=True)
     else:
         h_conv = np.array(y_bar)                # * escale
         y_conv = np.array(y)                    # * escale
@@ -116,11 +164,15 @@ def calc_test_images(test_images, amp_pes, title, suptitle,ncore, Lgraph,val_id=
         #err = rmse(y, y_bar)*escale
     return err, res_max
 
-def f_write(outf, HL, E_conv, f_conv,f_coeff, ntotal, dtype, dlist, err=None, max_res=None, job_index=None):
+def f_write(outf, HL, Elist, f_conv,f_coeff, ntotal, dtype, dlist, err=None, max_res=None, job_index=None):
     with open(outf, "a") as f:
         st = ' '.join(str(x) for x in HL)
         f.write(f"{'Hidden Lay':10}:{st:>10}\n")
+        E_conv = Elist[0]
         f.write(f"{'Energy Lim':10}:{E_conv:10g}\n")
+        if len(Elist) == 2:
+            E_maxres = Elist[1]
+            f.write(f"{'Energy max':10}:{E_maxres:10g}\n")
         f.write(f"{'Force  Lim':10}:{f_conv:10g}\n")
         f.write(f"{'Force coef':10}:{f_coeff:10g}\n")
         print(f"ntotal {ntotal}")
@@ -226,7 +278,7 @@ def get_total_image(fdata, ndata):
     #print(st)
     return ase.io.read(fdata, index=st)    # can read extxyz, OUTCAR, 
 
-def amp_jobs(fdata,ndata,ntrain,job, dstype, dslist, amp_pes, Lload_amp, HL, E_conv, f_conv_list, Lgraph, ncore, n_mol, Ltwinx):
+def amp_jobs(fdata,job,Ltest_f,amp_inp,Lload_amp,HL,E_conv,f_conv_list,ncore,na_mol,ndata,ntrain,dstype,dslist,Lgraph,Ltwinx):
     ### parameter file
     outf = "hyperparam_" + job + ".dat"     # to write input info
     total_images = get_total_image(fdata,ndata)    # can read extxyz, OUTCAR, 
@@ -255,29 +307,33 @@ def amp_jobs(fdata,ndata,ntrain,job, dstype, dslist, amp_pes, Lload_amp, HL, E_c
     elif re.search("tr",job):
         pwd = os.getcwd()
         ### prevent running tr in tr-directory
-        amp_pot = None
-        if os.path.isfile(amp_pes):
-            if not Lload_amp:
-                print(f"There is {amp_pes}, can't run training")
-                sys.exit(10)
+        if amp_inp:
+            if Lload_amp:
+                pass
             else:
-                amp_pot = amp_pes
+                print(f"{amp_inp} can't be overwritten: Stop")
+                sys.exit(11)
+        else:
+            for amp_file in amp_amp:
+                if os.path.isfile(amp_file):
+                    print(f"There is {amp_file}: Stop")
+                    sys.exit(10)
         print("data training:total sets %d/%d" % (ntrain, ntotal))
         f_write(outf, HL, E_conv, f_conv, f_coeff, ntotal, dstype, dslist)
-        calc_train_images(tr_images, HL, E_conv, f_conv, f_coeff, ncore, amp_pot=amp_pot)
+        calc_train_images(tr_images, HL, E_conv, f_conv, f_coeff, ncore, Lload_amp,  amp_pot=amp_inp)
         ### Test after training:: not run in QSUB
         server =  socket.gethostname()
         if server == 'chi' or server == 'login':
             outf = "runamp_te.dat"     # to write input info
             title, suptitle = get_title(fdata, HL, E_conv,f_conv, f_coeff, ntrain, ntest)
             print("data test:train sets %d/%d" % (ntest, ntrain))
-            rmserr, max_res = calc_test_images(te_images, amp_pes, title, suptitle,ncore,Lgraph,Ltwinx=Ltwinx)
+            rmserr, max_res = calc_test_images(te_images,amp_inp,Ltest_f,title, suptitle,ncore,Lgraph,Ltwinx=Ltwinx)
             f_write(outf, HL, E_conv, f_conv, f_coeff, ntotal,dstype, dslist, err=rmserr, max_res=max_res)
     ### JOB == TEST
     elif re.search("te",job):
         title, suptitle = get_title( fdata, HL, E_conv, f_conv,f_coeff, ntrain, ntest)
         print("data test:train sets %d/%d" % (ntest, ntrain))
-        rmserr, max_res = calc_test_images(te_images, amp_pes, title, suptitle,ncore,Lgraph,nmol=n_mol,Ltwinx=Ltwinx)
+        rmserr, max_res = calc_test_images(te_images,amp_inp,Ltest_f,title, suptitle,ncore,Lgraph,na_mol=na_mol,Ltwinx=Ltwinx)
         f_write(outf, HL, E_conv, f_conv,f_coeff, ntotal,dstype, dslist, err=rmserr, max_res=max_res)
 
     return
@@ -299,14 +355,15 @@ def find_inputfile(pwd, job):
 
 def main():
     parser = argparse.ArgumentParser(description='run amp with extxyz, OUTCAR: validation is removed ', prefix_chars='-+/')
-    parser.add_argument('-f', '--infile', help='ASE readible file: extxyz, OUTCAR(VASP) ')
+    parser.add_argument('-f', '--infile', default='OUTCAR', help='ASE readible file: extxyz, OUTCAR(VASP) ')
     ### tef for test w. force
     parser.add_argument('-j', '--job', default='tr', choices=['tr','te','tef','pr','pt','md','chk'], help='job option:"train","test","md","profile","plot","check"')
+    parser.add_argument('-tef', '--test_force', action='store_true', help="test force")
     ### Neural Network
     parser.add_argument('-nc', '--ncore', default=1, type=int, help='number of core needs to be defined')
-    parser.add_argument('-p', '--pot', default="amp.amp", help="input amp potential")
+    parser.add_argument('-p', '--pot', help="input amp potential")
     parser.add_argument('-load', '--load_pot', action='store_true', help="load potential")
-    parser.add_argument('-nm','--nmol',default=1,type=int,help='num of molecules in the system to normalize error')
+    parser.add_argument('-nam','--mol_atoms',default=1,type=int,help='num of atoms in molecule in the system to normalize error')
     parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     parser.add_argument('-el', '--e_conv', nargs='+', default=[0.001,0.003], type=float, help='energy convergence limit')
     parser.add_argument('-fl', '--f_conv', nargs='+', default=[0.2, 0.04],   type=float, help='force convergence limit, [force coefficient]')
@@ -340,12 +397,12 @@ def main():
     if args.job == 'md':
         index = args.index
         atoms = ase.io.read(fname, index=index)      # index = string
-        amp_md(atoms, args.nstep, args.dt)
+        amp_md(atoms, args.nstep, args.dt, args.pot)
     elif args.job == 'chk':
         pass
     ### if not MD, it's training/test
     else:
-        amp_jobs(fname,args.ndata_total,args.ndata_train,args.job,args.data_s_type,args.data_s_list,args.pot,args.load_pot,args.hidden_layer,args.e_conv,args.f_conv,args.g,args.ncore,args.nmol,args.twinx)
+        amp_jobs(fname,args.job,args.test_force,args.pot,args.load_pot,args.hidden_layer,args.e_conv,args.f_conv,args.ncore,args.mol_atoms,args.ndata_total,args.ndata_train,args.data_s_type,args.data_s_list,args.g,args.twinx)
     return
 
 if __name__ == '__main__':

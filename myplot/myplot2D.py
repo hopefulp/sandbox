@@ -118,7 +118,7 @@ def draw_2subdots(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b'
     return rmse, max_res
 ### draw_dots_two was upgraded to twinx
 ### still used by amp_run.py
-def draw_amp_twinx(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b','o'], Ldiff=True):
+def draw_amp_twinx(y, h, title, suptitle, natom=1, Ltwinx=None, escale=1.0,Colors=['r','b','o'], Ldiff=True):
     '''
     this makes error in serial plotting
     '''
@@ -131,13 +131,13 @@ def draw_amp_twinx(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b
     ymax = max(y_conv)
     y_width = ymax - ymin
     diff =  np.subtract(h_conv,y_conv)
-    rmse = np.sqrt((diff**2).mean())
-    max_res = abs(max(diff, key=abs))
+    rmse = np.sqrt((diff**2).mean())/natom                      # eV/atom
+    max_res = abs(max(diff, key=abs))/natom                     # eV/atom
     #print("{:10.3f} {:10.3f}".format(rmse,max_res))
     ### input text inside figure
     text_pos_x = nlen*0.85                  # 0.85, 0.2
     text_pos_y = max(y_conv)*0.2
-    text="E_rms(test) = {:7.3f}\nE_maxres   = {:7.3f}".format(rmse, max_res)
+    text="E_rms(test) = {:7.3f} eV/atom\nE_maxres   = {:7.3f} eV/atom".format(rmse, max_res)
 
     if Colors:  color = Colors.pop(0)       #'tab:' + Colors.pop(0)
     else:       color='tab:green'

@@ -8,7 +8,7 @@ amp_db = ['amp-fingerprint-primes.ampdb', 'amp-neighborlists.ampdb', 'amp-finger
 
 files = { 'tr': amp_db, 'md': ['OUTCAR', 'amp.amp'], 'vasp': ['OUTCAR']}
 
-def jobs(ndir, work, job, odir):
+def jobs(ndir, work, job, odir, Lcopy):
     pwd = os.getcwd()
     #directory = pwd + '/'+ ndir
     if os.path.isdir(ndir):
@@ -23,11 +23,22 @@ def jobs(ndir, work, job, odir):
                 #forig = '../'+f
                 forig = pwd + '/' + f
                 if os.path.isfile(forig):
-                    os.system(f'ln -s {forig} {f}')
+                    if Lcopy:
+                        os.system(f'cp {forig} {f}')
+                    else:
+                        os.system(f'ln -s {forig} {f}')
                 else:
-                    print(f'there does not exist {forig}')
-                    print(f"here is {os.getcwd()}")
-                    sys.exit(2)
+                    if f == 'amp.amp':
+                        f = "amp-untrained-parameters.amp"
+                        forig = pwd + '/' + f
+                        if Lcopy:
+                            os.system(f'cp {forig} {f}')
+                        else:
+                            os.system(f'cp {forig} {f}')
+                    else:
+                        print(f'there does not exist {forig}')
+                        print(f"here is {os.getcwd()}")
+                        sys.exit(11)
         elif job == 'vasp':
             if odir == None:
                 print("input vasp directory")
@@ -49,9 +60,10 @@ def main():
     parser.add_argument('-w','--work', default='amp', choices=['amp'], help="work ")
     parser.add_argument('-j','--job', default='md', choices=['tr','md','vasp'], help="md ")
     parser.add_argument('-od','--old_dir', help=" in case 'vasp', input old directory")
+    parser.add_argument('-c', '--copy', action='store_true', help='make copy rather than ln')
     args = parser.parse_args()
 
-    jobs(args.directory, args.work, args.job, args.old_dir)
+    jobs(args.directory, args.work, args.job, args.old_dir, args.copy)
 
 if __name__ == "__main__":
     main()

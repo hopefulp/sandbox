@@ -76,9 +76,11 @@ amp.server.chi =   "=== AMP ===\
                     \n    == SERVER ==\
                     \n\tCHI::\
                     \n\t    TR -\
-                    \n\t\t$ amp_run.py -f OUTCAR -j tr -nc 4 -di 0 800 1000 -hl 8 8 -el 0.001 -fl 0.01 +g\
+                    \n\t\t$ amp_run.py -f OUTCAR -j tr -hl 8 8 -el 0.001 0.003 -fl 0.01 nt 4000 -ntr 1500 -dtype int -dl 0 3000 +g\
                     \n\t    TEST -\
-                    \n\t\t$ amp_run.py -f OUTCAR -j te -hl 8 8 -el 0.001 -fl 0.01 +g\
+                    \n\t\trun in ampdb directory\
+                    \n\t\t$ amp_run.py -f OUTCAR -j te -tef -hl 5 5 -el 0.001 0.003 -fl 0.0 -nt 4000 -ntr 1500 -dtype int -dl 3000 3002  +g -p EOHL55E0.001F0/amp-untrained-parameters.amp\
+                    \n\t\t    -tef: test run force calculation\
                     \n\t\t    detail in amp.scripts\
                     \n\t    MD -\
                     \n\t\t$ amp_run.py -j md -i 0 -ns 50 -f OUTCAR -dt 0.5\
