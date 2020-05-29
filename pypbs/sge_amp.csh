@@ -21,7 +21,11 @@ set EXE = "$sandbox/pyamp/amp_run.py"
 ###  -pl for continue training by load amp.amp
 if ( ! $?scan ) then
     if ( $?dtype ) then
-        $PYTHON $EXE -f $fname -j $pyjob -hl $hl -el $el -fl $fl -nc $nc -nt $ndata -dtype $dtype -dl $dlist -g
+        if ( $?tef ) then
+            $PYTHON $EXE -f $fname -j $pyjob -tef -hl $hl -el $el -fl $fl -nc $nc -nt $nt -ntr $ntr -dtype $dtype -dl $dlist -g
+        else
+            $PYTHON $EXE -f $fname -j $pyjob -hl $hl -el $el -fl $fl -nc $nc -nt $nt -ntr $ntr -dtype $dtype -dl $dlist -g
+        endif
     else
         $PYTHON $EXE -f $fname -j $pyjob -nc $np -hl $hl -el $el -fl $fl -g
     endif    

@@ -110,13 +110,15 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\t    :single job\
                     \n\t\t    $ sge_amp.py -qj NC1 -m 12G -nc 8 -hl 4 4 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0 \
                     \n\t\t    :scanning\
-                    \n\t\t    $ sge_amp.py -s -qj Emaxres -m 12G -nc 8 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0 -mh 10 \
+                    \n\t\t    $ sge_amp.py -s -sh 10 -qj Emaxres -m 12G -nc 8 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0\
                     \t\t\t-mh int for max number of node in each layer\
                     \n\t\t4. Test\
                     \n\t\t   test in sub-directory\
                     \n\t\t   run in master node\
                     \n\t\t   $ qrun.sh di te test qname OUTCAR 4 4 '8 8' 0.001 0.00 4000 1500 int '3000 3500' \
-                    \n\t\t   $ amp_run.py -f OUTCAR -j te -nc 4 -hl 8 8 -el 0.001 -fl 0.00 -nt 4000 -ntr 1500 -dtype int -dl 3000 3500 \
+                    \n\t\t   $ amp_run.py -f OUTCAR -j te -tef -nc 4 -hl 8 8 -el 0.001 0.003 -fl 0.00 -nt 4000 -ntr 1500 -dtype int -dl 3000 3500 \
+                    \n\t\t   :Scan\
+                    \n\t\t   $ sge_amp.py -s -sh 10 -qj EO -j te -tef -m 3G -nc 4 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0\
                     \n\t\t\t    \
                     \n\t\t$ \"qrun.sh\" shows all\
                     \n\t\t    qrun.sh sub_Node $ampjob $sub_dir $qjob     $fin    $np   $mem   \"$hl\"   $el     $fl      ntotal ntrain int \"$data\"\

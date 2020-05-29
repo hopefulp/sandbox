@@ -14,7 +14,7 @@ import numpy as np
 #import my_chem
 #from my_arith import rmse
 from my_images import Images
-from common import yes_or_no
+from common import yes_or_no, whereami
 from amp_plot import get_title         ### FOR MLET
 import re
 import sys
@@ -134,9 +134,9 @@ def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgrap
             f_rmses.append(f_rmse)
     if Ltest_f:
         with open('f_rmse.dat', 'w') as f:
-            f.write(f"{np.array(f_rmses).mean():10.5f} \n")
-            for rmse in f_rmses:
-                f.write(f"{rmse:10.5f} \n")
+            f.write(f"{'average':^10}{np.array(f_rmses).mean():10.5f}\n")
+            for idx, rmse in enumerate(f_rmses):
+                f.write(f"{idx:^9d}{rmse:10.5f} \n")
 
     with open("amp_test.txt",'w') as f:
         f.write("\ttrue\t\thypothesis\n")
@@ -175,7 +175,7 @@ def f_write(outf, HL, Elist, f_conv,f_coeff, ntotal, dtype, dlist, err=None, max
             f.write(f"{'Energy max':10}:{E_maxres:10g}\n")
         f.write(f"{'Force  Lim':10}:{f_conv:10g}\n")
         f.write(f"{'Force coef':10}:{f_coeff:10g}\n")
-        print(f"ntotal {ntotal}")
+        #print(f"ntotal {ntotal} in {whereami()}")
         f.write(f"{'Total Data':10}:{ntotal:10d}\n")
         f.write(f"{'Data  Type':10}:{dtype:>10}\n")
         if dlist:
@@ -282,13 +282,16 @@ def amp_jobs(fdata,job,Ltest_f,amp_inp,Lload_amp,HL,E_conv,f_conv_list,ncore,na_
     ### parameter file
     outf = "hyperparam_" + job + ".dat"     # to write input info
     total_images = get_total_image(fdata,ndata)    # can read extxyz, OUTCAR, 
-    ntotal = len(total_images)
-    print(f"dstype {dstype} dslist {dslist} with total {ntotal} data")
+    print(f"dstype {dstype} dslist {dslist} with data {len(total_images)} in {whereami()}: 1st")
     tr_images, te_images = data_selection(total_images, dstype, dslist, job)
-    if job == 'tr':
+    if job == 'te':
+        ntotal = 0
+        ### ntrain is input
+    else:
+        ntotal = len(total_images)
         ntrain = len(tr_images)     # ntrain is redefined in case of job==train
     ntest  = len(te_images)
-    print(f"{ntest} test images")
+    print(f"ntotal {ntotal} ntrain {ntrain} ntest {ntest} in {whereami()}: 2nd")
     ### Force input in training
     f_conv = f_conv_list[0]
     f_coeff = 0.1 # default
@@ -332,7 +335,7 @@ def amp_jobs(fdata,job,Ltest_f,amp_inp,Lload_amp,HL,E_conv,f_conv_list,ncore,na_
     ### JOB == TEST
     elif re.search("te",job):
         title, suptitle = get_title( fdata, HL, E_conv, f_conv,f_coeff, ntrain, ntest)
-        print("data test:train sets %d/%d" % (ntest, ntrain))
+        print(f"data test {ntest}:{ntrain} train in {whereami()}/job==te")
         rmserr, max_res = calc_test_images(te_images,amp_inp,Ltest_f,title, suptitle,ncore,Lgraph,na_mol=na_mol,Ltwinx=Ltwinx)
         f_write(outf, HL, E_conv, f_conv,f_coeff, ntotal,dstype, dslist, err=rmserr, max_res=max_res)
 
