@@ -3,6 +3,8 @@ import os
 import sys
 import inspect
 import numpy as np
+import weakref
+from varname import nameof
 
 """
     version dependency included
@@ -20,8 +22,51 @@ import numpy as np
 """
 
 class MyClass(dict):
+    instances = []
+    def __init__(self, name=None):
+        self.__class__.instances.append(weakref.proxy(self))    # self.name = name
+        #self.__class__.instances.append(name)
+        self.name = name
+
+class MyClass_t(dict):
+    instances = []
+    def __init__(self, name=None):
+        self.__class__.instances.append(name)    # self.name = name
+        self.name = name
+
+class MyClass_s(dict):
     pass
 
+def dir_classify_n(lsorted, class_instance, class_dict,Lwrite=1):
+    """
+    classify files in a directory
+    """
+    #print(classobj_dict_key)
+    luse=[]
+    ukeys=[]        # used keys
+    lsuff=['py','sh','csh']
+    for f in class_dict.__dict__.keys():             # as for keys == py_fname(.py)
+        Ltag = False
+        for suf in lsuff:
+            fsuf = f + '.' + suf
+            if fsuf in lsorted:                      # scan for keys
+                luse.append(fsuf)
+                lsorted.remove(fsuf)                 # remove key.py
+                ukeys.append(f)                     # return key
+                Ltag = True
+                continue
+        if Ltag ==  True:
+            continue
+
+        #print(f" in dir_classify():   {f}")      # to print all the not-selected files
+    ### classify modules used
+    if luse:
+        CLASS_instance = class_instance.upper()
+        print("  {:<10}::".format(CLASS_instance +" used"))
+        if Lwrite:
+            for f in luse:
+                print(f"    {f}     ")
+    return ukeys
 
 def dir_classify(lsorted, classobj_dict_key,classobj_dict,Lwrite=1):
     """

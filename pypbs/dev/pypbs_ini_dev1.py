@@ -1,20 +1,17 @@
-#!/home/joonho/anaconda3/bin/python
+#!/gpfs/home/joonho/anaconda3/bin/python
 
 import argparse
 import os
 import re
-from common import dir_all, dir_classify_n, whereami, MyClass
-#from common import MyClass_t as MyClass
-from varname import nameof
+from common import dir_all, MyClass, dir_classify
 
-### thest are globals() not locals()|vars()
-sge     = MyClass('sge')
-grmx    = MyClass('grmx')
-qsub    = MyClass('qsub')
-usage   = MyClass('usage')
-amp     = MyClass('amp')
-qchem   = MyClass('qchem')
-qsleep  = MyClass('qsleep')
+sge     = MyClass()
+grmx    = MyClass()
+qsub    = MyClass()
+usage   = MyClass()
+amp     = MyClass()
+qchem   = MyClass()
+qsleep  = MyClass()
 
 # if not use input variables, define here
 sge.usage="$qstat -f    # see all nodes(/used/total) and my job\
@@ -24,19 +21,17 @@ sge.usage="$qstat -f    # see all nodes(/used/total) and my job\
             \n\t\t$qhist       # shows number of running cores and jobs in Queue\
             \n\t\t$qmem        # memory\
             "
-sge.qsub_server = "qsub_server.py"
-sge.sge_dir_run = "sge_dir_run.py"
 qsub.usage="qsub -N jobname -v var=a_variable /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh\
             \n\t\t$var can be used as variable in the script\
             \n\t\tscript name should be full name\
             "
 grmx.usage="qsub -v tpr=mdname sge_mdrun2.sh"
+
 usage.gen="#Comment for sge: -w [sge|amp|grmx|qchem|sleep|qsub for arguments]\
             \n\t\tAMP::     sge_amp.tcsh\
             \n\t\tGromacs:: sge_mdrun2.tcsh\
             \n\t\tQ-Chem::  sge_qchem.csh\
             \n\t\tdummy job::  sge_sleep.csh"
-usage.files = ['u.py']
 amp.usage="\n\t\tpy_job for [validation||train||test]\
             \n\t\tscan variable (if exists) average for several trial with the same [HL, ene convergency]\
             \n\t\tsetenv SGE_HOME $HOME/sandbox_gl/pypbs\
@@ -46,21 +41,12 @@ amp.usage="\n\t\tpy_job for [validation||train||test]\
             \n\t\tset EXE = \"$HOME/sandbox_gl/py_ai/amp_ene.py\"\
             \n\t\t$PYTHON $EXE $fname $py_job -hl 4 4 4 -el 0.001 -n 5 -g\
             "
-amp.sge_amp="sge_amp.py \
-             sge_amp.csh\
-             "
 qchem.usage=""
 qsleep.usage=""
-
 classobj_dict={'SGE': sge, 'GRMX': grmx, 'AMP':amp, 'USAGE': usage, 'Qsub': qsub, 'QChem': qchem, 'Qsleep': qsleep}
 lclass_var=['QChem', 'AMP', 'Qsleep']
-#print(classobj_dict['SGE'].usage)
 
-def works(Lclassify, work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
-    if work:
-        Lwrite = 0
-    else:
-        Lwrite = 1
+def works(work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
 
     if Lusage:
         work = 'USAGE'
@@ -83,27 +69,17 @@ def works(Lclassify, work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
 
     if sort_exe:
         print("Executable:: ")
-        if not Lclassify:
+        if not work:
             for f in sort_exe:
                 print(f"    {f}")
-        ### classify
         else:
-            ### instance.name is string, stored as self.name in MyClass
-            ### class instance variable (sge) appears in the same letter as instance.name='sge'
-            #print(MyClass.instances)
-            for instance in MyClass.instances:
-                #print(globals().keys())
-                for gkey in globals().keys():
-                    if gkey == instance.name:    # 'sge'(class instance) == 'sge'(string)
-                        break
-                ### 
-                ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite)
-                
-                #print(f"{globals()[gkey].__dict__[ckey]} in {whereami()}") 
-                ### No globals()[gkey][ckey]: N.B.: dict_class does not have keys()
-                if work == instance.name:
-                    for ckey in ckeys:
-                        print(f"    {ckey}.py[sh]\t:: {globals()[gkey].__dict__[ckey]}")
+            for key in classobj_dict.keys():
+                fkey = dir_classify(sort_exe, key, classobj_dict)
+                if work:
+                    name_class = classobj_dict[work]
+                    for key in name_class.__dict__.keys():
+                        if key in fkey:
+                            print(f"    {key}.py\t:: {name_class.__dict__[key]}")
             print("  == remainder ")
             for f in sort_exe:
                 print(f"    {f}")
@@ -113,16 +89,13 @@ def works(Lclassify, work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
             for f in sort_mod:
                 print(f"    {f}")
         else:
-            for instance in MyClass.instances:
-                for key in globals().keys():
-                    if key == instance.name:
-                        break
-                fkey = dir_classify_n(sort_mod, instance.name, globals()[key])
-                #if work:
-                #    name_class = classobj_dict[work]
-                #    for key in name_class.__dict__.keys():
-                if key in fkey:
-                    print(f"    {key}.py\t:: {fkey.__dict__[key]}")
+            for key in classobj_dict.keys():
+                fkey = dir_classify(sort_mod, key, classobj_dict)
+                if work:
+                    name_class = classobj_dict[work]
+                    for key in name_class.__dict__.keys():
+                        if key in fkey:
+                            print(f"    {key}.py\t:: {name_class.__dict__[key]}")
             print("  == remainder ")
             for f in sort_mod:
                 print(f"    {f}")
@@ -159,20 +132,20 @@ def works(Lclassify, work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
             print("Dummy job::")
             print(f"            qsub -q {que} -pe numa {np} -l mem={nmem} $SB/pypbs/sge_sleep.csh")
             print("    Sample: qsub -q qname(sandy@slet02) -pe numa 6(num of process) -l mem=24G $SB/pypbs/sge_sleep.csh")
-    #if work in classobj_dict.keys():
-    print("Instances:: ", end='')
-    for instance in MyClass.instances:
-        print(f"{instance.name}", end=' ') 
-    print("\n\t    -w for detail")
-    print(f"#Comment: -c    for classification")
+    if work in classobj_dict.keys():                    
+        name_class = classobj_dict[work]
+        for key in name_class.__dict__.keys():
+            print(f" {work}   \t:: {name_class.__dict__[key]}")
+    print(f"#Comment: -c    for classification'\
+            \n\t  -u for usage: equal to -j USAGE\
+            \n\t  -w {classobj_dict.keys()} for detail\
+            ")
 
     return 0
 
 def main():
     parser = argparse.ArgumentParser(description="display Usage for $SB/pypbs  ")
-    parser.add_argument('-c','--classify', action='store_true', help="classify ")
-    #parser.add_argument('-w','--work',  choices=['AMP','QChem','SGE','Qsub','Qsleep','GRMX'], help="several explanation option ")
-    parser.add_argument('-w','--work',  help="several explanation option ")
+    parser.add_argument('-w','--work',  choices=['AMP','QChem','SGE','Qsub','Qsleep','GRMX'], help="several explanation option ")
     parser.add_argument('-f', '--infile', help='energy data input file')
     parser.add_argument('-r', '--run', action='store_true', help='run command')
     queue = parser.add_argument_group(title = 'SGE Queue')
@@ -182,11 +155,12 @@ def main():
     queue.add_argument('-l', '--memory', default=2.0, type=float,  help='size of memory per process')
     qchem = parser.add_argument_group(title='Q-Chem')
     qchem.add_argument('-s', '--save', action='store_true', help='save option in Q-Chem run')
+    parser.add_argument('-c','--classify', action='store_true', help="classify ")
     #parser.add_argument('-js','--specify', choices=['qcmo','nbo','eda'], help="present class details ")
     parser.add_argument('-u','--usage', action='store_true', help="present main details")
     args = parser.parse_args()
 
-    works(args.classify,args.work,args.usage,args.infile,args.run,args.que_job,args.nprocess,args.memory,args.queue,args.save)
+    works(args.work,args.usage,args.infile,args.run,args.que_job,args.nprocess,args.memory,args.queue,args.save)
     return 0
 
 if __name__ == "__main__":
