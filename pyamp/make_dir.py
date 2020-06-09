@@ -14,6 +14,7 @@ def jobs(ndir, work, job, odir, Lcopy):
     if os.path.isdir(ndir):
         print(f'there exist {ndir}')
         sys.exit(1)
+    #### make new directory anc cd
     else:
         os.system(f'mkdir {ndir}')
         os.chdir(f'{ndir}')
@@ -22,7 +23,7 @@ def jobs(ndir, work, job, odir, Lcopy):
             for f in files[job]:
                 #forig = '../'+f
                 forig = pwd + '/' + f
-                if os.path.isfile(forig):
+                if os.path.isfile(forig) or os.path.isdir(forig):
                     if Lcopy:
                         os.system(f'cp {forig} {f}')
                     else:
@@ -51,6 +52,10 @@ def jobs(ndir, work, job, odir, Lcopy):
                 else:
                     print(f'there does not exist {forig}')
                     sys.exit(31)
+        elif job == 'des':
+            com = f'ln -s ../OUTCAR OUTCAR'
+            os.system(com)
+
             
     return 0
 
@@ -58,7 +63,7 @@ def main():
     parser = argparse.ArgumentParser(description="make directory with some auxiliary files  ")
     parser.add_argument( 'directory', default='tmp', help='make directory') 
     parser.add_argument('-w','--work', default='amp', choices=['amp'], help="work ")
-    parser.add_argument('-j','--job', default='md', choices=['tr','md','vasp'], help="md ")
+    parser.add_argument('-j','--job', default='md', choices=['des','tr','md','vasp'], help="des: descriptor test ")
     parser.add_argument('-od','--old_dir', help=" in case 'vasp', input old directory")
     parser.add_argument('-c', '--copy', action='store_true', help='make copy rather than ln')
     args = parser.parse_args()

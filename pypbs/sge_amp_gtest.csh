@@ -16,24 +16,15 @@ set sandbox = "$HOME/sandboxg"
 
 setenv PYTHONPATH $sandbox/pycommon:$sandbox/myplot:$sandbox/acpype:$sandbox/py_ai:$sandbox/chem_mod
 set PYTHON = "$HOME/anaconda3/bin/python"
-set EXE = "$sandbox/pyamp/amp_run.py"
-#set EXEd = "$sandbox/pyamp/amp_test_descriptor.py"
+set EXE = "$sandbox/pyamp/amp_test_descriptor.py"
 
 ###  -pl for continue training by load amp.amp
 if ( ! $?scan ) then
     if ( $?dtype ) then
         if ( $?tef ) then
-            if ( $?des ) then
-                $PYTHON $EXE -f $fname -j $pyjob -tef -hl $hl -el $el -fl $fl -nc $nc -nt $nt -ntr $ntr -dtype $dtype -dl $dlist -des $des -g 
-            else
-                $PYTHON $EXE -f $fname -j $pyjob -tef -hl $hl -el $el -fl $fl -nc $nc -nt $nt -ntr $ntr -dtype $dtype -dl $dlist -g
-            endif
-        else 
-            if ( $?des ) then
-                $PYTHON $EXE -f $fname -j $pyjob -hl $hl -el $el -fl $fl -nc $nc -nt $nt -ntr $ntr -dtype $dtype -dl $dlist -des $des -g
-            else
-                $PYTHON $EXE -f $fname -j $pyjob -hl $hl -el $el -fl $fl -nc $nc -nt $nt -ntr $ntr -dtype $dtype -dl $dlist -g
-            endif
+            $PYTHON $EXE -f $fname -j $pyjob -tef -hl $hl -el $el -fl $fl -nc $nc -nt $nt -ntr $ntr -dtype $dtype -dl $dlist -g
+        else
+            $PYTHON $EXE -f $fname -j $pyjob -hl $hl -el $el -fl $fl -nc $nc -nt $nt -ntr $ntr -dtype $dtype -dl $dlist -g
         endif
     else
         $PYTHON $EXE -f $fname -j $pyjob -nc $np -hl $hl -el $el -fl $fl -g

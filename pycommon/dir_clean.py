@@ -8,7 +8,7 @@ from common import *
 
 q_list=[]
 
-def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir,Lshowmatch):
+def d_clean(dirs,works,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir,Lshowmatch,Lall_rm):
 
     pwd = os.getcwd()
     if isinstance(dirs, str):
@@ -25,40 +25,44 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
             d = pwd + '/' + dirs[0]
 
     matches=[]
-    if work == None:
-        if prefix:
-            f_list=get_files_prefix(prefix, d)
-        if suffix:
-            f_list=get_files_suffix(suffix, d)
-        if matches:
-            f_list=get_files_match(matches, d,Lshowmatch)
-        if exclude:
-            f_list=get_files_exclude(exclude, d)
-        if f_list and excl_fnames:
-            for f in excl_fnames:
-                if f in f_list:
-                    f_list.remove(f)
-    elif work == 'qchem':
-        pass
-    elif work == 'vasp':
-        f_list=os.listdir(d)
-        if excl_fnames:
-            for f in f_list:
-                if os.access(d+'/'+f, os.X_OK):
-                    excl_fnames.append(f)
-            for efile in excl_fnames:
-                if efile in f_list:
-                    f_list.remove(efile)
+    f_list_all=[]
+    for work in works:
+        if work == None:
+            if prefix:
+                f_list=get_files_prefix(prefix, d)
+            if suffix:
+                f_list=get_files_suffix(suffix, d)
+            if matches:
+                f_list=get_files_match(matches, d,Lshowmatch)
+            if exclude:
+                f_list=get_files_exclude(exclude, d)
+            if f_list and excl_fnames:
+                for f in excl_fnames:
+                    if f in f_list:
+                        f_list.remove(f)
+        elif work == 'qchem':
+            pass
+        elif work == 'vasp':
+            f_list=os.listdir(d)
+            if excl_fnames:
+                for f in f_list:
+                    if os.access(d+'/'+f, os.X_OK):
+                        excl_fnames.append(f)
+                for efile in excl_fnames:
+                    if efile in f_list:
+                        f_list.remove(efile)
 
-    elif work == 'pbs':
-        matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
-        f_list = get_files_match(matches, d, Lshowmatch)
-    elif work == 'amp':
-        matches=['amp','pdf']
-        f_list = get_files_match(matches, d, Lshowmatch)
-    elif work == 'lmp':
-        matches=['trj', 'log']
-        f_list = get_files_match(matches, d, Lshowmatch)
+        elif work == 'pbs':
+            matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
+            f_list = get_files_match(matches, d, Lshowmatch)
+            f_list_all.extend(f_list)
+        elif work == 'amp':
+            matches=['amp','pdf','dat']
+            f_list = get_files_match(matches, d, Lshowmatch)
+            f_list_all.extend(f_list)
+        elif work == 'lmp':
+            matches=['trj', 'log']
+            f_list = get_files_match(matches, d, Lshowmatch)
 
     ### Make directory for 'cp', 'mv'        
     if linux_job == 'mv' or linux_job == 'cp':
@@ -70,7 +74,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
             print(f"Dir {new_dir} was made")
     f_list.sort()
     ### Make command list
-    for f in f_list:
+    for f in f_list_all:
         #fname = d+'/'+f
         comm = "%s %s" % (linux_job, f)
         if linux_job == 'mv' or linux_job == 'cp':
@@ -101,7 +105,7 @@ def d_clean(dirs,work,prefix, suffix, matches, exclude,excl_fnames, linux_job,ne
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
     parser.add_argument('dirs', default=os.getcwd(), nargs='?', help='input work directories')
-    parser.add_argument('-w', '--work', choices=['qchem','amp','vasp','pbs','lmp'],help='remove depending on job')
+    parser.add_argument('-w', '--works', nargs='+', choices=['qchem','amp','vasp','pbs','lmp'],help='remove depending on job')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')
     parser.add_argument('-m', '--match', nargs='*', help='remove matching file')
@@ -110,17 +114,18 @@ def main():
     parser.add_argument('-j', '--job', default='rm', choices=['rm','mv','cp'], help='how to treat files [rm|cp|mv]')
     parser.add_argument('-jd', '--new_dir', default='tmp', help='directory where files to move')
     parser.add_argument('-ms', '--match_show', action='store_true')
+    parser.add_argument('-a', '--all_remove', action='store_true', help='remove all the files')
     args = parser.parse_args()
 
-    if args.work==None and args.prefix==None and args.suffix==None and args.match==None:
+    if args.works==None and args.prefix==None and args.suffix==None and args.match==None:
         print("input -w|-p|-s|-m")
         print("use %s -h for help" % os.path.basename(__file__))
         sys.exit(0)
-    if args.work == 'vasp' and not args.excluded_files:
+    if 'vasp' in args.works and not args.excluded_files:
         args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR']
     #if args.work == 'amp' and not args.excluded_files:
     #    args.excluded
-    d_clean(args.dirs,args.work,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.new_dir,args.match_show)
+    d_clean(args.dirs,args.works,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.new_dir,args.match_show,args.all_remove)
     return 0
 
 if __name__ == '__main__':

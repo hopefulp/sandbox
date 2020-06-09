@@ -5,7 +5,6 @@ import argparse
 import ase.io
 from amp import Amp
 from amp.descriptor.gaussian import Gaussian
-from amp.descriptor.gaussian import make_symmetry_functions
 from amp.model.neuralnetwork import NeuralNetwork
 from amp.model import LossFunction
 from amp.utilities import Annealer
@@ -25,21 +24,9 @@ import socket
 Ldebug = False
 amp_amp = [ "amp.amp", "amp-untrained-parameters.amp" ] 
 
-def make_Gs(image):
-
-    ### obtain atom symbols
-    elements = set([atom.symbol for atom in image])
-    elements = sorted(elements)     # because set is not subscriptable
-    G = {}
-    etas = np.logspace(np.log10(0.1), np.log10(40.), num=6)
-    for element in elements:
-        _G = make_symmetry_functions(type='G2', etas=etas, elements=elements)
-        _G += make_symmetry_functions(type='G4', etas=[0.005], zetas=[1., 4.], gammas=[+1., -1.], elements=elements)
-        G[element] = _G
-    return G
 
 ### Train Images 
-def calc_train_images(images, Gs, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, amp_pot=None):
+def calc_train_images(images, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, amp_pot=None):
     Hidden_Layer=tuple(HL)
     print("Hidden Layer: {}".format(Hidden_Layer))
     E_conv = Elist[0]
@@ -50,12 +37,10 @@ def calc_train_images(images, Gs, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, 
     print("Energy convergence: {}".format(E_conv))
     print("Energy maxresidue: {}".format(E_maxresid))
     cores={'localhost':ncore}   # 'localhost' depress SSH, communication between nodes
-
-    if Gs==None:
-        gs = None
-    else:
-        gs = make_Gs(images[0]) # images[0] to obtain atom symbols
-    calc = Amp(descriptor=Gaussian(gs), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+    ### load "amp.amp"
+    if Lload_amp:
+        calc = Amp.load(amp_pot)
+    calc = Amp(descriptor=Gaussian(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
     ### Global Search in Param Space
     Annealer(calc=calc, images=images, Tmax=20, Tmin=1, steps=4000)
 
@@ -72,6 +57,40 @@ def calc_train_images(images, Gs, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, 
     calc.train(images=images, overwrite=True)
     return
 
+def amp_md(atoms, nstep, dt, amp_pot):
+    from ase import units
+    from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
+    from ase.md import VelocityVerlet
+
+    traj = ase.io.Trajectory("traj.traj", 'w')
+
+    if amp_pot:
+        calc = Amp.load(amp_pot)
+    else:
+        try:
+            calc = Amp.load("amp.amp")
+        except FileNotFoundError:
+            try:
+                calc = Amp.load("amp-untrained-parameters.amp") 
+            except FileNotFoundError:
+                print("Error: amp-pes.amp file does not exist, input amp-pot file by -p")
+                sys.exit(1)
+
+    atoms.set_calculator(calc)
+    atoms.get_potential_energy()
+    MaxwellBoltzmannDistribution(atoms, 300 * units.kB)
+    traj.write(atoms)
+    dyn = VelocityVerlet(atoms, dt=dt * units.fs)
+    f = open("md.ene", "w")
+    f.write("{:^5s} {:^10s} {:^10s} {:^10s}\n".format("time","Etot","Epot","Ekin"))
+    for step in range(nstep):
+        pot = atoms.get_potential_energy()  # 
+        kin = atoms.get_kinetic_energy()
+        tot = pot + kin
+        f.write("{:5d}{:10.5f}{:10.5f}{:10.5f}\n".format(step, tot, pot, kin))
+        print("{}: Total Energy={}, POT={}, KIN={}".format(step, tot, pot, kin))
+        dyn.run(2)
+        traj.write(atoms)                   # write kinetic energy, but pot is not seen in ase
     f.close()        
 
 def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgraph,val_id=None,na_mol=1,Ltwinx=None):
@@ -259,9 +278,9 @@ def get_total_image(fdata, ndata):
     #print(st)
     return ase.io.read(fdata, index=st)    # can read extxyz, OUTCAR, 
 
-def chk_descriptor(fdata,job,Ltest_f,amp_inp,Lload_amp,HL,E_conv,f_conv_list,ncore,na_mol,ndata,ntrain,dstype,dslist,Lgraph,Ltwinx):
+def amp_jobs(fdata,job,Ltest_f,amp_inp,Lload_amp,HL,E_conv,f_conv_list,ncore,na_mol,ndata,ntrain,dstype,dslist,Lgraph,Ltwinx):
     ### parameter file
-    outf = "descriptor_" + job + ".dat"     # to write input info
+    outf = "hyperparam_" + job + ".dat"     # to write input info
     total_images = get_total_image(fdata,ndata)    # can read extxyz, OUTCAR, 
     print(f"dstype {dstype} dslist {dslist} with data {len(total_images)} in {whereami()}: 1st")
     tr_images, te_images = data_selection(total_images, dstype, dslist, job)
@@ -279,10 +298,15 @@ def chk_descriptor(fdata,job,Ltest_f,amp_inp,Lload_amp,HL,E_conv,f_conv_list,nco
     if len(f_conv_list) == 2:
         f_coeff = f_conv_list[1]
     ### AMP running parts
+    if re.search("pr", job):
+        y=[]
+        for mol in total_images:
+            y.append(mol.get_potential_energy())
+        if fdata.endswith('extxyz'):
+            mplot_nvector([],y,fdata.split(".")[0],'sample','E(eV)')
+        elif fdata == "OUTCAR":
+            mplot_nvector([],y,Xtitle='sample',Ytitle='E(eV)')
     ### JOB == TRAINING
-    if re.search('g', job):
-        print("gaussian descriptor test: make gaussian fingerprints ")
-        calc_train_images(tr_images, Gs, HL, E_conv, f_conv, f_coeff, ncore, Lload_amp,  amp_pot=amp_inp)
     elif re.search("tr",job):
         pwd = os.getcwd()
         ### prevent running tr in tr-directory
@@ -299,7 +323,7 @@ def chk_descriptor(fdata,job,Ltest_f,amp_inp,Lload_amp,HL,E_conv,f_conv_list,nco
                     sys.exit(10)
         print("data training:total sets %d/%d" % (ntrain, ntotal))
         f_write(outf, HL, E_conv, f_conv, f_coeff, ntotal, dstype, dslist)
-        calc_train_images(tr_images, Gs, HL, E_conv, f_conv, f_coeff, ncore, Lload_amp,  amp_pot=amp_inp)
+        calc_train_images(tr_images, HL, E_conv, f_conv, f_coeff, ncore, Lload_amp,  amp_pot=amp_inp)
         ### Test after training:: not run in QSUB
         server =  socket.gethostname()
         if server == 'chi' or server == 'login':
@@ -336,14 +360,14 @@ def main():
     parser = argparse.ArgumentParser(description='run amp with extxyz, OUTCAR: validation is removed ', prefix_chars='-+/')
     parser.add_argument('-f', '--infile', default='OUTCAR', help='ASE readible file: extxyz, OUTCAR(VASP) ')
     ### tef for test w. force
-    parser.add_argument('-j', '--job', default='tr', choices=['tr','pt','chk','gs'], help='job option:"train","plot","check"')
+    parser.add_argument('-j', '--job', default='tr', choices=['tr','te','tef','pr','pt','md','chk'], help='job option:"train","test","md","profile","plot","check"')
     parser.add_argument('-tef', '--test_force', action='store_true', help="test force")
     ### Neural Network
     parser.add_argument('-nc', '--ncore', default=1, type=int, help='number of core needs to be defined')
     parser.add_argument('-p', '--pot', help="input amp potential")
     parser.add_argument('-load', '--load_pot', action='store_true', help="load potential")
     parser.add_argument('-nam','--mol_atoms',default=1,type=int,help='num of atoms in molecule in the system to normalize error')
-    parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[4], help='Hidden Layer of lists of integer')
+    parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     parser.add_argument('-el', '--e_conv', nargs='+', default=[0.001,0.003], type=float, help='energy convergence limit')
     parser.add_argument('-fl', '--f_conv', nargs='+', default=[0.2, 0.04],   type=float, help='force convergence limit, [force coefficient]')
     #parser.add_argument('-fc', '--f_coeff', default=0.1, type=float, help='weight of force training')
@@ -357,8 +381,8 @@ def main():
     data_group.add_argument('-ntr', '--ndata_train', type=int, help='in case of te, define ND_train, ND_test is calculated')
     data_group.add_argument('-dtype','--data_s_type',default='pick',choices=['npart','int','div','pick'], help='data selection type: div-divide by dl[0] and remainder dl[1] for train, dl[2] for test ')
     data_group.add_argument('-dl','--data_s_list', type=int, nargs='+', help='data selection list')
-    ### Gaussian Descriptor
-    md_group = parser.add_argument_group(title='Gaussian')
+    ### MD group
+    md_group = parser.add_argument_group(title='MD')
     md_group.add_argument('-i','--index', default=0, help='select start configuration from input file')
     md_group.add_argument('-ns','--nstep', default=100, type=int, help='number of step with dt')
     md_group.add_argument('-dt','--dt', default=1.0, type=float, help='time interval in fs')
@@ -373,7 +397,15 @@ def main():
     if not fname:
         sys.exit(1)
 
-    chk_descriptor(fname,args.job,args.test_force,args.pot,args.load_pot,args.hidden_layer,args.e_conv,args.f_conv,args.ncore,args.mol_atoms,args.ndata_total,args.ndata_train,args.data_s_type,args.data_s_list,args.g,args.twinx)
+    if args.job == 'md':
+        index = args.index
+        atoms = ase.io.read(fname, index=index)      # index = string
+        amp_md(atoms, args.nstep, args.dt, args.pot)
+    elif args.job == 'chk':
+        pass
+    ### if not MD, it's training/test
+    else:
+        amp_jobs(fname,args.job,args.test_force,args.pot,args.load_pot,args.hidden_layer,args.e_conv,args.f_conv,args.ncore,args.mol_atoms,args.ndata_total,args.ndata_train,args.data_s_type,args.data_s_list,args.g,args.twinx)
     return
 
 if __name__ == '__main__':

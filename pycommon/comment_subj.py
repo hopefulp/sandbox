@@ -56,7 +56,7 @@ amp_scripts.run  =  "\n    == Scripts ==\
                     \n\t\trefer to myplot\
                     "
 amp_scripts.mlet =  "\n\t=== AMP Qsub scripts \
-                    \n\t$ sge_amp.py -db -i OUTCAR -qj dt15 -m 12 -nc 1 -j tr -hl 8 8 -el 0.001 -fl 0.01 -nt 4766 -ntr 4766 -dt int -dl 0 4766 \
+                    \n\t$ sge_amp.py -db -i OUTCAR -qj dt15 -m 12G -nc 1 -j tr -hl 8 8 -el 0.001 -fl 0.01 -nt 4766 -ntr 4766 -dt int -dl 0 4766 \
                     \t    : work option\
                     \n\t\t-s for scan\
                     \n\t\t-db for .ampdb\
@@ -67,7 +67,7 @@ amp_scripts.mlet =  "\n\t=== AMP Qsub scripts \
                     \n\t$ qsub_server.py\
                     \n\t    make qsub command line\
                     \n\t    For making all fingerprints\
-                    \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -js tr -hl 10 10 -el 0.001 -dt interval -dl 0 3000 4000 -m 4\
+                    \n\t\t$ qsub_server.py amp -i OUTCAR -qj qname -js tr -hl 10 10 -el 0.001 -dt interval -dl 0 3000 4000 -m 4G\
                     \n\t    amp positional argument for software\
                     \n\t    -i input file of PES-force\
                     \n\t    -hl hidden layer, -el energy convergence limit\
@@ -96,13 +96,16 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t    QSUB [AMP-Training]:\
                     \n\t\t1. Make a copy from VASP to amp\
                     \n\t\t    $ make_dir.py dname_new -w amp -j vasp -od vasp_dir\
-                    \n\t\t2. First make fingerprints using datatype interval\
-                    \n\t\t    $ sge_amp.py -db -i OUTCAR -qj dt15 -nc 8 -j tr -hl 8 8 -el 0.001 -fl 0.01 -nt 4000 -ntr 4000 -dt int -dl 0 4000 -m 12 \
+                    \n\t\t2. Make db, first\
+                    \n\t\t    $ sge_amp.py -db -i OUTCAR -qj dt15 -nc 8 -j tr -hl 8 8 -el 0.001 -fl 0.01 -nt 4000 -ntr 4000 -dt int -dl 0 4000 -m 12G \
                     \t\t\tMake amp.db on pwd\
                     \n\t\t\t-m 12 : more than 12G is required include force calculation\
                     \n\t\t\t-m 4  : for energy calculation\
                     \n\t\t\t-nd ndata_total=4000, -dt data_type=interval -dl data_list=d1~d2 training and d2~d3 test\
                     \n\t\t\tN.B. in nodes, amp_job=tr doesnot runs test; test runs only in master node (login)\
+                    \n\t\t    $ sge_amp.py -db -i OUTCAR -qj Gs26 -nc 8 -j tr -hl 4 -el 0.001 -fl 0.01 -nt 4000 -ntr 1500 -dt int -dl 1000 -m 12 -des gs -tef\
+                    \n\t\t\t-des: descriptor of 'gaussian', etc\
+                    \n\t\t\t-tef: test for foce which makes files\
                     \n\t\t2.1 qsub:\
                     \n\t\t    $ qsub -N qname -pe numa 16 -l mem=12G -v fname=OUTCAR -v pyjob=tr -v hl='10 10' -v el=0.001 -v fl=0.01 -v np=16 -v ndata=3000 -v dtype=div -v dl='2 0' $SB/pypbs/sge_amp.csh\
                     \n\t\t3. Training\

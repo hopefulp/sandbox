@@ -17,17 +17,21 @@ def make_dir(HL, elimit):
     else:
         print("HL is empty")
         sys.exit(10)
-def amp_command(qjobname, ncore, mem, infile, amp_job, Lte_force, str_hl, e_list, f_list, ntotal,ntr, ntype, nlist):
+def amp_command(qjobname, ncore, mem, infile, amp_job, descriptor, Lte_force, str_hl, e_list, f_list, ntotal,ntr, ntype, nlist):
+    if mem.isdigit():
+        mem += 'G'
     elimit = e_list[0]
     comm  = f"qsub -N {qjobname}"
     comm += f" -pe numa {ncore} -l mem={mem} -v fname={infile} -v pyjob={amp_job} -v hl=\"{str_hl}\" -v el={elimit}"
     if Lte_force:
         comm += " -v tef=force"
+    if descriptor:
+        comm += f" -v des={descriptor}"
     comm += " -v fl='" + ' '.join(f_list) + "'"
     comm += f" -v nc={ncore}"
     comm += " -v nt=" + ' '.join(ntotal)
     comm += f" -v ntr={ntr}"
-    comm += f" -v dtype={ntype} "
+    comm += f" -v dtype={ntype}"
     comm += " -v dlist='" + ' '.join(nlist) + "'"
     comm += " $SB/pypbs/sge_amp.csh"
     #print(f"in amp_command, {comm}")
@@ -87,7 +91,8 @@ def submit(qjobname,ncore,infile,amp_job,Lte_force,HL,elist,f_list,mem,ntotal,nt
         for amp_dir in amp_db:
             os.system(f"ln -s {pwd}/{amp_dir} {tedir}/{amp_dir}")
     """
-    comm = amp_command(qjobname, ncore, mem, infile, amp_job,Lte_force, str_hl, elist, f_list, ntotal,ntr, ntype, nlist)
+    ###                   1        2     3      4       5       6           7       8       9       10  11      12      13
+    comm = amp_command(qjobname, ncore, mem, infile, amp_job, Lte_force, str_hl, elist, f_list, ntotal, ntr, ntype, nlist)
     str1 = f"will you run? \n{comm}"
     if yes_or_no(str1):
         os.system(comm)
@@ -114,7 +119,7 @@ def get_qname_suff(queue_default, *hlist):
     qname = queue_default+'HL'+list2str(hlist)
     return qname
 
-def amp_work(work, qjobname,ncore,infile,amp_job,Lte_force,HL,nhl,elist,f_list,mem,ntotal,ntr,ntype,nlist):
+def amp_work(work,qjobname,ncore,infile,amp_job,descriptor,Lte_force,HL,nhl,elist,f_list,mem,ntotal,ntr,ntype,nlist):
     ### Make subdir and run
     if work == 'scan':
         hl_lists = HL_list(nhl, *HL)
@@ -127,7 +132,7 @@ def amp_work(work, qjobname,ncore,infile,amp_job,Lte_force,HL,nhl,elist,f_list,m
     ### make DATA BASE without making subdirectory
     else:
         str_hl = " ".join(str(x) for x in HL)
-        comm = amp_command(qjobname, ncore, mem, infile, amp_job, str_hl, elist, f_list, ntotal,ntr, ntype, nlist)
+        comm = amp_command(qjobname, ncore, mem, infile, amp_job, descriptor, Lte_force, str_hl, elist, f_list, ntotal,ntr, ntype, nlist)
         str1 = f"will you run: \n{comm}"
         if yes_or_no(str1):
             os.system(comm)
@@ -139,6 +144,7 @@ def main():
     parser.add_argument('-m', '--mem', default='10G', help='memory usage')
     parser.add_argument('-i', '--input_file', default='OUTCAR', help='ASE readible file: extxyz, OUTCAR(VASP) ')
     parser.add_argument('-j', '--amp_job', default='tr', help='job option:"train","test","md","validation","profile"')
+    parser.add_argument('-des', '--descriptor', choices=['gs'], help='descriptor test: "gs, ..."')
     parser.add_argument('-tef', '--test_force', action='store_true', help='As for test: calculate force')
     parser.add_argument('-hl', '--hidden_layers', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     w_group = parser.add_mutually_exclusive_group()
@@ -161,7 +167,7 @@ def main():
         work = 'db'
     else:
         work = 'onejob'
-    amp_work(work,args.queue_jobname,args.ncore,args.input_file,args.amp_job,args.test_force,args.hidden_layers,args.nhl,args.e_convergence, args.f_convergence, args.mem, args.ndata_total, args.ndata_train, args.data_s_type, args.data_s_list)
+    amp_work(work,args.queue_jobname,args.ncore,args.input_file,args.amp_job,args.descriptor,args.test_force,args.hidden_layers,args.nhl,args.e_convergence, args.f_convergence, args.mem, args.ndata_total, args.ndata_train, args.data_s_type, args.data_s_list)
 
 if __name__ == "__main__":
     main()

@@ -20,6 +20,7 @@ models= {
 amp     = MyClass('amp')
 qchem   = MyClass('qchem')
 fconv   = MyClass('fconv')
+general = MyClass('general')
 
 amp.amp_run             ="amp_run.py\
                         \n\t\t\trun amp for training, test, md etc"
@@ -29,6 +30,11 @@ amp.amp_plot            ="amp_plot.py\
                         \n\t\t\tplot amp_run.py test"
 amp.amp_test_descriptor ="amp_test_descript.py\
                         \n\t\t\tModify default descriptor parameters\
+                        "
+general.make_dir        ="make_dir.py new_dir [old_dir] -w amp pbs -j tr\
+                        \n\t\t\tto make new dir and copy or ln -s files\
+                        \n\t\t\tUsage:\
+                        \n\t\t\t    ~ part -w amp -j tr\
                         "
 
 fconv.fconv2extxyz="convert file format to extxyz: im_format"
