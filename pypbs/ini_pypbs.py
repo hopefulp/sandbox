@@ -57,10 +57,6 @@ lclass_var=['QChem', 'AMP', 'Qsleep']
 #print(classobj_dict['SGE'].usage)
 
 def works(Lclassify, work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
-    if work:
-        Lwrite = 0
-    else:
-        Lwrite = 1
 
     if Lusage:
         work = 'USAGE'
@@ -96,12 +92,10 @@ def works(Lclassify, work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
                 for gkey in globals().keys():
                     if gkey == instance.name:    # 'sge'(class instance) == 'sge'(string)
                         break
-                ### 
-                ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite)
-                
-                #print(f"{globals()[gkey].__dict__[ckey]} in {whereami()}") 
-                ### No globals()[gkey][ckey]: N.B.: dict_class does not have keys()
-                if work == instance.name:
+                if work != instance.name:
+                    ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=1)
+                else:
+                    ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=0)
                     for ckey in ckeys:
                         print(f"    {ckey}.py[sh]\t:: {globals()[gkey].__dict__[ckey]}")
             print("  == remainder ")
@@ -117,11 +111,11 @@ def works(Lclassify, work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
                 for gkey in globals().keys():
                     if gkey == instance.name:
                         break
-                ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite)
-                if work == instance.name:
-                #    name_class = classobj_dict[work]
-                #    for key in name_class.__dict__.keys():
-                    if ckey in ckeys:
+                if not work or work != instance.name:
+                    ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite=1)
+                else:
+                    ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite=0)
+                    for ckey in ckeys:
                         print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
             print("  == remainder ")
             for f in sort_mod:

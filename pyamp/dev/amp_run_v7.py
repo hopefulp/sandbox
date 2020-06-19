@@ -85,28 +85,15 @@ def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgrap
             f.write(f"{y1:15.5f} {ybar1:15.5f}\n")
     if Ltest_f:            
         with open("forces.dat",'w') as f:
-            iatom = int(f_max_i/3)
+            iatom = f_max_i/3
             icoord = f_max_i%3
-            f.write(f"image={f_max_image_i}; atom id={iatom} {icoord}-th coord; f_max_res={f_maxerr:10.5f}\n")
-            f.write("\tx true\t    hypo\t\t y true\t  hypo\t\t\tz true\t   hypo\t\ttrue_force  hypo_force     diff\n")
+            f.write(f"image={f_max_image_i} atom id={iatom} {icoord}-th coord, f_max_res={f_maxerr} w.r.t. test_images\n")
+            f.write("\tx true\thypo\t\ty true\thypo\t\tz true\thypo\n")
             #for f_image, fbar_image in zip(yf, yf_bar):   # write all the images?
-            atom_f=[]
-            for f1, fbar1 in zip(yf3d[f_max_image_i], yf3d_bar[f_max_image_i]):
-                arrf1 = np.array(f1)
-                arrfbar1 = np.array(fbar1)
+            for f1, fbar1 in zip(yf3d[if_max_image], yf3d_bar[if_max_image]):
                 for i in range(3):
                     f.write(f"{f1[i]:10.5f} {fbar1[i]:10.5f}\t")
-                force_true = np.sum(arrf1*arrf1)**0.5
-                force_hypo = np.sum(arrfbar1*arrfbar1)**0.5
-                diff = force_true - force_hypo
-                atom_f.append([force_true, force_hypo])
-                f.write(f"{force_true:10.5f} {force_hypo:10.5f} {diff:10.5f}")
                 f.write("\n")
-            arr_aforce = np.array(atom_f)
-            print(f"shape of 2d array: {arr_aforce.shape}")
-            ave_f = np.sqrt(np.mean((arr_aforce[:,0]-arr_aforce[:,1])**2))
-            f.write(f"force rmse = {ave_f:10.5f}")
-
     if Lgraph:
         modulename='myplot2D'   ### FOR MLET
         if modulename not in sys.modules:
@@ -122,7 +109,7 @@ def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgrap
     return err, res_max
 
 ### Amp job 2: Train Images 
-def calc_train_images(images, des_obj, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, amp_pot=None):
+def calc_train_images(images, dscrpt, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, amp_pot=None):
     Hidden_Layer=tuple(HL)
     print("Hidden Layer: {}".format(Hidden_Layer))
     E_conv = Elist[0]
@@ -139,14 +126,17 @@ def calc_train_images(images, des_obj, HL, Elist, f_conv, f_coeff, ncore, Lload_
     if Lload_amp:
         calc = Amp.load(amp_pot)
     ### descriptor checking?
-    if des_obj.name == 'gs':
+    if dscrpt == None or dscrpt.name == 'gs':
         from amp.descriptor.gaussian import Gaussian
-        gs = des_obj.make_Gs(images[0]) # images[0] to obtain atom symbols
+        if dscrpt:
+            gs = amp_des.make_Gs(images[0]) # images[0] to obtain atom symbols
+        else:
+            gs = None
         calc = Amp(descriptor=Gaussian(Gs=gs), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-    elif des_obj.name == 'zn':
+    elif dscrpt.name == 'zn':
         from amp.descriptor.zernike import Zernike
         calc = Amp(descriptor=Zernike(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-    elif des_obj.name == 'bs':
+    elif dscrpt.name == 'bs':
         from amp.descriptor.bispectrum import Bispectrum
         calc = Amp(descriptor=Bispectrum(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
     ### Global Search in Param Space
@@ -340,7 +330,11 @@ def main():
         pass
     ### if not MD, it's training/test
     else:
-        des_obj = amp_des.GS_param(args.param_function, args.param_minmax[0], args.param_minmax[1], args.nparam)
+        #des=[]              # des = ['symmetry function', 'param function', min, max, nparams)
+        if args.descriptor:
+            des_obj = amp_des.GS_param(args.param_function, args.param_minmax[0], args.param_minmax[1], args.nparam)
+        else:
+            des_obj = None
         amp_jobs(fname,args.job,des_obj,args.test_force,args.pot,args.load_pot,args.hidden_layer,args.e_conv,args.f_conv,args.ncore,args.mol_atoms,args.ndata_total,args.ndata_train,args.data_s_type,args.data_s_list,args.g,args.twinx)
     return
 

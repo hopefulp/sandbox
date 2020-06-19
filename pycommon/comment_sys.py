@@ -1,20 +1,20 @@
 from common import MyClass
 
-start   = MyClass()
-system  = MyClass()
-sys_install = MyClass()
-sys_manage  = MyClass()
-server  = MyClass()
-server.MLET  = MyClass()
-server.CHI  = MyClass()
-server.KISTI = MyClass()
-server.pbs  = MyClass()
-server.ssh  = MyClass()
-backup  = MyClass()
-dir_job = MyClass()
-vmd     = MyClass()
-git     = MyClass()
-awk     = MyClass()
+start               = MyClass()
+system              = MyClass()
+sys_install         = MyClass()
+sys_manage          = MyClass()
+server              = MyClass()
+server.MLET         = MyClass()
+server.CHI          = MyClass()
+server.KISTI        = MyClass()
+server.js_sge       = MyClass()
+server.ssh          = MyClass()
+backup              = MyClass()
+dir_job             = MyClass()
+vmd                 = MyClass()
+git                 = MyClass()
+awk                 = MyClass()
 
 start.order     =   "===START Usage===\
                     \n    ORDER:: ~/.bashrc backup ~/bin ...\
@@ -153,7 +153,10 @@ server.MLET.sleep   =       "\n    SLEEP::\
 server.MLET.at_node =       "\n    RUN @NODE VASP::\
                     \n\t$ sge_vasp_node.csh re0D3mdk_high 36\
                     "
+server.MLET.sge     = server.js_sge
+
 server.sleep        = server.MLET.sleep
+
 
 
 server.KISTI.pbs  = "=== KISTI ===\
@@ -204,7 +207,7 @@ server.ssh.scripts = "\n    Scripts::\
                     \n\tsee server.pbs.scripts u. -j server -k pbs\
                     "
 
-server.pbs.sge=     "=== SGE: grid-engine (MLET) ===\
+server.js_sge.sge=     "=== SGE: grid-engine (MLET) ===\
                     \n    QSUB\
                     \n\tOverwrite \#$ -option in script\
                     \n\tOptions::\
@@ -212,12 +215,14 @@ server.pbs.sge=     "=== SGE: grid-engine (MLET) ===\
                     \n\t -pe numa $np (number of process)\
                     \n\t -l mem=10G (memory per process)\
                     \n\t    mem * $np is charged on the node\
-                    \n\t -q skylake@node11 (define node)\
+                    \n\t -q skylake@node11 (define node), double nodes: -q skylake@node01 -q skylake@node02\
                     \n\t -v vname=value (CLI input can't overwrite the same vname in script)\
                     \n    e.g.\
                     \n\t(Q-Chem) $ qsub -N qname -v qcjob=infile -pe numa np -l mem=3G -v np=np -q skylake@node11 $SB/pypbs/sge_qchem.csh\
+                    \n\t(amp)    $ qsub ... double nodes (-q skylake@node01 -q skylake@node02)\
+                    \n\t\t\tcores={'node01':ncore,'node02':ncore}\
                     "
-server.pbs.qstat=   "\n    SGE command in MLET\
+server.js_sge.qstat=   "\n    SGE command in MLET\
                     \n\t$ qstat\
                     \n\t    -f\
                     \n\t    qstatf is aliased\
@@ -226,7 +231,7 @@ server.pbs.qstat=   "\n    SGE command in MLET\
                     \n\t$ qfree\
                     \n\t$ qmem\
                     "
-server.pbs.scripts  = "\n    Scripts::\
+server.js_sge.scripts  = "\n    Scripts::\
                     \n\tSSH\
                     \n\t    ssh_node.sh\
                     \n\t\t...\

@@ -17,7 +17,7 @@ def make_dir(HL, elimit):
     else:
         print("HL is empty")
         sys.exit(10)
-def amp_command(qjobname, ncore, mem, infile, amp_job, descriptor, Lte_force, str_hl, e_list, f_list, ntotal,ntr, ntype, nlist):
+def amp_command(qjobname, ncore, mem, infile, amp_job, descriptor,p_function,p_minmax,nparam, Lte_force, str_hl, e_list, f_list, ntotal,ntr, ntype, nlist):
     if mem.isdigit():
         mem += 'G'
     elimit = e_list[0]
@@ -27,6 +27,9 @@ def amp_command(qjobname, ncore, mem, infile, amp_job, descriptor, Lte_force, st
         comm += " -v tef=force"
     if descriptor:
         comm += f" -v des={descriptor}"
+        comm += f" -v pf={p_function}"
+        comm += f" -v pmm='{p_minmax[0]} {p_minmax[1]}'"
+        comm += f" -v pn={nparam}"
     comm += " -v fl='" + ' '.join(f_list) + "'"
     comm += f" -v nc={ncore}"
     comm += " -v nt=" + ' '.join(ntotal)
@@ -37,7 +40,7 @@ def amp_command(qjobname, ncore, mem, infile, amp_job, descriptor, Lte_force, st
     #print(f"in amp_command, {comm}")
     return comm
 
-def submit(qjobname,ncore,infile,amp_job,Lte_force,HL,elist,f_list,mem,ntotal,ntr,ntype,nlist):
+def submit(qjobname,ncore,infile,amp_job,descriptor,p_function,p_minmax,nparam,Lte_force,HL,elist,f_list,mem,ntotal,ntr,ntype,nlist):
     pwd = os.getcwd()
     str_hl = " ".join(str(x) for x in HL)
     #if yes_or_no("run ?"):
@@ -91,8 +94,9 @@ def submit(qjobname,ncore,infile,amp_job,Lte_force,HL,elist,f_list,mem,ntotal,nt
         for amp_dir in amp_db:
             os.system(f"ln -s {pwd}/{amp_dir} {tedir}/{amp_dir}")
     """
-    ###                   1        2     3      4       5       6           7       8       9       10  11      12      13
-    comm = amp_command(qjobname, ncore, mem, infile, amp_job, Lte_force, str_hl, elist, f_list, ntotal, ntr, ntype, nlist)
+    ###                   1        2     3      4       5       6           7           8       9       10    11   12     13    14
+    #comm = amp_command(qjobname, ncore, mem, infile, amp_job, descriptor, Lte_force, str_hl, elist, f_list, ntotal, ntr, ntype, nlist)
+    comm = amp_command(qjobname, ncore, mem, infile, amp_job, descriptor, p_function,p_minmax,nparam, Lte_force, str_hl, elist, f_list, ntotal, ntr, ntype, nlist)
     str1 = f"will you run? \n{comm}"
     if yes_or_no(str1):
         os.system(comm)
@@ -119,32 +123,40 @@ def get_qname_suff(queue_default, *hlist):
     qname = queue_default+'HL'+list2str(hlist)
     return qname
 
-def amp_work(work,qjobname,ncore,infile,amp_job,descriptor,Lte_force,HL,nhl,elist,f_list,mem,ntotal,ntr,ntype,nlist):
+def amp_work(work,qjobname,ncore,infile,amp_job,descriptor,p_function,p_minmax,nparam,Lte_force,HL,nhl,elist,f_list,mem,ntotal,ntr,ntype,nlist):
     ### Make subdir and run
     if work == 'scan':
         hl_lists = HL_list(nhl, *HL)
         for hlist in hl_lists:
             qname = get_qname_suff(qjobname, *hlist)
-            submit(qname,ncore,infile,amp_job,Lte_force,hlist,elist,f_list,mem,ntotal,ntr,ntype,nlist)
+            submit(qname,ncore,infile,amp_job,descriptor,p_function,p_minmax,nparam,Lte_force,hlist,elist,f_list,mem,ntotal,ntr,ntype,nlist)
     elif work == 'onejob':
         qname = get_qname(qjobname, *HL)
-        submit(qname,ncore,infile,amp_job,Lte_force,HL,elist,f_list,mem,ntotal,ntr,ntype,nlist)
+        submit(qname,ncore,infile,amp_job,descriptor,p_function,p_minmax,nparam,Lte_force,HL,elist,f_list,mem,ntotal,ntr,ntype,nlist)
     ### make DATA BASE without making subdirectory
-    else:
+    else:   # work == 'db'
         str_hl = " ".join(str(x) for x in HL)
-        comm = amp_command(qjobname, ncore, mem, infile, amp_job, descriptor, Lte_force, str_hl, elist, f_list, ntotal,ntr, ntype, nlist)
+        ###                 1          2    3      4       5          6         7       8       9       10        11      12      13     14    15    16     17
+        comm = amp_command(qjobname, ncore, mem, infile, amp_job, descriptor,p_function,p_minmax,nparam, Lte_force, str_hl, elist, f_list, ntotal,ntr, ntype, nlist)
+        ###
         str1 = f"will you run: \n{comm}"
         if yes_or_no(str1):
             os.system(comm)
     return 0
 
 def main():
-    parser = argparse.ArgumentParser(description="submit jobs in queue in SGE(mlet) ")
+    parser = argparse.ArgumentParser(description="making new_dir & submit jobs in queue in SGE(mlet) ")
     parser.add_argument('-qj', '--queue_jobname', default='amp', help='job option:"train","test","md","validation","profile"')
     parser.add_argument('-m', '--mem', default='10G', help='memory usage')
     parser.add_argument('-i', '--input_file', default='OUTCAR', help='ASE readible file: extxyz, OUTCAR(VASP) ')
     parser.add_argument('-j', '--amp_job', default='tr', help='job option:"train","test","md","validation","profile"')
-    parser.add_argument('-des', '--descriptor', choices=['gs'], help='descriptor test: "gs, ..."')
+    ### Descriptor group
+    descriptor_group = parser.add_argument_group(title="Descriptor generator")
+    descriptor_group.add_argument('-des', '--descriptor', choices=['gs','zn','bs'], help="test new descriptor")
+    descriptor_group.add_argument('-pf', '--param_function', default='log10', choices=['log10'], help="function for parameter interval")
+    descriptor_group.add_argument('-pmm', '--param_minmax', nargs=2, default=[0.05, 5.0], help="min, max for param interval")
+    descriptor_group.add_argument('-pn', '--nparam', default=4, help="num of parameters for descriptor")
+
     parser.add_argument('-tef', '--test_force', action='store_true', help='As for test: calculate force')
     parser.add_argument('-hl', '--hidden_layers', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     w_group = parser.add_mutually_exclusive_group()
@@ -152,8 +164,8 @@ def main():
     w_group.add_argument('-db', '--ampdb', action='store_true', help='make amp_fingreprint.db')
     parser.add_argument('-sh', '--nhl', type=int, default=5, help='number of HL')
     parser.add_argument('-nc', '--ncore', default=12, type=int, help='number of core needs to be defined')
-    parser.add_argument('-el', '--e_convergence', nargs='+', default=[0.001,0.003], help='energy convergence limit')
-    parser.add_argument('-fl', '--f_convergence', nargs='*', default=[0.01, 0.01],  help='force convergence limit')
+    parser.add_argument('-el', '--e_convergence', nargs='+', default=['0.001','0.003'], help='energy convergence limit') # make default string
+    parser.add_argument('-fl', '--f_convergence', nargs='*', default=['0.01', '0.04'],  help='force convergence limit, force coeff')
     data_group = parser.add_argument_group(title='Data')
     data_group.add_argument('-nt', '--ndata_total', nargs='*', help='cut total data: it requires two value for region')
     data_group.add_argument('-ntr', '--ndata_train', help='in case of te, define ND_train, ND_test is calculated')
@@ -167,7 +179,10 @@ def main():
         work = 'db'
     else:
         work = 'onejob'
-    amp_work(work,args.queue_jobname,args.ncore,args.input_file,args.amp_job,args.descriptor,args.test_force,args.hidden_layers,args.nhl,args.e_convergence, args.f_convergence, args.mem, args.ndata_total, args.ndata_train, args.data_s_type, args.data_s_list)
-
+    ### run amp_work
+            # 1             2              3             4             5              6               7                8                   9     
+    amp_work(work,args.queue_jobname,args.ncore,args.input_file,args.amp_job,args.descriptor,args.param_function,args.param_minmax,args.nparam,args.test_force,args.hidden_layers,args.nhl,args.e_convergence, args.f_convergence, args.mem, args.ndata_total, args.ndata_train, args.data_s_type, args.data_s_list)
+    # 10                 11           12            13                  14             15             16               17               18     
+    # 19
 if __name__ == "__main__":
     main()

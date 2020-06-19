@@ -96,30 +96,38 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t    QSUB [AMP-Training]:\
                     \n\t\t1. Make a copy from VASP to amp\
                     \n\t\t    $ make_dir.py dname_new -w amp -j vasp -od vasp_dir\
-                    \n\t\t2. Make db, first\
-                    \n\t\t    $ sge_amp.py -db -i OUTCAR -qj dt15 -nc 8 -j tr -hl 8 8 -el 0.001 -fl 0.01 -nt 4000 -ntr 4000 -dt int -dl 0 4000 -m 12G \
-                    \t\t\tMake amp.db on pwd\
-                    \n\t\t\t-m 12 : more than 12G is required include force calculation\
-                    \n\t\t\t-m 4  : for energy calculation\
+                    \n\t\t2. Make db\
+                    \n\t\t    2.1 Make des-dir\
+                    \n\t\t\t$ make_dir.py g2_6 -w amp -j des\
+                    \n\t\t\t$ cd g2_6\
+                    \n\t\t\t$ sge_amp.py -db -i OUTCAR -qj G2w80p8 -nc 10 -j tr -hl 4 -nt 4000 -ntr 100 -dt int -dl 1000 1100 -m 2G -des gs -pf log10 -pmm 0.05 100.0 -pn 10 -tef\
+                    \t\t\t    -des: descriptor of 'gaussian', etc\
+                    \n\t\t\t    -tef: test for foce which makes files\
+                    \n\t\t\tMake amp.db on previous directory by link\
+                    \n\t\t\t-m 2G: for database\
+                    \n\t\t\t-m 4G: for energy calculation\
+                    \n\t\t\t-m 12G: more than 12G is required for HL training\
                     \n\t\t\t-nd ndata_total=4000, -dt data_type=interval -dl data_list=d1~d2 training and d2~d3 test\
                     \n\t\t\tN.B. in nodes, amp_job=tr doesnot runs test; test runs only in master node (login)\
-                    \n\t\t    $ sge_amp.py -db -i OUTCAR -qj Gs26 -nc 8 -j tr -hl 4 -el 0.001 -fl 0.01 -nt 4000 -ntr 1500 -dt int -dl 1000 -m 12 -des gs -tef\
-                    \n\t\t\t-des: descriptor of 'gaussian', etc\
-                    \n\t\t\t-tef: test for foce which makes files\
-                    \n\t\t2.1 qsub:\
+                    \n\t\t    2.2 Make db-making directory\
+                    \n\t\t\t$ make_dir.py part -w amp -j db\
+                    \n\t\t\t$ cd part\
+                    \n\t\t\t$ sge_amp.py -db -i OUTCAR -qj Gs26 -nc 10 -j tr -hl 4 -nt 4000 -ntr 100 -dt int -dl 1000 -m 12 -des gs -pf log10 -pmm 0.05 5.0 -pn 4 -tef\
                     \n\t\t    $ qsub -N qname -pe numa 16 -l mem=12G -v fname=OUTCAR -v pyjob=tr -v hl='10 10' -v el=0.001 -v fl=0.01 -v np=16 -v ndata=3000 -v dtype=div -v dl='2 0' $SB/pypbs/sge_amp.csh\
+                    \n\t\t    $ amp_run.py -f OUTCAR -j tr -tef -hl 4 -el 0.001 -fl 0.01 -nc 10 -nt 4000 -ntr 1500 -dtype int -dl 1000 -des gs -pf log10 -pmm 0.05 5.0 -pn 4\
                     \n\t\t3. Training\
-                    \n\t\t    Making sub-directory w. single job or scanning\
+                    \n\t\t    Run at pwd, Making sub-directory w. single job or scanning\
                     \n\t\t    :single job\
-                    \n\t\t    $ sge_amp.py -qj NC1 -m 12G -nc 8 -hl 4 4 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0 \
+                    \n\t\t    $ sge_amp.py -qj NC1 -m 12G -nc 10 -hl 4 4 -el 0.001 -fl 0.1 0.1 -nt 4000 -ntr 100 -dt int -dl 1000 1100 -des gs -pf log10 -pmm 0.05 100 -pn 10 -tef \
                     \n\t\t    :scanning\
-                    \n\t\t    $ sge_amp.py -s -sh 10 -qj Emaxres -m 12G -nc 8 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0\
-                    \t\t\t-mh int for max number of node in each layer\
+                    \n\t\t    $ sge_amp.py -s -sh 10 -qj Emaxres -m 12G -nc 8 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0 [-des gs -tef]\
+                    \n\t\t\t-mh int for max number of node in each layer\
                     \n\t\t4. Test\
                     \n\t\t   test in sub-directory\
                     \n\t\t   run in master node\
                     \n\t\t   $ qrun.sh di te test qname OUTCAR 4 4 '8 8' 0.001 0.00 4000 1500 int '3000 3500' \
-                    \n\t\t   $ amp_run.py -f OUTCAR -j te -tef -nc 4 -hl 8 8 -el 0.001 0.003 -fl 0.00 -nt 4000 -ntr 1500 -dtype int -dl 3000 3500 \
+                    \n\t\t   $ amp_run.py -f OUTCAR -j te -tef -nc 4 -hl 8 8 -el 0.001 0.003 -fl 0.00 -nt 4000 -ntr 1500 -dtype int -dl 3000 3500\
+                    \n\t\t   $ amp_run.py -f OUTCAR -j te -tef -nc 1 -nt 4000 -ntr 100 -dtype int -dl 1000 1002\
                     \n\t\t   :Scan\
                     \n\t\t   $ sge_amp.py -s -sh 10 -qj EO -j te -tef -m 3G -nc 4 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0\
                     \n\t\t\t    \

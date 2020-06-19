@@ -6,7 +6,7 @@ import sys
 
 amp_db = ['amp-fingerprint-primes.ampdb', 'amp-neighborlists.ampdb', 'amp-fingerprints.ampdb', 'OUTCAR']
 
-files = { 'tr': amp_db, 'md': ['OUTCAR', 'amp.amp'], 'vasp': ['OUTCAR']}
+files = { 'tr': amp_db, 'md': ['OUTCAR', 'amp.amp'], 'vasp': ['OUTCAR'], 'db': amp_db}
 
 def jobs(ndir, work, job, odir, Lcopy):
     pwd = os.getcwd()
@@ -19,7 +19,7 @@ def jobs(ndir, work, job, odir, Lcopy):
         os.system(f'mkdir {ndir}')
         os.chdir(f'{ndir}')
     if work == 'amp':
-        if job == 'md' or job == 'tr':
+        if job == 'md' or job == 'tr' or job == 'db':
             for f in files[job]:
                 #forig = '../'+f
                 forig = pwd + '/' + f
@@ -63,7 +63,7 @@ def main():
     parser = argparse.ArgumentParser(description="make directory with some auxiliary files  ")
     parser.add_argument( 'directory', default='tmp', help='make directory') 
     parser.add_argument('-w','--work', default='amp', choices=['amp'], help="work ")
-    parser.add_argument('-j','--job', default='md', choices=['des','tr','md','vasp'], help="des: descriptor test ")
+    parser.add_argument('-j','--job', default='md', choices=['des','tr','md','db','vasp'], help="des: different descriptor test ")
     parser.add_argument('-od','--old_dir', help=" in case 'vasp', input old directory")
     parser.add_argument('-c', '--copy', action='store_true', help='make copy rather than ln')
     args = parser.parse_args()

@@ -9,9 +9,14 @@
 """
 import ase.io
 
-def f_write(outf, HL, Elist, f_conv,f_coeff, ntotal, dtype, dlist, descriptor, err=None, max_res=None, job_index=None):
+Ldebug = False
+
+def f_write(outf, HL, Elist, f_conv,f_coeff, ntotal, dtype, dlist, descriptor=None, err=None, max_res=None, job_index=None):
     with open(outf, "a") as f:
-        f.write(f"{'Descriptor':10}: {descriptor}\n")
+        if descriptor:
+            #f.write(f"{'Descriptor':10}: {descriptor}\n")      # for list, it's simple
+            f.write(', '.join("%s: %s" % item for item in vars(descriptor).items()))
+            f.write("\n")
         st = ' '.join(str(x) for x in HL)
         f.write(f"{'Hidden Lay':10}:{st:>10}\n")
         E_conv = Elist[0]
@@ -76,7 +81,8 @@ def data_partition(total_images, dt, dl, job):
                 d_list = dl[2:]
             test_images = total_images[d_list[0]:d_list[1]]
         else:
-            print("There is no test set region ")
+            if job == 'tr':
+                print("There is no test set region ")
             if len(training_images) >= 100:
                 test_images=training_images[-100:]
             else:

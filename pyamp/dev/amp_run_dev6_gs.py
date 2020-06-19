@@ -3,6 +3,7 @@
 import argparse
 
 from amp import Amp
+from amp.descriptor.gaussian import Gaussian
 from amp.model.neuralnetwork import NeuralNetwork
 from amp.model import LossFunction
 from amp.utilities import Annealer
@@ -18,8 +19,7 @@ import re
 import sys
 import os
 import socket
-import amp_mod
-import amp_descriptor as amp_des
+import amp_mod, amp_descriptor
 
 amp_amp = [ "amp.amp", "amp-untrained-parameters.amp" ] 
 
@@ -71,8 +71,8 @@ def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgrap
             f_res_max = np.max(np.absolute(yfbar_1d-yf_1d))
             if(f_maxerr < f_res_max):
                 f_maxerr = f_res_max
-                f_max_i = np.argmax(np.absolute(yfbar_1d-yf_1d))
-                f_max_image_i = i
+                if_max_atom = np.argmax(np.absolute(yfbar_1d-yf_1d))
+                if_max_image = i
     if Ltest_f:
         with open('f_rmse.dat', 'w') as f:
             f.write(f"{'average':^10}{np.array(f_rmses).mean():10.5f}\n")
@@ -85,28 +85,13 @@ def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgrap
             f.write(f"{y1:15.5f} {ybar1:15.5f}\n")
     if Ltest_f:            
         with open("forces.dat",'w') as f:
-            iatom = int(f_max_i/3)
-            icoord = f_max_i%3
-            f.write(f"image={f_max_image_i}; atom id={iatom} {icoord}-th coord; f_max_res={f_maxerr:10.5f}\n")
-            f.write("\tx true\t    hypo\t\t y true\t  hypo\t\t\tz true\t   hypo\t\ttrue_force  hypo_force     diff\n")
+            f.write(f"image={if_max_image} atom id={if_max_atom} f_max_res={f_maxerr}\n")
+            f.write("\tx true\thypo\t\ty true\thypo\t\tz true\thypo\n")
             #for f_image, fbar_image in zip(yf, yf_bar):   # write all the images?
-            atom_f=[]
-            for f1, fbar1 in zip(yf3d[f_max_image_i], yf3d_bar[f_max_image_i]):
-                arrf1 = np.array(f1)
-                arrfbar1 = np.array(fbar1)
+            for f1, fbar1 in zip(yf3d[if_max_image], yf3d_bar[if_max_image]):
                 for i in range(3):
                     f.write(f"{f1[i]:10.5f} {fbar1[i]:10.5f}\t")
-                force_true = np.sum(arrf1*arrf1)**0.5
-                force_hypo = np.sum(arrfbar1*arrfbar1)**0.5
-                diff = force_true - force_hypo
-                atom_f.append([force_true, force_hypo])
-                f.write(f"{force_true:10.5f} {force_hypo:10.5f} {diff:10.5f}")
                 f.write("\n")
-            arr_aforce = np.array(atom_f)
-            print(f"shape of 2d array: {arr_aforce.shape}")
-            ave_f = np.sqrt(np.mean((arr_aforce[:,0]-arr_aforce[:,1])**2))
-            f.write(f"force rmse = {ave_f:10.5f}")
-
     if Lgraph:
         modulename='myplot2D'   ### FOR MLET
         if modulename not in sys.modules:
@@ -122,7 +107,7 @@ def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgrap
     return err, res_max
 
 ### Amp job 2: Train Images 
-def calc_train_images(images, des_obj, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, amp_pot=None):
+def calc_train_images(images, descriptor, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, amp_pot=None):
     Hidden_Layer=tuple(HL)
     print("Hidden Layer: {}".format(Hidden_Layer))
     E_conv = Elist[0]
@@ -133,22 +118,16 @@ def calc_train_images(images, des_obj, HL, Elist, f_conv, f_coeff, ncore, Lload_
     print("Energy convergence: {}".format(E_conv))
     print("Energy maxresidue: {}".format(E_maxresid))
     cores={'localhost':ncore}   # 'localhost' depress SSH, communication between nodes
-    ### multiserver test: not working in this level
-    #cores={'192.168.1.12':ncore, '192.168.1.13':ncore}
+
+    ### descriptor checking?
+    if descriptor == None:
+        gs = None
+    else:
+        gs = amp_descriptor.make_Gs(images[0])   # images[0] to obtain atom symbols
     ### load "amp.amp"
     if Lload_amp:
         calc = Amp.load(amp_pot)
-    ### descriptor checking?
-    if des_obj.name == 'gs':
-        from amp.descriptor.gaussian import Gaussian
-        gs = des_obj.make_Gs(images[0]) # images[0] to obtain atom symbols
-        calc = Amp(descriptor=Gaussian(Gs=gs), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-    elif des_obj.name == 'zn':
-        from amp.descriptor.zernike import Zernike
-        calc = Amp(descriptor=Zernike(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-    elif des_obj.name == 'bs':
-        from amp.descriptor.bispectrum import Bispectrum
-        calc = Amp(descriptor=Bispectrum(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+    calc = Amp(descriptor=Gaussian(Gs=gs), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
     ### Global Search in Param Space
     Annealer(calc=calc, images=images, Tmax=20, Tmin=1, steps=4000)
     ### set convergence for LossFunction
@@ -291,16 +270,11 @@ def main():
     ### tef for test w. force
     parser.add_argument('-j', '--job', default='tr', choices=['tr','te','tef','pr','pt','md','chk'], help='job option:"train","test","md","profile","plot","check"')
     parser.add_argument('-tef', '--test_force', action='store_true', help="test force")
-    ### Descriptor group
-    descriptor_group = parser.add_argument_group(title="Descriptor generator")
-    descriptor_group.add_argument('-des', '--descriptor', choices=['gs','zn','bs'], help="test new descriptor")
-    descriptor_group.add_argument('-pf', '--param_function', default='log10', choices=['log10'], help="function for parameter interval")
-    descriptor_group.add_argument('-pmm', '--param_minmax', nargs=2, default=[0.05, 5.0], type=float, help="min, max for param interval")
-    descriptor_group.add_argument('-pn', '--nparam', type=int, default=4, help="num of parameters for descriptor")
+    parser.add_argument('-des', '--descriptor', choices=['gs'], help="test new descriptor")
     ### Neural Network
     parser.add_argument('-nc', '--ncore', default=1, type=int, help='number of core needs to be defined')
     parser.add_argument('-p', '--pot', help="input amp potential")
-    parser.add_argument('-lp', '--load_pot', action='store_true', help="load potential")
+    parser.add_argument('-load', '--load_pot', action='store_true', help="load potential")
     parser.add_argument('-nam','--mol_atoms',default=3,type=int,help='num of atoms in molecule: default 3 for H2O')
     parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     parser.add_argument('-el', '--e_conv', nargs='+', default=[0.001,0.003], type=float, help='energy convergence limit')
@@ -340,8 +314,7 @@ def main():
         pass
     ### if not MD, it's training/test
     else:
-        des_obj = amp_des.GS_param(args.param_function, args.param_minmax[0], args.param_minmax[1], args.nparam)
-        amp_jobs(fname,args.job,des_obj,args.test_force,args.pot,args.load_pot,args.hidden_layer,args.e_conv,args.f_conv,args.ncore,args.mol_atoms,args.ndata_total,args.ndata_train,args.data_s_type,args.data_s_list,args.g,args.twinx)
+        amp_jobs(fname,args.job,args.descriptor,args.test_force,args.pot,args.load_pot,args.hidden_layer,args.e_conv,args.f_conv,args.ncore,args.mol_atoms,args.ndata_total,args.ndata_train,args.data_s_type,args.data_s_list,args.g,args.twinx)
     return
 
 if __name__ == '__main__':

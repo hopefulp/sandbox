@@ -62,7 +62,7 @@ def dir_classify_n(lsorted, class_instance, class_dict,Lwrite=1):
     ### classify modules used
     if luse:
         CLASS_instance = class_instance.upper()
-        print("  {:<10}::".format(CLASS_instance +" used"))
+        print("  {:<10}::".format(CLASS_instance))
         if Lwrite:
             for f in luse:
                 print(f"    {f}     ")

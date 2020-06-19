@@ -16,25 +16,39 @@ models= {
     'ethylene': 'Ethylene.extxyz',
     'Diss_CHO': 'Diss_H2COH.extxyz',
     'water'   : 'water128.extxyz'}
-
+### these are included as key in globals()
 amp     = MyClass('amp')
 qchem   = MyClass('qchem')
 fconv   = MyClass('fconv')
 general = MyClass('general')
 
-amp.amp_run             ="amp_run.py\
-                        \n\t\t\trun amp for training, test, md etc"
+amp.amp_run             ="amp_run.py -f OUTCAR -j tr -des gs -tef -nc 4 -hl 8 8 -el 0.001 0.003 -fl 0.00 -nt 4000 -ntr 1500 -dtype int -dl 3000 3500\
+                        \n\t\t\t   amp_run.py -f OUTCAR -j te -tef -nc 1 -nt 4000 -ntr 100 -dtype int -dl 0 10\
+                        \n\t\t\t    run amp for making db (gen descriptor), training, test, md etc\
+                        \n\t\t\t    mem:\
+                        \n\t\t\t\t2G for db\
+                        \n\t\t\t\t12G for training: HL, total_images\
+                        \n\t\t\t    -j tr -des gs -tef:\
+                        \n\t\t\t\tuse train for gs test (in the script) and test force\
+                        \n\t\t\t\ttr w. 100 images is enough?\
+                        "
 amp.amp_loop            ="amp_loop.py\
-                        \n\t\t\tloop for many situation used in SGE"
+                        \n\t\t\t    loop for many situation used in SGE"
 amp.amp_plot            ="amp_plot.py\
-                        \n\t\t\tplot amp_run.py test"
-amp.amp_test_descriptor ="amp_test_descript.py\
-                        \n\t\t\tModify default descriptor parameters\
+                        \n\t\t\t    plot amp_run.py test"
+amp.amp_descriptor      ="called by amp_run.py\
+                        \n\t\t\tprovide symmetry function to test diverse descriptor\
+                        "
+amp.amp_mod             ="called by amp_run.py\
+                        \n\t\t\tprovide some functions\
                         "
 general.make_dir        ="make_dir.py new_dir [old_dir] -w amp pbs -j tr\
                         \n\t\t\tto make new dir and copy or ln -s files\
                         \n\t\t\tUsage:\
-                        \n\t\t\t    ~ part -w amp -j tr\
+                        \n\t\t\t    amp\
+                        \n\t\t\t\tnew_dir -w amp -j ['tr','db','des','md']\
+                        \n\t\t\t\t    des links OUTCAR\
+                        \n\t\t\t\t    tr, db, md links OUTCAR, amp.db\
                         "
 
 fconv.fconv2extxyz="convert file format to extxyz: im_format"
@@ -84,12 +98,7 @@ def run_amp(fname,HL,elimit,nc,Lgraph):
     print("\t{} -h\n\t{} scan val {} 6 ".format(amp_collection['amp_scan'],amp_collection['amp_scan'],models['water']))
     return 0
 
-
 def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
-    if work:
-        Lwrite = 0
-    else:
-        Lwrite = 1
     
     mdir = os.path.dirname(__file__)
     print(f"List directory of {mdir} ")
@@ -110,17 +119,19 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
             for f in sort_exe:
                 print("    {}".format(f))
         else:
-            ### confer "ini_pypbs.py"
+            ### confer "ini_pypbs.py", MyClass.instances is a list of string as class variables
             for instance in MyClass.instances:
+                ### globals() includes MyClass() instances as keys
                 for gkey in globals().keys():
                     if gkey == instance.name:
                         break
-                ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite)
-
-                if work == instance.name:
+                if work != instance.name:
+                    ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=1) # globals()[instance.name] is not working
+                else:
+                    ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=0)
                     for ckey in ckeys:
                         print(f"    {ckey}.py[sh]\t:: {globals()[gkey].__dict__[ckey]}")
-            print("  == remainder ")
+            print("  == not analyzed")
             for f in sort_exe:
                 print(f"    {f}")
     if sort_mod:
@@ -133,11 +144,13 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
                 for gkey in globals().keys():
                     if gkey == instance.name:
                         break
-                ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite)
-                if work == instance.name:
-                    if ckey in ckeys:
+                if not work or work != instance.name:
+                    ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite=1)
+                else:
+                    ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite=0)
+                    for ckey in ckeys:
                         print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
-            print("  == remainder ")
+            print("  == not analized ")
             for f in sort_mod:
                 print(f"    {f}")
 
