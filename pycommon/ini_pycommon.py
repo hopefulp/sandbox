@@ -1,0 +1,125 @@
+#!/home/joonho/anaconda3/bin/python
+
+import argparse
+import os
+import re
+from common import dir_all, MyClass, dir_classify_n, whereami
+
+comment = MyClass('comment')
+mod     = MyClass('mod')
+jobdir  = MyClass('jobdir')
+jobfile = MyClass('jobfile')
+
+comment.howto       =   "=== COMMENT ===\
+                        \n\treads 'comment_sys.py' or 'comment_subj.py'\
+                        "
+comment.showall     =   "runs 'howto.py'\
+                        \n\tshows comment for system info\
+                        "
+comment.comment_sys =   "\tINFO: SYSTEM\
+                        \n\tshowall.py\
+                        "
+comment.comment_subj=   "\tINFO: SCIENCE JOB \
+                        \n\tshowall.py -s\
+                        "
+
+mod.common="module with commonly used functions \"import common\""
+
+
+jobdir.dir_clean    =   "=== DIRECTORY JOB ==\
+                        \n\t\tclean directory\
+                        \n\t\t    by -prefix -suffix -middle match -e excluded -ef 'exclude these files' -work {qchem,ai} -j rm[mv] -jd new_dir\
+                        \n\t\tUsage::\
+                        \n\t\t    dir_clean_p2.py -s out -ef 6-CC-NiFe-A-relax.out 5-FePNP-CO2.out -j mv -jd j631gs_v3.2\
+                        "
+jobdir.dir_clean_r_py2= "clean dir recursively\
+                        \n\t\tdir_clean_r_py2.py -p -s -m\
+                        "
+jobdir.dir_cli      =   "basic command line interface for all files in directory\
+                        \n\t\tmodify script for all the files/selected files\
+                        \n\t\tdir_cli.sh [0:vmake 1:incar 2:qsub 3:cp 4:rm 5:chmod\
+                        "
+
+### removed
+jobdir.dir_reset="reset dir as initial state by job: -j ai"
+jobdir.dir_run="scan dir and run the same command for all the files such as\n\t\tqcout_mol_in.pl"
+
+#classobj_dict={'EDIR':exe_dir, "MDIR":mod_dir}
+
+def classify(Lclassify, work):
+    
+    mdir = os.path.dirname(__file__)
+    print(f"List directory of {mdir} ")
+    exe, mod, dirs, d_link = dir_all(mdir)
+    sort_exe = sorted(exe)
+    sort_mod = sorted(mod)
+    sort_dir = sorted(dirs)
+    if sort_dir:
+        print("Directories:: ")
+        for f in sort_dir:
+            print(f"    {f}")
+    if sort_exe:
+        print("Executable:: ")
+        if not Lclassify:
+            for f in sort_exe:
+                print(f"    {f}")
+        else:
+            
+            for instance in MyClass.instances:
+                #print(globals().keys())
+                for gkey in globals().keys():
+                    if gkey == instance.name:    # 'sge'(class instance) == 'sge'(string)
+                        break
+                if work != instance.name:
+                    ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=1)
+                else:
+                    ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=0)
+                    for ckey in ckeys:
+                        print(f"    {ckey}.py[sh]\t:: {globals()[gkey].__dict__[ckey]}")
+            print("  Remainder == ")
+            for f in sort_exe:
+                print(f"    {f}")
+    if sort_mod:
+        print("Module:: ")
+        if not Lclassify:
+            for f in sort_mod:
+                print(f"    {f}")
+        else:
+            for instance in MyClass.instances:
+                for gkey in globals().keys():
+                    if gkey == instance.name:
+                        break
+                if not work or work != instance.name:
+                    ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite=1)
+                else:
+                    ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite=0)
+                    for ckey in ckeys:
+                        print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
+            print("  Remainder == ")
+            for f in sort_mod:
+                print(f"    {f}")
+    
+    print("Instances:: ", end='')
+    for instance in MyClass.instances:
+        print(f"{instance.name}", end=' ')
+    print("\n\t    -w for detail")
+    print(f"#Comment: -c    for classification")
+    '''
+    if not spec == None:
+        print(f"Detail for {spec}:: ")
+        name_class = classobj_dict[spec]
+        for key in name_class.__dict__.keys():
+            print(f"    {key}\t:: {name_class.__dict__[key]}")
+    '''
+    return 0
+
+def main():
+    parser = argparse.ArgumentParser(description="display Usage for $SB/py_qcmo  ")
+    parser.add_argument('-c', '--classify', action="store_true", help="classify files ")
+    parser.add_argument('-w','--work',  help="several explanation option ")
+    args = parser.parse_args()
+
+    classify(args.classify,args.work)
+
+if __name__ == "__main__":
+    main()

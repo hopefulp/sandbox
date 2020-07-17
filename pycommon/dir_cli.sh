@@ -2,18 +2,25 @@
 ### in mlet
 SB=/gpfs/home/joonho/sandboxg
 
-### job 0        1      2     3    4  for CASE
-job=( "vmake" "incar" "qsub" "cp" "rm")
+### job 0        1      2     3    4      5     for CASE
+job=( "vmake" "incar" "qsub" "cp" "rm" "chmod" )
 if [ $# -eq 0 ]; then
-    echo "list job[0]vmake [1]incar [2]qsub [3]cp [4]rm"
+    echo "list job[0]vmake [1]incar [2]qsub [3]cp [4]rm [5]chmod"
     exit
 fi
-j=${job[$1]}
+
+re='^[0-9]+$'
+if [[ $1 =~ $re ]]; then
+    j=${job[$1]}
+else
+    j=$1
+fi
 #echo $j
 match=$2
 f=$3
 
-for d in $(ls -d ${match}*); do
+#for d in $(ls -d ${match}*); do
+for d in $(ls -d *); do
     case $j in
         ### VASP make DIR for CONTINOUS JOB
         "vmake")
@@ -43,6 +50,15 @@ for d in $(ls -d ${match}*); do
         ### REMOVE directory
         'rm')
             echo "rm $d/$f"
+            ;;
+        ### chmod for dir and files
+        'chmod')
+            if [ -d $d ]; then
+                CHMOD=755
+            else
+                CHMOD=644
+            fi
+            echo chmod $CHMOD $d
             ;;
         *)
             ### clean in many directoreis
