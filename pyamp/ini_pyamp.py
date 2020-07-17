@@ -33,11 +33,16 @@ amp.amp_run             ="amp_run.py -f OUTCAR -j tr -des gs -tef -nc 4 -hl 8 8 
                         \n\t\t\t\ttr w. 100 images is enough?\
                         "
 amp.amp_loop            ="amp_loop.py\
-                        \n\t\t\t    loop for many situation used in SGE"
+                        \n\t\t\t\t: loop for many situation used in SGE"
 amp.amp_plot            ="amp_plot.py\
-                        \n\t\t\t    plot amp_run.py test"
+                        \n\t\t\t\t: plot amp_run.py test"
 amp.amp_descriptor      ="called by amp_run.py\
                         \n\t\t\tprovide symmetry function to test diverse descriptor\
+                        "
+amp.amp_anal            = "amp_anal.py -f ../OUTCAR -p hl44E0.001F0.1N100/amp-untrained-parameters.amp -im 1081 -ia 3 -t 'wrong F'\
+                        \n\t\t\t   amp_anal.py -f ../OUTCAR -p hl44E0.001F0.1N100/amp-untrained-parameters.amp -im 1081 1083\
+                        \n\t\t\t\t: plot fingerprint of an atom by: index of image, index of atom\
+                        \n\t\t\t\t: without -ia atom index, fp ranges for all the kinds of atoms are plotted\
                         "
 amp.amp_mod             ="called by amp_run.py\
                         \n\t\t\tprovide some functions\
@@ -50,7 +55,11 @@ general.make_dir        ="make_dir.py new_dir [old_dir] -w amp pbs -j tr\
                         \n\t\t\t\t    des links OUTCAR\
                         \n\t\t\t\t    tr, db, md links OUTCAR, amp.db\
                         "
-
+general.dir_scan        = "dir_scan.sh \
+                        \n\t\t\tscan the present directory then, ampdb's\
+                        \n\t\t\tcount the fingerprint files in .../loose\
+                        \n\t\t\to check the calculated database\
+                        "
 fconv.fconv2extxyz="convert file format to extxyz: im_format"
 fconv.im2extxyz="convert IM file format to extxyz"
 fconv.NucCarts2xyz="Not Used: use when View.xyz is not provide in Q-Chem, AIMD calculation"

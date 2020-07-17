@@ -405,7 +405,7 @@ def _mplot_2f3c(x, y1, y2,f1, f2, figname, Title, Xtitle, Ytitle, Lsave):
     return 0
 
 
-def barplot(hash, name, title):
+def barplot2(hash, name, title):
     """Makes a barplot of the fingerprint about the O atom."""
     fp = descriptor.fingerprints[hash][0]
     fig, ax = pyplot.subplots()
@@ -416,3 +416,13 @@ def barplot(hash, name, title):
     ax.set_ylabel('value')
     fig.savefig(name)
 
+def barplot_y(ys, name=None, xlabel=None, ylabel=None, title=None):
+    """Makes a barplot of the fingerprint about the O atom."""
+    fig, ax = plt.subplots()
+    ax.bar(range(1,len(ys)+1), ys)
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    plt.show()
+    if name:
+        fig.savefig(name)

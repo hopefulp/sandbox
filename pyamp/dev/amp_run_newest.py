@@ -13,73 +13,18 @@ import numpy as np
 #import my_chem
 #from my_arith import rmse
 from my_images import Images
-from common import yes_or_no
+from common import yes_or_no, whereami
 from amp_plot import get_title         ### FOR MLET
 import re
 import sys
 import os
 import socket
 import amp_mod
-import my_descriptor as my_des
-from amp_gsversion import g_version, whereami, gmodule
+import my_descriptor_newest as my_des
+
 amp_amp = [ "amp.amp", "amp-untrained-parameters.amp" ] 
-import importlib
 
-mod_gauss = f'amp.descriptor.{gmodule}'
-print(f"gaussian module version: {g_version}, module_name: {gmodule}")
-if   g_version == 2:
-    my_gauss = importlib.import_module(mod_gauss)      # trial version: gaussian2a
-elif g_version == 3:
-    my_gauss = importlib.import_module('amp.descriptor.gaussian3')
-print(my_gauss)
-
-### Amp job 1: Train Images 
-def calc_train_images(images, des_obj, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, amp_pot=None):
-    Hidden_Layer=tuple(HL)
-    print("Hidden Layer: {}".format(Hidden_Layer))
-    E_conv = Elist[0]
-    if len(Elist) == 2:
-        E_maxresid = Elist[1]
-    else:
-        E_maxresid = E_conv*3
-    print("Energy convergence: {}".format(E_conv))
-    print("Energy maxresidue: {}".format(E_maxresid))
-    cores={'localhost':ncore}   # 'localhost' depress SSH, communication between nodes
-    ### multiserver test: not working in this level
-    #cores={'192.168.1.12':ncore, '192.168.1.13':ncore}
-    ### load "amp.amp"
-    if Lload_amp:
-        calc = Amp.load(amp_pot)
-    ### descriptor checking?
-    if des_obj.name == 'gs':
-        #from amp.descriptor.gaussian2 import Gaussian        # original gaussian, modified gaussian2
-        gs = des_obj.make_Gs(images[0]) # images[0] to obtain atom symbols
-        #print(gs, f"in {whereami()} of {__name__}")
-        #calc = Amp(descriptor=Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-        calc = Amp(descriptor=my_gauss.Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-    elif des_obj.name == 'zn':
-        from amp.descriptor.zernike import Zernike
-        calc = Amp(descriptor=Zernike(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-    elif des_obj.name == 'bs':
-        from amp.descriptor.bispectrum import Bispectrum
-        calc = Amp(descriptor=Bispectrum(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-    ### Global Search in Param Space
-    Annealer(calc=calc, images=images, Tmax=20, Tmin=1, steps=4000)
-    ### set convergence for LossFunction
-    convergence={}
-    if E_conv:
-        convergence['energy_rmse'] = E_conv
-    if E_maxresid:
-        convergence['energy_maxresid'] = E_maxresid
-    if f_conv > 0.0:
-        if f_conv:
-            convergence['force_rmse'] = f_conv
-        if not f_coeff:
-            f_coeff = 0.02
-    calc.model.lossfunction = LossFunction(convergence=convergence, force_coefficient=f_coeff)  # setting
-    calc.train(images=images, overwrite=True)
-    return
-### AMP job 2: Test
+### AMP job 1: Test
 def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgraph,val_id=None,na_in_mol=1,Ltwinx=None):
     ### in case other name of amp pot is used
     #if amp_pes:
@@ -177,6 +122,51 @@ def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgrap
         #err = rmse(y, y_bar)*escale
     return err, res_max
 
+### Amp job 2: Train Images 
+def calc_train_images(images, des_obj, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, amp_pot=None):
+    Hidden_Layer=tuple(HL)
+    print("Hidden Layer: {}".format(Hidden_Layer))
+    E_conv = Elist[0]
+    if len(Elist) == 2:
+        E_maxresid = Elist[1]
+    else:
+        E_maxresid = E_conv*3
+    print("Energy convergence: {}".format(E_conv))
+    print("Energy maxresidue: {}".format(E_maxresid))
+    cores={'localhost':ncore}   # 'localhost' depress SSH, communication between nodes
+    ### multiserver test: not working in this level
+    #cores={'192.168.1.12':ncore, '192.168.1.13':ncore}
+    ### load "amp.amp"
+    if Lload_amp:
+        calc = Amp.load(amp_pot)
+    ### descriptor checking?
+    if des_obj.name == 'gs':
+        from amp.descriptor.gaussian2 import Gaussian        # original gaussian, modified gaussian2
+        gs = des_obj.make_Gs(images[0]) # images[0] to obtain atom symbols
+        #print(gs, f"in {whereami()} of {__name__}")
+        calc = Amp(descriptor=Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+    elif des_obj.name == 'zn':
+        from amp.descriptor.zernike import Zernike
+        calc = Amp(descriptor=Zernike(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+    elif des_obj.name == 'bs':
+        from amp.descriptor.bispectrum import Bispectrum
+        calc = Amp(descriptor=Bispectrum(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+    ### Global Search in Param Space
+    Annealer(calc=calc, images=images, Tmax=20, Tmin=1, steps=4000)
+    ### set convergence for LossFunction
+    convergence={}
+    if E_conv:
+        convergence['energy_rmse'] = E_conv
+    if E_maxresid:
+        convergence['energy_maxresid'] = E_maxresid
+    if f_conv > 0.0:
+        if f_conv:
+            convergence['force_rmse'] = f_conv
+        if not f_coeff:
+            f_coeff = 0.02
+    calc.model.lossfunction = LossFunction(convergence=convergence, force_coefficient=f_coeff)  # setting
+    calc.train(images=images, overwrite=True)
+    return
 
 ### amp job 3: MD
 def amp_md(atoms, nstep, dt, amp_pot):

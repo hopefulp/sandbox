@@ -1,18 +1,19 @@
 from common import MyClass
 import comment_sys as mod_sys
 
-amp         = MyClass()
-amp.server      = MyClass()
-amp.run         = MyClass()
-amp_scripts     = MyClass()
-lammps          = MyClass()
-lammps.start        = MyClass()
-lammps.lamphet      = MyClass()
-lammps.kim          = MyClass()
-myplot      = MyClass()
-nico2       = MyClass()
-packmol     = MyClass()
-qcmo        = MyClass()
+amp                 = MyClass()
+amp.server              = MyClass()
+amp.run                 = MyClass()
+amp.source              = MyClass()
+amp_scripts             = MyClass()
+lammps              = MyClass()
+lammps.start            = MyClass()
+lammps.lamphet          = MyClass()
+lammps.kim              = MyClass()
+myplot              = MyClass()
+nico2               = MyClass()
+packmol             = MyClass()
+qcmo                = MyClass()
 qchem               = MyClass()
 qchem.server            = MyClass()
 qchem.server.MLET       = MyClass()
@@ -100,28 +101,36 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\t    2.1 Make des-dir\
                     \n\t\t\t$ make_dir.py g2_6 -w amp -j des\
                     \n\t\t\t$ cd g2_6\
-                    \n\t\t\t$ sge_amp.py -db -i OUTCAR -qj G2w80p8 -nc 10 -j tr -hl 4 -nt 4000 -ntr 100 -dt int -dl 1000 1100 -m 2G -des gs -pf log10 -pmm 0.05 100.0 -pn 10 -tef\
-                    \t\t\t    -des: descriptor of 'gaussian', etc\
+                    \n\t\t\t$ sge_amp.py -db -i OUTCAR -qj NN5G2 -nc 10 -j tr -hl 4 -nt 4000 -ntr 100 -dtype int -dl 1000 1100 -m 3G -des gs -pf powNN -pmm 0.05 100.0 -pn 5 -tef\
+                    \n\t\t\t$ amp_run.py -f OUTCAR -j tr -hl 4 -el 0.001 -fl 0.01 0.04 -nt 4000 -ntr 100 -dtype int -dl 1000 1100 -des gs -pf powNN -pn 5 -tef \
+                    \n\t\t\t    -pf: parameter function: 'log10', 'powNN'\
+                    \n\t\t\t    -des: descriptor of 'gaussian', etc\
                     \n\t\t\t    -tef: test for foce which makes files\
                     \n\t\t\tMake amp.db on previous directory by link\
                     \n\t\t\t-m 2G: for database\
                     \n\t\t\t-m 4G: for energy calculation\
-                    \n\t\t\t-m 12G: more than 12G is required for HL training\
-                    \n\t\t\t-nd ndata_total=4000, -dt data_type=interval -dl data_list=d1~d2 training and d2~d3 test\
+                    \n\t\t\t-m 3G: training for 100 image, 12G for 1000 images\
+                    \n\t\t\t-nd ndata_total=4000, -dtype data_type=interval -dl data_list=d1~d2 training and d2~d3 test\
                     \n\t\t\tN.B. in nodes, amp_job=tr doesnot runs test; test runs only in master node (login)\
                     \n\t\t    2.2 Make db-making directory\
                     \n\t\t\t$ make_dir.py part -w amp -j db\
                     \n\t\t\t$ cd part\
-                    \n\t\t\t$ sge_amp.py -db -i OUTCAR -qj Gs26 -nc 10 -j tr -hl 4 -nt 4000 -ntr 100 -dt int -dl 1000 -m 12 -des gs -pf log10 -pmm 0.05 5.0 -pn 4 -tef\
-                    \n\t\t    $ qsub -N qname -pe numa 16 -l mem=12G -v fname=OUTCAR -v pyjob=tr -v hl='10 10' -v el=0.001 -v fl=0.01 -v np=16 -v ndata=3000 -v dtype=div -v dl='2 0' $SB/pypbs/sge_amp.csh\
-                    \n\t\t    $ amp_run.py -f OUTCAR -j tr -tef -hl 4 -el 0.001 -fl 0.01 -nc 10 -nt 4000 -ntr 1500 -dtype int -dl 1000 -des gs -pf log10 -pmm 0.05 5.0 -pn 4\
+                    \n\t\t\t$ sge_amp.py -db -i OUTCAR -qj Gs26 -nc 10 -j tr -hl 4 -nt 4000 -ntr 100 -dtype int -dl 1000 -m 12 -des gs -pf log10 -pmm 0.05 5.0 -pn 5 -tef\
+                    \n\t\t\t$ qsub -N qname -pe numa 16 -l mem=12G -v fname=OUTCAR -v pyjob=tr -v hl='10 10' -v el=0.001 -v fl=0.01 -v ndata=3000 -v dtype=div -v dl='2 0' $SB/pypbs/sge_amp.csh\
+                    \n\t\t\t$ amp_run.py -f OUTCAR -j tr -tef -hl 4 -el 0.001 -fl 0.01 -nc 10 -nt 4000 -ntr 1500 -dtype int -dl 1000 -des gs -pf log10 -pmm 0.05 5.0 -pn 5\
+                    \n\t\t    2.3 Analyze fingerprints\
+                    \n\t\t\t$ amp_anal.py -f ../OUTCAR -p amp-untrained-parameters.amp -im 1081 -ia 3 -t 'wrong F'\
+                    \n\t\t\t$ amp_anal.py -f ../OUTCAR -p amp-untrained-parameters.amp -im 1081 1083\
                     \n\t\t3. Training\
                     \n\t\t    Run at pwd, Making sub-directory w. single job or scanning\
                     \n\t\t    :single job\
-                    \n\t\t    $ sge_amp.py -qj NC1 -m 12G -nc 10 -hl 4 4 -el 0.001 -fl 0.1 0.1 -nt 4000 -ntr 100 -dt int -dl 1000 1100 -des gs -pf log10 -pmm 0.05 100 -pn 10 -tef \
+                    \n\t\t\t$ sge_amp.py -qj tr2 -m 3G -nc 10 -hl 4 -el 0.001 -fl 0.1 -nt 4000 -ntr 100 -dtype int -dl 1000 1100 -des gs -pf powNN -pmm 0.05 100 -pn 5 -tef \
+                    \n\t\t\t$ amp_run.py -f OUTCAR -j tr -hl 4 4 -el 0.001 -fl 0.01 0.04 -nt 4000 -ntr 300 -dtype div -dl 3 0 -des gs -pf powNN -pn 5 -tef\
                     \n\t\t    :scanning\
-                    \n\t\t    $ sge_amp.py -s -sh 10 -qj Emaxres -m 12G -nc 8 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0 [-des gs -tef]\
-                    \n\t\t\t-mh int for max number of node in each layer\
+                    \n\t\t\t$ sge_amp.py -s -nhl 6 -ihl 1 -qj Fmr -m 12G -nc 8 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dtype div -dl 2 0 -des gs -pf powNN -pn 5 -tef\
+                    \n\t\t\t    scanning parameters:\
+                    \n\t\t\t    -nhl: number of HL sets\
+                    \n\t\t\t    -ihl: interval of number of nodes\
                     \n\t\t4. Test\
                     \n\t\t   test in sub-directory\
                     \n\t\t   run in master node\
@@ -182,6 +191,17 @@ amp.md_anal     =   "\n    == MD Analysis ==\
                     \n\t\t-icx: x-column, default=1\
                     \n\t\t-tx : twinx\
                     \n\t\t-ity: index for right-y among y-columns\
+                    "
+amp.source      =   "\n    == ampi ==\
+                    \n\t: developed in mlet:~/.local/lib/python3.6/site-packages/amp\
+                    \n\t: development in amp.descriptor\
+                    \n\t    gs-function parameter generator includes pow(N,sqrt(1/N)), logspace\
+                    \n\t    pow(N,sqrt(1/N))\
+                    \n\t\tRs is not 0 but moving with eta\
+                    \n\t\t    Rc is excluded from parameter generation so Rc is included in source for Rs, eta-rescale: gaussian2.py\
+                    \n\t\t\t: control by 'amp_gversion.py'\
+                    \n\t\t    Rc is included in parameter generation so Rc is excluded in source: gaussian3.py -- Bug\
+                    \n\t\t\t: But cannot be fixed at the moment\
                     "
                     #\n\t\t    import myplot_default\
 lammps.start.install ="=== LAMMPS ===\

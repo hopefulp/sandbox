@@ -9,8 +9,9 @@ from varname import nameof
 
 ### thest are globals() not locals()|vars()
 sge     = MyClass('sge')
-grmx    = MyClass('grmx')
 qsub    = MyClass('qsub')
+ssh     = MyClass('ssh')
+grmx    = MyClass('grmx')
 usage   = MyClass('usage')
 amp     = MyClass('amp')
 qchem   = MyClass('qchem')
@@ -24,12 +25,26 @@ sge.usage="$qstat -f    # see all nodes(/used/total) and my job\
             \n\t\t$qhist       # shows number of running cores and jobs in Queue\
             \n\t\t$qmem        # memory\
             "
-sge.qsub_server = "qsub_server.py"
-sge.sge_dir_run = "sge_dir_run.py"
-qsub.usage="qsub -N jobname -v var=a_variable /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh\
-            \n\t\t$var can be used as variable in the script\
-            \n\t\tscript name should be full name\
-            "
+sge.qsub_server     = "\n\tqsub_server.py\
+                    \n\t    diverse qsub contents\
+                    "
+sge.sge_dir_run     = "\n\tsge_dir_run.py\
+                    \n\t    run in a directory w/wo qsub\
+                    "
+qsub.usage          ="qsub -N jobname -v var=a_variable /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh\
+                    \n\t\t$var can be used as variable in the script\
+                    \n\t\tscript name should be full name\
+                    "
+ssh.ssh_node_byproc = "\n\tssh_node_byproc.sh node index_proc num_proc[default=16]\
+                    \n\t    kill process in a node\
+                    "
+ssh.ssh_mlet_scan_nodes   = "\n\tssh_mlet_nodes.sh [ls|rm|mkdir|vasp|qchem|ln|python] [$2]\
+                    \n\t    : scan all nodes in mlet\
+                    \n\t    depending on $1, $2 is required\
+                    "
+ssh.ssh_node_kill   = "\n\tssh_node_kill.sh proc_name nodes\
+                    \n\t    : for the given nodes find process of proc_name the kill each process\
+                    "
 grmx.usage="qsub -v tpr=mdname sge_mdrun2.sh"
 usage.gen="#Comment for sge: -w [sge|amp|grmx|qchem|sleep|qsub for arguments]\
             \n\t\tAMP::     sge_amp.tcsh\
@@ -49,6 +64,10 @@ amp.usage="\n\t\tpy_job for [validation||train||test]\
 amp.sge_amp="sge_amp.py \
              sge_amp.csh\
              "
+amp.amp_scan="amp_scan.sh\
+            \n\t\tdirect run at node with scan\
+            "
+
 qchem.usage=""
 qsleep.usage=""
 
@@ -98,7 +117,7 @@ def works(Lclassify, work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
                     ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=0)
                     for ckey in ckeys:
                         print(f"    {ckey}.py[sh]\t:: {globals()[gkey].__dict__[ckey]}")
-            print("  == remainder ")
+            print("  Remainder == ")
             for f in sort_exe:
                 print(f"    {f}")
     if sort_mod:       
@@ -117,7 +136,7 @@ def works(Lclassify, work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
                     ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite=0)
                     for ckey in ckeys:
                         print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
-            print("  == remainder ")
+            print("  Remainder == ")
             for f in sort_mod:
                 print(f"    {f}")
     if  work in lclass_var:
