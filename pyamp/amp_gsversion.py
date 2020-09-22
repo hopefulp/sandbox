@@ -1,5 +1,8 @@
 ### module selection
 from common import whereami
 g_version = 2                   # Rc is out/in module
-gmodule   = 'gaussian2a'
+if g_version == 2:
+    gmodule = 'gaussian2a'
+elif g_version == 3:
+    gmodule = 'gaussian3'
 

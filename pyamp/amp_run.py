@@ -1,13 +1,10 @@
 #!/home/joonho/anaconda3/bin/python
+'''
+    2020.08.25 GA(genetic algorithm) was encoded by job='trga', 'tega', if 'ga' in job, turn on Lga
+    2020.08.25 Ltest-force is deprecated. if there is force training, make a force test
+'''
 
 import argparse
-
-from amp import Amp
-from amp.model.neuralnetwork import NeuralNetwork
-from amp.model import LossFunction
-from amp.utilities import Annealer
-from amp.descriptor.cutoffs import Cosine
-
 import numpy as np
 #from myplot2D import *                 ### FOR MLET 
 #import my_chem
@@ -19,44 +16,43 @@ import re
 import sys
 import os
 import socket
-import amp_mod
+import amp_util
 import my_descriptor as my_des
-from amp_gsversion import g_version, whereami, gmodule
-amp_amp = [ "amp.amp", "amp-untrained-parameters.amp" ] 
-import importlib
+from common import whereami
+import amp_ini 
 
-mod_gauss = f'amp.descriptor.{gmodule}'
-print(f"gaussian module version: {g_version}, module_name: {gmodule}")
-if   g_version == 2:
-    my_gauss = importlib.import_module(mod_gauss)      # trial version: gaussian2a
-elif g_version == 3:
-    my_gauss = importlib.import_module('amp.descriptor.gaussian3')
-print(my_gauss)
+### in case changing amp package name
+#import ampm
+#sys.modules['amp'] = ampm
+from amp import Amp
+from amp.model.neuralnetwork import NeuralNetwork
+from amp.model import LossFunction
+from amp.regression import Regressor
+from amp.utilities import Annealer
+from amp.descriptor.cutoffs import Cosine
+from amp.descriptor.gaussian import Gaussian
+
+Lprint = 0
 
 ### Amp job 1: Train Images 
-def calc_train_images(images, des_obj, HL, Elist, f_conv, f_coeff, ncore, Lload_amp, amp_pot=None):
+def calc_train_images(images, des_obj, HL, Elist, flist, ncore, amp_pot=None, max_iter=10000) :
     Hidden_Layer=tuple(HL)
-    print("Hidden Layer: {}".format(Hidden_Layer))
-    E_conv = Elist[0]
-    if len(Elist) == 2:
-        E_maxresid = Elist[1]
-    else:
-        E_maxresid = E_conv*3
-    print("Energy convergence: {}".format(E_conv))
-    print("Energy maxresidue: {}".format(E_maxresid))
+    if Lprint: print("Hidden Layer: {}".format(Hidden_Layer))
+    E_conv, E_maxresid = amp_util.decom_ef(Elist)
+    if Lprint: 
+        print("Energy convergence: {}".format(E_conv))
+        print("Energy maxresidue: {}".format(E_maxresid))
     cores={'localhost':ncore}   # 'localhost' depress SSH, communication between nodes
-    ### multiserver test: not working in this level
-    #cores={'192.168.1.12':ncore, '192.168.1.13':ncore}
-    ### load "amp.amp"
-    if Lload_amp:
+    ### if amp.pot is loaded
+    if amp_pot:
         calc = Amp.load(amp_pot)
     ### descriptor checking?
     if des_obj.name == 'gs':
         #from amp.descriptor.gaussian2 import Gaussian        # original gaussian, modified gaussian2
         gs = des_obj.make_Gs(images[0]) # images[0] to obtain atom symbols
         #print(gs, f"in {whereami()} of {__name__}")
-        #calc = Amp(descriptor=Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-        calc = Amp(descriptor=my_gauss.Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+        calc = Amp(descriptor=Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+        #calc = Amp(descriptor=my_gauss.Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
     elif des_obj.name == 'zn':
         from amp.descriptor.zernike import Zernike
         calc = Amp(descriptor=Zernike(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
@@ -71,114 +67,86 @@ def calc_train_images(images, des_obj, HL, Elist, f_conv, f_coeff, ncore, Lload_
         convergence['energy_rmse'] = E_conv
     if E_maxresid:
         convergence['energy_maxresid'] = E_maxresid
-    if f_conv > 0.0:
-        if f_conv:
-            convergence['force_rmse'] = f_conv
+    if flist:
+        f_conv, f_coeff = amp_util.decom_ef(flist)
+        convergence['force_rmse'] = f_conv      # if it is, force_coefficient turns on
         if not f_coeff:
-            f_coeff = 0.02
+            f_coeff = 0.04                      # default of amp
+    else:
+        f_coeff = None
+        if Lprint:
+            print("Energy only training")
+            print(f"force limit: {f_conv:5.2f}, force coeff: {f_coeff:5.2f}")
     calc.model.lossfunction = LossFunction(convergence=convergence, force_coefficient=f_coeff)  # setting
+    ### this is always working for max_iteration
+    regressor = Regressor(optimizer='BFGS', max_iterations=max_iter)    #'L-BFGS-B'
+    calc.model.regressor = regressor
     calc.train(images=images, overwrite=True)
+    #calc.train(images=images, max_iterations=max_iter, overwrite=True) # not working in case Annealing runs 
     return
+
 ### AMP job 2: Test
-def calc_test_images(test_images, amp_pes, Ltest_f, title, suptitle,ncore, Lgraph,val_id=None,na_in_mol=1,Ltwinx=None):
+def calc_test_images(images, calc, f_conv_list, title, suptitle,ncore,na_in_mol,Lgraph,Ltwinx=None, Lga=False, val_id=None):
     ### in case other name of amp pot is used
-    #if amp_pes:
-    #    calc = Amp.load(amp_pes)
-    #else:
-    try:
-        calc = Amp.load("amp.amp")
-    except FileNotFoundError:
-        try:
-            calc = Amp.load("amp-untrained-parameters.amp")
-        except FileNotFoundError:
-            print("Error: amp-pes.amp file does not exist, input amp-pot file by -p")
-            sys.exit(1)
+    #calc = amp_util.get_amppot(amp_pes)
+    Lforce = False
+    Lhack_force = False
+    if f_conv_list:
+        Lforce = True
+        Lhack_force = True
+
     escale = 1                  # my_chem.ev2kj
-    y=[]
-    y_bar=[]
-    if Ltest_f:
-        yf3d=[]
-        yf3d_bar=[]
-        f_rmses=[]
-        f_maxerr=0
-    #return         # this runs
+    y=[]            # QM  image energy
+    y_bar=[]        # AMP image energy
+    yf3d=[]         # QM  force in 3D
+    yf3d_bar=[]     # AMP force in 3D
     ### as for all the same molecule
-    natom = len(test_images[0])
-    for i, image in enumerate(test_images):
+    ### control display unit: E(ev) per atom(amp), mol, system(all the atoms in image)
+    natom = len(images[0]) # Atoms == image, len(Atoms) == number of Atom
+    print(f"Lforce = {Lforce}, {Lhack_force}")
+    for i, image in enumerate(images):
         ### get QM-pot
         y.append(image.get_potential_energy()/natom*na_in_mol)
         ### get QM-forces in a image
-        if Ltest_f:
+        if Lforce:
             y_forces = image.get_forces()       # 2D list
             yf3d.append(y_forces)               # 3D list 
         ### get AMP-pot
         image.set_calculator(calc)
         y_bar.append(image.get_potential_energy()/natom*na_in_mol)
         ### get AMP-forces
-        if Ltest_f:
+        if Lforce:
             ybar_forces = image.get_forces()    # 2D
             yf3d_bar.append(ybar_forces)        # 3D
-            ### treat 1 image
-            yf_1d = np.array(y_forces).flatten()       
-            yfbar_1d = np.array(ybar_forces).flatten()
-            f_rmse = np.sqrt(((yfbar_1d-yf_1d)**2).mean())
-            f_rmses.append(f_rmse)
-            ### max force
-            f_res_max = np.max(np.absolute(yfbar_1d-yf_1d))
-            if(f_maxerr < f_res_max):
-                f_maxerr = f_res_max
-                f_max_i = np.argmax(np.absolute(yfbar_1d-yf_1d))
-                f_max_image_i = i
-    if Ltest_f:
-        with open('f_rmse.dat', 'w') as f:
-            f.write(f"{'average':^10}{np.array(f_rmses).mean():10.5f}\n")
-            for idx, rmse in enumerate(f_rmses):
-                f.write(f"{idx:^9d}{rmse:10.5f} \n")
-
-    with open("amp_test.txt",'w') as f:
-        f.write("\ttrue\t\thypothesis\n")
-        for y1, ybar1 in zip(y, y_bar):
-            f.write(f"{y1:15.5f} {ybar1:15.5f}\n")
-    if Ltest_f:            
-        with open("forces.dat",'w') as f:
-            iatom = int(f_max_i/3)
-            icoord = f_max_i%3
-            f.write(f"image={f_max_image_i}; atom id={iatom} {icoord}-th coord; f_max_res={f_maxerr:10.5f}\n")
-            f.write("\tx true\t    hypo\t\t y true\t  hypo\t\t\tz true\t   hypo\t\ttrue_force  hypo_force     diff\n")
-            #for f_image, fbar_image in zip(yf, yf_bar):   # write all the images?
-            atom_f=[]
-            for f1, fbar1 in zip(yf3d[f_max_image_i], yf3d_bar[f_max_image_i]):
-                arrf1 = np.array(f1)
-                arrfbar1 = np.array(fbar1)
-                for i in range(3):
-                    f.write(f"{f1[i]:10.5f} {fbar1[i]:10.5f}\t")
-                force_true = np.sum(arrf1*arrf1)**0.5
-                force_hypo = np.sum(arrfbar1*arrfbar1)**0.5
-                diff = force_true - force_hypo
-                atom_f.append([force_true, force_hypo])
-                f.write(f"{force_true:10.5f} {force_hypo:10.5f} {diff:10.5f}")
-                f.write("\n")
-            arr_aforce = np.array(atom_f)
-            print(f"shape of 2d array: {arr_aforce.shape}")
-            ave_f = np.sqrt(np.mean((arr_aforce[:,0]-arr_aforce[:,1])**2))
-            f.write(f"force rmse = {ave_f:10.5f}")
-
+    ### write energy (all images): scale np.square(meV)
+    e_rmse, e_maxres = amp_util.write_energy(amp_ini.ampout_te_e_chk, y, y_bar, scale=np.power(10,6))
+    if Lforce:
+        ### write force file of averate and of each image if fpre
+        f_rmse, f_maxres = amp_util.stat_forces_filesum(yf3d, yf3d_bar,fpre="test_force_img")
+    ### this runs only in master(login) node
     if Lgraph:
         modulename='myplot2D'   ### FOR MLET
         if modulename not in sys.modules:
             import myplot2D
-        err, res_max = myplot2D.draw_amp_twinx(y, y_bar, title, suptitle, natom=natom, Ltwinx=Ltwinx,Ldiff=True)
-    else:
-        h_conv = np.array(y_bar)                # * escale
-        y_conv = np.array(y)                    # * escale
-        diff =  np.subtract(h_conv,y_conv)
-        err = np.sqrt((diff**2).mean())
-        res_max = abs(max(diff, key=abs))
-        #err = rmse(y, y_bar)*escale
-    return err, res_max
+        e_rmse, e_maxres = myplot2D.draw_amp_twinx(y, y_bar, title, suptitle, natom=natom, Ltwinx=Ltwinx,Ldiff=True)
+    if Lga:
+        ### get hl directory from images, amp.amp
+        hl = calc.model.parameters.hiddenlayers[images[0][0].symbol]  # retuns hl as tuple
+        ### 
+        e_aim   = 0.0005
+        f_aim   = 0.1       # 0.1 eV/A
+        f2_aim  = 0.4       # 3 sigma
+        ### higher score is better 
+        score = 1/(f_maxres + f_rmse*4) * 10
+            
+        ### amp_ini.ampout_chromosome_fitness = "ga_fit.txt"
+        with open(amp_ini.ampout_chromosome_fitness, 'w') as f:
+            f.write(' '.join(str(nodes) for nodes in hl))
+            f.write(f" {score}\n")
+        os.system(f"cat {amp_ini.ampout_chromosome_fitness} >> ../{amp_ini.ampout_onegeneration_fitness}")  # GA checks this file
+    return e_rmse, e_maxres
 
-
-### amp job 3: MD
+### Amp job 3: MD
 def amp_md(atoms, nstep, dt, amp_pot):
     from ase import units
     from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
@@ -215,12 +183,24 @@ def amp_md(atoms, nstep, dt, amp_pot):
         traj.write(atoms)                   # write kinetic energy, but pot is not seen in ase
     f.close()        
 
-def amp_jobs(fdata,job,descriptor,Ltest_f,amp_inp,Lload_amp,HL,E_conv,f_conv_list,ncore,na_mol,ndata,ntrain,dstype,dslist,Lgraph,Ltwinx):
+
+def decom_force(f_conv_list):
+    ### 1st ele is force_rmse_limit
+    f_limit = f_conv_list[0]
+    if f_limit <= 0:
+        f_limit = None
+    ### 2nd ele is force coefficient: default(amp) = 0.04
+    f_coeff = None
+    if len(f_conv_list) == 2:
+        f_coeff = f_conv_list[1]
+    return f_limit, f_coeff
+
+def amp_jobs(fdata,job,descriptor,amp_inp,HL,E_conv,f_conv_list,max_iter,ncore,na_mol,ndata,ntrain,dstype,dslist,Lgraph,Ltwinx):
     outf = "hyperparam_" + job + ".dat"
     ### parameter file
-    total_images = amp_mod.get_total_image(fdata,ndata)    # can read extxyz, OUTCAR, 
-    print(f"dstype {dstype} dslist {dslist} with data {len(total_images)} in {whereami()}: 1st")
-    tr_images, te_images = amp_mod.data_partition(total_images, dstype, dslist, job)
+    total_images = amp_util.get_total_image(fdata,ndata)    # can read extxyz, OUTCAR, 
+    if Lprint: print(f"dstype {dstype} dslist {dslist} with data {len(total_images)} in {whereami()}: 1st")
+    tr_images, te_images = amp_util.data_partition(total_images, dstype, dslist, job)
     if job == 'te':
         ntotal = 0
         ### ntrain is input
@@ -228,13 +208,13 @@ def amp_jobs(fdata,job,descriptor,Ltest_f,amp_inp,Lload_amp,HL,E_conv,f_conv_lis
         ntotal = len(total_images)
         ntrain = len(tr_images)     # ntrain is redefined in case of job==train
     ntest  = len(te_images)
-    print(f"ntotal {ntotal} ntrain {ntrain} ntest {ntest} in {whereami()}: 2nd")
+    if Lprint: print(f"ntotal {ntotal} ntrain {ntrain} ntest {ntest} in {whereami()}")
     ### Force input in training
-    f_conv = f_conv_list[0]
-    f_coeff = 0.1 # default
-    if len(f_conv_list) == 2:
-        f_coeff = f_conv_list[1]
     ### AMP running parts
+    Lga = False
+    if re.search('ga', job):
+        Lga = True
+    title, suptitle = get_title(fdata, HL, E_conv,f_conv_list, ntrain, ntest)
     if re.search("pr", job):
         y=[]
         for mol in total_images:
@@ -246,83 +226,68 @@ def amp_jobs(fdata,job,descriptor,Ltest_f,amp_inp,Lload_amp,HL,E_conv,f_conv_lis
     ### JOB == TRAINING
     elif re.search("tr",job):
         pwd = os.getcwd()
-        ### prevent running tr in tr-directory
-        if amp_inp:
-            if Lload_amp:
-                pass
-            else:
-                print(f"{amp_inp} can't be overwritten: Stop")
-                sys.exit(11)
-        else:
-            for amp_file in amp_amp:
-                if os.path.isfile(amp_file):
-                    print(f"There is {amp_file}: Stop")
-                    sys.exit(10)
-        print("data training:total sets %d/%d" % (ntrain, ntotal))
-        amp_mod.f_write(outf, HL, E_conv, f_conv, f_coeff, ntotal, dstype, dslist, descriptor)
-        calc_train_images(tr_images, descriptor, HL, E_conv, f_conv, f_coeff, ncore, Lload_amp,  amp_pot=amp_inp)
-        ### Test after training:: not run in QSUB
-        server =  socket.gethostname()
-        outf = "runamp_te.dat"     # to write input info
-        if server == 'chi' or server == 'login':
-            title, suptitle = get_title(fdata, HL, E_conv,f_conv, f_coeff, ntrain, ntest)
-            print("data test:train sets %d/%d" % (ntest, ntrain))
-            rmserr, max_res = calc_test_images(te_images,amp_inp,Ltest_f,title, suptitle,ncore,Lgraph,na_in_mol=na_mol,Ltwinx=Ltwinx)
-            amp_mod.f_write(outf, HL, E_conv, f_conv, f_coeff, ntotal,dstype, dslist, descriptor=descriptor, err=rmserr, max_res=max_res)
-        ### Do self test
-        else:
-            rmserr, max_res = calc_test_images(te_images,amp_inp,Ltest_f,title, suptitle,ncore,Lgraph,na_in_mol=na_mol,Ltwinx=Ltwinx)
-            amp_mod.f_write(outf, HL, E_conv, f_conv, f_coeff, ntotal,dstype, dslist, descriptor=descriptor, err=rmserr, max_res=max_res)
+        if Lprint: print("data training:total sets %d/%d" % (ntrain, ntotal))
+        amp_util.f_write(outf, HL, E_conv, f_conv_list, ntotal, dstype, dslist, descriptor)
+        calc_train_images(tr_images, descriptor, HL, E_conv, f_conv_list, ncore, amp_pot=amp_inp,max_iter=max_iter)
             
     ### JOB == TEST
     elif re.search("te",job):
-        title, suptitle = get_title( fdata, HL, E_conv, f_conv,f_coeff, ntrain, ntest)
-        print(f"data test {ntest}:{ntrain} train in {whereami()}/job==te")
-        rmserr, max_res = calc_test_images(te_images,amp_inp,Ltest_f,title, suptitle,ncore,Lgraph,na_in_mol=na_mol,Ltwinx=Ltwinx)
-        amp_mod.f_write(outf, HL, E_conv, f_conv,f_coeff, ntotal,dstype, dslist, descriptor=descriptor,err=rmserr, max_res=max_res)
+        print(f"data test {ntest} images/ per train {ntrain} in {whereami()}:job==te")
+        #os.system("touch test_start")
+        calc = amp_util.get_amppot(amp_inp)
+        rmserr, max_res = calc_test_images(te_images,calc,f_conv_list,title, suptitle,ncore,na_mol,Lgraph,Ltwinx=Ltwinx,Lga=Lga)
+        HL = calc.model.parameters.hiddenlayers['O']
+        amp_util.f_write(outf, HL, E_conv, f_conv_list, ntotal,dstype, dslist, descriptor=descriptor,err=rmserr, max_res=max_res)
     return
 
-def find_inputfile(pwd, job):
-    if os.path.isfile('OUTCAR'):
+def find_inputfile(inf, pwd, job):
+    if inf:
+        return inf
+    elif os.path.isfile('OUTCAR'):
         fname = 'OUTCAR'
     else:
         for f in os.listdir(pwd):
             if f.endswith('extxyz'):
                 fname = f
                 break
-    quest = f"file {fname} will be read with job='{job}' ?"
-    if yes_or_no(quest):
-        return fname
-    else:
-        return 0
+        if "fname" not in locals():
+            sys.exit(1)
+    #quest = f"file {fname} will be read with job='{job}' ?"
+    #if yes_or_no(quest):
+    #    return fname
+    #else:
+    return 0
     
 
 def main():
     parser = argparse.ArgumentParser(description='run amp with extxyz, OUTCAR: validation is removed ', prefix_chars='-+/')
-    parser.add_argument('-f', '--infile', default='OUTCAR', help='ASE readible file: extxyz, OUTCAR(VASP) ')
+    parser.add_argument('-inf', '--infile', default='OUTCAR', help='ASE readible file: extxyz, OUTCAR(VASP) ')
     ### tef for test w. force
-    parser.add_argument('-j', '--job', default='tr', choices=['tr','te','tef','pr','pt','md','chk'], help='job option:"train","test","md","profile","plot","check"')
-    parser.add_argument('-tef', '--test_force', action='store_true', help="test force")
+    #parser.add_argument('-j', '--job', default='tr', choices=['tr','trga','te','tega','tef','pr','pt','md','chk'], help='job option:"train","test","ga" for addtional genetic algorithm, "md","profile","plot","check"')
+    parser.add_argument('-j', '--job', default='tr', choices=['tr','trga','te','tega','pr','pt','md','chk'], help='job option:"train","test","ga" for addtional genetic algorithm, "md","profile","plot","check"')
     ### Descriptor group
     descriptor_group = parser.add_argument_group(title="Descriptor generator")
     descriptor_group.add_argument('-des', '--descriptor', choices=['gs','zn','bs'], help="test new descriptor")
-    descriptor_group.add_argument('-pf', '--param_function', default='log10', choices=['log10','powNN'], help="function for parameter interval")
+    descriptor_group.add_argument('-pf', '--p_function', default='log10', choices=['log10','powNN'], help="function for parameter interval")
     descriptor_group.add_argument('-pmm', '--param_minmax', nargs=2, default=[0.05, 5.0], type=float, help="min, max for param interval")
     descriptor_group.add_argument('-pn', '--nparam', type=int, default=5, help="num of parameters for descriptor")
+    descriptor_group.add_argument('-pmod', '--param_mod', default='orig', choices=['orig','del','couple','mod'], help="modify param to control number of param")
     descriptor_group.add_argument('-c', '--cutoff', type=float, default=6.5, help="initialize cutoff distance here")
     ### Neural Network
     parser.add_argument('-nc', '--ncore', default=1, type=int, help='number of core needs to be defined')
     parser.add_argument('-p', '--pot', help="input amp potential")
-    parser.add_argument('-lp', '--load_pot', action='store_true', help="load potential")
-    parser.add_argument('-nam','--mol_atoms',default=3,type=int,help='num of atoms in molecule: default 3 for H2O')
+    parser.add_argument('-nam','--natoms_molec',type=int, default=3, help='num of atoms in molecule ')
     parser.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     parser.add_argument('-el', '--e_conv', nargs='+', default=[0.001,0.003], type=float, help='energy convergence limit')
-    parser.add_argument('-fl', '--f_conv', nargs='+', default=[0.2, 0.04],   type=float, help='force convergence limit, [force coefficient]')
+    parser.add_argument('-fl', '--f_conv', nargs='*', type=float, help="f-convergence('-' for no f train)[f-coeff]")
+    #parser.add_argument('-hf', '--hack_force', action='store_true', help="hacking force in detail")
+    #parser.add_argument('-fl', '--f_conv', nargs='*', default=[0.1], type=float, help="f-convergence('-' for no f train)[f-coeff]")
     #parser.add_argument('-fc', '--f_coeff', default=0.1, type=float, help='weight of force training')
     parser.add_argument('-tx', '--twinx', action="store_false", help='turn off to use twinx of two y-axes')
     parser.add_argument('-g', action="store_false", help='if val default is False, otherwise True')
     parser.add_argument('+g', action="store_true", help='if val default is False, otherwise True')
     #parser.add_argument('-a', '--all_fig', action="store_true", help='if job==te, include all figures')
+    parser.add_argument('-mi', '--max_iteration', type=int, help='stop at max_iteration for comparison')
     ### DATA group
     data_group = parser.add_argument_group(title='Data')
     data_group.add_argument('-nt', '--ndata_total', type=int, nargs='*', help='cut total data: it requires two value for region')
@@ -338,12 +303,7 @@ def main():
     args = parser.parse_args()
 
     pwd = os.getcwd()
-    if args.infile:
-        fname=args.infile
-    else:
-        fname=find_inputfile(pwd, args.job)
-    if not fname:
-        sys.exit(1)
+    fname = find_inputfile(args.infile, pwd, args.job)
 
     if args.job == 'md':
         index = args.index
@@ -353,8 +313,10 @@ def main():
         pass
     ### if not MD, it's training/test
     else:
-        des_obj = my_des.GS_param(args.param_function, pmin=args.param_minmax[0], pmax=args.param_minmax[1], pnum=args.nparam, cutoff=args.cutoff)
-        amp_jobs(fname,args.job,des_obj,args.test_force,args.pot,args.load_pot,args.hidden_layer,args.e_conv,args.f_conv,args.ncore,args.mol_atoms,args.ndata_total,args.ndata_train,args.data_s_type,args.data_s_list,args.g,args.twinx)
+        des_obj = my_des.GS_param(args.p_function, pmin=args.param_minmax[0], pmax=args.param_minmax[1], pnum=args.nparam, pmod=args.param_mod, cutoff=args.cutoff)
+        amp_jobs(fname, args.job, des_obj, args.pot, args.hidden_layer, args.e_conv, args.f_conv, args.max_iteration, 
+            args.ncore, args.natoms_molec, args.ndata_total, args.ndata_train, args.data_s_type, args.data_s_list, args.g, args.twinx)
+        #amp_jobs(fname,args.job,des_obj,args.pot,args.hidden_layer,args.e_conv,args.f_conv,args.ncore,args.mol_atoms,args.ndata_total,args.ndata_train,args.data_s_type,args.data_s_list,args.g,args.twinx)
     return
 
 if __name__ == '__main__':

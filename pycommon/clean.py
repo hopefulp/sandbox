@@ -8,7 +8,7 @@ from common import *
 
 q_list=[]
 
-def d_clean(dirs,works,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir,Lshowmatch,Lall_rm):
+def d_clean(dirs,works,prefix, suffix, matches, exclude,excl_fnames, linux_job,new_dir,Lshowmatch,Lall_rm, Lyes):
 
     pwd = os.getcwd()
     if isinstance(dirs, str):
@@ -57,9 +57,14 @@ def d_clean(dirs,works,prefix, suffix, matches, exclude,excl_fnames, linux_job,n
             f_list = get_files_match(matches, d, Lshowmatch)
             f_list_all.extend(f_list)
         elif work == 'amp':
-            matches=['amp','pdf','dat']
-            f_list = get_files_match(matches, d, Lshowmatch)
+            fmatches=['amp','pdf','dat', 'ga', 'GA', 'te']
+            ### if Lall_rm: remove directory also
+            f_list = get_files_match(fmatches, d, Lshowmatch)
             f_list_all.extend(f_list)
+            dmatches=['ch']
+            f_list = get_files_match(dmatches, d, Lshowmatch, Ldirectory=Lall_rm)
+            f_list_all.extend(f_list)
+                
         elif work == 'lmp':
             matches=['trj', 'log']
             f_list = get_files_match(matches, d, Lshowmatch)
@@ -76,7 +81,10 @@ def d_clean(dirs,works,prefix, suffix, matches, exclude,excl_fnames, linux_job,n
     ### Make command list
     for f in f_list_all:
         #fname = d+'/'+f
-        comm = "%s %s" % (linux_job, f)
+        if Lall_rm:
+            comm = "%s -r %s" % (linux_job, f)
+        else:
+            comm = "%s %s" % (linux_job, f)
         if linux_job == 'mv' or linux_job == 'cp':
             comm += " %s" % new_dir
         print(comm)
@@ -84,9 +92,10 @@ def d_clean(dirs,works,prefix, suffix, matches, exclude,excl_fnames, linux_job,n
         
     #print "all %s files" % len(f_list)
     ### Show command list and run
-    if f_list:
-        q = "will you %s %s files? " % (linux_job, len(f_list))
-        if yes_or_no(q):
+    ### change f_list to f_list_all
+    if f_list_all:
+        q = "will you %s %s files? " % (linux_job, len(f_list_all))
+        if Lyes or yes_or_no(q):
             i = 0
             for comm in q_list:
                 os.system(comm)
@@ -115,6 +124,7 @@ def main():
     parser.add_argument('-jd', '--new_dir', default='tmp', help='directory where files to move')
     parser.add_argument('-ms', '--match_show', action='store_true')
     parser.add_argument('-a', '--all_remove', action='store_true', help='remove all the files')
+    parser.add_argument('-y', '--yes', action='store_true', help='execute command')
     args = parser.parse_args()
 
     if args.works==None and args.prefix==None and args.suffix==None and args.match==None:
@@ -125,7 +135,7 @@ def main():
         args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR']
     #if args.work == 'amp' and not args.excluded_files:
     #    args.excluded
-    d_clean(args.dirs,args.works,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.new_dir,args.match_show,args.all_remove)
+    d_clean(args.dirs,args.works,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.job,args.new_dir,args.match_show,args.all_remove, args.yes)
     return 0
 
 if __name__ == '__main__':

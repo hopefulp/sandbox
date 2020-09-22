@@ -10,7 +10,6 @@ from cycler import cycler
 import sys
 import my_chem 
 import numpy as np
-from myplot_default import *
 from common import *
 #plt.switch_backend('agg')
 
@@ -25,23 +24,28 @@ from common import *
 #   draw_histogram
 #
 
-def my_font(pack):
+#from myplot_default import *
+
+def my_font(pack='amp'):
     if pack == 'amp':
         font={  'family': 'normal',
                 'weight': 'bold',
-                'size'  : 22 }
+                'size'  : 22,
+                }
     else:
         print("package: %s is not included" % pack)
         sys.exit(0)
     mpl.rc('font', **font)
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
     return
 ### choice between "import myplot_default"|call common_figure
 def common_figure():
-    fig = plt.figure(figsize=(8,6))
-    mpl.rcParams.update({'font.size':10})
+    fig = plt.figure(figsize=(15,10))
     ax = plt.axes()
-    ax.tick_params(axis='both', which='major', labelsize=10)
-    #ax.tick_params(labelsize=25)
+    mpl.rcParams.update({'font.size':20})
+    ax.tick_params(axis='both', which='major', labelsize=20)
+    #ax.tick_params(axis='x', labelsize=30)
 
     custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
     #custom_cycler = (cycler(color=['r','g']))                                          # Figure 8(b)
@@ -50,11 +54,6 @@ def common_figure():
     #custom_cycler = (cycler(color=['orange','m','g','b']))
     ax.set_prop_cycle(custom_cycler)
     return fig, ax
-
-def common_figure_after():
-    plt.legend(loc=2)
-    return 0
-
 
 ### draw_dots_two was upgraded to twinx
 def draw_2subdots(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b','o'], Ldiff=True):
@@ -195,57 +194,98 @@ def xtitle_font(tit):
 
 ### used for md.ene, normal data file
 #def mplot_twinx(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None):
-def mplot_twinx(x, y, iy_right_y, Title=None, Xtitle=None, Ytitle=None, Ytitle2=None, Ylabels=None, Lsave=False, Colors=None):
+def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=None, Lsave=False, Colors=None):
     '''
+    called from "amp_plot_stat.py"
     call with x=[] and y=[ [...
     x:: [] or [size]
-    y:: [size] or [[multi],[multi],...size]
+    y:: [size] or [[size],[size],...[size]]
+    len(ylabel) == 2
     '''
-#    fig, ax = common_figure()
+    fig, ax = common_figure()
     ys = np.array(y)
     if len(x) != 0:
         xsize = len(x)
     else:
         xsize = ys.shape[0]
         x=range(xsize)
-    #print(f"{x}-{ys}")
     ### function: mplot_twinx
-    plt.title(Title)
-    if Xtitle:
-        plt.xlabel(Xtitle, fontsize=15)
-    #plt.ylabel(Ytitle, fontsize=15)
+    plt.title(title)
+    if xlabel:
+        plt.xlabel(xlabel, fontsize=20)
+    if isinstance(ylabel, str): ylabel1 = ylabel2 = ylabel
+    elif isinstance(ylabel, list):
+        ylabel1 = ylabel[0]
+        ylabel2 = ylabel[1]
+    plt.ylabel(ylabel1, fontsize=20)
     #ax.xaxis.set_major_locator(plt.NullLocator())
-    print(f"x, y shape:: {np.array(x).shape} {np.array(y).shape} and Ylabel {Ylabels} in {whereami()}")
+    #print(f"x, y shape:: {np.array(x).shape} {np.array(y).shape} and ylabel {ylabel} in {whereami()}")
     ax2=ax.twinx()
-    ax2.set_ylabel(Ytitle2)
+    ax2.set_ylabel(ylabel2)
+    ax2.set_ylim(0,1)
     pls=[]
-    if Ytitle:
-        ax.set_ylabel(Ytitle)
-    for i in range(len(y)):
-        if i+1 not in iy_right_y: 
-            #if Colors:  color = Colors.pop(i)       #color = 'tab:' + Colors.pop(0)
-            #else:       color = 'tab:red'
-            p1, = ax.plot(x, ys[i,:], 'o-', label=Ylabels[i])
-            pls.append(p1)
-            #ax.tick_params(axis='y')
-        else:
+    for i in range(len(ys)):
+        if i in iy_right: 
             #if Colors:  color = Colors.pop(i)       #'tab:' + Colors.pop(0)
             #else:       color='tab:green'
             #ax2.set_ylabel(Ylabels[i])
-            p2, = ax2.plot(x, ys[i,:], 'x-', label=Ylabels[i])
+            p2, = ax2.plot(x, ys[i,:], 'x-', label=legend[i])
             pls.append(p2)
+        else:
             #ax2.tick_params(axis='y')
+            #if Colors:  color = Colors.pop(i)       #color = 'tab:' + Colors.pop(0)
+            #else:       color = 'tab:red'
+            p1, = ax.plot(x, ys[i,:], 'o-', label=legend[i])
+            pls.append(p1)
+            #ax.tick_params(axis='y')
     #plt.legend(pls, Ylabels, loc=2)
-    ax.legend(loc=2)
-    ax2.legend(loc=1)
+    ax.legend(loc=3)            # 2
+    ax2.legend(loc=4)           # 1
     #plt.legend()
     #common_figure_after()
+    plt.xticks(x)
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)
     return 0
 
-def mplot_nvector(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None, Ltwinx=None):
+
+def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, Colors=None):
+    '''
+    call with x=[] and y=[ [...
+    x:: [] or [size]
+    y:: [size] or [[size],[size],...[size]]
+    '''
+    fig, ax = common_figure()
+    ys = np.array(y)
+    if len(x) != 0:
+        xsize = len(x)
+    else:
+        xsize = ys.shape[0]
+        x=range(xsize)
+
+    plt.title(title)
+    if xlabel:
+        plt.xlabel(xlabel, fontsize=20)
+    plt.ylabel(ylabel, fontsize=20)
+    if ys.ndim == 1:
+        plt.plot(x, y, 'bo-')
+        #plt.scatter(x, y)
+    elif ys.ndim == 2:
+        for i in range(len(ys)):
+            plt.plot(x,ys[i,:], 'o-', label=legend[i] )
+    else:
+        print(f"Error:: obscure in y-dim {ys.ndim}")
+    ### ADD LEGEND
+    plt.legend(loc=2)                # locate after plot
+    plt.xticks(x)
+    plt.show()
+    if Lsave:
+        plt.savefig(figname, dpi=150)
+    return 0
+
+
+def mplot_nvector_v1(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None, Ltwinx=None):
     '''
     call with x=[] and y=[ [...
     x:: [] or [size]

@@ -1,0 +1,371 @@
+#!/home/joonho/anaconda3/bin/python
+
+import numpy as np
+import os
+import gaamp.ga as ga
+import random
+import shutil
+import glob
+import time
+import argparse
+import qsub_restart
+import sys
+import subprocess
+import amp_jobstr
+import pickle
+from common import whereami, search_dir
+
+amp_setting={'jsubmit':'node','hl':'strHL', 'elimit':'0.001', 'train_f':'-1', 'ncore':'5'}
+
+def ran_pop(nchromo, nlayers, nodes):
+    '''
+    randomly generate population matrix
+    int nchromo: number of population of chromosome as row in matrix
+    int nlayers: number of max layers
+    '''
+    #print(f"nlyaers = {nlayers} in {whereami()}")
+    initial_pop=[]
+    genes=[]
+    for curr_sol in np.arange(0, nchromo): # 30 Chromosomes have 5 genes
+        for i in range(nlayers):
+            genes.append(random.choice(nodes))
+        initial_pop.append(genes)
+        genes=[]
+    print(f"initial_pop = \n{initial_pop} in {whereami()}")
+    ### move 0 to the end and make nlayers chromo
+    for chromo in initial_pop:
+        while 0 in chromo:
+            chromo.remove(0)
+        for i in range(nlayers-len(chromo)):
+            chromo.append(0)
+        if chromo == [0]*nlayers:
+            chromo[0]=1             # not to make [0,0...]
+
+    return initial_pop
+
+def design_pop(cwd, nchromo, initial_pop, layers):
+    '''
+    designn population matrix
+    '''
+    len_layer = len(layers)
+    with open('GANNtest'+cwd+'_Genes.txt','r') as f:
+        flines = f.readlines()
+    for i in range(len(flines)):
+        if 'Generation' in flines[-(i+1)]:
+            break
+    generation = eval(flines[-(i+1)][-3:])
+ 
+        
+    pop_lines = []
+    tmp_list = []
+    pop_lines.append(flines[-(i+1)+2:-(i+1)+2+nchromo])
+    for j in range(len(pop_lines)):
+        for s in [',',"'",'[',']','\n','\\n']:
+            pop_lines[j] = str(pop_lines[j])
+            pop_lines[j] = pop_lines[j].replace(s,'')
+        pop_lines[j] = pop_lines[j].split(' ')
+
+        while '' in pop_lines[j]:
+            pop_lines[j].remove('')
+    
+        cnt = 0
+        for k in pop_lines[j]:
+            cnt += 1
+            tmp_list.append(eval(k))
+            if cnt == len_layer :
+                initial_pop.append(tmp_list)
+                tmp_list = []
+                cnt = 0
+
+    for i in range(len(flines)):
+        if 'Error' in flines[-(i+1)]:
+            break
+
+    fit_lines = flines[-(i+1)+1:]
+    fitness = []
+    for j in range(len(fit_lines)):
+        for s in ['[',']','\n']:
+            fit_lines[j] = str(fit_lines[j])
+            fit_lines[j] = fit_lines[j].replace(s,'')
+        fit_lines[j] = fit_lines[j].split(' ')
+       
+        while '' in fit_lines[j]:
+            fit_lines[j].remove('')
+
+        for k in fit_lines[j]:
+            tmp_list.append(eval(k))
+        fitness.extend(tmp_list)
+        tmp_list = []
+
+    return (generation, initial_pop, fitness) 
+        
+def gen_step(pop_mat, fit, nparent_sets, best_fit, mutation_percent, max_node, min_node): 
+    parents = ga.select_mating_pool(pop_mat, fit, nparent_sets)
+    print(f"parents = {parents}")
+
+    offspring_crossover = ga.crossover(parents, offspring_size=(pop_mat.shape[0]-parents.shape[0], pop_mat.shape[1]))
+    print(f"offspring_crossover = {offspring_crossover}")
+    offspring_mutation = ga.mutation(offspring_crossover, mutation_percent, max_node, min_node)
+    print(f"offspring_mutation = {offspring_mutation}")
+    pop_mat[0:nparent_sets] = parents
+    pop_mat[nparent_sets:] = offspring_crossover
+ 
+    return pop_mat
+
+
+def calc_ga(fin, job_submit, init_pop, nchromo, max_nhl, nnodes, nparent_sets, mutation_percent, ngenerations):
+    cwd=os.getcwd()
+    print(f"{cwd}")
+
+    layers = np.arange(1, max_nhl+1)    # 0 ~ 9 -> 1 ~ 10
+    nlayers = max_nhl
+    nodes = np.arange(nnodes)           # 0 ~ 14
+    max_node = max(nodes)
+    min_node = min(nodes)
+    initial_pop=[]
+    #pop_mat = []
+ 
+    start_point = 0
+    cnt = 0
+    dir_prefix = 'ch'
+    ### generate initial population matrix(chromosome,genes)
+    if init_pop == 'random': 
+        pop_mat = np.array(ran_pop(nchromo, nlayers, nodes))  # linear increasing num of layers
+        print(f"{pop_mat} in {whereami()}")
+
+    elif init_pop == 'reference':
+        option = design_pop(cwd, nchromo, initial_pop, layers)
+        pop_mat = option[1]
+        pop_mat = np.array(pop_mat)
+        start_point = option[0]+1
+        fitness = option[2]
+        fitness = np.array(fitness)
+        best_fit = min(fitness)
+        pop_mat = gen_step(pop_mat, fitness, nparent_sets, best_fit, mutation_percent, max_node, min_node)
+        np.array(pop_mat)
+    
+    elif init_pop == 'ongoing':
+        while True:
+            time.sleep(10)
+            pftxt = os.path.isfile('ga_fit.txt')
+            if pftxt == True:
+                alines=[]
+                with open("ga_fit.txt", "r") as a:
+                    alines=a.readlines()
+                    if len(alines) >= nchromo:
+                        print('delete ga_fit')
+                        os.system("rm ga_fit.txt")
+                        break
+                    elif len(alines) < nchromo:
+                        if job_submit == 'qsub':
+                            qsub_restart.qsub(nchromo)
+
+        pop_tmp = []                                           
+        for i in range(len(alines)):
+            tmp_list = alines[i].split(']')
+            pop_list = []
+            
+            for s in ['[',' ']:
+                tmp_list[0] = tmp_list[0].replace(s,'')
+
+            tmp_list[0] = tmp_list[0].split(',')             
+            
+            for l in tmp_list[0]:
+                pop_list.append(eval(l))
+
+            if len(pop_list) != len(layers):
+                for cnt in range(len(layers)-len(pop_list)):
+                    pop_list.append(0)         
+            pop_tmp.append(pop_list)
+            fit.append(eval(tmp_list[1]))
+
+        pop_mat = np.array(pop_tmp)
+        fit = np.array(fit)
+        best_fit = min(fit)
+ 
+        with open('GANNtest'+cwd+'_Genes.txt','r') as f:
+            flines = f.readlines()
+        for i in range(len(flines)):
+            if 'Generation' in flines[-(i+1)]:
+                break
+        generation = eval(flines[-(i+1)][-3:])
+
+      
+        with open("GANNtest"+cwd+"_Genes.txt", "a") as f:
+            f.write("Generation : {}\nGenes : \n{}\nError : \n{}\n".format(generation, pop_mat, fit))
+        with open("GANNtest"+cwd+".txt", "a") as f:
+            f.write("Generation : {}\nGenes : {}, Error : {}\n".format(generation, pop_mat[np.where(fit == best_fit)], best_fit))
+            
+        pop_mat = gen_step(pop_mat, fit, nparent_sets, best_fit, mutation_percent, max_node, min_node)
+        fit=[]
+ 
+        option = design_pop(cwd, nchromo, initial_pop, layers)
+        pop_mat = option[1]
+        pop_mat = np.array(pop_mat)
+        start_point = option[0]+2
+        fitness = option[2]
+        fitness = np.array(fitness)
+        best_fit = min(fitness)
+        pop_mat = gen_step(pop_mat, fitness, nparent_sets, best_fit, mutation_percent, max_node, min_node)
+        np.array(pop_mat)
+
+    ### run amp for generations
+    home='/gpfs/home/joonho'
+    for igen in range(start_point, ngenerations):
+        population = pop_mat.tolist() # Copy pop_mat to population
+        dir_genname = dir_prefix + '{:02}'.format(igen) 
+        fit = []                            # end of 1 generation
+        for i, chromo in enumerate(population):
+            chromo = [ x for x in chromo if x != 0] # remove 0 or HL
+            if chromo == []:
+                chromo.append(1)
+            dirname = dir_genname + '_{:02d}'.format(i)
+            os.system(f"make_dir.py {dirname} -w amp -j tr")
+
+            ### submit job inside directory
+            os.chdir(dirname)
+            #if os.path.isfile('score') == True:
+            #    os.remove('score')
+            #rmfin = glob.glob('amp_pot.sh.e*')
+            #for rm in rmfin:            
+            #    os.remove(rm)
+            #with open('HL','w') as f:         # write HL
+            #    f.write('{}'.format(chromo))
+            with open('hl.pkl', 'wb' ) as f:
+                pickle.dump(chromo, f)
+            strHL=' '.join(str(x) for x in chromo)
+            ### write qsub.csh
+            with open('amp_pot.csh', 'w') as f:
+                f.write('#!/usr/bin/csh\n\n')       # to run w. qsub also where only csh is working
+                f.write(f'{home}/anaconda3/bin/python {home}/sandboxg/pyamp/amp_ga.py '+fin[0]+' train -n 100 -hl '+strHL+' -el 0.001\n')
+
+            qjobname='chromo{:02d}'.format(i)
+            if job_submit == 'qsub':
+                ampstr = amp_jobstr.Amp_string(jsubmit='qsub',jobname=qjobname, hl=strHL)
+                str_qsub = ampstr.make_queuestring() + " /home/joonho/sandboxg/pypbs/sge_amp.csh"
+                print(f"{str_qsub}")
+                #os.system(str_qsub)
+                os.system('qsub -cwd -pe numa 1 -l mem=3G amp_pot.sh')
+                #amp_setting={'jsubmit':'node','hl':'strHL', 'elimit':'0.001', train_f='-1', ncore=5}
+            elif job_submit == 'sh':
+                ampstr = amp_jobstr.Amp_string(jsubmit=amp_setting['jsubmit'],hl=locals()[amp_setting['hl']], elimit=amp_setting['elimit'],
+                                            train_f=amp_setting['train_f'], ncore=amp_setting['ncore'])
+                str_node = "amp_run.py " + ampstr.make_string() + " -g &"
+                print(str_node)
+                os.system(str_node)
+            elif job_submit == 'csh':
+                os.system('chmod 775 amp_pot.csh ')
+                os.system('./amp_pot.csh &')
+
+            os.chdir(cwd)
+            
+           
+        '''
+
+        if not normal finish of training resulting in 'amp.amp', 
+        need to restart:
+            1. scan subdirectory for amp-untrained-parameters.amp, then restart with 'test'
+        It reads ga_fit.txt so it should be made before going to other process
+        '''
+        while True:
+            time.sleep(10)
+            ### succeeded job, failed training jobs, and waiting
+            dsucc = search_dir(dir_genname, 'amp.amp')
+            dfail = search_dir(dir_genname, 'amp-untrained-parameters.amp')
+            if len(dsucc) != nchromo:
+                nwait = nchromo - (len(dsucc) + len(dfail))
+                print(f"succeed dir {len(dsucc)} failed dir {len(dfail)}, waiting = {nwait}")
+            else:
+                print(f" amp.amp in {len(dsucc)} in {nchromo} direcotry")
+            ### break condition
+            pftxt = os.path.isfile('ga_gen_fit.txt')
+            if pftxt == True:
+                nline = subprocess.check_output(['wc','-l','ga_gen_fit.txt'])
+                n = eval(nline.decode('utf-8').split()[0])
+                print(f"n = {n}")
+                if n == nchromo:
+                    with open("ga_gen_fit.txt", "r") as f:
+                        ga_gen_fit = f.read().splitlines()  # remove \n character
+                    os.system("rm ga_gen_fit.txt") # this file transfered data to alines so removed for next generation
+                    break
+            else:
+                print('ga_gen_fit.txt is not made yet')
+            ### restart for failed amp-training
+            if dfail:
+                test_dirs = [ x for x in dfail if x not in dsucc ]
+                for test_dir in test_dirs:
+                    os.chdir(test_dir)
+                    os.system('ln -s amp-untrained-parameters.amp amp.amp')
+                    with open('hl.pkl', 'rb' ) as f:
+                        chromo = pickle.load(f)
+                    strHL=' '.join(str(x) for x in chromo)
+                    print(f"restart with {strHL} in {test_dir}")
+                    qjobname='chromo{:02d}_te'.format(i)
+                    if job_submit == 'qsub':
+                        ampstr = amp_jobstr.Amp_string(jsubmit='qsub',jobname=qjobname, hl=strHL)
+                        str_qsub = ampstr.make_queuestring() + " /home/joonho/sandboxg/pypbs/sge_amp.csh"
+                        print(f"{str_qsub}")
+                        #os.system(str_qsub)
+                        os.system('qsub -cwd -pe numa 1 -l mem=3G amp_pot.sh')
+                        #amp_setting={'jsubmit':'node','hl':'strHL', 'elimit':'0.001', train_f='-1', ncore=5}
+                    elif job_submit == 'sh':
+                        ampstr = amp_jobstr.Amp_string(jsubmit=amp_setting['jsubmit'],hl=strHL, 
+                                            elimit=amp_setting['elimit'], train_f=amp_setting['train_f'], ncore=amp_setting['ncore'],
+                                            ampjob='tega')
+                        str_node = "amp_run.py " + ampstr.make_string() + " -g &"
+                        print(str_node)
+                        os.system(str_node)
+                    os.chdir(cwd)
+        ### analyze the input of ga_gen_fit.txt
+        gen_chromos=[]
+        gen_fitnesses=[]
+        for hl_fit in ga_gen_fit:
+            print(hl_fit)
+            hllist = hl_fit.split()
+            fitness = eval(hllist.pop())    # extract last element then evaluate string to float
+            hl = list(map(int, hllist))     # map change each elements then change obj to int
+            hl.extend([0] * (len(layers)-len(hllist)))
+            
+            gen_chromos.append(hl)
+            gen_fitnesses.append(fitness)
+
+        gen_chromos = np.array(gen_chromos)
+        print(f"result = {gen_chromos.shape}")
+        gen_fitnesses = np.array(gen_fitnesses)
+        best_fit = min(gen_fitnesses)
+       
+        with open("GANNtest"+cwd[-3]+"_Genes.txt", "a") as f:
+            f.write(f"Generation : {igen}\nGenes : \n{gen_chromos}\nfitness : \n{gen_fitnesses}\n")
+        with open("GANNtest"+cwd[-3]+".txt", "a") as f:
+            f.write(f"Generation : {igen}\nGenes : {gen_chromos[np.where(gen_fitnesses == best_fit)]}, fitness : {best_fit}\n")
+            
+        pop_mat = gen_step(gen_chromos, gen_fitnesses, nparent_sets, best_fit, mutation_percent, max_node, min_node)
+        print(f"go to next generation {pop_mat}")
+        fit=[]  # initialize
+    print('GA CALCULATION IS DONE')
+    return 0
+
+def main():
+    parser = argparse.ArgumentParser(description='Process for Genetic Algorithm & Artificial Neural Network')
+    parser.add_argument('-f', '--inf', default=['OUTCAR'], nargs='+', help='input file')
+    parser.add_argument('-js', '--job_submit', default='qsub', choices=['qsub','csh','sh'], help='Select between node and login server')
+    parser.add_argument('-i', '--init_pop_method', default = 'random', choices=['random','reference','ongoing'], help='reference/ongoing from GANNtest file')
+    parser.add_argument('-nhls', '--hl_nsets', default=20, type=int, help="number of HLs in each generation")
+    parser.add_argument('-hl', '--hlayers', default=10, type=int, help="fixed number of layers in each HL")
+    parser.add_argument('-nn', '--nnodes', default=15, type=int, help="number of nodes in each HL")
+    parser.add_argument('-nps', '--nparents_sets', default=4, type=int, help="number of parents mating: select best hls")
+    parser.add_argument('-mp', '--prob_mutation', default=10, type=int, help="percentage of mutation")
+    parser.add_argument('-ng', '--ngenerations', default=10, type=int, help="number of generation")
+    args = parser.parse_args()
+
+    pf = glob.glob("ga_fit.txt")
+    if pf != []:
+        os.system("rm ga_fit.txt")
+    #fin = glob.glob("*extxyz") 
+    calc_ga(args.inf,args.job_submit,args.init_pop_method,args.hl_nsets,args.hlayers,args.nnodes,args.nparents_sets,args.prob_mutation,args.ngenerations)
+    return 0
+
+
+if __name__ == '__main__':
+    main()
+

@@ -11,19 +11,15 @@ from amp.utilities import hash_images, get_hash
 
 from ase import io
 from myplot2D import barplot_y
+import amp_util
 
-def amp_analysis(inf, pot, job, sub_command,  i_image, iatom, xtitle, ytitle, title):
-    ### parameter file, 
-    if len(i_image) == 1:
-        sindex = "%i:%i" % (i_image[0], i_image[0]+1)                 # get only one image
-        nimage = 1
-    else:
-        sindex = "%i:%i" % (i_image[0], i_image[1])
-        nimage = i_image[1] - i_image[0]
-    images = io.read(inf, index=sindex)
+def amp_analysis(inf, calc, job, sub_command,  i_image, iatom, xtitle, ytitle, title):
+    ###
+    str_index = amp_util.list2str(i_image)
+    images = io.read(inf, index=str_index)
+    nimage = len(images)
     images = hash_images(images)
     ### basically it doesn't need calc if fp was already there
-    if pot: calc = Amp.load(pot)
     fpplot = FingerprintPlot(calc)
     fpplot._calc.descriptor.calculate_fingerprints(images)  # add fingerprints in fpplot._calc.descriptor
     if len(i_image) == 1 and iatom:
@@ -36,21 +32,6 @@ def amp_analysis(inf, pot, job, sub_command,  i_image, iatom, xtitle, ytitle, ti
         fpplot(images)
         print(f"The fingerprint range of {nimage} images from {i_image[0]} were presented in 'fingerprints.pdf'")
     return
-
-def find_inputfile(pwd, job):
-    if os.path.isfile('OUTCAR'):
-        fname = 'OUTCAR'
-    else:
-        for f in os.listdir(pwd):
-            if f.endswith('extxyz'):
-                fname = f
-                break
-    quest = f"file {fname} will be read with job='{job}' ?"
-    if yes_or_no(quest):
-        return fname
-    else:
-        return 0
-    
 
 def main():
     parser = argparse.ArgumentParser(description='run amp with extxyz, OUTCAR: validation is removed ', prefix_chars='-+/')
@@ -75,10 +56,11 @@ def main():
     if args.infile:
         fname=args.infile
     else:
-        fname=find_inputfile(pwd, args.job)
+        fname=amp_util.get_inputfile(pwd)
     if not fname:
         sys.exit(1)
-    amp_analysis(args.infile, args.pot, args.job, args.sub_command, args.iimage, args.iatom, args.xtitle, args.ytitle, args.title)
+    calc = amp_util.get_amppot(args.pot)
+    amp_analysis(args.infile, calc, args.job, args.sub_command, args.iimage, args.iatom, args.xtitle, args.ytitle, args.title)
     return
 
 if __name__ == '__main__':

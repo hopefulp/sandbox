@@ -4,13 +4,16 @@ import argparse
 #import myplot2D                ### FOR MLET: QXcbConnection: Could not connect to display
 from common import f_parsing
 import sys
+from amp_util import *
 
-def get_title(fname, HL, E_conv,f_conv,f_coeff, ntrain, ndata):
+def get_title(fname, HL, E_conv, f_list, ntrain, ndata):
+    f_conv, f_coeff = decom_ef(f_list)
     title = fname.split(".")[0] + "\n"
     hl = '$\\times$'.join(str(x) for x in HL)
     suptitle = "\n\nAMP Model(HL={}".format(hl) + ", "
     suptitle += "E_rms={} ".format(E_conv) + " "
-    suptitle += "F_err={},F_coeff={}):".format(f_conv,f_coeff) + " "
+    if f_coeff:
+        suptitle += "F_err={},F_coeff={}):".format(f_conv,f_coeff) + " "
     suptitle += "test/train={}/{}".format(ndata, ntrain)
     return title, suptitle
 

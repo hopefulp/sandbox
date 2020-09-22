@@ -19,8 +19,8 @@ fi
 match=$2
 f=$3
 
-#for d in $(ls -d ${match}*); do
-for d in $(ls -d *); do
+for d in $(ls -d ${match}*); do
+#for d in $(ls -d *); do
     case $j in
         ### VASP make DIR for CONTINOUS JOB
         "vmake")

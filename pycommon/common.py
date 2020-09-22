@@ -4,7 +4,8 @@ import sys
 import inspect
 import numpy as np
 import weakref
-from varname import nameof
+import glob
+#from varname import nameof
 
 """
     version dependency included
@@ -246,7 +247,7 @@ def get_files_suffix(suffixes, dname):
                 matched_files.append(fname)
     return matched_files                
 
-def get_files_match(matches, dname, Lshow):
+def get_files_match(matches, dname, Lshow, Ldirectory=None):
     """
         receive list of patterns for match
         matches: list of match
@@ -254,7 +255,12 @@ def get_files_match(matches, dname, Lshow):
     matched_files=[]
     for match in matches:
         for fname in os.listdir(dname):
-            if re.search(match, fname) and not os.path.isdir(fname):
+            if re.search(match, fname):
+                if Ldirectory:
+                    pass
+                else:
+                    if os.path.isdir(fname):
+                        continue
                 if Lshow:
                     print("detect {fname}")
                 matched_files.append(fname)
@@ -285,7 +291,15 @@ def get_files_exclude(matches, dname):
         all_files.remove(fname)
     return all_files
 
-
+def search_dirs(dir_pre, fname):
+    dirs =  glob.glob(f"{dir_pre}*")
+    list_dir=[]
+    #print(fname, dirs)
+    for d in dirs:
+        if os.path.isfile(f"{d}/{fname}"):
+            list_dir.append(d)
+    return list_dir            
+        
 
 def expand_dim_str(lstring):
     """ expand 1D string to 2D string """

@@ -5,10 +5,10 @@ def select_mating_pool(pop, fit, num_parents):
     # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
     parents = numpy.empty((num_parents, pop.shape[1]))
     fitness = numpy.ndarray.tolist(fit)
-    fitness.sort()
-    for parent_num in range(num_parents):
-        fitness_idx = numpy.where(fit == fitness[parent_num])
-        parents[parent_num] = pop[fitness_idx]
+    fitness.sort(reverse=True)                                                  # use decreasing order in case, sort()
+    for i in range(num_parents):
+        fitness_idx = numpy.where(fit == fitness[i])       # out of range error with nc=5
+        parents[num_parents] = pop[fitness_idx]
     return parents
 
 def crossover(parents, offspring_size):

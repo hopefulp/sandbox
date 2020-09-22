@@ -112,22 +112,33 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\t\t-m 3G: training for 100 image, 12G for 1000 images\
                     \n\t\t\t-nd ndata_total=4000, -dtype data_type=interval -dl data_list=d1~d2 training and d2~d3 test\
                     \n\t\t\tN.B. in nodes, amp_job=tr doesnot runs test; test runs only in master node (login)\
+                    \n\t\t    2.11 envs for Module selection\
+                    \n\t\t\t(venv) python $SBamp/amp_run.py ......\
                     \n\t\t    2.2 Make db-making directory\
                     \n\t\t\t$ make_dir.py part -w amp -j db\
                     \n\t\t\t$ cd part\
-                    \n\t\t\t$ sge_amp.py -db -i OUTCAR -qj Gs26 -nc 10 -j tr -hl 4 -nt 4000 -ntr 100 -dtype int -dl 1000 -m 12 -des gs -pf log10 -pmm 0.05 5.0 -pn 5 -tef\
+                    \n\t\t\t$ sge_amp.py -db -i OUTCAR -qj Gs26 -nc 10 -j tr -hl 4 -tef -m 3G -LOG10 -DATA \
                     \n\t\t\t$ qsub -N qname -pe numa 16 -l mem=12G -v fname=OUTCAR -v pyjob=tr -v hl='10 10' -v el=0.001 -v fl=0.01 -v ndata=3000 -v dtype=div -v dl='2 0' $SB/pypbs/sge_amp.csh\
-                    \n\t\t\t$ amp_run.py -f OUTCAR -j tr -tef -hl 4 -el 0.001 -fl 0.01 -nc 10 -nt 4000 -ntr 1500 -dtype int -dl 1000 -des gs -pf log10 -pmm 0.05 5.0 -pn 5\
+                    \n\t\t\t$ amp_run.py -f OUTCAR -j tr -tef -hl 4 -el 0.001 -fl 0.01 -nc 10 -DATA -LOG10\
                     \n\t\t    2.3 Analyze fingerprints\
                     \n\t\t\t$ amp_anal.py -f ../OUTCAR -p amp-untrained-parameters.amp -im 1081 -ia 3 -t 'wrong F'\
                     \n\t\t\t$ amp_anal.py -f ../OUTCAR -p amp-untrained-parameters.amp -im 1081 1083\
+                    \n\t\t3.0 Arguments Abbreviation\
+                    \n\t\t    -DES:\
+                    \n\t\t\tLOG10: -des gs -pf log10 -pmm 0.05 200.0 -pn 10 -pmod del\
+                    \n\t\t\tNpowN: -des gs -pf powNN -pn 5\
+                    \n\t\t    -DATA:\
+                    \n\t\t\t-INT:   -nt 4000 -ntr 1500 -dtype int -dl 1000 [1100]\
+                    \n\t\t\t\t-nt 4000 -ntr 100 -dtype int -dl 1000 1100\
+                    \n\t\t\t-DIV:   -nt 4000 -ntr 300 -dtype div -dl 3 0\
+                    \n\t\t\t\t-nt 3000 -ntr 1500 -dt div -dl 2 0\
                     \n\t\t3. Training\
                     \n\t\t    Run at pwd, Making sub-directory w. single job or scanning\
                     \n\t\t    :single job\
-                    \n\t\t\t$ sge_amp.py -qj tr2 -m 3G -nc 10 -hl 4 -el 0.001 -fl 0.1 -nt 4000 -ntr 100 -dtype int -dl 1000 1100 -des gs -pf powNN -pmm 0.05 100 -pn 5 -tef \
-                    \n\t\t\t$ amp_run.py -f OUTCAR -j tr -hl 4 4 -el 0.001 -fl 0.01 0.04 -nt 4000 -ntr 300 -dtype div -dl 3 0 -des gs -pf powNN -pn 5 -tef\
+                    \n\t\t\t$ sge_amp.py -qj tr2 -m 3G -nc 10 -hl 4 -el 0.001 -fl 0.1 -tef -DATA -DES  \
+                    \n\t\t\t$ amp_run.py -f OUTCAR -j tr -hl 4 4 -el 0.001 -fl 0.1 0.04 -tef -DIV -DES \
                     \n\t\t    :scanning\
-                    \n\t\t\t$ sge_amp.py -s -nhl 6 -ihl 1 -qj Fmr -m 12G -nc 8 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dtype div -dl 2 0 -des gs -pf powNN -pn 5 -tef\
+                    \n\t\t\t$ sge_amp.py -s -nhl 6 -ihl 1 -qj Fmr -m 12G -nc 8 -hl 5 5 -el 0 -fl 0.01 0.1 -DIV -DES -tef\
                     \n\t\t\t    scanning parameters:\
                     \n\t\t\t    -nhl: number of HL sets\
                     \n\t\t\t    -ihl: interval of number of nodes\
@@ -135,13 +146,13 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\t   test in sub-directory\
                     \n\t\t   run in master node\
                     \n\t\t   $ qrun.sh di te test qname OUTCAR 4 4 '8 8' 0.001 0.00 4000 1500 int '3000 3500' \
-                    \n\t\t   $ amp_run.py -f OUTCAR -j te -tef -nc 4 -hl 8 8 -el 0.001 0.003 -fl 0.00 -nt 4000 -ntr 1500 -dtype int -dl 3000 3500\
+                    \n\t\t   $ amp_run.py -f OUTCAR -j te -tef -nc 4 -hl 8 8 -el 0.001 0.003 -fl 0.00 -INT\
                     \n\t\t   $ amp_run.py -f OUTCAR -j te -tef -nc 1 -nt 4000 -ntr 100 -dtype int -dl 1000 1002\
                     \n\t\t   :Scan\
-                    \n\t\t   $ sge_amp.py -s -sh 10 -qj EO -j te -tef -m 3G -nc 4 -hl 5 5 -el 0 -fl 0.01 0.1 -nt 3000 -ntr 1500 -dt div -dl 2 0\
+                    \n\t\t   $ sge_amp.py -s -sh 10 -qj EO -j te -tef -m 3G -nc 4 -hl 5 5 -el 0 -fl 0.01 0.1 -DIV\
                     \n\t\t\t    \
                     \n\t\t$ \"qrun.sh\" shows all\
-                    \n\t\t    qrun.sh sub_Node $ampjob $sub_dir $qjob     $fin    $np   $mem   \"$hl\"   $el     $fl      ntotal ntrain int \"$data\"\
+                    \n\t\t    qrun.sh sub_Node $ampjob $sub_dir $qjob     $fin    $np   $mem   \"$hl\"   $el     $fl   ntotal ntrain int \"$data\"\
                     \n\t\t    case 1: qsub training data-interval\
                     \n\t\t\t$ qrun.sh qsub tr  dir   N1500      OUTCAR  16    4  \"10 10\" 0.001   0.01    5000   1500   int  \"0 1500\"\
                     \n\t\t\t  run qsub_server.py\

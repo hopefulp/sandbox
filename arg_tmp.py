@@ -8,19 +8,7 @@ from common import dir_files
 def jobs(job):
     if job == None:
         print("List this directory = ")
-        mdir = os.path.dirname(__file__)
-        exe, mod = dir_files(mdir)
-        print("Executable:: ")
-        sort_exe = sorted(exe)
-        sort_mod = sorted(mod)
-        for f in sort_exe:
-            print("    {}".format(f))
-        print("Module:: ")
-        for f in sort_mod:
-            print("    {}".format(f))
-        print("#Comment: Here is SGE server in mlet")
-        print("    SGE::(start)\n\tsge_pypbs_ini.py")
-        
+    return 0 
     
 
 def main():

@@ -18,35 +18,85 @@ models= {
     'water'   : 'water128.extxyz'}
 ### these are included as key in globals()
 amp     = MyClass('amp')
+ampga   = MyClass('ampga')
 qchem   = MyClass('qchem')
 fconv   = MyClass('fconv')
 general = MyClass('general')
+Gs      = MyClass('Gs')
 
-amp.amp_run             ="amp_run.py -f OUTCAR -j tr -des gs -tef -nc 4 -hl 8 8 -el 0.001 0.003 -fl 0.00 -nt 4000 -ntr 1500 -dtype int -dl 3000 3500\
-                        \n\t\t\t   amp_run.py -f OUTCAR -j te -tef -nc 1 -nt 4000 -ntr 100 -dtype int -dl 0 10\
-                        \n\t\t\t    run amp for making db (gen descriptor), training, test, md etc\
-                        \n\t\t\t    mem:\
-                        \n\t\t\t\t2G for db\
-                        \n\t\t\t\t12G for training: HL, total_images\
-                        \n\t\t\t    -j tr -des gs -tef:\
-                        \n\t\t\t\tuse train for gs test (in the script) and test force\
-                        \n\t\t\t\ttr w. 100 images is enough?\
+ampga.gaamp               ="===== Genetic Algoritm for AMP =====\
+                        \n\t\tclass GaAmp: instance runs for generation\
+                        \n\t\t    amp_jobstr is required to run 'amp_run.py' with ga\
+                        \n\t\tga.py: retains GA method\
+                        \n\t\tqsub_restart.py for re-qsub\
+                        "
+ampga.ga_amp_run        ="\n\tga_amp_run.py -js sh -nc 10 -hl 5 -nn 5\
+                        \n\t-js: job_submit: qsub, sh(node-bash)\
+                        \n\t-nch: number of chromosome\
+                        \n\t-hl: max number of hidden layers, -nn: max number of nodes in layer\
+                        \n\t   old version of amp_run.py for GA\
+                        "
+amp.amp_wrapper         ="run 'amp_run.py' 'twice' with job 'tr' then 'te' with waiting using time.sleep()\
+                        \n\tUsage:: amp_wrapper.py -js [node|qsub] [-te] [-c] &\
+                        \n\t\t-c: check amp_run.py string without job submit\
+                        \n\t\t-te: run only 'te'\
+                        "
+amp.amp_ini             ="class Amp_string\
+                        \n\t\t imported from 'amp_wrapper.py', 'ga_amp_run.py'\
+                        "
+
+amp.amp_run             ="amp running with 'training' or 'test' and 'make db', md, profile\
+                        \n\tUsage:: (tr) amp_run.py -f OUTCAR -j tr -nc 4 -hl 8 8 -el 0.001 -fl 0.1 0.04 SYM_FUNC DATA_SEL\
+                        \n\t\t\tSYM_FUNC = '-des gs -pf log10 -pmod del -pmm 0.05 200.0 -pn 10'\
+                        \n\t\t\tDATA_SEL = '-nt 4000 -ntr 1500 -dtype int -dl 1000 2500 3500 3600'\
+                        \n\t\t\tmem:\
+                        \n\t\t\t    2G for db\
+                        \n\t\t\t    12G for training: HL, total_images\
+                        \n\t        (te) amp_run.py -f OUTCAR -j te DATA_SEL\
+                        \n\t\t\tNot necessary: ncore, sym-function, \
+                        \n\tMODULE dependence :\
+                        \n\t    after v9(latest before amp other module)\
+                        \n\t    using venv in anaconda\
+                        \n\t    (venv) python $SBamp/amp_run.py ... which overwrites shebang\
+                        \n\t    e.g.: (ampG2off) python $SBamp/amp_run.py -f OUTCAR -j tr -hl 4 -el 0.001 -fl 0.01 0.04 -nt 4000 -ntr 100 -dtype int\
+                        "
+amp.stat_check          ="Machine Learning: statistics calculation for script check\
+                        \n\trun at work directory\
+                        "
+amp.amp_env_run         ="amp_run.py in (envs) anaconda\
+                        \n\t\t   when envs is not (base), detect envs and import proper module\
                         "
 amp.amp_loop            ="amp_loop.py\
                         \n\t\t\t\t: loop for many situation used in SGE"
-amp.amp_plot            ="amp_plot.py\
+amp.amp_plot            ="plot data: \
                         \n\t\t\t\t: plot amp_run.py test"
+amp.amp_plot_stat       =" plot amp test files: 'test_energy.pkl', 'test_force.pkl'\
+                        "
 amp.amp_descriptor      ="called by amp_run.py\
                         \n\t\t\tprovide symmetry function to test diverse descriptor\
                         "
 amp.amp_anal            = "amp_anal.py -f ../OUTCAR -p hl44E0.001F0.1N100/amp-untrained-parameters.amp -im 1081 -ia 3 -t 'wrong F'\
-                        \n\t\t\t   amp_anal.py -f ../OUTCAR -p hl44E0.001F0.1N100/amp-untrained-parameters.amp -im 1081 1083\
-                        \n\t\t\t\t: plot fingerprint of an atom by: index of image, index of atom\
-                        \n\t\t\t\t: without -ia atom index, fp ranges for all the kinds of atoms are plotted\
+                        \t\t   amp_anal.py -f ../OUTCAR -p hl44E0.001F0.1N100/amp-untrained-parameters.amp -im 1081 1083\
+                        \n\t\t\t: plot fingerprint of an atom by: index of image, index of atom\
+                        \n\t\t\t: without -ia atom index, fp ranges for all the kinds of atoms are plotted\
+                        \n\t\t   amp_anal.py -im 0\
+                        \n\t\t   amp_anal.py -im 0 1\
                         "
-amp.amp_mod             ="called by amp_run.py\
+amp.amp_datamining      = "developed by 'amp_anal.py'\
+                        \n\t\t\tamp_datamining.py -im 0  +g\
+                        \n\t\t\tamp_datamining.py -im 0 1 +g\
+                        \n\t\t\tamp_datamining.py -im 0 -ia 0 +g\
+                        "
+
+amp.amp_util             ="called by amp_run.py\
                         \n\t\t\tprovide some functions\
                         "
+Gs.amp_gsversion         =" === Gaussian Symmetry function for AMP descriptor ===\
+                        \n\tamp_gversion.py to select different versions of gaussian.py in ~/amp\
+                        "
+Gs.my_descriptor        ="\n\tmodule for GS"
+
+                        
 general.make_dir        ="make_dir.py new_dir [old_dir] -w amp pbs -j tr\
                         \n\t\t\tto make new dir and copy or ln -s files\
                         \n\t\t\tUsage:\
@@ -64,6 +114,7 @@ fconv.fconv2extxyz="convert file format to extxyz: im_format"
 fconv.im2extxyz="convert IM file format to extxyz"
 fconv.NucCarts2xyz="Not Used: use when View.xyz is not provide in Q-Chem, AIMD calculation"
 fconv.aimd2extxyz="from Q-Chem, AIMD calculation with result of EComponents to extxyz format"
+fconv.xyz2extxyz="from Q-Chem, AIMD change xyz to include force in extxyz format"
 
 qchem.aimd = "AIMD run:: (chi::parallel) mpirun -np 4 $QC/exe/qcprog water1_aimd.in $QCSCRATCH/w1K400 > w1k400.out\
                     \n\t\t use high T to get proper Ek for small system, generate as the number of scratch folders as -np\
@@ -119,8 +170,23 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
 
     if sort_dir:
         print("Directories:: ")
-        for f in sort_dir:
-            print(f"    {f}")
+        if not Lclassify:
+            for f in sort_dir:
+                print(f"    {f}")
+        else:
+            for instance in MyClass.instances:
+                for gkey in globals().keys():
+                    if gkey == instance.name:
+                        break
+                if work != instance.name:
+                    ckeys = dir_classify_n(sort_dir, instance.name, globals()[gkey], Lwrite=1) # globals()[instance.name] is not working
+                else:
+                    ckeys = dir_classify_n(sort_dir, instance.name, globals()[gkey], Lwrite=0)
+                    for ckey in ckeys:
+                        print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
+            print("  == not analyzed")
+            for f in sort_dir:
+                print(f"    {f}")
     
     if sort_exe: 
         print("Executable:: ")
@@ -134,12 +200,13 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
                 for gkey in globals().keys():
                     if gkey == instance.name:
                         break
+                ### work == None without -w
                 if work != instance.name:
                     ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=1) # globals()[instance.name] is not working
                 else:
                     ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=0)
                     for ckey in ckeys:
-                        print(f"    {ckey}.py[sh]\t:: {globals()[gkey].__dict__[ckey]}")
+                        print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
             print("  == not analyzed")
             for f in sort_exe:
                 print(f"    {f}")

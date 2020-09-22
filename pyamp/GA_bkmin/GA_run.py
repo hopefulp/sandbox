@@ -1,4 +1,4 @@
-#!$HOME/anaconda3/bin/python
+#!/home/joonho/anaconda3/bin/python
 
 import numpy as np
 import os
@@ -9,6 +9,7 @@ import glob
 import time
 import argparse
 import restart
+import sys
 
 def ran_pop(num_pop, layers, nodes, genes, initial_pop, cnt):
     for curr_sol in np.arange(0, num_pop): # 30 Chromosomes have 5 genes
@@ -96,6 +97,7 @@ def gen_step(pop_mat, fit, num_parents_mating, best_fit, mutation_percent, max_n
     pop_mat[num_parents_mating:] = offspring_crossover
  
     return pop_mat
+
 def main():
     cwd=os.getcwd()
     cwd = cwd[-2:] 

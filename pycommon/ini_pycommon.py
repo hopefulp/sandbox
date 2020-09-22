@@ -7,7 +7,7 @@ from common import dir_all, MyClass, dir_classify_n, whereami
 
 comment = MyClass('comment')
 mod     = MyClass('mod')
-jobdir  = MyClass('jobdir')
+dirjob  = MyClass('dirjob')
 jobfile = MyClass('jobfile')
 
 comment.howto       =   "=== COMMENT ===\
@@ -22,27 +22,31 @@ comment.comment_sys =   "\tINFO: SYSTEM\
 comment.comment_subj=   "\tINFO: SCIENCE JOB \
                         \n\tshowall.py -s\
                         "
+comment.ini_pycommon=   "\texplanation of files in $SB/pycommon"
 
 mod.common="module with commonly used functions \"import common\""
 
 
-jobdir.dir_clean    =   "=== DIRECTORY JOB ==\
+dirjob.clean    =   "=== DIRECTORY JOB ==\
                         \n\t\tclean directory\
                         \n\t\t    by -prefix -suffix -middle match -e excluded -ef 'exclude these files' -work {qchem,ai} -j rm[mv] -jd new_dir\
                         \n\t\tUsage::\
                         \n\t\t    dir_clean_p2.py -s out -ef 6-CC-NiFe-A-relax.out 5-FePNP-CO2.out -j mv -jd j631gs_v3.2\
                         "
-jobdir.dir_clean_r_py2= "clean dir recursively\
+dirjob.dir_clean_r_py2= "clean dir recursively\
                         \n\t\tdir_clean_r_py2.py -p -s -m\
                         "
-jobdir.dir_cli      =   "basic command line interface for all files in directory\
+dirjob.dir_cli      =   "basic command line interface for all files in directory\
                         \n\t\tmodify script for all the files/selected files\
                         \n\t\tdir_cli.sh [0:vmake 1:incar 2:qsub 3:cp 4:rm 5:chmod\
                         "
+dirjob.dir1_cli     =   "simple command inside directory\
+                        \n\t\tdir1_cli.sh gitpush\
+                        "
 
 ### removed
-jobdir.dir_reset="reset dir as initial state by job: -j ai"
-jobdir.dir_run="scan dir and run the same command for all the files such as\n\t\tqcout_mol_in.pl"
+dirjob.dir_reset="reset dir as initial state by job: -j ai"
+dirjob.dir_run="scan dir and run the same command for all the files such as\n\t\tqcout_mol_in.pl"
 
 #classobj_dict={'EDIR':exe_dir, "MDIR":mod_dir}
 

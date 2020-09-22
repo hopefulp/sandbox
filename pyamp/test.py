@@ -18,19 +18,25 @@ models= {
     'water'   : 'water128.extxyz'}
 ### these are included as key in globals()
 amp     = MyClass('amp')
+ampga   = MyClass('ampga')
 qchem   = MyClass('qchem')
 fconv   = MyClass('fconv')
 general = MyClass('general')
 
 amp.amp_run             ="amp_run.py -f OUTCAR -j tr -des gs -tef -nc 4 -hl 8 8 -el 0.001 0.003 -fl 0.00 -nt 4000 -ntr 1500 -dtype int -dl 3000 3500\
-                        \n\t\t\t   amp_run.py -f OUTCAR -j te -tef -nc 1 -nt 4000 -ntr 100 -dtype int -dl 0 10\
-                        \n\t\t\t    run amp for making db (gen descriptor), training, test, md etc\
-                        \n\t\t\t    mem:\
-                        \n\t\t\t\t2G for db\
-                        \n\t\t\t\t12G for training: HL, total_images\
-                        \n\t\t\t    -j tr -des gs -tef:\
-                        \n\t\t\t\tuse train for gs test (in the script) and test force\
-                        \n\t\t\t\ttr w. 100 images is enough?\
+                        \n\t\t   amp_run.py -f OUTCAR -j te -tef -nc 1 -nt 4000 -ntr 100 -dtype int -dl 0 10\
+                        \n\t\t    run amp for making db (gen descriptor), training, test, md etc\
+                        \n\t\t    mem:\
+                        \n\t\t\t2G for db\
+                        \n\t\t\t12G for training: HL, total_images\
+                        \n\t\t    -j tr -des gs -tef:\
+                        \n\t\t\tuse train for gs test (in the script) and test force\
+                        \n\t\t\ttr w. 100 images is enough?\
+                        \n\tMODULE dependence :\
+                        \n\t    after v9(latest before amp other module)\
+                        \n\t    using venv in anaconda\
+                        \n\t    (venv) python $SBamp/amp_run.py ... which overwrites shebang\
+                        \n\t    e.g.: (ampG2off) python $SBamp/amp_run.py -f OUTCAR -j tr -hl 4 -el 0.001 -fl 0.01 0.04 -nt 4000 -ntr 100 -dtype int\
                         "
 amp.amp_loop            ="amp_loop.py\
                         \n\t\t\t\t: loop for many situation used in SGE"
@@ -47,6 +53,18 @@ amp.amp_anal            = "amp_anal.py -f ../OUTCAR -p hl44E0.001F0.1N100/amp-un
 amp.amp_mod             ="called by amp_run.py\
                         \n\t\t\tprovide some functions\
                         "
+ampga.GA_run            =" === Genetic Algorithm for AMP ===\
+                        \n\tGA_run.py\
+                        \n\t    calls amp_ga.py GA.py qsub_restart\
+                        "
+ampga.GA                ="\n\tGA.py: module called by GA_run.py"
+
+ampga.amp_ga            ="\n\tamp_ga.py\
+                        \n\t    old version of amp_run.py for GA\
+                        "
+ampga.qsub_restart      ="\n\tqsub_restart.py for re-qsub\
+                        "
+                        
 general.make_dir        ="make_dir.py new_dir [old_dir] -w amp pbs -j tr\
                         \n\t\t\tto make new dir and copy or ln -s files\
                         \n\t\t\tUsage:\
@@ -139,7 +157,7 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
                 else:
                     ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=0)
                     for ckey in ckeys:
-                        print(f"    {ckey}.py[sh]\t:: {globals()[gkey].__dict__[ckey]}")
+                        print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
             print("  == not analyzed")
             for f in sort_exe:
                 print(f"    {f}")

@@ -26,13 +26,13 @@ if ( ! $?nt ) then
     set ntr = 100
 endif
 
-set string = "-f $fname -j $pyjob -hl $hl -el $el -fl $fl -nc $nproc"
+set string = "-inf $fname -j $pyjob -hl $hl -el $el -fl $fl -nc $nproc"
 if ( $?dtype ) then
     set string = "$string -nt $nt -ntr $ntr -dtype $dtype -dl $dlist"
 endif
 ### in case: -des = gs, -pf powNN; if -pf log10, -pmm "pmin pmax" is added
 if ( $?des ) then
-    set string = "$string -des $des -pf $pf -pn $pn"
+    set string = "$string -des $des -pf $pf -pmod $pmod -pn $pn"
     if ( $pf == "log10" ) then
         set string = "$string -pmm $pmm"
     endif

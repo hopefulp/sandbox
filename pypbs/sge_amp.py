@@ -5,8 +5,7 @@ import os
 import sys
 import numpy as np
 from common import yes_or_no, list2str, whereami
-
-amp_db = ['amp-fingerprint-primes.ampdb', 'amp-neighborlists.ampdb', 'amp-fingerprints.ampdb', 'OUTCAR']
+from amp_ini import ampdb
 
 def make_dir(HL, elimit):
     if HL:
@@ -17,7 +16,7 @@ def make_dir(HL, elimit):
     else:
         print("HL is empty")
         sys.exit(10)
-def qsub_command(qjobname, ncore, mem, infile, amp_job, descriptor,p_function,p_minmax,nparam, Lte_force, str_hl, e_list, f_list, ntotal,ntr, ntype, nlist):
+def qsub_command(qjobname, ncore, mem, infile, amp_job, descriptor,p_function,p_mod,p_minmax,nparam, Lte_force, str_hl, e_list, f_list, ntotal,ntr, ntype, nlist):
     if mem.isdigit():
         mem += 'G'
     elimit = e_list[0]
@@ -28,6 +27,8 @@ def qsub_command(qjobname, ncore, mem, infile, amp_job, descriptor,p_function,p_
     if descriptor:
         comm += f" -v des={descriptor}"
         comm += f" -v pf={p_function}"
+        if p_mod:
+            comm += f" -v pmod={p_mod}"
         comm += f" -v pmm='{p_minmax[0]} {p_minmax[1]}'"
         comm += f" -v pn={nparam}"
     comm += " -v fl='" + ' '.join(f_list) + "'"
@@ -39,7 +40,7 @@ def qsub_command(qjobname, ncore, mem, infile, amp_job, descriptor,p_function,p_
     #print(f"in qsub_command, {comm}")
     return comm
 
-def submit(qjobname,ncore,infile,amp_job,descriptor,p_function,p_minmax,nparam,Lte_force,HL,elist,f_list,mem,ntotal,ntr,ntype,nlist):
+def submit(qjobname,ncore,infile,amp_job,descriptor,p_function,pmod,p_minmax,nparam,Lte_force,HL,elist,f_list,mem,ntotal,ntr,ntype,nlist):
     pwd = os.getcwd()
     str_hl = " ".join(str(x) for x in HL)
     #if yes_or_no("run ?"):
@@ -71,7 +72,7 @@ def submit(qjobname,ncore,infile,amp_job,descriptor,p_function,p_minmax,nparam,L
             new_dir = pwd + "/" + jobdir
             ### cd directory
             os.chdir(f"{new_dir}")
-            for amp_dir in amp_db:
+            for amp_dir in ampdb:
                 os.system(f"ln -s {pwd}/{amp_dir} {new_dir}/{amp_dir}")
             #os.system(f"cp {pwd}/OUTCAR {new_dir}")
             print("amp- directories and OUTCAR were copied")
@@ -90,12 +91,12 @@ def submit(qjobname,ncore,infile,amp_job,descriptor,p_function,p_minmax,nparam,L
         os.mkdir('te')
         tedir = new_dir + "/" + "te"
         os.chdir(tedir)
-        for amp_dir in amp_db:
+        for amp_dir in ampdb:
             os.system(f"ln -s {pwd}/{amp_dir} {tedir}/{amp_dir}")
     """
     ###                   1        2     3      4       5       6           7           8       9       10    11   12     13    14
     #comm = qsub_command(qjobname, ncore, mem, infile, amp_job, descriptor, Lte_force, str_hl, elist, f_list, ntotal, ntr, ntype, nlist)
-    comm = qsub_command(qjobname, ncore, mem, infile, amp_job, descriptor, p_function,p_minmax,nparam, Lte_force, str_hl, elist, f_list, ntotal, ntr, ntype, nlist)
+    comm = qsub_command(qjobname, ncore, mem, infile, amp_job, descriptor, p_function,pmod,p_minmax,nparam, Lte_force, str_hl, elist, f_list, ntotal, ntr, ntype, nlist)
     str1 = f"will you run? \n{comm}"
     if yes_or_no(str1):
         os.system(comm)
@@ -126,22 +127,22 @@ def get_qname_suff(queue_default, *hlist):
     qname = queue_default+'HL'+list2str(hlist)
     return qname
 
-def amp_work(work,qjobname,ncore,infile,amp_job,descriptor,p_function,p_minmax,nparam,Lte_force,HL,hll,elist,f_list,mem,ntotal,ntr,ntype,nlist):
+def amp_work(work,qjobname,ncore,infile,amp_job,descriptor,p_function,p_mod,p_minmax,nparam,Lte_force,HL,hll,elist,f_list,mem,ntotal,ntr,ntype,nlist):
     ### Make subdir and run
     if work == 'scan':
         ### scan: multi HLs
         hl_lists = HL_list(HL, hll)
         for hlist in hl_lists:
             qname = get_qname_suff(qjobname, *hlist)
-            submit(qname,ncore,infile,amp_job,descriptor,p_function,p_minmax,nparam,Lte_force,hlist,elist,f_list,mem,ntotal,ntr,ntype,nlist)
+            submit(qname,ncore,infile,amp_job,descriptor,p_function,p_mod,p_minmax,nparam,Lte_force,hlist,elist,f_list,mem,ntotal,ntr,ntype,nlist)
     elif work == 'onejob':
         qname = get_qname(qjobname, *HL)
-        submit(qname,ncore,infile,amp_job,descriptor,p_function,p_minmax,nparam,Lte_force,HL,elist,f_list,mem,ntotal,ntr,ntype,nlist)
+        submit(qname,ncore,infile,amp_job,descriptor,p_function,p_mod,p_minmax,nparam,Lte_force,HL,elist,f_list,mem,ntotal,ntr,ntype,nlist)
     ### make DATA BASE without making subdirectory
     else:   # work == 'db'
         str_hl = " ".join(str(x) for x in HL)
         ###                 1          2    3      4       5          6         7       8       9       10        11      12      13     14    15    16     17
-        comm = qsub_command(qjobname, ncore, mem, infile, amp_job, descriptor,p_function,p_minmax,nparam, Lte_force, str_hl, elist, f_list, ntotal,ntr, ntype, nlist)
+        comm = qsub_command(qjobname, ncore, mem, infile, amp_job, descriptor,p_function,p_mod,p_minmax,nparam, Lte_force, str_hl, elist, f_list, ntotal,ntr, ntype, nlist)
         ###
         str1 = f"will you run: \n{comm}"
         if yes_or_no(str1):
@@ -160,7 +161,7 @@ def main():
     descriptor_group.add_argument('-pf', '--param_function', default='log10', choices=['log10','powNN'], help="function for parameter interval")
     descriptor_group.add_argument('-pmm', '--param_minmax', nargs=2, default=[0.05, 5.0], help="min, max for param interval")
     descriptor_group.add_argument('-pn', '--nparam', default=4, help="num of parameters for descriptor")
-
+    descriptor_group.add_argument('-pmod', '--param_mod', default='orig', choices=['orig','del','couple','mod'], help="modify param to control number of param")
     parser.add_argument('-tef', '--test_force', action='store_true', help='As for test: calculate force')
     parser.add_argument('-hl', '--hidden_layers', nargs='*', type=int, default=[8,8,8], help='Hidden Layer of lists of integer')
     w_group = parser.add_mutually_exclusive_group()
@@ -189,7 +190,7 @@ def main():
         work = 'onejob'
     ### run amp_work
             # 1             2              3             4             5              6               7                8                   9     
-    amp_work(work,args.queue_jobname,args.ncore,args.input_file,args.amp_job,args.descriptor,args.param_function,args.param_minmax,args.nparam,args.test_force,args.hidden_layers,hll,args.e_convergence, args.f_convergence, args.mem, args.ndata_total, args.ndata_train, args.data_s_type, args.data_s_list)
+    amp_work(work,args.queue_jobname,args.ncore,args.input_file,args.amp_job,args.descriptor,args.param_function,args.param_mod,args.param_minmax,args.nparam,args.test_force,args.hidden_layers,hll,args.e_convergence, args.f_convergence, args.mem, args.ndata_total, args.ndata_train, args.data_s_type, args.data_s_list)
     # 10                 11           12            13                  14             15             16               17               18     
     # 19
 if __name__ == "__main__":

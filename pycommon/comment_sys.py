@@ -147,7 +147,8 @@ server.MLET.sleep   =       "\n    SLEEP::\
                     \n\t$ qsub_server.py sge -s sleep -n 36\
                     \n\t    qsub -pe numa 36 $SB/pypbs/sge_sleep.csh\
                     \n\t$ qsub_server.py sge -s sleep -n 36 -N sleep2\
-                    \n\t    qsub -N sleep2 -pe numa 36 $SB/pypbs/sge_sleep.csh\
+                    \n\t$ qsub -N amplog -pe numa 36 -l mem=5G $SB/pypbs/sge_sleep.csh\
+                    \n\t    : 188G / 36 nproc = 5.22\
                     \n\t$ qsub -N amplog -pe numa 36 -q skylake@node11 $SB/pypbs/sge_sleep.csh\
                     "
 server.MLET.at_node =       "\n    RUN @NODE VASP::\
@@ -223,13 +224,14 @@ server.js_sge.sge=     "=== SGE: grid-engine (MLET) ===\
                     \n\t\t\tcores={'node01':ncore,'node02':ncore}\
                     "
 server.js_sge.qstat=   "\n    SGE command in MLET\
+                    \n\tPATH: /gpfs/opt/util\
                     \n\t$ qstat\
-                    \n\t    -f\
-                    \n\t    qstatf is aliased\
-                    \n\tPATH /gpfs/opt/util\
+                    \n\t    -f: 'qstatf' is aliased\
+                    \n\t    -r: details of job\
                     \n\t$ qhist\
                     \n\t$ qfree\
                     \n\t$ qmem\
+                    \n\t    available_mem/total_mem(available_proc)\
                     "
 server.js_sge.scripts  = "\n    Scripts::\
                     \n\tSSH\
