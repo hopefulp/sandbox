@@ -119,7 +119,7 @@ class GaAmp:
         print(f"cwd {cwd} in {whereami()}")
         for igen in range(istart, ngenerations):
             print(f"{igen}-th generation in {ngenerations} in {whereami()}")
-            #population = calc.chromo_mat.tolist() # Copy pop_mat to population
+            #population = calc.chromo_mat.tolist() # Copy chromo_mat to population
             dir_genname = dir_prefix + '{:02d}'.format(igen) 
             fit = []                            # end of 1 generation
             gen_dirs=[]
@@ -231,15 +231,15 @@ class GaAmp:
             print(f"go to next generation {self.chromo_mat}")
             fit=[]
 
-def gen_step(pop_mat, fit, nparent_sets, best_fit, mutation_percent, nnode):
-    parents = select_mating_pool(pop_mat, fit, nparent_sets)
-    print(f"parents = {parents}")
+def gen_step(chromo_mat, fit, nparent_sets, best_fit, mutation_percent, nnode):
+    parents = select_mating_pool(chromo_mat, fit, nparent_sets)     # returns list
+    print(f"parents = {parents}")   
 
-    offspring_crossover = crossover(parents, offspring_size=(pop_mat.shape[0]-parents.shape[0], pop_mat.shape[1]))
+    offspring_crossover = crossover(parents, offspring_size=(chromo_mat.shape[0]-parents.shape[0], chromo_mat.shape[1]))
     print(f"offspring_crossover = {offspring_crossover}")
     offspring_mutation = mutation(offspring_crossover, mutation_percent, nnode)
     print(f"offspring_mutation = {offspring_mutation}")
-    pop_mat[0:nparent_sets] = parents
-    pop_mat[nparent_sets:] = offspring_crossover
+    chromo_mat[0:nparent_sets] = parents
+    chromo_mat[nparent_sets:] = offspring_crossover
 
-    return pop_mat
+    return chromo_mat

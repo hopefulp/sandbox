@@ -25,7 +25,7 @@ def calc_ga(fin, job_submit, setup, nchromo, nhl, nnode, ngenerations, nparent_s
     #                'mem':'12G', 'dlist':[1000,2000,3500,3600]})
     ### for Test
     p = Parameters({'jsubmit':job_submit,'ampjob':'trga', 'elimit':'0.0001', 'ncore':'2', 'max_iter':100,
-                    'mem':'12G', 'dlist':[1000,1100,3500,3600]})
+                    'mem':'12G', 'dlist':[1000,1100,3500,3510]})
     ### include force or not
     if force_train == None:     # else default p.train_f is set
         p.train_f = None

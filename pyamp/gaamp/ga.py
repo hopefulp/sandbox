@@ -5,13 +5,14 @@ import random
 selection_rule = 'best'
 
 def select_mating_pool(chromo_mat, fit, num_parents):
-    fitness = numpy.ndarray.tolist(fit)
-    fitness.sort(reverse=True)                                             # use decreasing order in case, sort()
-    parents = []
+    parents = numpy.empty((num_parents, chromo_mat.shape[1]))
+    fitness = numpy.ndarray.tolist(fit)                     # change into list
+    fitness.sort(reverse=True)                              # use decreasing order in case, sort()
     for i in range(num_parents):
-        fitness_idx = numpy.where(fit == fitness[i])        # out of range error with nc=5
-        parents.append(chromo_mat[fitness_idx])
-    return parents                                          # return list
+        fitness_idx = numpy.where(fit == fitness[i])        # np.where returns tuple of array ( array([4,2,...), ... )
+        parents[i] = chromo_mat[fitness_idx]
+        #parents.append(chromo_mat[fitness_idx[0][0]])      # in case list
+    return parents                                          
 
 def crossover(parents, offspring_size):
     offspring = numpy.empty(offspring_size)
