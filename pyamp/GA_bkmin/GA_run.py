@@ -118,7 +118,7 @@ def main():
     num_generations = 10
     mutation_percent = 10
     layers = np.arange(10) # five layers 
-    nodes = np.arange(25) # zero to 20 nodes
+    nodes = np.arange(25) # zero to 20 nodes, make list to use random.choice
     max_node = max(nodes)
     min_node = min(nodes)
     initial_pop=[]

@@ -39,11 +39,11 @@ class GaAmp:
         '''
         #print(f"nlyaers = {nlayers} in {whereami()}")
         chromo_mat=[]
-        for curr_sol in np.arange(0, self.nchromo): # 30 Chromosomes have 5 genes
-            genes=[]
+        for curr_sol in np.arange(0, self.nchromo): # 
+            chromosome=[]
             for i in range(self.nhl):
-                genes.append(random.choice(self.nnode))
-            chromo_mat.append(genes)
+                chromosome.append(random.randint(0, self.nnode))
+            chromo_mat.append(chromosome)
         print(f"chromosom_matrix = \n{chromo_mat} in {whereami()}")
         ### move 0 to the end and make nlayers chromo
         for chromo in chromo_mat:
