@@ -12,6 +12,8 @@ import amp_ini
 import pickle
 from common import whereami, search_dirs
 
+Lprint = 0
+
 class GaAmp:
     '''
     checkfile_amptest  for checking test amp running in failed directory of 'amp-untrained-paramaters.amp'
@@ -44,7 +46,7 @@ class GaAmp:
             for i in range(self.nhl):
                 chromosome.append(random.randint(0, self.nnode))
             chromo_mat.append(chromosome)
-        print(f"chromosom_matrix = \n{chromo_mat} in {whereami()}")
+        if Lprint: print(f"chromosom_matrix = \n{chromo_mat} in {whereami()}")
         ### move 0 to the end and make nlayers chromo
         for chromo in chromo_mat:
             while 0 in chromo:
