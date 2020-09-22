@@ -12,7 +12,7 @@ import amp_ini
 import pickle
 from common import whereami, search_dirs
 
-Lprint = 0
+Lprint = 1
 
 class GaAmp:
     '''
@@ -20,7 +20,6 @@ class GaAmp:
     checkfile_generation to go to next generation when one generation is done, ampout_onegeneration_fitness='ga_gen_fit.txt'
     '''
     _chkfile_generation=amp_ini.ampout_onegeneration_fitness
-    _sleeptime=300
     def __init__(self, setup='random', nchromo=10, nhl=10, nnode=15):
         self.setup      = setup
         self.nchromo    = nchromo
@@ -46,7 +45,7 @@ class GaAmp:
             for i in range(self.nhl):
                 chromosome.append(random.randint(0, self.nnode))
             chromo_mat.append(chromosome)
-        if Lprint: print(f"chromosom_matrix = \n{chromo_mat} in {whereami()}")
+        if Lprint: print(f"chromosom_matrix = \n{np.array(chromo_mat)}\n in {whereami()}")
         ### move 0 to the end and make nlayers chromo
         for chromo in chromo_mat:
             while 0 in chromo:
@@ -115,13 +114,13 @@ class GaAmp:
 
     
     def run_generation(self, job_submit='qsub', dir_prefix='ch', istart=0, ngenerations=10, amp_job_setting=None, nparent_sets=4,
-                        mutation_percent=10, max_node=15, min_node=1, check_print=False ):
+                        mutation_percent=10, check_print=False, sleeptime=10 ):
         cwd = os.getcwd()
         print(f"cwd {cwd} in {whereami()}")
         for igen in range(istart, ngenerations):
             print(f"{igen}-th generation in {ngenerations} in {whereami()}")
             #population = calc.chromo_mat.tolist() # Copy pop_mat to population
-            dir_genname = dir_prefix + '{:02}'.format(igen) 
+            dir_genname = dir_prefix + '{:02d}'.format(igen) 
             fit = []                            # end of 1 generation
             gen_dirs=[]
             for i, chromo in enumerate(self.chromo_mat):
@@ -134,8 +133,6 @@ class GaAmp:
 
                 ### submit nchromo-jobs inside each directory
                 os.chdir(dirname)
-                with open('hl.pkl', 'wb' ) as f:
-                    pickle.dump(chromo, f)
                 strHL=' '.join(str(x) for x in chromo)
 
                 qjobname='ch{:02d}_{:02d}tr'.format(igen, i)
@@ -157,25 +154,21 @@ class GaAmp:
             ### to not use ''' ''' in the middle of function
             ### Wait On: until Training Step is done
             while True:
-                time.sleep(GaAmp._sleeptime)
+                time.sleep(sleeptime)
                 ### Testing code: succeeded job, failed training jobs, and waiting
                 dir_succ = search_dirs(dir_genname, 'amp.amp')
                 dir_fail = search_dirs(dir_genname, 'amp-untrained-parameters.amp')
                 ntraining = len(dir_succ) + len(dir_fail)
                 nwait = self.nchromo - ntraining
                 if nwait:
-                    print(f"succeed dir {len(dir_succ)} failed dir {len(dir_fail)}, waiting = {nwait} for {GaAmp._sleeptime} sec")
+                    print(f"succeed dir {len(dir_succ)} failed dir {len(dir_fail)}, waiting = {nwait} for {sleeptime} sec")
                 else:
                     break
             ### TEST direct run for test for all directories
             for test_dir in gen_dirs:  # run test in all dir
                 os.chdir(test_dir)
                 dir_suf=test_dir[-2:]
-                #with open('hl.pkl', 'rb' ) as f:
-                #    chromo = pickle.load(f)
-                #strHL=' '.join(str(x) for x in chromo)
-                #print(f"test run with {strHL} in {test_dir}")
-                qjobname='ch{:02d}_{:02d}te'.format(igen,dir_suf)
+                qjobname='ch{:02d}_{:2}te'.format(igen,dir_suf)
                 if job_submit == 'qsub':
                     ### set test here
                     amp_job_setting['ampjob'] = 'gate'
@@ -196,7 +189,7 @@ class GaAmp:
                 os.chdir(cwd)
             ### Wait On: until one generation is done defined by number of lines in GaAmp._chkfile_generation
             while True:
-                time.sleep(GaAmp._sleeptime)
+                time.sleep(sleeptime)
                 pftxt = os.path.isfile(GaAmp._chkfile_generation)
                 if pftxt == True:
                     nline = subprocess.check_output(['wc','-l',GaAmp._chkfile_generation])
@@ -218,32 +211,33 @@ class GaAmp:
                 hllist = hl_fit.split()
                 fitness = eval(hllist.pop())    # extract last element then evaluate string to float
                 hl = list(map(int, hllist))     # map change each elements then change obj to int
-                hl.extend([0] * (self.nhl-len(hllist)))
+                hl.extend([0] * (self.nhl-len(hllist))) # hl reserve the original size of chromo_matrix 
                 
                 gen_chromos.append(hl)
                 gen_fitnesses.append(fitness)
 
-            gen_chromos = np.array(gen_chromos)
-            print(f"result = {gen_chromos.shape}")
-            gen_fitnesses = np.array(gen_fitnesses)
-            best_fit = max(gen_fitnesses)               # or min
+            gen_chromos     = np.array(gen_chromos)
+            print(f"result  = {gen_chromos.shape}")
+            gen_fitnesses   = np.array(gen_fitnesses)
+            best_fit        = np.max(gen_fitnesses)
+            i_bestfit       = np.argmax(gen_fitnesses)
            
             with open("GANNtest"+cwd[-2:]+"_Genes.txt", "a") as f:
                 f.write(f"Generation : {igen}\nGenes : \n{gen_chromos}\nfitness : \n{gen_fitnesses}\n")
             with open("GANNtest"+cwd[-2:]+".txt", "a") as f:
-                f.write(f"Generation : {igen}\nGenes : {gen_chromos[np.where(gen_fitnesses == best_fit)]}, fitness : {best_fit}\n")
+                f.write(f"Generation : {igen}\nGenes : {gen_chromos[i_bestfit]}, fitness : {best_fit}\n")
                 
-            self.chromo_mat = gen_step(gen_chromos, gen_fitnesses, nparent_sets, best_fit, mutation_percent, max_node, min_node)
+            self.chromo_mat = gen_step(gen_chromos, gen_fitnesses, nparent_sets, best_fit, mutation_percent, self.nnode)
             print(f"go to next generation {self.chromo_mat}")
             fit=[]
 
-def gen_step(pop_mat, fit, nparent_sets, best_fit, mutation_percent, max_node, min_node):
+def gen_step(pop_mat, fit, nparent_sets, best_fit, mutation_percent, nnode):
     parents = select_mating_pool(pop_mat, fit, nparent_sets)
     print(f"parents = {parents}")
 
     offspring_crossover = crossover(parents, offspring_size=(pop_mat.shape[0]-parents.shape[0], pop_mat.shape[1]))
     print(f"offspring_crossover = {offspring_crossover}")
-    offspring_mutation = mutation(offspring_crossover, mutation_percent, max_node, min_node)
+    offspring_mutation = mutation(offspring_crossover, mutation_percent, nnode)
     print(f"offspring_mutation = {offspring_mutation}")
     pop_mat[0:nparent_sets] = parents
     pop_mat[nparent_sets:] = offspring_crossover

@@ -10,24 +10,22 @@ import sys
 from common import whereami 
 from ase.calculators.calculator import Parameters
 
-def calc_ga(fin, job_submit, setup, nchromo, nhl, max_nnode, ngenerations, nparent_sets, mutation_percent):
+def calc_ga(fin, job_submit, setup, nchromo, nhl, nnode, ngenerations, nparent_sets, mutation_percent):
 
-    #layers = np.arange(1, max_nhl+1)    # 0 ~ 9 -> 1 ~ 10
-    nodes = np.arange(max_nnode)           # 0 ~ 14
-    #initial_pop=[]
-
-    calc = GaAmp(setup=setup, nchromo=nchromo, nhl=nhl, nnode=nodes)
-    print(f"{calc.chromo_mat} in {whereami()}")
+    calc = GaAmp(setup=setup, nchromo=nchromo, nhl=nhl, nnode=nnode)
 
     ### choose whether train force [any True] or None
-    force_train = 1
+    force_train = None      # for force_train 1, for energy only None
+    sleep_time  = 10        # 10 for test, 300 for run
 
     start_point = 0
-    cnt = 0
     subdir_prefix = 'ch'
 
-    p = Parameters({'jsubmit':job_submit,'ampjob':'trga', 'elimit':'0.0001', 'ncore':'8', 'max_iter':500,
-                    'mem':'12G', 'dlist':[1000,2000,3500,3600]})
+    #p = Parameters({'jsubmit':job_submit,'ampjob':'trga', 'elimit':'0.0001', 'ncore':'8', 'max_iter':500,
+    #                'mem':'12G', 'dlist':[1000,2000,3500,3600]})
+    ### for Test
+    p = Parameters({'jsubmit':job_submit,'ampjob':'trga', 'elimit':'0.0001', 'ncore':'2', 'max_iter':100,
+                    'mem':'12G', 'dlist':[1000,1100,3500,3600]})
     ### include force or not
     if force_train == None:     # else default p.train_f is set
         p.train_f = None
@@ -37,7 +35,7 @@ def calc_ga(fin, job_submit, setup, nchromo, nhl, max_nnode, ngenerations, npare
 
     calc.run_generation(job_submit=job_submit, dir_prefix=subdir_prefix, istart=start_point, ngenerations=ngenerations, 
                         amp_job_setting=p, nparent_sets=nparent_sets, 
-                        mutation_percent=mutation_percent, max_node=max_nnode, min_node=0, check_print=check_ampstring)
+                        mutation_percent=mutation_percent, check_print=check_ampstring, sleeptime=10)
 
     print('GA CALCULATION IS DONE')
     return 0
