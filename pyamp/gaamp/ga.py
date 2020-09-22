@@ -11,10 +11,13 @@ def select_mating_pool(chromo_mat, fit, num_parents):
     for i in range(num_parents):
         fitness_idx = numpy.where(fit == fitness[i])        # np.where returns tuple of array ( array([4,2,...), ... )
         parents[i] = chromo_mat[fitness_idx]
-        #parents.append(chromo_mat[fitness_idx[0][0]])      # in case list
-    return parents                                          
+    return parents                                          # return np.array
 
 def crossover(parents, offspring_size):
+    '''
+    parents.shape = (nparents, nhl)
+    offsprint_size = (nchromosome-nparents, nhl)
+    '''
     offspring = numpy.empty(offspring_size)
     # The point at which crossover takes place between two parents. Usually, it is at the center.
     crossover_point = numpy.uint8(offspring_size[1]/2)
