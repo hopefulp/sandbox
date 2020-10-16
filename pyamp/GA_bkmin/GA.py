@@ -1,8 +1,8 @@
 import numpy
 import random
 
+# Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
 def select_mating_pool(pop, fit, num_parents):
-    # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
     parents = numpy.empty((num_parents, pop.shape[1]))
     fitness = numpy.ndarray.tolist(fit)
     fitness.sort()

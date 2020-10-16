@@ -99,7 +99,7 @@ amp.server.mlet =   "\n\tMLET::\
                     \n\t\t    $ make_dir.py dname_new -w amp -j vasp -od vasp_dir\
                     \n\t\t2. Make db\
                     \n\t\t    2.1 Make des-dir\
-                    \n\t\t\t$ make_dir.py g2_6 -w amp -j des\
+                    \n\t\t\t$ make_dir.py g2_6 -w amp -j db\
                     \n\t\t\t$ cd g2_6\
                     \n\t\t\t$ sge_amp.py -db -i OUTCAR -qj NN5G2 -nc 10 -j tr -hl 4 -nt 4000 -ntr 100 -dtype int -dl 1000 1100 -m 3G -des gs -pf powNN -pmm 0.05 100.0 -pn 5 -tef\
                     \n\t\t\t$ amp_run.py -f OUTCAR -j tr -hl 4 -el 0.001 -fl 0.01 0.04 -nt 4000 -ntr 100 -dtype int -dl 1000 1100 -des gs -pf powNN -pn 5 -tef \

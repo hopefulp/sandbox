@@ -37,6 +37,9 @@ if ( $?des ) then
         set string = "$string -pmm $pmm"
     endif
 endif
+if ( $?tef ) then
+    set string = "$string -tef"
+endif
 # depricate graphic in qsub, do not write comment line following a sentence
 set string = "$string -g"
 

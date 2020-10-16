@@ -1,20 +1,20 @@
-from common import MyClass
+from common import MyClass_str as MyClass
 
-start               = MyClass()
-system              = MyClass()
-sys_install         = MyClass()
-sys_manage          = MyClass()
-server              = MyClass()
-server.MLET         = MyClass()
-server.CHI          = MyClass()
-server.KISTI        = MyClass()
-server.js_sge       = MyClass()
-server.ssh          = MyClass()
-backup              = MyClass()
-dir_job             = MyClass()
-vmd                 = MyClass()
-git                 = MyClass()
-awk                 = MyClass()
+awk                 = MyClass('awk')
+backup              = MyClass('backup')
+dir_job             = MyClass('dir_job')
+git                 = MyClass('git')
+start               = MyClass('start')
+system              = MyClass('system')
+sys_install         = MyClass('sys_install')
+sys_manage          = MyClass('sys_manage')
+server              = MyClass('server')
+server.mlet         = MyClass('server.mlet')
+server.chi          = MyClass('server.chi')
+server.kisti        = MyClass('server.kisti')
+server.js_sge       = MyClass('server.js_sge')
+server.ssh          = MyClass('server.ssh')
+vmd                 = MyClass('vmd')
 
 start.order     =   "===START Usage===\
                     \n    ORDER:: ~/.bashrc backup ~/bin ...\
@@ -92,7 +92,7 @@ sys_install.intel = "== INTEL ==\
                     \n\t    serial: $QCHEM_HOME:./configure intel mkl\
                     "
 sys_manage.user =   "$getent passwd | grep ‘/home’ | cut -d: -f1"
-server.CHI =         "=== CHI (HOME) ===\
+server.chi =         "=== CHI (HOME) ===\
                     \n    Q-Chem::\
                     \n\tsetup .bashrc\
                     \n\t    activate: INTEL\
@@ -107,7 +107,7 @@ server.CHI =         "=== CHI (HOME) ===\
                     \n\t    makes 4 scratch folder in $QCSCRATCH\
                     "
 
-server.MLET.plot =   "=== MLET (SGE) ===\
+server.mlet.plot =   "=== MLET (SGE) ===\
                     \n  --System:\
                     \n\tmem 188: node11, 15, 16, 20, 21, 22, 23; 16 nproc * 11.7 G mem\
                     \n\tmem 128: opt07\
@@ -124,7 +124,7 @@ server.MLET.plot =   "=== MLET (SGE) ===\
                     \n\tcall qsub_server.py\
                     \n\t    $ qsub_server.py sge qchem -i input -n np -m mem\
                     "
-server.MLET.vasp =   "\n    VASP::\
+server.mlet.vasp =   "\n    VASP::\
                     \n\tqsub -N pe500 -pe numa 16 -v np=16 -v dir=pe500 $SB/pypbs/sge_vasp.csh\
                     \n\t    -pe numa: take charge the number of process\
                     \n\tOr Use PBS command\
@@ -134,7 +134,7 @@ server.MLET.vasp =   "\n    VASP::\
                     \n\tIN CASE hybrid functional job, it might be killed in 8 hr\
                     \n\t    get node by sleep 'sge.sleep', run at node\
                     "
-server.MLET.qchem =  "\n    Q-Chem::\
+server.mlet.qchem =  "\n    Q-Chem::\
                     \n\tSetup: .bashrc\
                     \n\t    v5.1\
                     \n\t\tCompilation Method::\
@@ -143,7 +143,7 @@ server.MLET.qchem =  "\n    Q-Chem::\
                     \n\t\t    $QC=$SCI/qchem5.1p\
                     \n\t\t    $QCAUX = $SCI/qcaux for basis irr. of version \
                     "
-server.MLET.sleep   =       "\n    SLEEP::\
+server.mlet.sleep   =       "\n    SLEEP::\
                     \n\t$ qsub_server.py sge -s sleep -n 36\
                     \n\t    qsub -pe numa 36 $SB/pypbs/sge_sleep.csh\
                     \n\t$ qsub_server.py sge -s sleep -n 36 -N sleep2\
@@ -151,16 +151,16 @@ server.MLET.sleep   =       "\n    SLEEP::\
                     \n\t    : 188G / 36 nproc = 5.22\
                     \n\t$ qsub -N amplog -pe numa 36 -q skylake@node11 $SB/pypbs/sge_sleep.csh\
                     "
-server.MLET.at_node =       "\n    RUN @NODE VASP::\
+server.mlet.at_node =       "\n    RUN @NODE VASP::\
                     \n\t$ sge_vasp_node.csh re0D3mdk_high 36\
                     "
-server.MLET.sge     = server.js_sge
+server.mlet.sge     = server.js_sge
 
-server.sleep        = server.MLET.sleep
+server.sleep        = server.mlet.sleep
 
 
 
-server.KISTI.pbs  = "=== KISTI ===\
+server.kisti.pbs  = "=== KISTI ===\
                     \n    System::\
                     \n\tnode(queue)\
                     \n\t    KNL: massive parallel\
@@ -191,7 +191,7 @@ server.ssh.nodes  = "=== SSH ===\
                     \n    Scan all the NODES for process name\
                     \n\t$ ssh node01 ps aux | grep process_name(vasp)\
                     \n\t    single node test for vasp\
-                    \n\t$ ssh_sge_nodes.sh process_name[default=vasp]\
+                    \n\t$ ssh_mlet_scan_nodes.sh process_name[default=vasp]\
                     \n\t    to check (vasp, qcprog, etc) in all nodes\
                     "
 server.ssh.node    =       "\n    Do process on ONE NODE\
@@ -237,7 +237,7 @@ server.js_sge.scripts  = "\n    Scripts::\
                     \n\tSSH\
                     \n\t    ssh_node.sh\
                     \n\t\t...\
-                    \n\t    ssh_sge_nodes.sh\
+                    \n\t    ssh_mlet_scan_nodes.sh\
                     \n\t\tmlet node scan and run (ls rm mkdir vasp qchem ln )\
                     \n\tPBS\
                     \n\t    qstat_ssh.sh\
@@ -383,3 +383,10 @@ backup.camera   =   "\n    BACKUP Phone to Linux Home:\
                     \n\t    $mountp/mtp\:host\=%5Busb%3A005%2C004%5D\
                     \n\t$ rsync -avz /run/user/1000/gvfs/mtp\:host\=%5Busb%3A005%2C004%5D/Card/DCIM/Camera/ /home/joonho/Pictures\
                     "
+
+def print_obj():
+    print("Instances:: ", end='')
+    for instance in MyClass.instances:
+        print(f"{instance}", end=' ')
+    print("\n\t    -j for detail")
+    return 0

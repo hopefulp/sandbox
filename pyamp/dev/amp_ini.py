@@ -15,8 +15,6 @@ ampout_te_f_chk                 = 'test_fstat_acc.pkl'      # used in ampplot_st
 from ase.calculators.calculator import Parameters
 
 import re
-from common import get_digits_4str, whereami
-
 
 ### Imported by amp_wrapper.py, gaamp/__init__.py 
 class Amp_string:
@@ -27,8 +25,8 @@ class Amp_string:
     hack_force: making force rmse per image, force file for a maxres image
     '''
     def __init__(self, jsubmit='qsub', queuename='test', mem='3G', fname='OUTCAR', ampjob='trga', ncore='1', hl='4',
-                       elimit='0.001', train_f='0.12 0.04', sftype='dellog', dtype='int1000', dlist=None, add_amp_kw=None, 
-                       max_iter=5000, nam=None):
+                       elimit='0.001', train_f='0.1 0.04', sftype='dellog', dtype='int1000', dlist=None, add_amp_kw=None, 
+                       max_iter=10000, nam=None):
         p = self.parameters = Parameters()
         p.jsubmit       = jsubmit
         p.queuename     = queuename
@@ -231,32 +229,36 @@ class Amp_string:
     def symmetry_function(self):
         p = self.parameters
         str_sf=" -des gs"
-        print(f"sf type in {whereami()}: {p.sftype}")
         if 'log' in p.sftype:
+            #if p.jsubmit == 'qsub':
+            #    tmp = ' -v des=gs -v pf=log10'
+            #else:
+             
             str_sf += ' -pf log10'
             if 'del' in p.sftype:
+                #if p.jsubmit == 'qsub':
+                #    tmp = ' -v pmod=del'
+                #else:
                 tmp = ' -pmod del'
                 str_sf += tmp
-
-            if 'p' in p.sftype:        # number of parameters of eta
-                word = 'p'
-                if 'pn' in p.sftype:
-                    word = 'pn'
-                nparam = get_digits_4str(word, p.sftype)
-            else:
-                nparam = '10'
-            if 'm' in p.sftype:
-                word = 'm'
+            if 'pn' in p.sftype:
+                substr = re.split("pn",p.sftype)[1]
+                m = re.match('\d+', substr)
+                nparam = m.group()
                 if 'max' in p.sftype:
-                    word = 'max'
-                pmax = get_digits_4str(word, p.sftype)
+                    substr = re.split("max", p.sftype)[1]
+                    pmax = substr
+                tmp = f" -pmm 0.05 {pmax:5.1f} -pn {nparam}"
+                
             else:
-                pmax = '200'
-            tmp = f" -pmm 0.05 {float(pmax):5.1f} -pn {nparam}"
+                tmp = " -pmm 0.05 200 -pn 10"                   # now modifed here
             str_sf += tmp
+            #if p.jsubmit == 'qsub':
+            #    tmp = " -v pmm='0.05 200.0' -v pn=10"
+            #else:
         elif 'NN' in p.sftype:
             str_sf += ' -pf powNN'
-            nparam = re.sub(r'\D+', '', p.sftype)   # using substitution of word to null for one pair
+            nparam = re.sub(r'\D+', '', p.sftype)
             str_sf +=  f' -pn {nparam}'
             
         return str_sf

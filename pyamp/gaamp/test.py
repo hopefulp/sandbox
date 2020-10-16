@@ -160,7 +160,7 @@ class GaAmp:
                 ntraining = len(dir_succ) + len(dir_fail)
                 nwait = self.nchromo - ntraining
                 if nwait:
-                    print(f"succeed dir {len(dir_succ)} failed dir {len(dir_fail)}, waiting = {nwait} for {sleeptime} sec in {igen}-gen")
+                    print(f"succeed dir {len(dir_succ)} failed dir {len(dir_fail)}, waiting = {nwait} for {sleeptime} sec")
                 else:
                     break
             ### TEST direct run for test for all directories
@@ -170,8 +170,8 @@ class GaAmp:
                 if job_submit == 'qsub':
                     qjobname='ch{:02d}_{:2}te'.format(igen,dir_suf)
                     ### this is input, not affect training string
-                    ampstr = amp_ini.Amp_string(queuename=qjobname,jsubmit=job_submit,ampjob='tega',elimit = None,
-                                                                    dlist=amp_job_setting['dlist'])
+                    ampstr = amp_ini.Amp_string(queuename=qjobname, jsubmit=job_submit, ampjob='tega', ncore='1', max_iter=None,
+                                                elimit = None, mem='3G')
                     with open("mlet_te.csh", 'w') as f:
                         f.write(ampstr.qscript)
                     str_2run = ampstr()

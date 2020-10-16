@@ -33,8 +33,11 @@ amp_getqsub_str = { 'noforce': ' -j tr -hl 4 -el 0.001 -fl -0.1', 'force': ' -j 
 amp_getqsub_datatype = amp_data_type
 amp_getqsub_symmfuncttype = amp_gaussian_function_param
 
-def show_command(job, job_submit, qname, sftype, dtype):
+def show_command(job, job_submit, qname, sftype, dtype, keyvalues):
     
+    if keyvalues:
+        kw1 = keyvalues[0]
+
     if job == 'amp':
         ### modify setting here
         settings = {'force':'force',
@@ -46,26 +49,55 @@ def show_command(job, job_submit, qname, sftype, dtype):
         if job_submit == 'node':
             print("Train:\namp_run.py -f OUTCAR", amp_node_str[settings['force']], amp_data_type[settings['dtype']], amp_gaussian_function_param[settings['gs']], amp_node_str_suff)
             print("Test:\namp_run.py -f OUTCAR -j te -nc 10", amp_data_type[settings['dtype-te']], amp_node_str_suff)
-            print("for GA")
-            print("ga_amp_run.py -js node -nch 10 -hl 5 -nn 10")
             print("\n=== New Method")
-            print("amp_wrapper.py -js node -te [-c| &] ")
+            print("amp_wrapper.py -js node [-te] [-c| &] ")
             print("\t -c: for check string but not to submit jobs")
-        elif job_submit == 'qsub': 
-            print(f"amp_wrapper.py -js qsub -qn HL44 -hl 4 4 [-c] &")
+            print("GA")
+            print("ga_amp_run.py -js node -nch 8 -hl 10 -nn 10 -np 5 [-c] &")
+        elif job_submit == 'qsub':
+            print("Shell script to run multiple jobs")
+            print(f"dir_cli.sh ampwrap hl 4 5 6 7 8 9 10  | sh")
+            print("\nAMP WRAPPER:: train and test with failed-convergence")
+            print(f"amp_wrapper.py -js qsub [-j [te|tr|trte]] -qn HL44 [-hl 4 4] [-dl int int]  [-s] [-c] &")
+            print(f"amp_wrapper.py -js qsub &  !!! all options in the script")
+            print("amp_wrapper.py -js qsub -j te -qn check &")
+            print("amp_wrapper.py -js qsub -j tr -qn NN9p2 -dl 360 720 &")
+            print("amp_wrapper.py -js qsub -sf logpn10max200 -qn HL1010 -hl 10 10 -dl 1000 1100 3500 3600 &")
+            print("\tqsub -N HL44tr -pe numa 8 -l mem=12G mlet_tr.csh")
+            print("DB folder")
+            print("amp_wrapper.py -js qsub -j tr -qn hl4 -dl 0 400 &")
+            print("DB")
+            print("diramp.sh fp | sh")
+            print("TRAIN")
+            print("diramp.sh wrapper")
+            print("amp_wrapper.py -js qsub -qn HL1010 -hl 10 10 &")
             print("\t : queue submit job HL44tr-HL44te consecutively")
+
             print("for GA")
             print("ga_amp_run.py -js qsub -nch 12 -hl 7 -nn 15 -np 4")
         elif job_submit == 'getqsub':
             print(f"sge_amp.py -qj {qname} -m 3G", amp_getqsub_str[settings['force']], amp_getqsub_datatype[settings['dtype']], amp_getqsub_symmfuncttype[settings['gs']]) 
         ### this part is for common
+        print("\nCLEAN")
+        print("clean.py -w amp pbs -a -y")
+        print("\nSTATISTICS")
         print("stat_check.py -st [e|f|ef]")
-        print("ampplot_stat_dir.py -le mse -t 'Energy Training'")
-        print("ampplot_stat_dir.py -le mse -t 'Force (Energy-only training)' -yl '(eV/A)^2' Correlation")
-        print("ampplot_stat_dir.py -le maxres -t 'Force (Energy-only training)' -yl eV/A")
-        print("ampplot_stat_dir.py -le mse -t 'Energy (Force-Training)'")
-        print("ampplot_stat_dir.py -le mse -t 'Force (Force-Training)' -yl '(eV/A)^2' Correlation")
-        print("ampplot_stat_dir.py -le maxres -t 'Force (Force-Training)' -yl eV/A ")
+        if 'kw1' in locals():
+            d_pre=kw1
+        else:
+            d_pre='ND'
+        print(f"ampplot_stat_dir.py -p {d_pre} -le mse -t 'Energy Training' -k hl")
+        print("    in case dir scan is hl: -k hl")
+        print(f"ampplot_stat_dir.py -p {d_pre} -le mse -t 'Force (Energy-only training)' -yl '(eV/A)^2' Correlation")
+        print(f"ampplot_stat_dir.py -p {d_pre} -le maxres -t 'Force (Energy-only training)' -yl eV/A")
+        print(f"ampplot_stat_dir.py -p {d_pre} -le mse -t 'Energy (Force-Training)'")
+        print(f"ampplot_stat_dir.py -p {d_pre} -le mse -t 'Force (Force-Training)' -yl '(eV/A)^2' Correlation")
+        print(f"ampplot_stat_dir.py -p {d_pre} -le maxres -t 'Force (Force-Training)' -yl eV/A ")
+        print("ampplot_stat_dir.py -p {d_pre} -le maxres -t 'Force (Force-Training)' -yl \"F\$_{rmse}\$ (eV/A)\" \"F\$_{maxres}\$ (eV/A)\"")
+        print("ampplot_stat_dir.py -p {d_pre} -le maxres -t 'Force (Force-Training)' -yl \"F\$_{rmse}\$ (eV/A)\" \"F\$_{maxres}\$ (eV/A)\" -k hl -xl 'HL (2layers)'")
+        print("ND100, x = 'data index'")
+        print("ampplot_stat_dir.py -p nd100i -le mse -t 'Energy (ND=100)' -xl \"Data index\"")
+        print("ampplot_stat_dir.py -p nd100i -le maxres -t 'Force (ND=100)' -yl \"F\$_{rmse}\$ (eV/A)\" \"F\$_{maxres}\$ (eV/A)\"  -xl 'Data index'")
     else:
         print("build more jobs")
     return 0 
@@ -79,10 +111,11 @@ def main():
     parser.add_argument('-qn', '--qname', default='amptest', help="queue name for qsub shown by qstat")
     parser.add_argument('-dt', '--data_type', default='int', choices=['int','div'], help="data selection type")
     parser.add_argument('-ft', '--func_type', default='log', choices=['log','pow'], help="gaussian symmetry function parameter type")
+    parser.add_argument('-k', '--keyvalues', nargs='*', help='change a keyword in print')
 
     args = parser.parse_args()
 
-    show_command(args.job,args.job_submit,args.qname,args.func_type,args.data_type)
+    show_command(args.job,args.job_submit,args.qname,args.func_type,args.data_type, args.keyvalues)
 
 if __name__ == "__main__":
     main()

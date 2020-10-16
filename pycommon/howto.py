@@ -48,17 +48,11 @@ def main():
     else:
         mod_name = 'comment_subj'
     my_module = importlib.import_module(mod_name)
-    #att = [ x for x in dir(my_module) if regex.match(x) ]
-    att = [ x for x in dir(my_module) if not regex.match(x) ]
-    att.remove('MyClass')
-    print(f"===ALL ATTributes in \"{mod_name}.py\" ===")
-    print(f" -j {att}")
 
     if not args.job:
-        #print(f"Use -j for attribute")
+        my_module.print_obj()
         if mod_name == 'comment_sys':
-            #print(f"Use -m sub or -s for 'comm_subj.py' if attribute you find is not here")
-            print(f" -s for other attributes in module 'comment_subj.py' ")
+            print(f"\t    -s for other attributes in module 'comment_subj.py' ")
     else:
         jobs(my_module, args.job, args.subkey)
 

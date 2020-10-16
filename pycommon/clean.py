@@ -57,12 +57,12 @@ def d_clean(dirs,works,prefix, suffix, matches, exclude,excl_fnames, linux_job,n
             f_list = get_files_match(matches, d, Lshowmatch)
             f_list_all.extend(f_list)
         elif work == 'amp':
-            fmatches=['amp','pdf','dat', 'ga', 'GA', 'te']
+            fmatches=['amp','pdf','dat', 'ga', 'GA', 'te', 'sh']
             ### if Lall_rm: remove directory also
             f_list = get_files_match(fmatches, d, Lshowmatch)
             f_list_all.extend(f_list)
             dmatches=['ch']
-            f_list = get_files_match(dmatches, d, Lshowmatch, Ldirectory=Lall_rm)
+            f_list = get_files_match(dmatches, d, Lshowmatch, Ldir=Lall_rm)
             f_list_all.extend(f_list)
                 
         elif work == 'lmp':

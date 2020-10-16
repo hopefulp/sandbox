@@ -222,7 +222,7 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     #print(f"x, y shape:: {np.array(x).shape} {np.array(y).shape} and ylabel {ylabel} in {whereami()}")
     ax2=ax.twinx()
     ax2.set_ylabel(ylabel2)
-    ax2.set_ylim(0,1)
+    #ax2.set_ylim(0,1)
     pls=[]
     for i in range(len(ys)):
         if i in iy_right: 
@@ -235,6 +235,7 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
             #ax2.tick_params(axis='y')
             #if Colors:  color = Colors.pop(i)       #color = 'tab:' + Colors.pop(0)
             #else:       color = 'tab:red'
+            #print(f"shape of x, ys[i] = {np.array(x).shape} {ys[i,:].shape}")
             p1, = ax.plot(x, ys[i,:], 'o-', label=legend[i])
             pls.append(p1)
             #ax.tick_params(axis='y')

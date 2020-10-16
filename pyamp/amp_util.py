@@ -1,3 +1,4 @@
+#!/home/joonho/anaconda3/bin/python
 """
     amp module for amp_run.py
 
@@ -23,9 +24,48 @@ import pickle
 from common import whereami, fname_decom
 import my_stat
 import amp_ini
+import random
 
 Ldebug = False
 Lprint = 0
+
+XMID = 0.1  # half of logistic function: this is aim
+exponent = 3
+FMAX = 3.0
+FMIN = 1.0
+
+def fitness_func(value):
+    '''
+    logmax is maximum values for f_rmse and f_maxres, 
+        if value >= 3: error on log10 function
+    sigmoid : 
+        x: -inf ~ inf
+        y: 0 ~ 1
+    '''
+    logmax = 3     
+    if value >= logmax-0.1:
+        return 0
+    loga = np.log10(-value + logmax)
+    sigmo = 1./(1.+np.exp(-loga))
+    return sigmo * 100
+
+def fit_logistic(value, scale=1):
+    '''
+    designed for amp force error with logistic function, rising around 0.1 eV/A with 0.5 in function
+    '''
+    if value > 2.5:
+        return 0
+    expo = np.exp(-scale*(value-XMID)) - 1.      # -1 to infinit
+    sigmo = ( 1./ (1. + np.exp(-expo))) * 2         # * 2 to max=1
+    return sigmo * 100
+
+def get_score(rmse, maxres, rmse_target=0.1, maxres_target=0.3):
+    ''' for test and GA '''
+    score_err = fit_logistic(rmse, scale=3)
+    score_maxerr = fit_logistic(maxres, scale=1)
+    return 0.2*score_err + 0.8*score_maxerr
+
+get_score_e = get_score
 
 def decom_ef(list_ef):
     '''
@@ -56,16 +96,26 @@ def write_force_rmse(fout, f_rmses):
 ffmt = '10.4f'
 sfmt  = '^8'
 
-def write_energy(fout, y, y_bar, scale=np.power(10,6)):
+
+def write_stat_format(f, p):
+    '''
+    f file pointer
+    '''
+    f.write(f"{'MSE':{sfmt}}{p.mse:{ffmt}}    {'RMSE':{sfmt}}{p.rmse:{ffmt}}    {'MAXRES':{sfmt}}{p.maxres:{ffmt}}\
+            \n{'BIAS_SQ':{sfmt}}{p.bias_sq:{ffmt}}\
+            \n{'var(X-Y)':{sfmt}}{p.varx_y:{ffmt}}    {'var(true)':{sfmt}}{p.varx:{ffmt}}    {'var(hypo)':{sfmt}}{p.vary:{ffmt}}    {'Cov(X,Y)':{sfmt}}{p.cov:{ffmt}}    r_corr {p.r_corr:7.4f}\n")
+    return 0
+
+def write_energy(fout, y, y_bar, scale=np.power(10,3)):
 
     f_pre, f_suf = fname_decom(fout)
     pklfile      = f_pre+ '.pkl'
+    datfile      = f_pre+'.dat'
     p = my_stat.stat_2col(y_bar, y, scale=scale)
     with open(pklfile, 'wb') as f:
         pickle.dump(p, f)
-    with open(fout, 'w') as f:
-        f.write(f"{'MSE':{sfmt}}{p.mse:{ffmt}}\n{'BIAS_SQ':{sfmt}}{p.bias_sq:{ffmt}}\
-                \n{'var(X-Y)':{sfmt}}{p.varx_y:{ffmt}}    {'var(true)':{sfmt}}{p.varx:{ffmt}}    {'var(hypo)':{sfmt}}{p.vary:{ffmt}}    {'Cov(X,Y)':{sfmt}}{p.cov:{ffmt}}    r_corr {p.r_corr:7.4f}\n")
+    with open(datfile, 'w') as f:
+        write_stat_format(f, p)
         f.write("\ttrue\t\thypothesis\t\tdiff\n")
         for y1, ybar1 in zip(y, y_bar):
             f.write(f"{y1:15.5f} {ybar1:15.5f} {ybar1-y1:15.5f}\n")
@@ -77,7 +127,7 @@ def write_energy(fout, y, y_bar, scale=np.power(10,6)):
 def stat_forces_filesum(yf3d, ybar_f3d, fpre=None):
     file_force  = "test_force_stat.dat"
     file_maxres = "test_fmaxres"
-    accfile     = "test_fstat_acc.txt"
+    accfile     = "test_fstat_acc.txt"          # what is acc : accumulate
     pklfile     = "test_fstat_acc.pkl"
     f = open(file_force, 'w')
 
@@ -92,14 +142,11 @@ def stat_forces_filesum(yf3d, ybar_f3d, fpre=None):
         yf_1d       = np.array(yf2d).flatten()
         yfbar_1d    = np.array(ybar_f2d).flatten()
         p           = my_stat.stat_2col(yf_1d, yfbar_1d)
-        diff        = np.absolute(yfbar_1d-yf_1d)
-        ### select maximum residue
-        f_maxres        = np.max(diff)
-        f_maxres_ind    = np.argmax(diff)
-        if tmp_maxres < f_maxres:
+        ### to get maximum residue file
+        if tmp_maxres < p.maxres:
             i_maxres_file  = i_image
-            i_maxres_ind   = f_maxres_ind
-            tmp_maxres = f_maxres
+            i_maxres_ind   = p.imaxres
+            tmp_maxres = p.maxres
         ### save for cummulating all the images
         true_f.extend(yf_1d)
         hypo_f.extend(yfbar_1d)
@@ -107,10 +154,9 @@ def stat_forces_filesum(yf3d, ybar_f3d, fpre=None):
         ### Write force file for each image if fpre != None
         if fpre:
             fout = fpre + '_{:03d}'.format(i_image) + '.dat'
-            write_force_image(fout, p, yf2d, ybar_f2d, f_maxres, f_maxres_ind)
+            write_force_image(fout, p, yf2d, ybar_f2d, p.maxres, p.imaxres)
         ### write stat to 'test_force_stat.dat'
-        f.write(f"{'MSE':{sfmt}}{p.mse:{ffmt}}    {'RMSE':{sfmt}}{p.rmse:{ffmt}}\n{'BIAS_SQ':{sfmt}}{p.bias_sq:{ffmt}}\
-            \n{'var(X-Y)':{sfmt}}{p.varx_y:{ffmt}}    {'var(true)':{sfmt}}{p.varx:{ffmt}}    {'var(hypo)':{sfmt}}{p.vary:{ffmt}}    {'Cov(X,Y)':{sfmt}}{p.cov:{ffmt}}    r_corr {p.r_corr:7.4f}\n")
+        write_stat_format(f, p)
     ### end of loop for files
 
     ### write maxres file to 'test_fmaxres_img000.txt'
@@ -127,17 +173,15 @@ def stat_forces_filesum(yf3d, ybar_f3d, fpre=None):
     with open(pklfile, 'wb') as f:
         pickle.dump(p, f)
     with open(accfile, 'w') as f:
-        f.write(f"{'MSE':{sfmt}}{p.mse:{ffmt}}\n{'BIAS_SQ':{sfmt}}{p.bias_sq:{ffmt}}\
-                \n{'var(X-Y)':{sfmt}}{p.varx_y:{ffmt}}    {'var(true)':{sfmt}}{p.varx:{ffmt}}    {'var(hypo)':{sfmt}}{p.vary:{ffmt}}    {'Cov(X,Y)':{sfmt}}{p.cov:{ffmt}}    r_corr {p.r_corr:7.4f}\n")
-    os.system(f"touch {amp_ini.ampout_te_f_chk}")
+        write_stat_format(f, p)
+    #os.system(f"touch {amp_ini.ampout_te_f_chk}")
     return p.rmse, p.maxres
 
 def write_force_image(fout, p, yf2d, ybar_f2d, f_maxres, f_maxres_ind):
     with open(fout, 'w') as f:
         iatom = int(f_maxres_ind/3)
         icoord = f_maxres_ind%3
-        f.write(f"{'MSE':{sfmt}}{p.mse:{ffmt}}    {'RMSE':{sfmt}}{p.rmse:{ffmt}}\n{'BIAS_SQ':{sfmt}}{p.bias_sq:{ffmt}}\
-            \n{'var(X-Y)':{sfmt}}{p.varx_y:{ffmt}}    {'var(true)':{sfmt}}{p.varx:{ffmt}}    {'var(hypo)':{sfmt}}{p.vary:{ffmt}}    {'Cov(X,Y)':{sfmt}}{p.cov:{ffmt}}    r_corr {p.r_corr:7.4f}\n")
+        write_stat_format(f, p)
         f.write(f"atom id={iatom} {icoord}-th coord; f_maxres={f_maxres:10.5f}\n")
         f.write(f"{'x true':^10} {'hypo':^10}   {'y true':^10} {'hypo':^10}    {'z true':^10} {'hypo':^10} {'true netforce'} {'hypo_force'} {'diff'}\n")
         #for f_image, fbar_image in zip(yf, yf_bar):   # write all the images?
@@ -155,35 +199,54 @@ def write_force_image(fout, p, yf2d, ybar_f2d, f_maxres, f_maxres_ind):
             f.write("\n")
     return 0
 
-def f_write(outf, HL, Elist, flist, ntotal, dtype, dlist, descriptor=None, err=None, max_res=None, job_index=None):
+def write_result(outf, score,  e_err, e_maxres, f_err=None, f_maxres=None):
+    with open(outf, 'a') as f:
+        f.write(f"{'SCORE':15}{score:15.4f}")
+        f.write(f"{'E:    RMSE (eV)':15}{'MAX Res (eV)':15}")
+        if f_err:
+            f.write(f"{'F:    RMSE (meV/A)':15}{'MAX Res (eV/A)':15}")
+        f.write("\n")
+        f.write(f"{e_err:15.4f}{e_maxres:15.4f}")
+        if f_err:
+            f.write(f"{f_err:15.4f}{f_maxres:15.4f}")
+        f.write("\n")
+    return 0
+
+def f_write(outf, HL, Elist, flist, dtype, dlist, descriptor=None,  max_res=None, job_index=None, calc=None, images=None):
     with open(outf, "a") as f:
         if descriptor:
             #f.write(f"{'Descriptor':10}: {descriptor}\n")      # for list, it's simple
             f.write(', '.join("%s: %s" % item for item in vars(descriptor).items()))
             f.write("\n")
+        if calc and images:
+            HL = calc.model.parameters.hiddenlayers[images[0][0].symbol]
         st = ' '.join(str(x) for x in HL)
         f.write(f"{'Hidden Lay':10}:{st:>10}\n")
         E_conv, E_maxres = decom_ef(Elist)
-        f.write(f"{'Energy Lim':10}:{E_conv:10g}\n")
+        f.write(f"{'E Lim max':10}:{E_conv:10g}")
         if E_maxres:
-            f.write(f"{'Energy max':10}:{E_maxres:10g}\n")
+            f.write(f"{E_maxres:10g}\n")
+        else:
+            f.write("\n")
         f_conv, f_coeff = decom_ef(flist)
-        if f_coeff:
-            f.write(f"{'Force coef':10}:{f_coeff:10g}\n")
+        f.write(f"{'F Lim coef':10}:")
         if f_conv:
-            f.write(f"{'Force  Lim':10}:{f_conv:10g}\n")
-        #print(f"ntotal {ntotal} in {whereami()}")
-        f.write(f"{'Total Data':10}:{ntotal:10d}\n")
+            f.write(f"{f_conv:10g}")
+        if f_coeff:
+            f.write(f"{f_coeff:10g}")
+        f.write("\n")
         f.write(f"{'Data  Type':10}:{dtype:>10}\n")
         if dlist:
             st = ' '.join(str(x) for x in dlist)
             f.write(f"{'Data  list':10}:{st:>10}\n")
+        '''
         if err:
             if job_index == None:
                 f.write("{:5.3f}, {:5.3f}\n".format(err, max_res))
             else:
                 f.write(f"{'Error RMSE':10}:{err:10.4f}\n")
                 f.write(f"{'MAX Residu':10}:{max_res:10.4f}\n")
+        '''                
     return 0            
 
 def list2str(i_image):
@@ -199,19 +262,29 @@ def list2str(i_image):
         nimage = i_image[1] - i_image[0]
     return sindex
 
+amp_pot=[ "amp.amp", "amp-untrained-parameters.amp" ]
+
 def get_amppot(pot = None):
     if pot:
         calc = Amp.load(pot)
     else:
         try:
-            calc = Amp.load("amp.amp")
+            calc = Amp.load(amp_pot[0])
         except FileNotFoundError:
             try:
-                calc = Amp.load("amp-untrained-parameters.amp")
+                calc = Amp.load(amp_pot[1])
             except FileNotFoundError:
                 print("Error: amp-pes.amp file does not exist, input amp-pot file by -p")
                 return FileNotFoundError
     return calc
+
+def get_amppotname():
+    if os.path.isfile(amp_pot[0]):
+        return amp_pot[0]
+    elif os.path.isfile(amp_pot[1]):
+        return amp_pot[1]
+    else:
+        return None
 
 def get_total_image(fdata, ndata):
     ### choose data
@@ -321,3 +394,20 @@ def data_partition(total_images, dt, dl, job):
             return training_images, test_images
         else:
             return None, None
+
+def main():
+    ### test get_score()
+
+    arr = np.linspace(FMIN, FMAX, 10)
+    score = np.empty([0])
+    for x in arr:
+        score = np.append(score, get_score(x, 3*x))
+
+    for x, y in zip(arr, score):
+        print(f"value {x} score {y}")
+
+    return 0
+
+
+if __name__ == "__main__":
+    main()

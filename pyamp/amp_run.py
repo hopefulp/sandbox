@@ -6,9 +6,7 @@
 
 import argparse
 import numpy as np
-#from myplot2D import *                 ### FOR MLET 
 #import my_chem
-#from my_arith import rmse
 from my_images import Images
 from common import yes_or_no
 from amp_plot import get_title         ### FOR MLET
@@ -86,7 +84,7 @@ def calc_train_images(images, des_obj, HL, Elist, flist, ncore, amp_pot=None, ma
     return
 
 ### AMP job 2: Test
-def calc_test_images(images, calc, f_conv_list, title, suptitle,ncore,na_in_mol,Lgraph,Ltwinx=None, Lga=False, val_id=None):
+def calc_test_images(images, calc, f_conv_list, title, suptitle,ncore,na_in_mol,Lgraph, outf='test_result.txt', Ltwinx=None, Lga=False, val_id=None):
     ### in case other name of amp pot is used
     #calc = amp_util.get_amppot(amp_pes)
     Lforce = False
@@ -119,32 +117,37 @@ def calc_test_images(images, calc, f_conv_list, title, suptitle,ncore,na_in_mol,
             ybar_forces = image.get_forces()    # 2D
             yf3d_bar.append(ybar_forces)        # 3D
     ### write energy (all images): scale np.square(meV)
-    e_rmse, e_maxres = amp_util.write_energy(amp_ini.ampout_te_e_chk, y, y_bar, scale=np.power(10,6))
+    e_rmse, e_maxres = amp_util.write_energy(amp_ini.ampout_te_e_chk, y, y_bar, scale=np.power(10,3))
     if Lforce:
         ### write force file of averate and of each image if fpre
         f_rmse, f_maxres = amp_util.stat_forces_filesum(yf3d, yf3d_bar,fpre="test_force_img")
+        ###### cal Score
+        e_aim   = 0.0005
+        f_aim   = 0.1       # 0.1 eV/A
+        f2_aim  = 0.3       # 3 sigma
+        ### higher score is better 
+        score = amp_util.get_score(f_rmse, f_maxres, rmse_target=f_aim, maxres_target=f2_aim)
+        amp_util.write_result(outf, score, e_rmse, e_maxres, f_err=f_rmse, f_maxres=f_maxres)
+    else:
+        score = amp_util.get_score_e(e_rmse, e_maxres)
+        amp_util.write_result(outf, score, e_rmse, e_maxres)
+     
+    ### amp_ini.ampout_chromosome_fitness = "ga_fit.txt" >> every test reports "score.dat"
+    ### get hl directory from images, amp.amp
+    hl = calc.model.parameters.hiddenlayers[images[0][0].symbol]  # hl is tuple, 
+    with open('score.dat', 'w') as f:
+        f.write(' '.join("%2s" % str(nodes) for nodes in hl))
+        f.write(f" {score:10.5f}\n")
+    if Lga:
+        os.system(f"cat {'score.dat'} >> ../{amp_ini.ampout_onegeneration_fitness}")  # GA checks this file
+    
     ### this runs only in master(login) node
     if Lgraph:
         modulename='myplot2D'   ### FOR MLET
         if modulename not in sys.modules:
             import myplot2D
         e_rmse, e_maxres = myplot2D.draw_amp_twinx(y, y_bar, title, suptitle, natom=natom, Ltwinx=Ltwinx,Ldiff=True)
-    if Lga:
-        ### get hl directory from images, amp.amp
-        hl = calc.model.parameters.hiddenlayers[images[0][0].symbol]  # retuns hl as tuple
-        ### 
-        e_aim   = 0.0005
-        f_aim   = 0.1       # 0.1 eV/A
-        f2_aim  = 0.4       # 3 sigma
-        ### higher score is better 
-        score = 1/(f_maxres + f_rmse*4) * 10
-            
-        ### amp_ini.ampout_chromosome_fitness = "ga_fit.txt"
-        with open(amp_ini.ampout_chromosome_fitness, 'w') as f:
-            f.write(' '.join(str(nodes) for nodes in hl))
-            f.write(f" {score}\n")
-        os.system(f"cat {amp_ini.ampout_chromosome_fitness} >> ../{amp_ini.ampout_onegeneration_fitness}")  # GA checks this file
-    return e_rmse, e_maxres
+    return 0
 
 ### Amp job 3: MD
 def amp_md(atoms, nstep, dt, amp_pot):
@@ -227,7 +230,8 @@ def amp_jobs(fdata,job,descriptor,amp_inp,HL,E_conv,f_conv_list,max_iter,ncore,n
     elif re.search("tr",job):
         pwd = os.getcwd()
         if Lprint: print("data training:total sets %d/%d" % (ntrain, ntotal))
-        amp_util.f_write(outf, HL, E_conv, f_conv_list, ntotal, dstype, dslist, descriptor)
+        ### from descriptor - keyword argument
+        amp_util.f_write(outf, HL, E_conv, f_conv_list, dstype, dslist, descriptor=descriptor)
         calc_train_images(tr_images, descriptor, HL, E_conv, f_conv_list, ncore, amp_pot=amp_inp,max_iter=max_iter)
             
     ### JOB == TEST
@@ -235,9 +239,8 @@ def amp_jobs(fdata,job,descriptor,amp_inp,HL,E_conv,f_conv_list,max_iter,ncore,n
         print(f"data test {ntest} images/ per train {ntrain} in {whereami()}:job==te")
         #os.system("touch test_start")
         calc = amp_util.get_amppot(amp_inp)
-        rmserr, max_res = calc_test_images(te_images,calc,f_conv_list,title, suptitle,ncore,na_mol,Lgraph,Ltwinx=Ltwinx,Lga=Lga)
-        HL = calc.model.parameters.hiddenlayers['O']
-        amp_util.f_write(outf, HL, E_conv, f_conv_list, ntotal,dstype, dslist, descriptor=descriptor,err=rmserr, max_res=max_res)
+        amp_util.f_write(outf, HL, E_conv, f_conv_list, dstype, dslist, descriptor=descriptor, calc=calc, images=te_images)
+        calc_test_images(te_images,calc,f_conv_list,title, suptitle,ncore,na_mol,Lgraph,outf=outf,Ltwinx=Ltwinx,Lga=Lga)
     return
 
 def find_inputfile(inf, pwd, job):
@@ -263,7 +266,6 @@ def main():
     parser = argparse.ArgumentParser(description='run amp with extxyz, OUTCAR: validation is removed ', prefix_chars='-+/')
     parser.add_argument('-inf', '--infile', default='OUTCAR', help='ASE readible file: extxyz, OUTCAR(VASP) ')
     ### tef for test w. force
-    #parser.add_argument('-j', '--job', default='tr', choices=['tr','trga','te','tega','tef','pr','pt','md','chk'], help='job option:"train","test","ga" for addtional genetic algorithm, "md","profile","plot","check"')
     parser.add_argument('-j', '--job', default='tr', choices=['tr','trga','te','tega','pr','pt','md','chk'], help='job option:"train","test","ga" for addtional genetic algorithm, "md","profile","plot","check"')
     ### Descriptor group
     descriptor_group = parser.add_argument_group(title="Descriptor generator")

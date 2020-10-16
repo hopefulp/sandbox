@@ -3,10 +3,11 @@
 import argparse
 import os
 import sys
+import amp_util
 
 amp_db = ['amp-fingerprint-primes.ampdb', 'amp-neighborlists.ampdb', 'amp-fingerprints.ampdb', 'OUTCAR']
-
-files = { 'tr': amp_db, 'md': ['OUTCAR', 'amp.amp'], 'vasp': ['OUTCAR'], 'db': amp_db}
+### 'db' for what?
+files = { 'tr': amp_db, 'md': ['OUTCAR'], 'vasp': ['OUTCAR'], 'db': amp_db, 'te': amp_db, 'des':['OUTCAR'] }
 
 def jobs(ndir, work, job, odir, Lcopy):
     pwd = os.getcwd()
@@ -19,9 +20,8 @@ def jobs(ndir, work, job, odir, Lcopy):
         os.system(f'mkdir {ndir}')
         os.chdir(f'{ndir}')
     if work == 'amp':
-        if job == 'md' or job == 'tr' or job == 'db':
+        if job == 'md' or job == 'tr' or job == 'db' or job == 'te' or job == 'des':
             for f in files[job]:
-                #forig = '../'+f
                 forig = pwd + '/' + f
                 if os.path.isfile(forig) or os.path.isdir(forig):
                     if Lcopy:
@@ -29,17 +29,22 @@ def jobs(ndir, work, job, odir, Lcopy):
                     else:
                         os.system(f'ln -s {forig} {f}')
                 else:
-                    if f == 'amp.amp':
-                        f = "amp-untrained-parameters.amp"
-                        forig = pwd + '/' + f
-                        if Lcopy:
-                            os.system(f'cp {forig} {f}')
-                        else:
-                            os.system(f'cp {forig} {f}')
+                    print(f"can't find {f}")
+                    sys.exit(0)
+            if job == 'md' or job == 'te':
+                f = amp_util.get_amppotname(pwd)
+                if not f:
+                    forig = pwd + '/' + f        
+                    if Lcopy:                    
+                        os.system(f'cp {forig} {f}')
                     else:
-                        print(f'there does not exist {forig}')
-                        print(f"here is {os.getcwd()}")
-                        sys.exit(11)
+                        os.system(f'ln -s {forig} {f}')
+                else:
+                    forig = pwd + '/amp-untrained-parameters.amp'
+                    f = 'amp-untrained-parameters.amp'
+                    os.system(f'ln -s {forig} {f}')
+                    print(f"No amp file in {pwd}")
+                    sys.exit(11)
         elif job == 'vasp':
             if odir == None:
                 print("input vasp directory")
@@ -52,10 +57,8 @@ def jobs(ndir, work, job, odir, Lcopy):
                 else:
                     print(f'there does not exist {forig}')
                     sys.exit(31)
-        elif job == 'des':
-            com = f'ln -s ../OUTCAR OUTCAR'
-            os.system(com)
-
+            
+            
             
     return 0
 
@@ -63,7 +66,7 @@ def main():
     parser = argparse.ArgumentParser(description="make directory with some auxiliary files  ")
     parser.add_argument( 'directory', default='tmp', help='make directory') 
     parser.add_argument('-w','--work', default='amp', choices=['amp'], help="work ")
-    parser.add_argument('-j','--job', default='md', choices=['des','tr','md','db','vasp'], help="des: different descriptor test ")
+    parser.add_argument('-j','--job', default='md', choices=['des','tr','md','db','vasp','te'], help="des: different descriptor test ")
     parser.add_argument('-od','--old_dir', help=" in case 'vasp', input old directory")
     parser.add_argument('-c', '--copy', action='store_true', help='make copy rather than ln')
     args = parser.parse_args()

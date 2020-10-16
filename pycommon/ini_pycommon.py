@@ -9,6 +9,8 @@ comment = MyClass('comment')
 mod     = MyClass('mod')
 dirjob  = MyClass('dirjob')
 jobfile = MyClass('jobfile')
+convert = MyClass('convert')
+command = MyClass('command')
 
 comment.howto       =   "=== COMMENT ===\
                         \n\treads 'comment_sys.py' or 'comment_subj.py'\
@@ -43,6 +45,31 @@ dirjob.dir_cli      =   "basic command line interface for all files in directory
 dirjob.dir1_cli     =   "simple command inside directory\
                         \n\t\tdir1_cli.sh gitpush\
                         "
+dirjob.diramp       =   "Run multiple job in amp by scanning a value in bash\
+                        \n\t\tUsage::\
+                        \n\t\t    $diramp.sh job other-args\
+                        \n\t\tOptions::\
+                        \n\t\t    fp: calculate fingerprints\
+                        \n\t\t\tamp_wrapper.py -js qsub -j tr -qn NN9p\$num -dl \$num  \$(expr \$num + 360) &\
+                        \n\t\t    wrapper: run amp_wrapper.py in multiple dires\
+                        \n\t\t\tamp_wrapper.py -js qsub -qn \$dirname -k \$n & \
+                        \n\t\t    te: run amp_wrapper.py -js qsub -j te\
+                        "
+dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp\
+                        \n\t\tOptions::\
+                        \n\t\t    -[p|s|m] for matching type\
+                        \n\t\t    -rp for replacement of matching part\
+                        \n\t\t    -id to include dir in scanning dir\
+                        \n\t\tUsage::\
+                        \n\t\t    dir_fname.py rename -p G4 -rp G2 -id              ! to rename directories\
+                        \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'      ! to remove pbs files \
+                        "
+convert.py_2to3_nb  =   "to convert ipynb files of python2 to python3\
+                        \n\t\t to change .py file, use 2to3 in anaconda: source anaconda.sh and activate\
+                        "
+
+command.command     = "show Recent Command"
+command.web_load    = "To load in web, copy files to ~/public_html/"
 
 ### removed
 dirjob.dir_reset="reset dir as initial state by job: -j ai"

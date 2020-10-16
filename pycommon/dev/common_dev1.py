@@ -10,7 +10,6 @@ import glob
 """
     version dependency included
     common functions gathering
-    Class:: MyClass
     yes_or_no(question) : to obtain y/n for next command
     FILES
         find_file(dir,kw): search dir & find fname with kw in front or end
@@ -23,32 +22,21 @@ import glob
     whereami(): returns function name
 """
 
-class MyClass_obj(dict):
-    instances = []      # gathers object weak reference
+class MyClass(dict):
+    instances = []
     def __init__(self, name=None):
-        self.__class__.instances.append(weakref.proxy(self))    # obj.__class__ : class MyClass
-        self.name = name                                        # obj.__class__.instances : instances is class variable
-
-class MyClass(MyClass_obj):
-    pass
-
-### is this working?
-class MyClass_str(dict):
-    instances = []      # gathers string
-    def __init__(self, name=None):
-        self.__class__.instances.append(name)                   # this is name, can't be used for obj.name 
+        self.__class__.instances.append(weakref.proxy(self))    # self.name = name
+        #self.__class__.instances.append(name)
         self.name = name
 
-def get_digits_4str(word, string):
-    ''' obtain digits after key-word '''
-    if word in string:
-        substr = re.split(word,string)[1]
-        mat = re.match('\d+', substr)
-        digits = mat.group()
-    else:
-        digits = None
-    return digits
+class MyClass_t(dict):
+    instances = []
+    def __init__(self, name=None):
+        self.__class__.instances.append(name)    # self.name = name
+        self.name = name
 
+class MyClass_s(dict):
+    pass
 
 def dir_classify_n(lsorted, class_instance, class_dict,Lwrite=1):
     """

@@ -12,6 +12,7 @@ def stat_2col(x, y, scale=1):
     #for i, (f_true, f_hypo) in enumerate(zip(x, y)):
     #    print(f" {i}: true: {f_true}, hypo: {f_hypo}")
     maxres  = np.max(np.absolute(diff))
+    imaxres = np.argmax(diff)
     meanx   = np.mean(x)
     meany   = np.mean(y)
     bias_sq = (meanx - meany)**2                # Bias(X-Y)**2
@@ -25,13 +26,14 @@ def stat_2col(x, y, scale=1):
     r_pearson = cov/np.sqrt(varx*vary)
 
     if scale != 1:
-        mse     *= scale
-        bias_sq *= scale
-        varx_y  *= scale
-        varx    *= scale
-        vary    *= scale
-        cov     *= scale
-
+        mse     *= (scale**2)
+        bias_sq *= (scale**2)
+        varx_y  *= (scale**2)
+        varx    *= (scale**2)
+        vary    *= (scale**2)
+        cov     *= (scale**2)
+        rmse    *= scale
+        maxres  *= scale
     p.mse       = mse
     p.bias_sq   = bias_sq
     p.varx_y    = varx_y
@@ -41,6 +43,7 @@ def stat_2col(x, y, scale=1):
     p.r_corr    = r_pearson
     p.rmse      = rmse
     p.maxres    = maxres
+    p.imaxres   = imaxres
 
     return p
     #return mse, bias_sq, varx_y, r_pearson, varx, vary, cov
