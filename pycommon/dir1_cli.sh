@@ -1,1 +1,0 @@
-cli_dir1.sh

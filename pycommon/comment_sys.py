@@ -181,27 +181,36 @@ server.kisti.pbs  = "=== KISTI ===\
                     \n\t    $ qsub -N dirname $SB/pypbs/pbs_vasp.sh\
                     \n\t\tnumber of process is confirmed in the script 'pbs_vasp.sh'\
                     "
-server.ssh.nodes  = "=== SSH ===\
-                    \n    alias::\
+server.ssh.check  = "=== SSH ===\
+                    \n    alias.sh::\
                     \n\t$ checknodesamp\
                     \n\t    to check amp_run.sh in running nodes in qstat\
-                    \n\t$ checknode $1\
+                    \n\t$ checknodes process\
+                    \n\t$    scan qstat and check process in the nodes\
+                    \n\t$ checknode node process1\
                     \n\t    to check 'python' in running nodes in qstat, defined alias.sh as function\
                     \n\t    $1 can be 'python', 'amp_run.py', 'qchem', etc\n\
-                    \n    Scan all the NODES for process name\
+                    \n    Scan all the NODES with process name\
+                    \n\t$ ssh_mlet_scan_nodes.sh ps process[python]\
+                    \n\t$ ssh_mlet_scan_nodes.sh psl process[python]\
+                    \n\t    simply denotes the number of the processes\
+                    \n    Check One node\
+                    \n\t$ checknode 1node process\
+                    \n    Kill One node\
+                    \n\t$ ssh node pkill process\
+                    \n\t$    kills all the processes with the name\
+                    \n    Previousely\
                     \n\t$ ssh node01 ps aux | grep process_name(vasp)\
                     \n\t    single node test for vasp\
                     \n\t$ ssh_mlet_scan_nodes.sh process_name[default=vasp]\
                     \n\t    to check (vasp, qcprog, etc) in all nodes\
-                    "
-server.ssh.node    =       "\n    Do process on ONE NODE\
+                    \n    Do process on ONE NODE\
                     \n\t$ ssh_node.sh node_id process_id number_of_processes\
                     \n\t$ ssh_node.sh node13 58412 16\
                     \n\t    echos kill 16 process on node13\
                     \n\t$ ssh_node.sh node13 58412 16 run\
                     \n\t    run kill 16 process on node13\
-                    "
-server.ssh.check_nod =     "\n    CHECK node for vasp\
+                    \n    CHECK node for vasp\
                     \n\t$ ssh node08 ps aux | grep vasp | wc -l \
                     "
 server.ssh.scripts = "\n    Scripts::\
