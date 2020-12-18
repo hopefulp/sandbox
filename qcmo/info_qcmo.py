@@ -3,14 +3,14 @@
 import argparse
 import os
 import re
-from common import dir_all, MyClass, dir_classify
+from common import dir_all, MyClass, dir_classify_n, whereami
 from mplt_mo_ini import *
 
-qcmo = MyClass()
-mplt = MyClass()
-nico2 = MyClass()
-qchem = MyClass()
-usage = MyClass()
+qcmo = MyClass('qcmo')
+mplt = MyClass('mplt')
+nico2 = MyClass('nico2')
+qchem = MyClass('qchem')
+usage = MyClass('usage')
 qchem.version=  " <= v3.1 :: for MO plot of Jmol\
                 \n\t\t\t           some key-word are not wokring\
                 \n\t\t    v4.1    :: \
@@ -47,29 +47,25 @@ mplt.mplt_qcdraw="called by mplot_mo.py through mplt_ab_draw()\
                 \n\t\t\t\tmplot_arow_homo():: draw arrow for occupied levels\
                 \n\t\t\tXrange_nf_fixed_x_length():: use decimal.Decimal for x[]"
 
-nico2.Ni_CO2red="Usage:: Ni_CO2red.py -j {moc,nbo} -m {1,2,3,4,5} -nf {1, 3, 5} -l -lf -bar -r\
-                \n\t\t-j : job of MOC and NBO\
-                \n\t\t  -js, --job_level 2 [default=1] for more extension\
+nico2.Ni_CO2red="job of MOC and NBO\
+                \n\tUsage:: Ni_CO2red.py {moc,nbo} -m {1,2,3,4,5} -nf {1, 3, 5} -l -lf -bar -r\
+                \n\t\t-js, --job_level 2 [default=1] for more extension\
                 \n\t\t-m : model 1:1-PP, 2:2-PPP, 3:3-M3-PNP, 4:4-PNP, 5:5-FeNi, 6:6-CC-FeNi\
                 \n\t\t-nf : number of qcout files 3: m-A m m-B, 5: m-A-relax 3-files CO2-relax\
                 \n\t\t-l : make link by calculation\
                 \n\t\t-lf : use link_id.dat\
                 \n\t\t-bar : use m-A-relax instead of frozen m-A\
                 \n\t\t-r : ask whether run or copy the command\
-                \n\t\te.g.: Ni_CO2red.py -m 4 -nf 5 "
-nico2.usage="\tNi_CO2.py -j moc -m 4 -nf 5 -l -lf\
-            \n\tNi_CO2red.py -j nbo -js 2 "
+                \n\t\te.g.: Ni_CO2red.py -m 4 -nf 5\
+                \n\t\tNi_CO2.py -j moc -m 4 -nf 5 -l -lf\
+                \n\t\tNi_CO2red.py -j nbo -js 2
+                \n\t\tNOB refer to \
+                "
 usage.mlot_mo_mod = qcmo.mplot_mo
 
 classobj_dict={'QCMO':qcmo, 'MPLT':mplt, 'NiCO2':nico2, 'QChem':qchem, 'Usage':usage}
 
-def jobs(Lclass,job, Lusage, model):
-    if Lusage:
-        job = 'Usage'
-        name_class = classobj_dict[job]
-        for key in name_class.__dict__.keys():
-            print(f" {job}   \t:: {name_class.__dict__[key]}")
-        return 0
+def classify(Lclassify, work, Lusage, model):
 
     mdir = os.path.dirname(__file__)
     print(f"List directory of {mdir} ")
@@ -79,58 +75,85 @@ def jobs(Lclass,job, Lusage, model):
     sort_dir = sorted(dirs)
     if sort_dir:
         print("Directories:: ")
-        for f in sort_dir:
-            print(f"    {f}")
+        if not Lclassify:
+            for f in sort_dir:
+                print(f"    {f}")
+        else:
+            for instance in MyClass.instances:
+                for gkey in globals().keys():
+                    if gkey == instance.name:
+                        break
+                if work != instance.name:
+                    ckeys = dir_classify_n(sort_dir, instance.name, globals()[gkey], Lwrite=1) # globals()[instance.name] is not working
+                else:
+                    ckeys = dir_classify_n(sort_dir, instance.name, globals()[gkey], Lwrite=0)
+                    for ckey in ckeys:
+                        print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
+            print("  == not classified")
+            for f in sort_dir:
+                print(f"    {f}")
+
     if sort_exe:
         print("Executable:: ")
-        if not Lclass:
+        if not Lclassify:
             for f in sort_exe:
                 print(f"    {f}")
         else:
-            for key in classobj_dict.keys():
-                fkey = dir_classify(sort_exe, key, classobj_dict)
-                if job:
-                    name_class = classobj_dict[job]
-                    for key in name_class.__dict__.keys():
-                        if key in fkey:
-                            print(f"    {key}.py\t:: {name_class.__dict__[key]}")
-            print("  == remainder ")
+            ### confer "ini_pypbs.py", MyClass.instances is a list of string as class variables
+            for instance in MyClass.instances:
+                ### globals() includes MyClass() instances as keys
+                for gkey in globals().keys():
+                    if gkey == instance.name:
+                        break
+                ### work == None without -w
+                if work != instance.name:
+                    ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=1) # globals()[instance.name] is not working
+                else:
+                    ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=0)
+                    for ckey in ckeys:
+                        print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
+            print("  == not classified")
             for f in sort_exe:
                 print(f"    {f}")
+
     if sort_mod:       
         print("Module:: ")
-        if not Lclass:
+        if not Lclassify:
             for f in sort_mod:
-                print(f"    {f}")
+                print("    {}".format(f))
         else:
-            for key in classobj_dict.keys():
-                fkey = dir_classify(sort_mod, key, classobj_dict)
-                if job:
-                    name_class = classobj_dict[job]
-                    for key in name_class.__dict__.keys():
-                        if key in fkey:
-                            print(f"    {key}.py\t:: {name_class.__dict__[key]}")
-            print("  == remainder ")
+            for instance in MyClass.instances:
+                for gkey in globals().keys():
+                    if gkey == instance.name:
+                        break
+                if not work or work != instance.name:
+                    ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite=1)
+                else:
+                    ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite=0)
+                    for ckey in ckeys:
+                        print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
+            print("  == not classified ")
             for f in sort_mod:
                 print(f"    {f}")
-    if job == "QChem":
+
+    if work == "QChem":
         name_class = classobj_dict[job]
         for key in name_class.__dict__.keys():
             print(f" {job}   \t:: {name_class.__dict__[key]}")
             
     print(f"#Comment: -c    for classification'\
             \n\t  -u for usage: equal to -j USAGE\
-            \n\t  -j {classobj_dict.keys()} for detail ")
+            \n\t  -w {classobj_dict.keys()} for detail ")
 
 def main():
     parser = argparse.ArgumentParser(description="display Usage for $SB/py_qcmo  ")
-    parser.add_argument('-c','--classify', action='store_true', help="classify ")
-    parser.add_argument('-j','--job', help="present class details ")
+    parser.add_argument('-c','--classify', action='store_false', help="classify ")
+    parser.add_argument('-w','--work', help="present class details ")
     parser.add_argument('-u','--usage', action='store_true', help="present main details")
     parser.add_argument('-m','--model', type=int, help="present main details")
     args = parser.parse_args()
 
-    jobs(args.classify,args.job,args.usage,args.model)
+    classify(args.classify,args.work,args.usage,args.model)
 
 if __name__ == "__main__":
     main()

@@ -16,6 +16,7 @@ usage   = MyClass('usage')
 amp     = MyClass('amp')
 qchem   = MyClass('qchem')
 qsleep  = MyClass('qsleep')
+process = MyClass('process')
 
 # if not use input variables, define here
 sge.usage="$qstat -f    # see all nodes(/used/total) and my job\
@@ -25,22 +26,47 @@ sge.usage="$qstat -f    # see all nodes(/used/total) and my job\
             \n\t\t$qhist       # shows number of running cores and jobs in Queue\
             \n\t\t$qmem        # memory\
             "
-sge.qsub_server     = "\n\tqsub_server.py\
-                    \n\t    diverse qsub contents\
-                    "
 sge.sge_dir_run     = "\n\tsge_dir_run.py\
                     \n\t    run in a directory w/wo qsub\
+                    "
+qsub.qsub_server     = f"QSUB JOB\
+                    \n\tautodetection of server ['login','chi']\
+                    \n\tWorks: ['qchem','amp','vasp','sleep']\
+                    \n\t    Q-Chem:\
+                    \n\t\tOne Job::\
+                    \n\t\t    qsub_server.py qchem -qj Nimono -i CO2M06(.in) -n 16 -m 5(G)\
+                    \n\t\t    qsub_server.py qchem -qj CC6 -i 6-CC-NiFe.in -n 6 -m 6 -no skylake@node14\
+                    \n\t\tN.B.::\
+                    \n\t\t    showall.py -s -j qchem\
+                    \n\t\t    job downs in opt&slet -> specify -no skylake@node??\
+                    \n\t\t\tby checking qmem & qstat\
+                    \n\tOptions:\
+                    \n\t    PBS:\
+                    \n\t\t-qj --qjobname\
+                    \n\t\t-i --inf inputfile\
+                    \n\t\t-m --mem memory\
+                    \n\t\t-n --np  nproc\
+                    \n\t\t-no --node specify node\
                     "
 qsub.usage          ="qsub -N jobname -v var=a_variable /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh\
                     \n\t\t$var can be used as variable in the script\
                     \n\t\tscript name should be full name\
                     "
+qsub.qdel           ="qdel (from) job-ID (to) job-ID\
+                    \n\tto kill process in master node: rt. process.prockill\
+                    "
+process.prockill    ="kill (from) PID (to) PID\
+                    "
 ssh.ssh_node_byproc = "\n\tssh_node_byproc.sh node index_proc num_proc[default=16]\
                     \n\t    kill process in a node\
                     "
-ssh.ssh_mlet_scan_nodes   = "\n\tssh_mlet_nodes.sh [ls|rm|mkdir|vasp|qchem|ln|python] [$2]\
+ssh.ssh_mlet_scan_nodes   = "\n\tssh_mlet_nodes.sh [ls|rm|mkdir|qchem|ln|ps|psl] [$2]\
                     \n\t    : scan all nodes in mlet\
                     \n\t    depending on $1, $2 is required\
+                    \n\tUsage::\
+                    \n\t    psl python - runs ssh all-nodes ps aux | grep python\
+                    \n\t\t:ps shows all the line, psl shows just the number of lines for python process\
+                    \n\t:: also check alias.sh for chechnodes for qstat nodes and checknode for one node\
                     "
 ssh.ssh_node_kill   = "\n\tssh_node_kill.sh proc_name nodes\
                     \n\t    : for the given nodes find process of proc_name the kill each process\
@@ -177,13 +203,12 @@ def works(Lclassify, work,Lusage,fname,Lrun,quejob,np,nmem,que,qchem_Lsave):
     for instance in MyClass.instances:
         print(f"{instance.name}", end=' ') 
     print("\n\t    -w for detail")
-    print(f"#Comment: -c    for classification")
 
     return 0
 
 def main():
-    parser = argparse.ArgumentParser(description="display Usage for $SB/pypbs  ")
-    parser.add_argument('-c','--classify', action='store_true', help="classify ")
+    parser = argparse.ArgumentParser(description="PBS in $SB/pypbs  ")
+    parser.add_argument('-c','--classify', action='store_false', help="classify ")
     #parser.add_argument('-w','--work',  choices=['AMP','QChem','SGE','Qsub','Qsleep','GRMX'], help="several explanation option ")
     parser.add_argument('-w','--work',  help="several explanation option ")
     parser.add_argument('-f', '--infile', help='energy data input file')

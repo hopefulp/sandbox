@@ -2,7 +2,6 @@
 '''
     2020.08.25 GA(genetic algorithm) was encoded by job='trga', 'tega', if 'ga' in job, turn on Lga
     2020.08.25 Ltest-force is deprecated. if there is force training, make a force test
-    2020.11.13 find amp-pot in the directory even though -p None
 '''
 
 import argparse
@@ -10,7 +9,7 @@ import numpy as np
 #import my_chem
 from my_images import Images
 from common import yes_or_no
-from ampplot_test import get_title         ### FOR MLET
+from amp_plot import get_title         ### FOR MLET
 import re
 import sys
 import os
@@ -30,7 +29,7 @@ from amp.regression import Regressor
 from amp.utilities import Annealer
 from amp.descriptor.cutoffs import Cosine
 from amp.descriptor.gaussian import Gaussian
-import ase
+
 Lprint = 0
 
 ### Amp job 1: Train Images 
@@ -42,25 +41,24 @@ def calc_train_images(images, des_obj, HL, Elist, flist, ncore, amp_pot=None, ma
         print("Energy convergence: {}".format(E_conv))
         print("Energy maxresidue: {}".format(E_maxresid))
     cores={'localhost':ncore}   # 'localhost' depress SSH, communication between nodes
-    ### Detect amp.pot
-    ### if amp.pot: load
-    calc = amp_util.read_amppot(pot=amp_pot, mvpot=True)
+    ### if amp.pot is loaded
+    if amp_pot:
+        calc = Amp.load(amp_pot)
     ### descriptor checking?
-    ### if load amp.pot, is this necessary?
-    if calc == None:
-        if des_obj.name == 'gs':
-            #from amp.descriptor.gaussian2 import Gaussian        # original gaussian, modified gaussian2
-            gs = des_obj.make_Gs(images[0]) # images[0] to obtain atom symbols
-            #print(gs, f"in {whereami()} of {__name__}")
-            calc = Amp(descriptor=Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-            #calc = Amp(descriptor=my_gauss.Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-        elif des_obj.name == 'zn':
-            from amp.descriptor.zernike import Zernike
-            calc = Amp(descriptor=Zernike(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-        elif des_obj.name == 'bs':
-            from amp.descriptor.bispectrum import Bispectrum
-            calc = Amp(descriptor=Bispectrum(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
-        ### Global Search in Param Space
+    if des_obj.name == 'gs':
+        #from amp.descriptor.gaussian2 import Gaussian        # original gaussian, modified gaussian2
+        gs = des_obj.make_Gs(images[0]) # images[0] to obtain atom symbols
+        #print(gs, f"in {whereami()} of {__name__}")
+        calc = Amp(descriptor=Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+        #calc = Amp(descriptor=my_gauss.Gaussian(Gs=gs,cutoff=Cosine(des_obj.cutoff),fortran=False), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+    elif des_obj.name == 'zn':
+        from amp.descriptor.zernike import Zernike
+        calc = Amp(descriptor=Zernike(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+    elif des_obj.name == 'bs':
+        from amp.descriptor.bispectrum import Bispectrum
+        calc = Amp(descriptor=Bispectrum(), model=NeuralNetwork(hiddenlayers=Hidden_Layer), cores=cores)
+    ### Global Search in Param Space
+    if not amp_pot:
         Annealer(calc=calc, images=images, Tmax=20, Tmin=1, steps=4000)
     ### set convergence for LossFunction
     convergence={}
@@ -82,16 +80,9 @@ def calc_train_images(images, des_obj, HL, Elist, flist, ncore, amp_pot=None, ma
     ### this is always working for max_iteration
     regressor = Regressor(optimizer='BFGS', max_iterations=max_iter)    #'L-BFGS-B'
     calc.model.regressor = regressor
-    ### to check train finished
-    if os.path.isfile(amp_ini.amptrain_finish):
-        os.system(f"rm {amp_ini.amptrain_finish}")
     calc.train(images=images, overwrite=True)
-    #calc.train(images=images, max_iterations=max_iter, overwrite=True) # not working in case Annealing runs
-    ### Note: when train fails, it might stop running this script here making "amp-untrained-parameters.amp"
-    ### Leave message for finishing training
-    os.system(f"touch {amp_ini.amptrain_finish}")
-    print("Train in finished")
-    return 0
+    #calc.train(images=images, max_iterations=max_iter, overwrite=True) # not working in case Annealing runs 
+    return
 
 ### AMP job 2: Test
 def calc_test_images(images, calc, f_conv_list, title, suptitle,ncore,na_in_mol,Lgraph, outf='test_result.txt', Ltwinx=None, Lga=False, val_id=None):
@@ -142,7 +133,7 @@ def calc_test_images(images, calc, f_conv_list, title, suptitle,ncore,na_in_mol,
         score = amp_util.get_score_e(e_rmse, e_maxres)
         amp_util.write_result(outf, score, e_rmse, e_maxres)
      
-    ### amp_ini.ampout_score = "ga_fit.txt" >> every test reports "score.dat"
+    ### amp_ini.ampout_chromosome_fitness = "ga_fit.txt" >> every test reports "score.dat"
     ### get hl directory from images, amp.amp
     hl = calc.model.parameters.hiddenlayers[images[0][0].symbol]  # hl is tuple, 
     with open('score.dat', 'w') as f:
@@ -166,7 +157,18 @@ def amp_md(atoms, nstep, dt, amp_pot):
     from ase.md import VelocityVerlet
 
     traj = ase.io.Trajectory("traj.traj", 'w')
-    calc = amp_util.read_amppot(pot=amp_pot)
+
+    if amp_pot:
+        calc = Amp.load(amp_pot)
+    else:
+        try:
+            calc = Amp.load("amp.amp")
+        except FileNotFoundError:
+            try:
+                calc = Amp.load("amp-untrained-parameters.amp") 
+            except FileNotFoundError:
+                print("Error: amp-pes.amp file does not exist, input amp-pot file by -p")
+                sys.exit(1)
 
     atoms.set_calculator(calc)
     atoms.get_potential_energy()
@@ -174,14 +176,13 @@ def amp_md(atoms, nstep, dt, amp_pot):
     traj.write(atoms)
     dyn = VelocityVerlet(atoms, dt=dt * units.fs)
     f = open("md.ene", "w")
-    f.write(f"{'time':^5s}{'Etot':^15s}{'Epot':^15s}{'Ekin':^10s}\n")
-    print(f"   {'time':^5s}{'Etot':^15s}{'Epot':^15s}{'Ekin':^10s}")
+    f.write("{:^5s} {:^10s} {:^10s} {:^10s}\n".format("time","Etot","Epot","Ekin"))
     for step in range(nstep):
         pot = atoms.get_potential_energy()  # 
         kin = atoms.get_kinetic_energy()
         tot = pot + kin
-        f.write(f"{step:5d}{tot:15.4f}{pot:15.4f}{kin:10.4f}\n")
-        print(f"{step:5d}{tot:15.4f}{pot:15.4f}{kin:10.4f}")
+        f.write("{:5d}{:10.5f}{:10.5f}{:10.5f}\n".format(step, tot, pot, kin))
+        print("{}: Total Energy={}, POT={}, KIN={}".format(step, tot, pot, kin))
         dyn.run(2)
         traj.write(atoms)                   # write kinetic energy, but pot is not seen in ase
     f.close()        
@@ -202,7 +203,6 @@ def amp_jobs(fdata,job,descriptor,amp_inp,HL,E_conv,f_conv_list,max_iter,ncore,n
     outf = "hyperparam_" + job + ".dat"
     ### parameter file
     total_images = amp_util.get_total_image(fdata,ndata)    # can read extxyz, OUTCAR, 
-    #total_images = ase.io.read(fdata,ndata)
     if Lprint: print(f"dstype {dstype} dslist {dslist} with data {len(total_images)} in {whereami()}: 1st")
     tr_images, te_images = amp_util.data_partition(total_images, dstype, dslist, job)
     if job == 'te':
@@ -218,7 +218,7 @@ def amp_jobs(fdata,job,descriptor,amp_inp,HL,E_conv,f_conv_list,max_iter,ncore,n
     Lga = False
     if re.search('ga', job):
         Lga = True
-    title, suptitle = get_title(fdata, HL, E_conv,f_conv_list, ntrain, ntest, title=None)
+    title, suptitle = get_title(fdata, HL, E_conv,f_conv_list, ntrain, ntest)
     if re.search("pr", job):
         y=[]
         for mol in total_images:

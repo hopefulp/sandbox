@@ -19,7 +19,7 @@ job=${1:-$job_default}
 
 
 #echo $job
-if [ $job == "ls" -o $job == "mkdir" -o $job == "rm" -o $job == "ps" ]; then
+if [ $job == "ls" -o $job == "mkdir" -o $job == "rm" -o $job == "ps" -o $job == "psl" ]; then
     arg2=${2:-$pname}
     #if [ -z $arg2 ]; then
     #    echo "input 2nd argument for $job as \$2"
@@ -34,6 +34,9 @@ for node in $nodes; do
     case $job in
         "ps")
             ssh $node ps aux | grep $arg2
+            ;;
+        "psl")
+            ssh $node ps aux | grep $arg2 | wc -l
             ;;
         "ls")
             ssh $node ls $arg2

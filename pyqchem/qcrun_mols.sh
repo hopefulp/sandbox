@@ -1,36 +1,19 @@
 #!/bin/bash
 
-#rem=eda_pbed
+rem=b3lyp_G631sD3_eda
 
-#if [ $# -ne 0 ]; then
-#  rem=$1
-#fi
+remfile=${1:-$rem}
 
-pbs=pbs_qchem1_$HOST.sh
-bin=/qcfs/joonho/bin
+#pbs=pbs_qchem1_$HOST.sh
 
-if [ ! -e $pbs ]; then
-    echo "There is no pbs file of $pbs"
-    exit
-fi
+ippn=12
+ppn=${2:-$ippn}
 
-case $HOST in
-    "kdft")
-	ppn=12
-    	;;
-    "psi")
-	ppn=16
-	;;
-    *)
-	echo "Error:: There is no host in the host list"
-	exit
-	;;
-esac
-
-for x in `ls *.mol`
+for molfile in `ls *.mol`
   do
-    fmol=$( basename $x | cut -d'.' -f1 )
-    #cat rem.eda_pbed $f_pre.mol > $f_pre.in
-    $bin/changeline_pbs_QChem.pl $pbs $fmol  $ppn
+    fmol=$( basename $molfile | cut -d'.' -f1 )
+    echo "cat $molfile  rem.$remfile > $fmol.in"
+    cat $molfile  rem.$remfile > $fmol.in
+#    $bin/changeline_pbs_QChem.pl $pbs $fmol  $ppn
   done
 

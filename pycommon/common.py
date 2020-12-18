@@ -57,7 +57,7 @@ def dir_classify_n(lsorted, class_instance, class_dict,Lwrite=1):
     #print(classobj_dict_key)
     luse=[]
     ukeys=[]        # used keys
-    lsuff=['py','sh','csh']
+    lsuff=['py','sh','csh','pl']
     for f in class_dict.__dict__.keys():             # as for keys == py_fname(.py)
         Ltag = False
         for suf in lsuff:
@@ -273,10 +273,11 @@ def get_files_match(matches, dname, Lshow, Ldir=False):
         #print(f"{fname}")
         for match in matches:
             if re.search(match, fname):
+                ### if it is dir skip
                 if os.path.isdir(fname) and not Ldir:
                         continue
                 if Lshow:
-                    print(f"detect {fname}")
+                    print(f"detect {fname}") # in {match} {matches}")
                 matched_files.append(fname)
     return matched_files
 

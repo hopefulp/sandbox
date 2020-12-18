@@ -33,7 +33,7 @@ amp_getqsub_str = { 'noforce': ' -j tr -hl 4 -el 0.001 -fl -0.1', 'force': ' -j 
 amp_getqsub_datatype = amp_data_type
 amp_getqsub_symmfuncttype = amp_gaussian_function_param
 
-def show_command(job, job_submit, qname, sftype, dtype, keyvalues):
+def show_command(job, job_submit, qname, keyvalues, nodename, sftype, dtype):
     
     if keyvalues:
         kw1 = keyvalues[0]
@@ -55,11 +55,15 @@ def show_command(job, job_submit, qname, sftype, dtype, keyvalues):
             print("GA")
             print("ga_amp_run.py -js node -nch 8 -hl 10 -nn 10 -np 5 [-c] &")
         elif job_submit == 'qsub':
-            print("Shell script to run multiple jobs")
-            print(f"dir_cli.sh ampwrap hl 4 5 6 7 8 9 10  | sh")
+            print("Structure of script to run multiple amp jobs::\
+            \n    ampdir.sh wrapper_subdir [| sh]; which runs\
+            \n    amp_wrapper.py -js qsub -qn Npn${n}hl20 -sf NN${n} -hl 20 20 -dl 1000 1300 3500 3600 &; which runs\
+            \n    make mlet_tr(te).csh and run qsub\
+            \n    qsub -N HL44tr -pe numa 8 -l mem=12G mlet_tr.csh\
+            \n\tmlet_tr.csh should have -f force to make force_derivative directory\
+            ")
             print("AMP JOBS")
-            print("    ampdir.sh job")
-            print("\tjob: wrapper wrapper_subdir grep sh etc")
+            print("    ampdir.sh job[wrapper wrapper_subdir grep sh etc]")
             print("\nAMP WRAPPER:: train and test with failed-convergence")
             print(f"\tamp_wrapper.py -js qsub [-j [te|tr|trte]] -qn HL44 [-hl 4 4] [-dl int int]  [-s] [-c] &")
             print(f"\tamp_wrapper.py -js qsub &  !!! all options in the script")
@@ -68,7 +72,10 @@ def show_command(job, job_submit, qname, sftype, dtype, keyvalues):
             print("\tamp_wrapper.py -js qsub -sf logpn10max200 -qn HL1010 -hl 10 10 -dl 1000 1100 3500 3600 &")
             print("\tqsub -N HL44tr -pe numa 8 -l mem=12G mlet_tr.csh")
             print("    Water molecule:\
-                    \n\tamp_wrapper.py -f w1.extxyz -js qsub -qn wat1pn5 -sf NN5 -hl 10 10 -dl 0 300 900 1000 -nt 1000 &")
+                    \n\tamp_wrapper.py -f w1.extxyz -js qsub -qn wat1pn5 -sf NN5 -hl 10 10 -dl 0 300 900 1000 -nt 1000 &\
+                    \n\tamp_wrapper.py -f w1.extxyz -qn wat1pn5 -sf NN5 -hl 10 10 -dl 0 700 900 1000 -nt 1000 &\
+                    ")
+
             print("    DB folder")
             print("\tamp_wrapper.py -js qsub -j tr -qn hl4 -dl 0 400 &")
             print("    DB")
@@ -92,11 +99,11 @@ def show_command(job, job_submit, qname, sftype, dtype, keyvalues):
         else:
             d_pre='ND'
         print("\nPLOT")
-        print("    TRAIN")
+        print("    TRAIN & TEST")
         print("\tampdir.sh grep")
-        print("\tampplot_xy.py -p NN -t 'Ndata 100 (Gs-pow)' ")
-        print("\tampplot_xy.py -p NN -t 'Training Set: Gs-pow' -yv tr -yd . Ndata300")
-        print("\tampplot_xy.py -p NN -t 'Test Set    : Gs-pow' -yv te -yd . Ndata300")
+        print("\tampplot_dir.py -p NN -t 'Ndata 100 (Gs-pow)' ")
+        print("\tampplot_dir.py -p NN -t 'Training Set: Gs-pow' -y tr -yd . Nd300hl2020 Nd500hl2020")
+        print("\tampplot_dir.py -p NN -t 'Test Set    : Gs-pow' -y te -yd . Nd300hl2020 Nd500hl2020")
         print("    TEST")
         print(f"\tampplot_stat_dir.py -p {d_pre} -le mse -t 'Energy Training' -k hl")
         print("\t    in case dir scan is hl: -k hl")
@@ -110,6 +117,20 @@ def show_command(job, job_submit, qname, sftype, dtype, keyvalues):
         print("\tampplot_stat_dir.py -p NN -le maxres -sd Ndata300 -f f -xl Nparam -t 'Ndata 300 (Gs-pow)' -yl \"F\$_{rmse}\$ (eV/A)\" \"F\$_{maxres}\$ (eV/A)\"")
         print("\tampplot_stat_dir.py -p nd100i -le mse -t 'Energy (ND=100)' -xl \"Data index\"")
         print("\tampplot_stat_dir.py -p nd100i -le maxres -t 'Force (ND=100)' -yl \"F\$_{rmse}\$ (eV/A)\" \"F\$_{maxres}\$ (eV/A)\"  -xl 'Data index'")
+    elif job == 'qchem':
+        if job_submit == 'qsub':
+            print("Run Q-Chem")
+            print("    N.B.:")
+            print("\tv5.1 parallel runs only at skylake@node!!")
+            if not nodename:
+                print("    qsub_server.py qchem -qj CC6 -i 6-CC-NiFe.in -n 6 -m 6 -no skylake@node14")
+            else:
+                print(f"    qsub_server.py qchem -qj CC6 -i 6-CC-NiFe.in -n 6 -m 6 -no {nodename}")
+            print("\tN.B.: qchem parallel 5.1p doesnot run at Node of (haswell)opt, (sandy)slet -> use skylake@node00")
+            print("\t-n for nproc, -m for mem")
+            print("NBO analysis")
+            print("    qcout_nbo.py nbo -f 5-NiFe.out -a C O O Ni P P Fe P P N -g C O O")
+
     else:
         print("build more jobs")
     return 0 
@@ -118,16 +139,18 @@ def show_command(job, job_submit, qname, sftype, dtype, keyvalues):
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', nargs='?', default='amp', choices=['amp'],  help="one of amp,  ")
+    parser.add_argument('job', nargs='?', default='amp', choices=['amp','qchem'],  help="one of amp, qchem")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '--qname', default='amptest', help="queue name for qsub shown by qstat")
-    parser.add_argument('-dt', '--data_type', default='int', choices=['int','div'], help="data selection type")
-    parser.add_argument('-ft', '--func_type', default='log', choices=['log','pow'], help="gaussian symmetry function parameter type")
     parser.add_argument('-k', '--keyvalues', nargs='*', help='change a keyword in print')
+    parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
+    ampg = parser.add_argument_group(title = 'AMP args')
+    ampg.add_argument('-dt', '--data_type', default='int', choices=['int','div'], help="data selection type")
+    ampg.add_argument('-ft', '--func_type', default='log', choices=['log','pow'], help="gaussian symmetry function parameter type")
 
     args = parser.parse_args()
 
-    show_command(args.job,args.job_submit,args.qname,args.func_type,args.data_type, args.keyvalues)
+    show_command(args.job,args.job_submit,args.qname,args.keyvalues, args.nodename, args.func_type,args.data_type)
 
 if __name__ == "__main__":
     main()

@@ -54,16 +54,16 @@ def d_clean(dirs,works,prefix, suffix, matches, exclude,excl_fnames, linux_job,n
 
         elif work == 'pbs':
             matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI', 'sge']
-            f_list = get_files_match(matches, d, Lshowmatch)
+            f_list = get_files_match(matches, d, Lshow=Lshowmatch)
             f_list_all.extend(f_list)
         elif work == 'amp':
-            fmatches=['amp','pdf','dat', 'ga', 'GA', 'te', 'sh']
+            fmatches=['amp','pdf','dat', 'ga', 'GA' ]
             ### if Lall_rm: remove directory also
-            f_list = get_files_match(fmatches, d, Lshowmatch)
+            f_list = get_files_match(fmatches, d, Lshow=Lshowmatch)
             f_list_all.extend(f_list)
-            dmatches=['ch']
-            f_list = get_files_match(dmatches, d, Lshowmatch, Ldir=Lall_rm)
-            f_list_all.extend(f_list)
+            #dmatches=['ch']
+            #f_list = get_files_match(dmatches, d, Lshowmatch, Ldir=Lall_rm)
+            #f_list_all.extend(f_list)
                 
         elif work == 'lmp':
             matches=['trj', 'log']

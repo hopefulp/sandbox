@@ -10,7 +10,7 @@ import amp_ini
 import amp_util
 from ase.calculators.calculator import Parameters
 
-def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl, dlist, sftype):
+def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl, dlist, ndtotal, sftype):
     '''
     sleeptime: There are two qsub for train/test. These have time interval using time.sleep()
     to test routine: control
@@ -35,16 +35,18 @@ def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl
             sys.exit(0)
         max_iter    = 10
         sleeptime   = 600
-        ncore       = '20'
-        mem         = '3G'
+        ncore       = '16'
+        mem         = '2.5G'
     else:
         ### main check point (1)
         if not dlist:
             dlist   = [1000,2000,3500,3800]      # [1000,1100,3500,4000] [1000,2500,3500,3600]
-        max_iter    = 3000
-        sleeptime   = 100
-        ncore       = '16'      # ncore 16, mem 11 for 188G
-        mem         = '10G'
+        max_iter    = 10000  # 5000(Nd300), 10000(Nd500, it takes one weak)
+        sleeptime   = 600    # 600
+        ### Nd500: 
+        ### Nd300: pn50 8.6G, in 96: np10 m8.6
+        ncore       = '12'      # ncore 16, mem 11 for 188G
+        mem         = '13G'     # 11G for ND500 15G
     if hl:
         str_hl = ' '.join(str(x) for x in hl)
     else:
@@ -67,8 +69,14 @@ def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl
             p_tr['sftype'] = 'logm200n10'
         if 'max_iter' in locals():
             p_tr['max_iter'] = max_iter
-
-
+    ### add keyword for tr and te
+    if fin != 'OUTCAR':
+        p_tr['fname'] = fin
+        p_te['fname'] = fin
+    if ndtotal:
+        p_tr['ndtotal'] = ndtotal   # int
+        p_te['ndtotal'] = ndtotal   # int
+            
     if force_train == None:
         p_tr.train_f = None
         p_te.train_f = None
@@ -76,9 +84,10 @@ def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl
     ### make and run amp_run.py command for train
     if re.search('tr', ampjob):
         #if os.path.isfile("amp.amp") or os.path.isfile("amp-untrained-parameters.amp"):
-        if amp_util.get_amppotname():
-            print("There are amp potential file so exit")
-            sys.exit(1)
+        ### deprecate checking amp.pot
+        #if amp_util.get_amppotname():
+        #    print("There are amp potential file so exit")
+        #    sys.exit(1)
         ### run training
         if job_submit == 'qsub':
             ampstr = amp_ini.Amp_string(add_amp_kw=p_tr)
@@ -104,9 +113,10 @@ def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl
             time.sleep(sleeptime)
             if not os.path.isfile("amp-log.txt"):
                 if job_submit == 'qsub':
-                    print(f"{cwd}:: job is not loaded in queue")
+                    print(f"{cwd}-{qname}:: job is not loaded in queue")
             else:
-                print(f"{cwd}:: waiting until training finishes")
+                print(f"{cwd}-{qname}:: waiting until training finishes")
+            ### this is not working: when calc.train() in amp_run.py fails, doesnot make amp_ini.amptrain_finish but lives untrained.amp
             if os.path.isfile("amp.amp") or os.path.isfile("amp-untrained-parameters.amp"):
                 break
         print("\n\n\ntraining is done")
@@ -120,7 +130,6 @@ def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl
             ampstr = amp_ini.Amp_string(add_amp_kw=p_te)
             with open("mlet_te.csh", 'w') as f:
                 f.write(ampstr.qscript)
-
         elif job_submit == 'node':
             ampstr = amp_ini.Amp_string(add_amp_kw=p_te)
         print(ampstr())
@@ -128,14 +137,14 @@ def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl
         if test_wrapper == 'c' or test_wrapper == 's':
             sys.exit(3)
         else:
-            if os.path.isfile(amp_ini.ampout_chromosome_fitness):
-                os.system(f"rm {amp_ini.ampout_chromosome_fitness}") 
+            if os.path.isfile(amp_ini.ampout_score):
+                os.system(f"rm {amp_ini.ampout_score}") 
             os.system(ampstr())
 
         while True:
             time.sleep(sleeptime)
-            print(f"{cwd}:: test is going until finding '{amp_ini.ampout_chromosome_fitness}'")
-            if os.path.isfile(amp_ini.ampout_chromosome_fitness):
+            print(f"{cwd}-{qname}:: test is going until finding '{amp_ini.ampout_score}'")
+            if os.path.isfile(amp_ini.ampout_score):
                 break
         print("Job is Done")
 
@@ -151,13 +160,15 @@ def main():
     amp_gr = parser.add_argument_group(title='AMP')
     amp_gr.add_argument('-hl', '--hidden_layer', nargs='*', type=int, default=[4], help='Hidden Layer of lists of integer')
     amp_gr.add_argument('-dl', '--data_list', nargs='*', type=int, help='data index')
+    amp_gr.add_argument('-nt', '--ndtotal', type=int, help='data index')
+
     amp_gr.add_argument('-sf', '--sym_function', help='input symmetry function with type of log10 and pow(N,N) such as logpn10max20, NN10')
     parser.add_argument('-t', '--test_wrapper', choices=['c','s','r','db'],  help='test amp_wrapper.py by "c" == "s" for check qsub file and r for short run w. qsub')
     parser.add_argument('-k', '--keyv', help='extra key values for special test')
 
     args = parser.parse_args()
 
-    run_amp_wrapper(args.inf, args.job_submit, args.qname, args.job, args.test_wrapper, args.keyv, args.hidden_layer, args.data_list, args.sym_function)
+    run_amp_wrapper(args.inf, args.job_submit, args.qname, args.job, args.test_wrapper, args.keyv, args.hidden_layer, args.data_list, args.ndtotal, args.sym_function)
     return 0
 
 

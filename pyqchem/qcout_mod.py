@@ -787,6 +787,16 @@ AngSym=('1s', '2s', '2px', '2py', '2pz')
 
 ###################################### MODULE 3 :: NBO Bonding extraction #######################
 def analyze_nbo(f, nao_chg, chg_sum_group):
+    '''
+    inputs
+        f       : for one file
+        nao_chg : atoms to be found
+        chg_sum_group: atoms for the charge to be sum
+    prints
+        nao_chg atom lines
+    returns
+        charge in float
+    '''
     print (f"####################  MODULE 3 (NBO):: analyze NBO in {os.path.basename(__file__)} {whereami()}() ")
     tag_nbo = "OFF"
     flag_nbo= "NO"
@@ -794,6 +804,7 @@ def analyze_nbo(f, nao_chg, chg_sum_group):
     ibd=0
     ibd_atom=0
     nb_line=[]
+    nbo_charge_lines=[]
     flag_chg = False
     tag_chg  = False
     if nao_chg:
@@ -834,6 +845,7 @@ def analyze_nbo(f, nao_chg, chg_sum_group):
                     #if atom_id in nao_chg:
                     if atom_name in nao_chg:
                         print(line.strip())
+                        nbo_charge_lines.append(line.strip())
                         nao_chg.remove(atom_name)
                         if atom_name in chg_sum_group:
                             chg_sum_group.remove(atom_name)
@@ -903,4 +915,9 @@ def analyze_nbo(f, nao_chg, chg_sum_group):
                         nb_line=[]
                         flag_bd="NO"
                         continue
-    return 0
+    chgs=[]                       
+    for line in nbo_charge_lines:
+        chg = line.split()[2]
+        chgs.append(chg)
+
+    return chgs

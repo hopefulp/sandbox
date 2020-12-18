@@ -1,28 +1,29 @@
-from common import MyClass
-import comment_sys as mod_sys
+from common import MyClass_str as MyClass
+#from common import MyClass
+#import comment_sys as mod_sys
 
-amp                 = MyClass()
-amp.server              = MyClass()
-amp.run                 = MyClass()
-amp.source              = MyClass()
-amp_scripts             = MyClass()
-lammps              = MyClass()
-lammps.start            = MyClass()
-lammps.lamphet          = MyClass()
-lammps.kim              = MyClass()
-myplot              = MyClass()
-nico2               = MyClass()
-packmol             = MyClass()
-qcmo                = MyClass()
-qchem               = MyClass()
-qchem.server            = MyClass()
-qchem.server.MLET       = MyClass()
-qchem.server.CHI        = MyClass()
-qchem.server.KISTI      = MyClass()
-vasp                = MyClass()
-vasp.server             = MyClass()
-vasp.scripts            = MyClass()
-vasp.postproc           = MyClass()
+amp                 = MyClass('amp')
+amp.server              = MyClass('amp.server')
+amp.run                 = MyClass('amp.run')
+amp.source              = MyClass('amp.source')
+amp_scripts             = MyClass('amp_scripts')
+lammps              = MyClass('lammps')
+lammps.start            = MyClass('lammps.start')
+lammps.lamphet          = MyClass('lammps.lamphet')
+lammps.kim              = MyClass('lammps.kim')
+myplot              = MyClass('myplot')
+nico2               = MyClass('nico2')
+packmol             = MyClass('packmol')
+qcmo                = MyClass('qcmo')
+qchem               = MyClass('qchem')
+qchem.server            = MyClass('qchem.server')
+qchem.server.mlet       = MyClass('qchem.server.mlet')
+qchem.server.chi        = MyClass('qchem.server.chi')
+qchem.server.kisti      = MyClass('qchem.server.kisti')
+vasp                = MyClass('vasp')
+vasp.server             = MyClass('vasp.server')
+vasp.scripts            = MyClass('vasp.scripts')
+vasp.postproc           = MyClass('vasp.postproc')
 water       = MyClass()
 #server.sge     = MyClass()
 
@@ -198,7 +199,8 @@ amp.md_anal     =   "\n    == MD Analysis ==\
                     \n\tMD.ene:\
                     \n\t    1st line: \"time    Etot    Epot    Ekin\"\
                     \n\tUsage:\
-                    \n\t    $ run_fplot.py -f md.ene -ity 3 -t AMP-MD -yl \"E(eV)\" -yl2 \"E_kin(eV)\" -xl \"time (10fs)\" -tx \
+                    \n\t    $ mplot_f.py -f md.ene -icy2 3 -t AMP-MD -yl \"E(eV)\" -yl2 \"E_kin(eV)\" -xl \"time (10fs)\" -tx \
+                    \n\t    $ mplot_f.py -f md_dt01_nt1000.ene -icy2 3 -t AMP-MD -yl 'E(eV)' -yl2 'E_kin(eV)' -xl 'time (0.1fs)' -tx\
                     \n\t\t-icx: x-column, default=1\
                     \n\t\t-tx : twinx\
                     \n\t\t-ity: index for right-y among y-columns\
@@ -389,7 +391,7 @@ vasp.postproc.p4vasp = "\n    == VASP Post Processig ==\
 vasp.postproc.vaspkit = "\n\t = VASP KIT\
                     \n\t    vaspkit \
                     "
-qchem.server.MLET   = "=== Q-Chem ===\
+qchem.server.mlet   = "=== Q-Chem ===\
                     \n    SERVER: \
                     \n\tMLET::   \
                     \n\t    Install:\
@@ -406,19 +408,21 @@ qchem.server.MLET   = "=== Q-Chem ===\
                     \n\t\tfull mem:\
                     \n\t\t    qrun.sh NiFe5    a.in 16 11.7 for full mem 188G\
                     \n\t\t    qrun.sh NiFe5vtz a.in 12 8    for full mem 96G\
-                    \n\t\t$ qsub_server.py sge qchem -j CO2M06 -i CO2M06 -n 16 -m 5(G)\
+                    \n\t\t$ qsub_server.py qchem -qj Nimono -i CO2M06(.in) -n 16 -m 5(G)\
+                    \n\t\t    server is auto-detected\
+                    \n\t\t    running one job\
                     \n\t\t$ qsub -N qname -v qcjob=infile -pe numa np -l mem=3G -v np=np -q skylake@node11 $SB/pypbs/sge_qchem.csh\
                     \n\t\tsubmit \"sge_qchem.csh\":\
                     \n\t\t    -v save=ok (in script for qchem save)\
                     \n\t\t    -v iqc=5.1p (in script for qchem version)\
                     \n\t    Check \"howto.sh -j server -k MLET\" for SGE\
                     "
-qchem.server.CHI    =   "\n\tCHI::   \
+qchem.server.chi    =   "\n\tCHI::   \
                     \n\t    setup .bashrc\
                     \n\t    $ (parallel) mpirun -np 4 $QC/exe/qcprog.exe a.in $QCSCRATCH/savename > a.out\
                     \n\t\tmakes 4 scratch folder in $QCSCRATCH\
                     "
-qchem.server.KISTI  =   "\n\tKISTI-Nurioin::\
+qchem.server.kisti  =   "\n\tKISTI-Nurioin::\
                     \n\t$ qsub -N CCC6A -v fname=6-CCC-NiFe-A.in qchem_knl.sh\
                     "
 #qchem.server.KISTI_PBS = mod_sys.server.pbs.pbs
@@ -504,6 +508,13 @@ nico2.eda       =   "\n    EDA: Plot gragh\
                     \n\t$ myplot.py -f chg-nbo.dat BE.dat -ys -1 j- -yl 'NAO Charge of CO2 (e$^-$)' 'BE (kcal/mol)' -tx -c r darkcyan\
                     \n\t$ myplot.py -f CTene.dat scf.dat -ys 'j-' 'j-' -yl 'CT (kcal/mol)' 'SCF (kcal/mol)' -tx -c red blue\
                     "
+
+def print_obj():
+    print("Instances:: ", end='')
+    for instance in MyClass.instances:
+        print(f"{instance}", end=' ')
+    print("\n\t    -j for detail")
+    return 0
 
 
 

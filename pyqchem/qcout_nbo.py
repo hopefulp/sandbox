@@ -1,10 +1,12 @@
 #!/home/joonho/anaconda3/bin/python
-
+''' modified fron Ni_CO2red.py'''
 import argparse
 import os
 import re
 import sys
 from common import dir_all, MyClass, yes_or_no
+from qcout_mod import *
+import mystring
 
 Ni_files = MyClass()
 
@@ -54,9 +56,7 @@ class_dic={"1":m1, "2":m2, "3":m3, "4":m4, "5":m5, "6":m6}
 
 #models_dict
 
-def jobs(job, job_level, model, nfile, Llink, link_file, f3_option,Lnbo,nao_chg,nao_chgsum, Lrun):
-    One_model=class_dic[model]
-    model_name="m"+str(model)
+def nbos(job, job_level, files, nao_chg_atoms, nao_chgsum_atoms):
     if job == "moc":
         if nfile == 1:
             files = One_model.nf1
@@ -81,35 +81,41 @@ def jobs(job, job_level, model, nfile, Llink, link_file, f3_option,Lnbo,nao_chg,
         if yes_or_no(com+"  ::will you run?"):
             os.system(com)
     elif job == "nbo":
-        mfiles=" ".join([m1.f3,m2.f3,m3.f3,m4.f3,m5.f3,m6.f3])
-        atoms=" ".join(nao_chg)
-        chgsum=" ".join(nao_chgsum)
-        com=f"mplot_mo.py -f {mfiles} --{job} -ncg {atoms} -ncs {chgsum}"
+        mfiles=" ".join(files)
+        atoms=" ".join(nao_chg_atoms)
+        chgsum=" ".join(nao_chgsum_atoms)
+        for f in files:
+            with open(f, 'r') as inf:
+                chgs = analyze_nbo(inf, nao_chg_atoms, nao_chgsum_atoms)
+        print('\n'.join(chgs))                
+        #com=f"mplot_mo.py -f {mfiles} --{job} -ncg {atoms} -ncs {chgsum}"
         if job_level > 1:
             com +=  " | grep SUM | awk '{print $4}'"
         print("-js 2 for sum, 3 for plot")
-        if yes_or_no(com+"  ::will you run? (for more option: use -js [int>1]"):
-            os.system(com)
+        #if yes_or_no(com+"  ::will you run? (for more option: use -js [int>1]"):
+        #    os.system(com)
     return 0
 
 def main():
-    parser = argparse.ArgumentParser(description="display Usage for /Ni-CO2_red \n\tUsage:: sys.$0 -m {model index} -nf {int} [-l|-lf]  ")
-    parser.add_argument('-j', '--job', choices=['moc','nbo'],  help="run for MOC|NBO")
+    parser = argparse.ArgumentParser(description="Get NBO Charges ")
+    parser.add_argument('job', default='nbo', choices=['moc','nbo'],  help="run for MOC|NBO")
     parser.add_argument('-js','--job_level', default=1, type=int, help="run for MOC|NBO with more extension")
-    parser.add_argument('-m', '--model', default='1', choices=['1','2','3','4','5','6'], help="as for 1-PP, 2-PPP, 3-PNP, 4-PNP, 5-NiFe, 6-SM")
-    parser.add_argument('-nf', '--nfile', default=5, type=int, help="list input qcout file ")
-    parser.add_argument('-l', '--link', action='store_true', help="write link option")
-    parser.add_argument('-lf', '--link_file', action='store_true', help="input link_id data file") 
-    parser.add_argument('-bar', '--f3_option', action='store_true', help="use different A-fragment") 
-    parser.add_argument('-nbo', action='store_true', help="Do NBO analysis")
+    parser.add_argument('-f', '--files',  nargs='+', help="list input qcout file with nbo calculation ")
     #parser.add_argument('-chg', '--chg_atoms', default=["C1","O2","O3","Ni4","N7"], nargs="*", help="Do NBO analysis")
-    parser.add_argument('-chg', '--chg_atoms', default=["C","O","O","Ni","N","N","Fe"], nargs="*", help="Do NBO analysis")
-    parser.add_argument('--chg_sum', default=["C","O","O"], nargs="*", help="atoms for charge sum such as 'C O O' or 'N N'")
+    parser.add_argument('-a', '--chg_atoms', default=["C","O","O","Ni","N","N","Fe"], nargs="*", help="Do NBO analysis")
+    parser.add_argument('-g', '--chg_group', default=["C","O","O"], nargs="*", help="atoms for charge sum such as 'C O O' or 'N N'")
 
-    parser.add_argument('-r', '--run', action='store_true', help="input link_id data file") 
     args = parser.parse_args()
 
-    jobs(args.job,args.job_level,args.model,args.nfile,args.link,args.link_file,args.f3_option,args.nbo,args.chg_atoms,args.chg_sum,args.run)
+    if len(args.chg_atoms) == 1 and len(args.chg_atoms[0]) > 1:
+        print("change atoms to atom list")
+        chg_atoms = mystring.get_atomlist4str(args.chg_atoms[0])
+    else:
+        chg_atoms = args.chg_atoms
+
+    print(chg_atoms)
+
+    nbos(args.job,args.job_level,args.files,chg_atoms,args.chg_group)
 
 if __name__ == "__main__":
     main()

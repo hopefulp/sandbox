@@ -18,11 +18,13 @@ models= {
     'water'   : 'water128.extxyz'}
 ### these are included as key in globals()
 amp     = MyClass('amp')
+ampplot = MyClass('ampplot')
 ampga   = MyClass('ampga')
 qchem   = MyClass('qchem')
 fconv   = MyClass('fconv')
 general = MyClass('general')
 Gs      = MyClass('Gs')
+aux     = MyClass('aux')
 
 ampga.gaamp               ="===== Genetic Algoritm for AMP =====\
                         \n\t\tclass GaAmp: instance runs for generation\
@@ -36,29 +38,43 @@ ampga.ga_amp_run        ="\n\tga_amp_run.py -js sh -nc 10 -hl 5 -nn 5\
                         \n\t-hl: max number of hidden layers, -nn: max number of nodes in layer\
                         \n\t   old version of amp_run.py for GA\
                         "
-amp.amp_wrapper         ="run 'amp_run.py' 'twice' with job 'tr' then 'te' with waiting using time.sleep()\
-                        \n\tUsage:: amp_wrapper.py -js [node|qsub] [-te] [-c] &\
+amp.ampdir              ="run scripts by case\
+                        \n\t\tUsage:: ampdir.sh $1\
+                        \n\t\t$1::\
+                        \n\t\t    wrapper: run amp_wrapper.py in dirs\
+                        \n\t\t    wrapper_subdir: run amp_wrapper.py in subdirs\
+                        "
+amp.amp_wrapper         ="run 'amp_run.py' twice with job tr and te\
+                        \n\t\t\timport 'amp_ini.py' for class Amp_string\
+                        \n\t    Usage:: amp_wrapper.py -js [node|qsub] [-te] [-c] &\
                         \n\t\t-c: check amp_run.py string without job submit\
                         \n\t\t-te: run only 'te'\
+                        \n\t\t: with waiting using time.sleep()\
+                        n\t\t\t train: waiting file 'amp.amp' for sometimes the script is stopped when amp conv-failes\
                         "
 amp.amp_ini             ="class Amp_string\
                         \n\t\t imported from 'amp_wrapper.py', 'ga_amp_run.py'\
                         "
 
 amp.amp_run             ="amp running with 'training' or 'test' and 'make db', md, profile\
-                        \n\tUsage:: (tr) amp_run.py -f OUTCAR -j tr -nc 4 -hl 8 8 -el 0.001 -fl 0.1 0.04 SYM_FUNC DATA_SEL\
-                        \n\t\t\tSYM_FUNC = '-des gs -pf log10 -pmod del -pmm 0.05 200.0 -pn 10'\
-                        \n\t\t\tDATA_SEL = '-nt 4000 -ntr 1500 -dtype int -dl 1000 2500 3500 3600'\
-                        \n\t\t\tmem:\
-                        \n\t\t\t    2G for db\
-                        \n\t\t\t    12G for training: HL, total_images\
-                        \n\t        (te) amp_run.py -f OUTCAR -j te DATA_SEL\
-                        \n\t\t\tNot necessary: ncore, sym-function, \
+                        \n\tUsage::\
+                        \n\t    (tr) amp_run.py -inf OUTCAR -j tr -nc 4 -hl 8 8 -el 0.001 -fl 0.1 0.04 SYM_FUNC DATA_SEL\
+                        \n\t\tSYM_FUNC = '-des gs -pf log10 -pmod del -pmm 0.05 200.0 -pn 10'\
+                        \n\t\t   '-des gs -pf powNN -pn 5'\
+                        \n\t\tDATA_SEL = '-nt 4000 -ntr 1500 -dtype int -dl 1000 2500 3500 3600'\
+                        \n\t\tmem:\
+                        \n\t\t    2G for db\
+                        \n\t\t    12G for training: HL, total_images\
+                        \n\t    (te) amp_run.py -inf OUTCAR -j te DATA_SEL\
+                        \n\t\tNot necessary: ncore, sym-function, \
+                        \n\t    (md) amp_run.py -j md -inf w1.extxyz -i 800 -p amp.amp -dt 1 -ns 100\
+                        \n\t\t: makes traj.traj file which can be read by $ase gui traj.traj\
+                        \n\t\t  plot: 'showall.py -s -j amp -k md_anal'\
                         \n\tMODULE dependence :\
                         \n\t    after v9(latest before amp other module)\
                         \n\t    using venv in anaconda\
                         \n\t    (venv) python $SBamp/amp_run.py ... which overwrites shebang\
-                        \n\t    e.g.: (ampG2off) python $SBamp/amp_run.py -f OUTCAR -j tr -hl 4 -el 0.001 -fl 0.01 0.04 -nt 4000 -ntr 100 -dtype int\
+                        \n\t    e.g.: (ampG2off) python $SBamp/amp_run.py -inf OUTCAR -j tr -hl 4 -el 0.001 -fl 0.01 0.04 -nt 4000 -ntr 100 -dtype int\
                         "
 amp.stat_check          ="Machine Learning: statistics calculation for script check\
                         \n\trun at work directory\
@@ -68,10 +84,6 @@ amp.amp_env_run         ="amp_run.py in (envs) anaconda\
                         "
 amp.amp_loop            ="amp_loop.py\
                         \n\t\t\t\t: loop for many situation used in SGE"
-amp.amp_plot            ="plot data: \
-                        \n\t\t\t\t: plot amp_run.py test"
-amp.amp_plot_stat       =" plot amp test files: 'test_energy.pkl', 'test_force.pkl'\
-                        "
 amp.amp_descriptor      ="called by amp_run.py\
                         \n\t\t\tprovide symmetry function to test diverse descriptor\
                         "
@@ -90,6 +102,24 @@ amp.amp_datamining      = "developed by 'amp_anal.py'\
 
 amp.amp_util             ="called by amp_run.py\
                         \n\t\t\tprovide some functions\
+                        "
+ampplot.ampplot_test    ="plot test file: 'test_energy.dat',  \
+                        \n\truns 'myplot2D.draw_amp_twinx'\
+                        \n\tUsage:\
+                        \n\t    ampplot_test.py -f test_energy.dat -hl 10 10 -el 0.0001 -ntr 700 -nte 100 -tl '1 Water molecule'\
+                        "
+ampplot.ampplot_stat_dir=" plot amp test files: 'test_energy.pkl', 'test_force.pkl'\
+                        \n\tUsage:\
+                        "
+ampplot.ampplot_dir     ="using input x-dir, y-[tr,te] for files\
+                        \n\tOptions:\
+                        \n\t    -p for directory prefix\
+                        \n\t    -t title\
+                        \n\t    -yd for multiple directories for multiplot\
+                        \n\tUsage::\
+                        \n\t    ampplot_dir.py -p NN -t 'Ndata 100 (Gs-pow)'\
+                        \n\t    ampplot_dir.py -p NN -t 'Training Set: Gs-pow' -y tr -yd . Ndata300\
+                        \n\t    ampplot_dir.py -p NN -t 'Test Set    : Gs-pow' -y te -yd . Ndata300\
                         "
 Gs.amp_gsversion         =" === Gaussian Symmetry function for AMP descriptor ===\
                         \n\tamp_gversion.py to select different versions of gaussian.py in ~/amp\
@@ -113,7 +143,12 @@ general.dir_scan        = "dir_scan.sh \
 fconv.fconv2extxyz="convert file format to extxyz: im_format"
 fconv.im2extxyz="convert IM file format to extxyz"
 fconv.NucCarts2xyz="Not Used: use when View.xyz is not provide in Q-Chem, AIMD calculation"
-fconv.aimd2extxyz="from Q-Chem, AIMD calculation with result of EComponents to extxyz format"
+fconv.aimd2extxyz   =   "from Q-Chem, AIMD calculation with result of EComponents to extxyz format\
+                        \n\t\t-f output_filename(default:test.extxyz) -d aimp_dir(can be parent dir)\
+                        \n\t\ttry eV as it were without rescaling to minimum\
+                        \n\t\tUsage::\
+                        \n\t\t    aimd2extxyz.py -d water1_aimd\
+                        "
 fconv.xyz2extxyz="from Q-Chem, AIMD change xyz to include force in extxyz format"
 
 qchem.aimd = "AIMD run:: (chi::parallel) mpirun -np 4 $QC/exe/qcprog water1_aimd.in $QCSCRATCH/w1K400 > w1k400.out\
@@ -126,6 +161,7 @@ qchem.aimd = "AIMD run:: (chi::parallel) mpirun -np 4 $QC/exe/qcprog water1_aimd
 qchem.NucCarts2xyz="Convert NucCarts (AIMD) to xyz format\
                     \n\t\t\tNucCarts2xyz.py -d dirname -a atom_series such as O H H"
 
+aux.info_amp       ="info file of this directory"
 
 classobj_dict={'AMP_RUN': amp, 'FILE_CONV': fconv, 'QCHEM': qchem} 
 
@@ -184,7 +220,7 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
                     ckeys = dir_classify_n(sort_dir, instance.name, globals()[gkey], Lwrite=0)
                     for ckey in ckeys:
                         print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
-            print("  == not analyzed")
+            print("  == not classified")
             for f in sort_dir:
                 print(f"    {f}")
     
@@ -207,7 +243,7 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
                     ckeys = dir_classify_n(sort_exe, instance.name, globals()[gkey], Lwrite=0)
                     for ckey in ckeys:
                         print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
-            print("  == not analyzed")
+            print("  == not classified")
             for f in sort_exe:
                 print(f"    {f}")
     if sort_mod:
@@ -226,7 +262,7 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
                     ckeys = dir_classify_n(sort_mod, instance.name, globals()[gkey], Lwrite=0)
                     for ckey in ckeys:
                         print(f"    {ckey}.py\t:: {globals()[gkey].__dict__[ckey]}")
-            print("  == not analized ")
+            print("  == not classified ")
             for f in sort_mod:
                 print(f"    {f}")
 
@@ -244,14 +280,14 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
     for instance in MyClass.instances:
         print(f"{instance.name}", end=' ')
     print("\n\t    -w for detail")
-    print(f"#Comment: -c    for classification")
+    #print(f"#Comment: -c    for not classification")
 
     return 0        
 
 def main():
 
     parser = argparse.ArgumentParser(description="display Usage for ~/py_ai")
-    parser.add_argument('-c', '--classify', action="store_true", help="classify files ")
+    parser.add_argument('-c', '--classify', action="store_false", help="classify files ")
     parser.add_argument('-w','--work',  help="several explanation option ")
     parser.add_argument('-j','--job',  help="[val,train,test] ")
     parser.add_argument('-cn', '--cname', help="detail for each class ")

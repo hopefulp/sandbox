@@ -10,33 +10,35 @@ amp_db = ['amp-fingerprint-primes.ampdb', 'amp-neighborlists.ampdb', 'amp-finger
 files = { 'tr': amp_db, 'md': ['OUTCAR'], 'vasp': ['OUTCAR'], 'db': amp_db, 'te': amp_db, 'des':['OUTCAR'] }
 
 def jobs(ndir, work, job, odir, Lcopy):
-    #pwd = os.getcwd()
+    pwd = os.getcwd()
     #directory = pwd + '/'+ ndir
     if os.path.isdir(ndir):
         print(f'there exist {ndir}')
         sys.exit(1)
-    #### make new directory 
+    #### make new directory anc cd
     else:
         os.system(f'mkdir {ndir}')
-    #    os.chdir(f'{ndir}')
+        os.chdir(f'{ndir}')
     if work == 'amp':
         if job == 'md' or job == 'tr' or job == 'db' or job == 'te' or job == 'des':
             for f in files[job]:
-                if os.path.isfile(f) or os.path.isdir(f):
+                forig = pwd + '/' + f
+                if os.path.isfile(forig) or os.path.isdir(forig):
                     if Lcopy:
-                        os.system(f'cp {f} {ndir}')
+                        os.system(f'cp {forig} {f}')
                     else:
-                        os.system(f'ln -s ../{f} {ndir}/{f}')
+                        os.system(f'ln -s {forig} {f}')
                 else:
                     print(f"can't find {f}")
                     sys.exit(0)
             if job == 'md' or job == 'te':
                 f = amp_util.get_amppotname()
                 if f:
+                    forig = pwd + '/' + f        
                     if Lcopy:                    
-                        os.system(f'cp {f} {ndir}')
+                        os.system(f'cp {forig} {f}')
                     else:
-                        os.system(f'ln -s ../{f} {ndir}/{f}')
+                        os.system(f'ln -s {forig} {f}')
                 else:
                     forig = pwd + '/amp-untrained-parameters.amp'
                     f = 'amp-untrained-parameters.amp'

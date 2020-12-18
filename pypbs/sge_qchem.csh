@@ -5,7 +5,6 @@
 ## bash is not working
 ## PBS_VARIABLE is not working
 
-
 if ( ! $?qcjob ) then
     echo "variable job is not defined"
     echo "Usage:: qsub -N jobname -pe numa np -l mem=2G -v np=np -v qcjob=a(.in) $SB/sge_qchem.csh"
@@ -20,6 +19,11 @@ set save = no
 if ( $qcjob =~ *'in' ) then
     set qcjob = `cut -d. -f1 <<< $qcjob`
 endif
+
+set logfile = "$SGE_O_WORKDIR/sge$JOB_ID"
+date >> $logfile
+echo "HOSTNAME    JOB_NAME   NSLOTS(nproc)" >> $logfile
+echo "$HOSTNAME       $JOB_NAME        $NSLOTS " >> $logfile
 
 #### parallel version 5.1 (keyword) && 3.2 (Jmol)
 if ( $iqc == '5.1p' ) then

@@ -6,10 +6,12 @@ Filenames for consistency in several modules
 ### Filenames used in several module: 
 ampdb   = ['amp-fingerprint-primes.ampdb', 'amp-neighborlists.ampdb', 'amp-fingerprints.ampdb', 'OUTCAR']
 amp_amp = [ "amp.amp", "amp-untrained-parameters.amp" ]
-ampout_chromosome_fitness       = 'score.dat'               # "ga_fit.txt" refer to output file from  amp_run.py
+amptr_backup = [ "score.dat", "test_energy.dat", "test_energy.pkl", "test_force_stat.dat", "test_fstat_acc.pkl", "test_fstat_acc.txt"]
+ampout_score       = 'score.dat'               # "ga_fit.txt" refer to output file from  amp_run.py
 ampout_onegeneration_fitness    = 'ga_gen_fit.txt'
 ampout_te_e_chk                 = 'test_energy.pkl'         # used in amp_run.py, ampplot_stat_dir.py
 ampout_te_f_chk                 = 'test_fstat_acc.pkl'      # used in ampplot_stat_dir.py
+amptrain_finish                 = 'train_finished'
 #ampout_images_frmse            = 'f_rmse.dat'
 #ampout_image_maxforce          = "forces.dat"
 from ase.calculators.calculator import Parameters
@@ -28,7 +30,7 @@ class Amp_string:
     '''
     def __init__(self, jsubmit='qsub', queuename='test', mem='3G', fname='OUTCAR', ampjob='trga', ncore='1', hl='4',
                        elimit='0.001', train_f='0.12 0.04', sftype='dellog', dtype='int1000', dlist=None, add_amp_kw=None, 
-                       max_iter=5000, nam=None):
+                       max_iter=5000, ndtotal=4000, nam=None):
         p = self.parameters = Parameters()
         p.jsubmit       = jsubmit
         p.queuename     = queuename
@@ -44,6 +46,7 @@ class Amp_string:
         p.dlist         = dlist
         p.max_iter      = max_iter
         p.nam           = nam
+        p.ndtotal       = ndtotal
         if add_amp_kw:
             for key in add_amp_kw.keys():       # add_amp_string.__dict__.keys()
                 if  key in p.keys():                # p.__dict__.keys()
@@ -206,7 +209,7 @@ class Amp_string:
 
     def data_selection(self):
         p = self.parameters
-        ndata = 4000                # now fp was calculated only for 4000 images
+        ndata = p.ndtotal                # now fp was calculated only for 4000 images
         if p.dlist:
             dlist = p.dlist
         else:

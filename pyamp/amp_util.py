@@ -262,7 +262,41 @@ def list2str(i_image):
         nimage = i_image[1] - i_image[0]
     return sindex
 
-amp_pot=[ "amp.amp", "amp-untrained-parameters.amp" ]
+amp_pot=amp_ini.amp_amp
+def backup_amptr(lpot):
+    newdir = 'pot_save'
+    i=0
+    while(True):
+        ndir = newdir+'{:02d}'.format(i)
+        if not os.path.isdir(ndir):
+            os.mkdir(f"{ndir}")
+            os.system(f"mv {lpot} {ndir}") 
+            for f in amp_ini.amptr_backup:
+                os.system(f"mv {f} {ndir}")
+            break
+        else:
+            i+=1
+
+### load amp_pot if there is
+def read_amppot(pot = None, mvpot = False):
+    '''  put away amp_pot for amp_wrapper.py not to recognize the training finished '''
+    if pot:
+        lpot = pot
+    elif os.path.isfile(amp_pot[0]):
+        lpot = amp_pot[0]
+    elif os.path.isfile(amp_pot[1]):
+        lpot = amp_pot[1]
+    else:
+        lpot = None
+
+    if lpot:
+        calc = Amp.load(lpot)
+        print(f"Loaded {lpot}")
+        if mvpot == True:
+            backup_amptr(lpot)
+    else:
+        calc = None
+    return calc
 
 def get_amppot(pot = None):
     if pot:

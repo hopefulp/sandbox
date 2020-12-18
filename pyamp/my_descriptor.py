@@ -78,7 +78,7 @@ class GS_param:
             f.write(" ".join("%.1f" % x for x in etas))
         for element in elements:
             _G = make_symmetry_functions(type='G2', etas=etas, offsets=Rs, elements=elements)       # Rc is out of eta
-            _G += make_symmetry_functions(type='G4', etas=[0.005], zetas=[1., 4.], gammas=[+1., -1.], elements=elements)
+            _G += make_symmetry_functions(type='G4', etas=[0.005], zetas=[1., 2., 4., 8.], gammas=[+1., -1.], elements=elements)
             G[element] = _G
         #nflow.ncount += 1
         #if Lflow: print(f"finished making Gs {nflow.ncount}: {whereami()}() in module {__name__}")

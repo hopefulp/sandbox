@@ -13,11 +13,11 @@ mpl.rcParams.update({'font.size':20})
 #ax.tick_params(axis='both', which='major', labelsize=10)
 
 ### AMP in MLET
-fig = plt.figure(figsize=(15,10))
-ax = plt.axes()
+#fig = plt.figure(figsize=(15,10))
+#ax = plt.axes()
 
-custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))
-ax.set_prop_cycle(custom_cycler)
+#custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))
+#ax.set_prop_cycle(custom_cycler)
 
 size_title = 20
 size_label = 18

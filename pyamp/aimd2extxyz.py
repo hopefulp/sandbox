@@ -70,11 +70,14 @@ def aimd2extxyz(job, dname, fxyz, fene, ffor, Lattice_Size):
                 f.write('Lattice="{0:<.1f} 0.0 0.0 0.0 {0:<.1f} 0.0 0.0 0.0 {0:<.1f}" '.format(Lattice_Size))
                 f.write('Properties="species:S:1:pos:R:3:Z:I:1:forces:R:3" ')
                 E_pot_hr = float(lenergies[iframe].strip().split()[2])
-                if iframe==1:
-                    E_pot_hr0 = E_pot_hr
-                    epot = 0.0  # in unit of 100 kJ/mol
-                else:
-                    epot = (float(E_pot_hr) - E_pot_hr0)*escale
+                ### adjust the ground stat energy to 0
+                #if iframe==1:
+                #    E_pot_hr0 = E_pot_hr
+                #    epot = 0.0  # in unit of 100 kJ/mol
+                #else:
+                #    epot = (float(E_pot_hr) - E_pot_hr0)*escale
+                ### just energy conversion to escale
+                epot = float(E_pot_hr) * escale
                 f.write('energy={:<.10f}\n'.format(epot))
                 i+=1
             else:
@@ -132,14 +135,14 @@ def hack_qchem_AIMDdir(job, dir1, lattice_size):
 
 def main():
     parser = argparse.ArgumentParser(description='make extxyz from qchem output file: AIMD in scale of kj/mol')
-    parser.add_argument('-j', '--job', default='test', help='output filename')
+    parser.add_argument('-f', '--outfile', default='test', help='output filename')
     parser.add_argument('-d', '--onedir', help='directory where AIMD output files exist')
     parser.add_argument('-ls', '--lattice_size', default=10.0, type=float, help='size of lattice vector in cubic')
     #parser.add_argument('-n','--steps', help='the number of MD step')
 
     args = parser.parse_args()    
 
-    hack_qchem_AIMDdir(args.job, args.onedir, args.lattice_size)
+    hack_qchem_AIMDdir(args.outfile, args.onedir, args.lattice_size)
 
 if __name__ == '__main__':
     main()

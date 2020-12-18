@@ -26,7 +26,7 @@ def namestr(obj, namespace):
     #print(f"obj = {obj} with namespace {namespace}")
     return [ name for name in namespace if namespace[name] == obj ]
 
-def amp_stat_plot(dirs, dprefix, fname, keyv, legend_style,xlabel, ylabel, title, HL, E_conv,f_conv,f_coeff, ntrain, ntest):
+def amp_stat_plot(dirs, dprefix,subdir, fname, keyv, legend_style,xlabel, ylabel, title, HL, E_conv,f_conv,f_coeff, ntrain, ntest):
     global mse, bias_sq, varx_y, varx, vary, cov, r_corr, rmse, maxres
     mse     = []
     bias_sq = []
@@ -49,6 +49,7 @@ def amp_stat_plot(dirs, dprefix, fname, keyv, legend_style,xlabel, ylabel, title
     for d in dirs:
         ### make x labels
         #ndata = ''.join(filter(lambda i: i.isdigit(), d))    # how to retrieve digits from filter object
+        ### obtain integer from dirname for x-values in plot
         if dprefix:
             dir_num = re.sub(dprefix, "", d)
         else:
@@ -59,7 +60,12 @@ def amp_stat_plot(dirs, dprefix, fname, keyv, legend_style,xlabel, ylabel, title
         else:
             dir_sub = dir_num
         x.append(int(dir_sub))
-        with open(d+'/'+fname, 'rb') as f:
+        ### if data locate in subdirectory
+        if subdir:
+            dname = f"{d}/{subdir}/{fname}"
+        else:
+            dname = "{d}/{fname}"
+        with open(dname, 'rb') as f:
             p = pickle.load(f)
         for key in p.keys():
             #print(key)
@@ -104,6 +110,7 @@ def main():
     parser = argparse.ArgumentParser(description='plot amp test using my2dplot')
     parser.add_argument('-d', '--dirs', nargs='*', help='explicit derectories')
     parser.add_argument('-p', '--dprefix', help='prefix for directories')
+    parser.add_argument('-sd', '--sub_dir', help='read subdirectory below the directories with prefix')
     parser.add_argument('-f', '--fname',  help='energy file for amp test')
     parser.add_argument('-k', '--keyvalue', choices=['hl'], help='input directory properties')
     amp_gr = parser.add_argument_group(title='AMP')
@@ -120,18 +127,14 @@ def main():
     plt_gr.add_argument('-tl', '--title', help='title for matplot')
     args = parser.parse_args()
 
-    if args.title and not args.fname:
-        if re.match('E', args.title):
-            inf = amp_ini.ampout_te_e_chk
-        elif re.match('F', args.title):
-            inf = amp_ini.ampout_te_f_chk
-        else:
-            print("input -f input file")
-            sys.exit(1)
-    elif args.fname:
-        inf = args.fname
+    if re.match('E', args.title) or re.search('e', args.fname, re.IGNORECASE):
+        inf = amp_ini.ampout_te_e_chk
+    elif re.match('F', args.title) or re.search('f', args.fname, re.IGNORECASE):
+        inf = amp_ini.ampout_te_f_chk
+    #elif args.fname:
+    #    inf = args.fname
 
-    amp_stat_plot(args.dirs,args.dprefix,inf,args.keyvalue,args.legend,args.xlabel,args.ylabel,args.title, args.hidden_layer,args.e_conv,args.f_conv,args.f_coeff,args.ndata_train,args.ndata_test)
+    amp_stat_plot(args.dirs,args.dprefix,args.sub_dir,inf,args.keyvalue,args.legend,args.xlabel,args.ylabel,args.title, args.hidden_layer,args.e_conv,args.f_conv,args.f_coeff,args.ndata_train,args.ndata_test)
     return 0
 
 if __name__ == '__main__':

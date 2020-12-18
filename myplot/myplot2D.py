@@ -12,6 +12,13 @@ import my_chem
 import numpy as np
 from common import *
 #plt.switch_backend('agg')
+size_title = 20
+size_label = 18
+size_tick = 15
+text_x = 0.75
+text_y = 0.8
+text_twinx_x = 0.8
+text_twinx_y = 0.9
 
 ### functions
 #   my_font
@@ -60,7 +67,7 @@ def draw_2subdots(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b'
     '''
     this makes error in serial plotting
     '''
-    #fig, ax = common_figure()
+    fig, ax = common_figure()
     escale = 1.0
     nlen = len(y)
     h_conv = np.array(h) * escale        # escale = my_chem.ev2kj
@@ -99,6 +106,8 @@ def draw_2subdots(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b'
     #plt.scatter(x, y, 'r', x, y_bar, 'b')
     p1  = ax.scatter(range(nlen), y_conv, c='r', marker='o', label='true value')
     p2  = ax.scatter(range(nlen), h_conv, c='b', marker='^', label='hypothesis')
+    print(y_conv)
+    
     if Ltwinx:
         if Ldiff:
             p3, = ax2.plot(range(nlen), diff, c='g', label='difference')
@@ -121,7 +130,7 @@ def draw_amp_twinx(y, h, title, suptitle, natom=1, Ltwinx=None, escale=1.0,Color
     '''
     this makes error in serial plotting
     '''
-    #fig, ax = common_figure()
+    fig, ax = common_figure()
     escale = 1.0
     nlen = len(y)
     h_conv = np.array(h) * escale        # escale = my_chem.ev2kj
@@ -143,10 +152,10 @@ def draw_amp_twinx(y, h, title, suptitle, natom=1, Ltwinx=None, escale=1.0,Color
     ones = np.zeros((len(y_conv)))
     #my_font('amp')
     #mpl.rcParams.update({'font.size':22})
-    plt.title(title, fontsize=size_title)
-#    plt.suptitle(suptitle, x=0.5, y=0.92, va='top', fontsize=18)
-    suptitle="\n"+suptitle
-    plt.suptitle(suptitle, fontsize=size_tick)
+    plt.title(title+'\n', fontsize=size_title)
+    #suptitle=suptitle+'\n'
+    plt.suptitle(suptitle, x=0.5, y=0.96, va='top', fontsize=18)
+    #plt.suptitle(suptitle, fontsize=size_tick)
     if escale == 1.0:
         ax.set_ylabel('PE(eV)', color='b', fontsize=size_label)
         ax.set_ylim(ymin-1, ymax+0.25)
@@ -159,16 +168,17 @@ def draw_amp_twinx(y, h, title, suptitle, natom=1, Ltwinx=None, escale=1.0,Color
     if Ltwinx:
         ax2=ax.twinx()
         ax2.set_ylabel("Difference(eV)", color='g')
-        ax2.set_ylim(-0.5, 3.0)
+        ax2.set_ylim(-0.001, 0.01)
         #ax2.plot(x, ys[1,:], 'o-', color=color)
         ax2.tick_params(axis='y', labelcolor='g', labelsize=size_tick)
     #plt.scatter(x, y, 'r', x, y_bar, 'b')
+    #print(y_conv, h_conv)
     p1  = ax.scatter(range(nlen), y_conv, c='r', marker='o', label='true value')
     p2  = ax.scatter(range(nlen), h_conv, c='b', marker='^', label='hypothesis')
     if Ltwinx:
         if Ldiff:
             p3, = ax2.plot(range(nlen), diff, c='g', label='difference')
-            plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.45, 0.85))
+            plt.legend([p1,p2,p3],['true value', 'hypothesis', 'difference'],loc=(0.0, 0.2))
         else:
             plt.legend([p1,p2],['true value', 'hypothesis'],loc=(0.0, 0.1))
         plt.text(text_twinx_x, text_twinx_y, text, fontsize=size_tick, transform=ax.transAxes)
@@ -222,8 +232,9 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     #print(f"x, y shape:: {np.array(x).shape} {np.array(y).shape} and ylabel {ylabel} in {whereami()}")
     ax2=ax.twinx()
     ax2.set_ylabel(ylabel2)
-    #ax2.set_ylim(0,1)
+    ax2.set_ylim(0,0.2)
     pls=[]
+    print(iy_right, len(ys))
     for i in range(len(ys)):
         if i in iy_right: 
             #if Colors:  color = Colors.pop(i)       #'tab:' + Colors.pop(0)
@@ -245,11 +256,11 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     #plt.legend()
     #common_figure_after()
     plt.xticks(x)
+    plt.locator_params(axis='x', nbins=10)
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)
     return 0
-
 
 def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, Colors=None):
     '''
