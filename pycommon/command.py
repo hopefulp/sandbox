@@ -3,8 +3,10 @@
 import argparse
 import os
 import re
-from common import dir_files
+from common import dir_files, MyClass
 
+amp     =   MyClass('amp')
+plot    =   MyClass('plot')
 ### modify input-detail here
 ### AMP-NODE job
 amp_data_type={'interval': '-nt 4000 -ntr 100 -dtype int -dl 1000 1100 1200',
@@ -32,6 +34,39 @@ amp_qsub_str_suff=" /home/joonho/sandboxg/pypbs/sge_amp.csh"
 amp_getqsub_str = { 'noforce': ' -j tr -hl 4 -el 0.001 -fl -0.1', 'force': ' -j tr -hl 4 -el 0.001 -fl 0.1 0.04 -nc 10'}
 amp_getqsub_datatype = amp_data_type
 amp_getqsub_symmfuncttype = amp_gaussian_function_param
+
+
+amp.clean       =   "\nCLEAN\
+                    \n    clean.py -w amp pbs -a -y\
+                    "
+amp.statistics  =   "\nSTATISTICS\
+                    \n    stat_check.py -st [e|f|ef]\
+                    "
+
+amp.analysis    =   "\nAnalysis\
+                    \n    Training set: amp-log.txt\
+                    \n\tget_TRFrmse NN 2 \
+                    \n\tget_TRFrmse NN subdir 2\
+                    \n\tget_TRFrmse args in $pyamp/amp_bashfunc.sh\
+                    \n\t    null\t: scan all the directory with amp-log.txt and get training results\
+                    \n\t    1\t:with one column of value\
+                    \n\t    NN[dirname]: prefix or dirname\
+                    \n\t    NN 2\t: including directory name\
+                    \n\t    use with sort for plot\
+                    \n    Test set: test_fstat_acc.txt\
+                    \n\tget_TEFrmse NN subdir 2\
+                    "
+plot.first      =   "\nPLOT\
+                    \n    TRAIN & TEST\
+                    \n\tDraw file\
+                    \n\t    f2d_plot.py train.dat -pd -xs 2\
+                    \n\t    f2d_plot.py train.dat test.dat -pd -t 'TR-100:TE-100'\
+                    \n\t\t-pd pandas, -xs xspacing, -xst xspacing type (default:numerically)\
+                    \n\tampdir.sh grep\
+                    \n\tampplot_dir.py -p NN -t 'Ndata 100 (Gs-pow)'\
+                    \n\tampplot_dir.py -p NN -t 'Training Set: Gs-pow' -y tr -yd . Nd300hl2020 Nd500hl2020\
+                    \n\tampplot_dir.py -p NN -t 'Test Set    : Gs-pow' -y te -yd . Nd300hl2020 Nd500hl2020\
+                    "
 
 def show_command(job, job_submit, qname, keyvalues, nodename, sftype, dtype):
     
@@ -90,20 +125,16 @@ def show_command(job, job_submit, qname, keyvalues, nodename, sftype, dtype):
         elif job_submit == 'getqsub':
             print(f"sge_amp.py -qj {qname} -m 3G", amp_getqsub_str[settings['force']], amp_getqsub_datatype[settings['dtype']], amp_getqsub_symmfuncttype[settings['gs']]) 
         ### this part is for common
-        print("\nCLEAN")
-        print("clean.py -w amp pbs -a -y")
-        print("\nSTATISTICS")
-        print("stat_check.py -st [e|f|ef]")
+        print(amp.clean)
+        print(amp.statistics)
+        print(amp.analysis)
+        #print("\nAnalysis")
+        #print("    get_frmse NN 2 | sort -n -t N -k 3")
         if 'kw1' in locals():
             d_pre=kw1
         else:
             d_pre='ND'
-        print("\nPLOT")
-        print("    TRAIN & TEST")
-        print("\tampdir.sh grep")
-        print("\tampplot_dir.py -p NN -t 'Ndata 100 (Gs-pow)' ")
-        print("\tampplot_dir.py -p NN -t 'Training Set: Gs-pow' -y tr -yd . Nd300hl2020 Nd500hl2020")
-        print("\tampplot_dir.py -p NN -t 'Test Set    : Gs-pow' -y te -yd . Nd300hl2020 Nd500hl2020")
+        print(plot.first)
         print("    TEST")
         print(f"\tampplot_stat_dir.py -p {d_pre} -le mse -t 'Energy Training' -k hl")
         print("\t    in case dir scan is hl: -k hl")
@@ -123,9 +154,9 @@ def show_command(job, job_submit, qname, keyvalues, nodename, sftype, dtype):
             print("    N.B.:")
             print("\tv5.1 parallel runs only at skylake@node!!")
             if not nodename:
-                print("    qsub_server.py qchem -qj CC6 -i 6-CC-NiFe.in -n 6 -m 6 -no skylake@node14")
+                print("    qsub_server.py qchem -qj CC6 -i 6-CC-NiFe.in -n 16 -m 3 [-no skylake@node14]")
             else:
-                print(f"    qsub_server.py qchem -qj CC6 -i 6-CC-NiFe.in -n 6 -m 6 -no {nodename}")
+                print(f"    qsub_server.py qchem -qj CC6 -i 6-CC-NiFe.in -n 16 -m 3 -no {nodename}")
             print("\tN.B.: qchem parallel 5.1p doesnot run at Node of (haswell)opt, (sandy)slet -> use skylake@node00")
             print("\t-n for nproc, -m for mem")
             print("NBO analysis")

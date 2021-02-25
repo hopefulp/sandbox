@@ -1,4 +1,5 @@
 from common import MyClass_str as MyClass
+from parsing import str_decom as parse_str
 
 awk                 = MyClass('awk')
 backup              = MyClass('backup')
@@ -6,8 +7,8 @@ dir_job             = MyClass('dir_job')
 git                 = MyClass('git')
 start               = MyClass('start')
 system              = MyClass('system')
-sys_install         = MyClass('sys_install')
-sys_manage          = MyClass('sys_manage')
+system.install      = MyClass('system.install')
+system.manage       = MyClass('system.manage')
 server              = MyClass('server')
 server.mlet         = MyClass('server.mlet')
 server.chi          = MyClass('server.chi')
@@ -69,7 +70,7 @@ system.vga      =   "\n    VGA::\
                     \n\tmodel\
                     \n\t    lspci –nn | grep VGA\
                     "
-sys_install.hdd =   "== HDD install ==\
+system.install.hdd =   "== HDD install ==\
                     \n    Connected: detected in /dev/sd[a|b|c...] \
                     \n    Not Installed: if there is not /dev/sd{label}1, need to make partition    \
                     \n    Install\
@@ -81,17 +82,17 @@ sys_install.hdd =   "== HDD install ==\
                     \n\t\tls -al /dev/disk/by-uuid\tThe partitioned hard appear in uuid\
                     \n\t\tvi /etc/fstab\twrite uuid of new partition following the syntax\
                     \n\t\tmount -a\twill read all the mounting points and partitions"
-sys_install.qchem = "== Q-Chem ==\
+system.install.qchem = "== Q-Chem ==\
                     \n    Installed:: \
                     \n\tv.5 :: /home/joonho/sciwares/archvies/qchem.5.1.tar\
                     "
-sys_install.intel = "== INTEL ==\
+system.install.intel = "== INTEL ==\
                     \n     Installed:: /opt/intel \
                     \n\tsource /opt/intel/parallel_studio_xe_2019.3.062/bin/psxevars.sh \
                     \n\tCompilation:: \
                     \n\t    serial: $QCHEM_HOME:./configure intel mkl\
                     "
-sys_manage.user =   "$getent passwd | grep ‘/home’ | cut -d: -f1"
+system.manage.user =   "$getent passwd | grep ‘/home’ | cut -d: -f1"
 server.chi =         "=== CHI (HOME) ===\
                     \n    Q-Chem::\
                     \n\tsetup .bashrc\
@@ -393,9 +394,16 @@ backup.camera   =   "\n    BACKUP Phone to Linux Home:\
                     \n\t$ rsync -avz /run/user/1000/gvfs/mtp\:host\=%5Busb%3A005%2C004%5D/Card/DCIM/Camera/ /home/joonho/Pictures\
                     "
 
-def print_obj():
+def print_obj(job):
     print("Instances:: ", end='')
-    for instance in MyClass.instances:
-        print(f"{instance}", end=' ')
+    if job == None:
+        ins_list=[]
+        for instance in MyClass.instances:
+            ins_name = parse_str(instance)
+            if  ins_name not in ins_list:
+                ins_list.append(ins_name)
+        ### just print the first name
+        for ins_name in ins_list:
+            print(f"{ins_name}", end=' ')
     print("\n\t    -j for detail")
     return 0

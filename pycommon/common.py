@@ -228,7 +228,7 @@ def dir_all(dir_):
 def f_ext(fname):
     return fname.split('.')[-1]
 def f_root(fname):
-    return fname.split('.')[0]
+    return fname.split('/')[-1].split('.')[0]
 fname_root = f_root
 fname_ext  = f_ext
 

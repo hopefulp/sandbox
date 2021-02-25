@@ -50,7 +50,7 @@ def main():
     my_module = importlib.import_module(mod_name)
 
     if not args.job:
-        my_module.print_obj()
+        my_module.print_obj( job = args.job )
         if mod_name == 'comment_sys':
             print(f"\t    -s for other attributes in module 'comment_subj.py' ")
     else:

@@ -18,7 +18,8 @@ def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl
         max_iter=10
         sleeptime = 10
     '''
-    cwd = os.getcwd().split('/')[-1]
+    cwd = os.getcwd()
+    cwdname = cwd.split('/')[-1]
 
     force_train = 1              ### None: Do not train force but test, 1/any to use default
 
@@ -43,10 +44,10 @@ def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl
             dlist   = [1000,2000,3500,3800]      # [1000,1100,3500,4000] [1000,2500,3500,3600]
         max_iter    = 10000  # 5000(Nd300), 10000(Nd500, it takes one weak)
         sleeptime   = 600    # 600
-        ### Nd500: 
+        ### Nd500: pn 5 ~ 20: 
         ### Nd300: pn50 8.6G, in 96: np10 m8.6
-        ncore       = '12'      # ncore 16, mem 11 for 188G
-        mem         = '13G'     # 11G for ND500 15G
+        ncore       = '16'      # ncore 16, mem 11 for 188G
+        mem         = '8G'     # 11G for ND500 15G
     if hl:
         str_hl = ' '.join(str(x) for x in hl)
     else:
@@ -83,43 +84,47 @@ def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl
         
     ### make and run amp_run.py command for train
     if re.search('tr', ampjob):
-        #if os.path.isfile("amp.amp") or os.path.isfile("amp-untrained-parameters.amp"):
-        ### deprecate checking amp.pot
-        #if amp_util.get_amppotname():
-        #    print("There are amp potential file so exit")
-        #    sys.exit(1)
-        ### run training
-        if job_submit == 'qsub':
-            ampstr = amp_ini.Amp_string(add_amp_kw=p_tr)
-            with open("mlet_tr.csh", 'w') as f:
-                f.write(ampstr.qscript)
-        elif job_submit == 'node':
-            ampstr = amp_ini.Amp_string(add_amp_kw=p_tr)
-        print(ampstr())
-        ### check for show
-        if test_wrapper == None or test_wrapper == 'db':
-            os.system(ampstr())
-        ### if check: print test and exit
+        ### if amp_pot exist, do not run training
+        if amp_util.is_amppot():    # does it need cwd?
+            pass
         else:
-            if re.search('te', ampjob):
-                ampstr = amp_ini.Amp_string(add_amp_kw=p_te)
-                if job_submit == 'qsub':
-                    with open("mlet_te.csh", 'w') as f:
-                        f.write(ampstr.qscript)
-                print(ampstr())
-            sys.exit(2)
-        ### wait after running amp_run.py
-        while True:
-            time.sleep(sleeptime)
-            if not os.path.isfile("amp-log.txt"):
-                if job_submit == 'qsub':
-                    print(f"{cwd}-{qname}:: job is not loaded in queue")
+            #if os.path.isfile("amp.amp") or os.path.isfile("amp-untrained-parameters.amp"):
+            ### deprecate checking amp.pot
+            #if amp_util.get_amppotname():
+            #    print("There are amp potential file so exit")
+            #    sys.exit(1)
+            ### run training
+            if job_submit == 'qsub':
+                ampstr = amp_ini.Amp_string(add_amp_kw=p_tr)
+                with open("mlet_tr.csh", 'w') as f:
+                    f.write(ampstr.qscript)
+            elif job_submit == 'node':
+                ampstr = amp_ini.Amp_string(add_amp_kw=p_tr)
+            print(ampstr())
+            ### check for show
+            if test_wrapper == None or test_wrapper == 'db':
+                os.system(ampstr())
+            ### if check: print test and exit
             else:
-                print(f"{cwd}-{qname}:: waiting until training finishes")
-            ### this is not working: when calc.train() in amp_run.py fails, doesnot make amp_ini.amptrain_finish but lives untrained.amp
-            if os.path.isfile("amp.amp") or os.path.isfile("amp-untrained-parameters.amp"):
-                break
-        print("\n\n\ntraining is done")
+                if re.search('te', ampjob):
+                    ampstr = amp_ini.Amp_string(add_amp_kw=p_te)
+                    if job_submit == 'qsub':
+                        with open("mlet_te.csh", 'w') as f:
+                            f.write(ampstr.qscript)
+                    print(ampstr())
+                sys.exit(2)
+            ### wait after running amp_run.py
+            while True:
+                time.sleep(sleeptime)
+                if not os.path.isfile("amp-log.txt"):
+                    if job_submit == 'qsub':
+                        print(f"{cwdname}-{qname}:: job is not loaded in queue")
+                else:
+                    print(f"{cwdname}-{qname}:: waiting until training finishes")
+                ### this is not working: when calc.train() in amp_run.py fails, doesnot make amp_ini.amptrain_finish but lives untrained.amp
+                if os.path.isfile("amp.amp") or os.path.isfile("amp-untrained-parameters.amp"):
+                    break
+            print("\n\n\ntraining is done")
     ############################################################################################    
     ### Test Part         
     if re.search('te', ampjob):
@@ -143,7 +148,7 @@ def run_amp_wrapper(fin, job_submit, qname, ampjob, test_wrapper, key_values, hl
 
         while True:
             time.sleep(sleeptime)
-            print(f"{cwd}-{qname}:: test is going until finding '{amp_ini.ampout_score}'")
+            print(f"{cwdname}-{qname}:: test is going until finding '{amp_ini.ampout_score}'")
             if os.path.isfile(amp_ini.ampout_score):
                 break
         print("Job is Done")

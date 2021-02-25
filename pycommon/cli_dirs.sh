@@ -18,11 +18,12 @@ fi
 #echo $j
 dname=hl
 match=${2:-$dname}
+f=$match
 shift
 shift
 #for d in $(ls -d ${match}*); do
-#for d in $(ls -d *); do
-for d in $@; do
+for d in $(ls -d */); do
+#for d in $@; do
     case $j in
         ### VASP make DIR for CONTINOUS JOB
         "vmake")
@@ -60,6 +61,10 @@ for d in $@; do
         ### REMOVE directory
         'rm')
             echo "rm $d/$f"
+            ;;
+        ### REMOVE dir as whole
+        'rmr')
+            echo "rm -r $d$f"
             ;;
         ### chmod for dir and files
         'chmod')

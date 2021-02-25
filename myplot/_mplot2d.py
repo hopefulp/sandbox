@@ -6,18 +6,28 @@
 """    
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.ticker as ticker
 import sys
 
 ### font size
 font = {'size': 15}
-
-mpl.rcParams['legend.fontsize'] = 10
+mpl.rcParams['legend.fontsize'] = 15
 mpl.rc('font', **font)
 font_size=15
 
 fig = plt.figure()
 #ax = plt.subplot(111)
 ax = fig.gca()
+
+def ax_f(x_axis):
+    if 'xspacing' in x_axis.keys():
+        ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(x_axis['xspacing']))
+    return 0
+
+def xtick_invisible(ax, N):
+    for n, xlabel in enumerate(ax.xaxis.get_ticklabels()):
+        if n % N != 0:
+            xlabel.set_visible(False)
 
 def my_font(pack):
     if pack == 'amp':
@@ -28,7 +38,7 @@ def my_font(pack):
         print("package: %s is not included" % pack)
         sys.exit(0)
     mpl.rc('font', **font)
-    return
+    return 0
 
 def draw_histogram(y, nbin, Lsave, fname):
     n, bins, patches = plt.hist(y, nbin)

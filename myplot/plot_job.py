@@ -32,6 +32,8 @@ def get_jobtitle(job, title=None, xtitle=None, ytitle=None):
 
 #Ni_files=[m1.f3, m2.f3, m3.f3, m4.f3, m5.f3, m6.f3]
 Ni_6x=['1-PP', '2-PP$^{Me}$P', '3-PN$^{Me}$P', '4-PNP', '5-Ni-CO$_2$-Fe', '6-Ni-CO$_2$-Fe$^{SM}$']
+Ni_5x=['1-PP', '2-PP$^{Me}$P', "2`-PN$^{Me}$P", '3-PNP', '4-Ni-CO2-Fe']
+Ni_4x=['1PP', '2PPP', '3PNP', '4PNP-bridged']
 
 
 

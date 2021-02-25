@@ -7,7 +7,7 @@ import sys
 import numpy as np
 from myplot2D import mplot_nvector, mplot_twinx
 from plot_job import get_jobtitle
-from plot_job import Ni_4x as Nix
+from plot_job import Ni_6x
 from my_chem import *
 from common import *
 import parsing 
@@ -81,7 +81,7 @@ def convert2value(st):
     return val
 
 
-def get_yscale_value(yscale):
+def get_yv_scale(yscale):
     ''' treat yscale, values as list '''
     values=[]
     for ys in yscale:
@@ -142,8 +142,8 @@ def draw_twinx(fs,icx,x_val,icy,job,title,xt,yt,yl,Lsave,yscale,colors):
         if x_val:
             x = x_val
         else:
-            x=Nix
-    #x=Nix
+            x=Ni_6x
+    #x=Ni_6x
     ### y.ndim can be 1 or 2
     print(f'length of x: {len(x)}')
     if len(fs) == 1:
@@ -171,15 +171,12 @@ def get_title(name):
     if x is included in file, modify
     if 1st line is label, modify
 """    
-def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,colors,Ltwinx,icy_right,ylabel_r):
+def draw_f(flist,icx,x,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,colors,Ltwinx,icy_right,ylabel_r):
     '''
     flist: file list
     '''
-    if not x_ext:
+    if not x:
         x=[]
-    else:
-        x = x_ext
-    nysize = len(x)
     ### modify get title
     if not title:
         title = get_title(flist[0])
@@ -238,19 +235,15 @@ def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
                 ### read data line from file                        
                 items = line.strip().split()
                 if items:
-                    if not x and 'icx' in locals():
+                    if 'icx' in locals():
                         x.append(float(items[icx]))
                         #x_value.append(float(items[icx-1]))
                     #y_line = []     # convert string to float for a list
-                    ### if one file, get ys
-                    if len(flist) == 1:
-                        for y in icy:
-                            #y_line.append(float(items[y-1]))    # make 1D array
-                            #print(f"{y} {items[y-1]}")
-                            y_val.append(float(items[y]))    # make 1D array
-                            #y.append(y_line)                # make 2D array
-                    else:
-                        y_val.append(float(items[0]))
+                    for y in icy:
+                        #y_line.append(float(items[y-1]))    # make 1D array
+                        #print(f"{y} {items[y-1]}")
+                        y_val.append(float(items[y]))    # make 1D array
+                        #y.append(y_line)                # make 2D array
                 i+=1
             ### y_2d: 1 y_val, nfiles
             ###       n y_val, 1 files
@@ -260,8 +253,8 @@ def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
     if not x:
         if x_val:
             x = x_val
-        #else:
-        #    x=Nix
+        else:
+            x=Ni_6x
     ### function: draw_f()
     if len(flist) == 1:
         ### if 1 y_val
@@ -274,36 +267,21 @@ def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
         print(f"shape of y-data {new_array.shape}")
         y = [*zip(*new_array)]
         print(f"shape of y-data {np.array(y).shape}")
-    ### in case several files: icy2(y-right axis) == file index of icy_right
     else:
         y = y_2d
-        icy2 = icy_right
     ### scaling with 0-th axis: y shape was ready for [y1, y2, ...,yn]
     ### scaling canbe *|+ for view in plot
-    ### BE & SCF_TOTAL ['-1', '-j2cal'], NBO & BE ['-1'], 4f for EDA ['-j2cal'], NBO & CT ['-1','-j2c']
-    #yscale = ['-1', '-j2cal' ]
-    #yscale = [ '-j2cal' ]
-    yscale = get_yscale_value(yscale)
+    #yscale = get_yv_scale(yscale)
     #yscale = [4158.65, 4158.65, 0]
     #y=np.array(y)+np.array(yscale)[:,None]
     #yscale=[0.01,0.01,1.0]
-    print(f"{np.array(y).shape} {np.array(yscale).shape} yscale={yscale}")
-    if len(yscale) == 1:
-        y=np.array(y)*yscale[0]
-    else:
-        y=np.array(y)*np.array(yscale)[:,None]
-        
-    print(f"x before call mplot: {x} ")
+    #y=np.array(y)*np.array(yscale)[:,None]
+    print("before draw mplot_twinx")
+    #print(f"{x} ")
     if Ltwinx:
-        print("before draw mplot_twinx")
         print(f"title = {title} xlabel = {xlabel}")
-        yl2=[]
-        yl2.append(ylabel)
-        yl2.append(ylabel_r)
-        mplot_twinx(x, y, icy2, title=title, xlabel=xlabel, ylabel=yl2, legend=line_label, Lsave=Lsave, Colors=colors)
+        mplot_twinx(x, y, icy2, title=title, xlabel=xlabel, ylabel=ylabel, legend=line_label, Lsave=Lsave, Colors=colors)
     else:
-        print(f"x={x}")
-        print("before draw mplot_nvector")
         print(f"title = {title} xlabel = {xlabel}")
         mplot_nvector(x, y, title=title, xlabel=xlabel, ylabel=ylabel, Lsave=Lsave, legend=line_label,Colors=colors)
     return 0
@@ -314,7 +292,7 @@ def draw_v(y_val, job, title, xtitle, ytitle, Lsave,yscale):
     if job == 'eda':
         if yscale:
             ys = np.array(yscale) * j2cal
-    x=Nix
+    x=Ni_6x
     y=np.array(y_val)*ys
     mplot_nvector(x, y, Title=job_title.title, Xtitle=job_title.xtitle, Ytitle=job_title.ytitle, Lsave=Lsave)
     
@@ -324,8 +302,8 @@ def main():
     parser = argparse.ArgumentParser(description='Drawing files with values/files')
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-v', '--values', action='store_true', help='use input values as y')
     group.add_argument('-f', '--files', nargs='+',help='add all the files')
+    group.add_argument('-v', '--values', action='store_true', help='use input values as y')
     #parser.add_argument('-xv', '--xvalues', nargs='*', help='X values')
 
     g_value=parser.add_argument_group('Values', description="get argument as y-values")
@@ -336,13 +314,12 @@ def main():
     xvalues.add_argument('-x', '--x_ext', help='x-coord is supplied externally')
     g_file=parser.add_argument_group('Files', description="get input files")
     #g_file.add_argument('-nc', '--ncolumn', default=1, type=int, help='number of columns in each file')
-    g_file.add_argument('-icy', '--icolumn_y', nargs="*", type=int, help='column index of Y')
-    g_file.add_argument('-ys', '--y_scale', default=['1.0'], nargs="+", help='scale factor for Y -kj2kcal')
+    g_file.add_argument('-icy', '--icolumn_y', default=1, nargs="*", type=int, help='column index of Y')
+    g_file.add_argument('-ys', '--y_scale', default=[1], nargs="+", help='scale factor for Y [value|str|str-], use for str- for "-"')
     #g_file.add_argument('-ys', '--y_scale', nargs="*", help='scale factor for Y [value|str|str-], use for str- for "-"')
     g_twin = parser.add_argument_group('Twin-X', description='to plot using two y-axes')
     g_twin.add_argument('-tx', '--twinx', action="store_true", help='using two y-axes with twin x ticks')
-    #g_twin.add_argument('-icy2', '--second_iy', default=[2], nargs="+", type=int, help='designate the index of y for 2nd y-axis')
-    g_twin.add_argument('-icfy2', '--second_iy', default=[1], type=int, help='designate the index of y[columns or files] for 2nd y-axis')
+    g_twin.add_argument('-icy2', '--second_iy', default=[2], nargs="+", type=int, help='designate the index of y for 2nd y-axis')
     g_twin.add_argument('-yl2', '--second_yl', default='E(ev)', help='input left y-axis title')
     parser.add_argument('-j', '--job', help='job of qcmo|ai|gromacs')
     parser.add_argument('-t', '--title', help='title of figure would be filename')
@@ -354,23 +331,19 @@ def main():
     args = parser.parse_args()
 
     ### use input values as y[]
-    print(f"yscales {args.y_scale}")
     if args.values:
         draw_v(args.y,args.job,args.title,args.xlabel,args.ylabel,args.save,args.y_scale)
     ### use input files
     elif args.files:
-        print(f"read files {args.files}")
         ### x values
         if args.x_ext:
-            print(f"args.x_ext = {args.x_ext}")
+            print(f"x_ext = {x_ext}")
             print("use x-coordinate supplied by external input")
-            x=Nix
+            x=Ni_6x
         else:
             x=None
-        ### n columns in 1 file, twinx: 1 column for nfiles, working ?
-        print(args.second_iy)
-        print(f"x before draw_file: {x}")
-        draw_file(args.files, args.icolumn_x, x,args.icolumn_y,args.job,args.title,args.xlabel,args.ylabel,args.ylabels,args.save,args.y_scale, args.colors, args.twinx, args.second_iy, args.second_yl)
+        ### n columns in 1 file, twinx
+        draw_f(args.files,args.icolumn_x,x,args.icolumn_y,args.job,args.title,args.xlabel,args.ylabel,args.ylabels,args.save,args.y_scale, args.colors, args.twinx, args.second_iy, args.second_yl)
             #draw_1file(args.files[0],args.icolumn_x,args.icolumn_y,args.title,args.xlabel,args.ylabel,args.save)
     else:
         print("Error:: Turn on -v for values or -f files")

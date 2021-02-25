@@ -1,4 +1,5 @@
 from common import MyClass_str as MyClass
+from parsing import str_decom as parse_str
 #from common import MyClass
 #import comment_sys as mod_sys
 
@@ -6,7 +7,8 @@ amp                 = MyClass('amp')
 amp.server              = MyClass('amp.server')
 amp.run                 = MyClass('amp.run')
 amp.source              = MyClass('amp.source')
-amp_scripts             = MyClass('amp_scripts')
+amp.scripts             = MyClass('amp.scripts')
+amp.alias               = MyClass('amp.alias')
 lammps              = MyClass('lammps')
 lammps.start            = MyClass('lammps.start')
 lammps.lamphet          = MyClass('lammps.lamphet')
@@ -24,10 +26,9 @@ vasp                = MyClass('vasp')
 vasp.server             = MyClass('vasp.server')
 vasp.scripts            = MyClass('vasp.scripts')
 vasp.postproc           = MyClass('vasp.postproc')
-water       = MyClass()
-#server.sge     = MyClass()
+water               = MyClass('water')
 
-amp_scripts.run  =  "\n    == Scripts ==\
+amp.scripts.run  =  "\n    == Scripts ==\
                     \n\t== AMP direct Run Test\
                     \n\t$ amp_run.py -f OUTCAR -nd 200 -j tr -dt interval -dl 0 150 200 -nc 4 -hl 4 4 -el 0.1 -fl 0.0 +g\
                     \n\t$ amp_run.py -f OUTCAR -nd 1000 -j tr -dt div -dl 5 0 3 -nc 4 -hl 4 4 -el 0.1 -fl 0.0 +g\
@@ -57,7 +58,7 @@ amp_scripts.run  =  "\n    == Scripts ==\
                     \n\t\t   modify color option\
                     \n\t\trefer to myplot\
                     "
-amp_scripts.mlet =  "\n\t=== AMP Qsub scripts \
+amp.scripts.mlet =  "\n\t=== AMP Qsub scripts \
                     \n\t$ sge_amp.py -db -i OUTCAR -qj dt15 -m 12G -nc 1 -j tr -hl 8 8 -el 0.001 -fl 0.01 -nt 4766 -ntr 4766 -dt int -dl 0 4766 \
                     \t    : work option\
                     \n\t\t-s for scan\
@@ -73,6 +74,10 @@ amp_scripts.mlet =  "\n\t=== AMP Qsub scripts \
                     \n\t    amp positional argument for software\
                     \n\t    -i input file of PES-force\
                     \n\t    -hl hidden layer, -el energy convergence limit\
+                    "
+amp.analysis        = "\n    == Analysis ==\
+                    \n\t-- extract Frmse from training results of amp-log.txt\
+                    \n\t    grep \"optimization un\" */amp-log.txt -B 1 | awk '{if(NF==11) {print $8} else if(NF==12) {print $9} }'\
                     "
 amp.server.chi =   "=== AMP ===\
                     \n    == SERVER ==\
@@ -480,19 +485,19 @@ nico2.mpl_ini   =   "\n    MPL: initialize\
                     \n\t:: check by ipython>>>matplotlib.matplotlib_fname()\
                     "
 nico2.myplot    =   "\n    Several plots\
-                    \n\t$ myplot.py -v|-f values|files -j job -t title\
+                    \n\t$ mplot_f.py -v|-f values|files -j job -t title\
                     \n\t    :: -v y1 y2 y3 ... | -f f1 f2 f3 ...\
                     \n\t    :: -j for job qcmo|ai for xlabel, ylabel, title\
                     \n\t    :: -t, -xt, -yt overwrites xlabel, ylabel, title\
                     \n\t    :: -x for x-column -other options for title\
                     \n\t    --imports my_mplot2d for mplot_nvector\
                     \n\t    --imports plot_job for figure titles for jobs\
-                    \n\te.g.:(qcmo) myplot.py -v -y -0.8058   -0.7866   -0.7860   -1.0080   -1.2482   -1.2539 -j qcmo -t \"CO2 charges\"\
-                    \n\te.g.:(qcmo) myplot.py -f nbo-6f.dat -j qcmo -xt Model -ys -1 -yt \"Charge (e)\" -t \"CO2 charges\"\
+                    \n\te.g.:(qcmo) mplot_f.py -v -y -0.8058   -0.7866   -0.7860   -1.0080   -1.2482   -1.2539 -j qcmo -t \"CO2 charges\"\
+                    \n\te.g.:(qcmo) mplot_f.py -f nbo-6f.dat -j qcmo -xt Model -ys -1 -yt \"Charge (e)\" -t \"CO2 charges\"\
                     "
 nico2.qcmo      =   "\n    QCMO: Plot MO\
-                    \n\t$ myplot.py -v -y -0.8058   -0.7866   -0.7860   -1.0080   -1.2482   -1.2539 -j qcmo -t \"CO2 charges\"\
-                    \n\t$ myplot.py -f nbo-6f.dat -j qcmo -xt Model -ys -1 -yt \"Charge (e)\" -t \"CO2 charges\"\
+                    \n\t$ mplot_f.py -v -y -0.8058   -0.7866   -0.7860   -1.0080   -1.2482   -1.2539 -j qcmo -t \"CO2 charges\"\
+                    \n\t$ mplot_f.py -f nbo-6f.dat -j qcmo -xt Model -ys -1 -yt \"Charge (e)\" -t \"CO2 charges\"\
                     "
 nico2.eda       =   "\n    EDA: Plot gragh\
                     \n\t$ cd EDA\
@@ -500,22 +505,39 @@ nico2.eda       =   "\n    EDA: Plot gragh\
                     \n\t$ grep \"CT = DEL\" *out | awk '{print $13}' | tr '\\n' ' '\
                     \n\t$ grep 'SCF Total' *out | awk '{print $13}' | tr '\\n' ' '\
                     \n\t$ cd ..\
-                    \n\t$ myplot.py -v -y -0.8058   -0.7866   -0.7860  -j eda -t 'CT Energy' -yt 'E (kcal/mol)' \
-                    \n\t$ myplot.py -f frozen_1.dat Polar.dat CTene.dat scf.dat -j eda -t EDA -yt 'E (kcal/mol)' -ys -1 -yl FRZ POL CT SCF-TOTAL\
-                    \n\t$ myplot.py -f chg-nbo.dat CTene.dat -ys -1 j- -yl 'NAO Charge of CO2 (e$^-$)' 'CT (kcal/mol)' -tx\
-                    \n\t$ myplot.py -f chg-nbo-4f.dat CTene-4f.dat -ys -1 j- -yl 'Charge of CO$_2$ (e$^-$)' 'CT (kcal/mol)' -tx -xv PP PPP PNP PNP-bridged\
-                    \n\t$ myplot.py -f BE.dat scf.dat -ys -1 j- -t 'BE & SCF' -yt 'E (kcal/mol)' -yl BE SCF-TOTAL\
-                    \n\t$ myplot.py -f chg-nbo.dat BE.dat -ys -1 j- -yl 'NAO Charge of CO2 (e$^-$)' 'BE (kcal/mol)' -tx -c r darkcyan\
-                    \n\t$ myplot.py -f CTene.dat scf.dat -ys 'j-' 'j-' -yl 'CT (kcal/mol)' 'SCF (kcal/mol)' -tx -c red blue\
+                    \n\t$ mplot_f.py -v -y -0.8058   -0.7866   -0.7860  -j eda -t 'CT Energy' -yt 'E (kcal/mol)' \
+                    \n\t$ mplot_f.py -f chg-nbo-4f.dat CTene-4f.dat -ys -1 j- -yl 'Charge of CO$_2$ (e$^-$)' 'CT (kcal/mol)' -tx -xv PP PPP PNP PNP-bridged\
+                    \n\t$ mplot_f.py -f chg-nbo.dat BE.dat -ys -1 j- -yl 'NAO Charge of CO2 (e$^-$)' 'BE (kcal/mol)' -tx -c r darkcyan\
+                    \n\t$ mplot_f.py -f CTene.dat scf.dat -ys 'j-' 'j-' -yl 'CT (kcal/mol)' 'SCF (kcal/mol)' -tx -c red blue\
+                    \n\t$ mplot_f.py -f mol5_1froz.dat mol5_2pol.dat mol5_3ct.dat mol5_4scf_total.dat -t EDA -yl 'E (kcal/mol)' -ys j- -yls FRZ POL CT SCF_TOTAL -x Ni5\
+                    \n\t$ mplot_f.py -f mol5_nbo.dat mol5_3ct.dat -ys -1 j- -yl 'NAO Charge of CO2 (e$^-$)' -yl2 'CT (kcal/mol)' -tx -x Ni5 -t 'NAO & CT'\
+                    \n\t$ mplot_f.py -f mol5_BE-tzD.dat mol5_4scf_total.dat -x Ni5 -ys -1 j- -t 'BE & SCF' -yl 'E (kcal/mol)' -yls BE SCF_TOTAL  \
+                    \n\t$ mplot_f.py -f mol5_nbo.dat mol5_BE-tzD.dat -ys -1 -yl 'NAO Charge of CO2 (e$^-$)' -yl2 'BE (kcal/mol)' -tx -t 'BE & NAO' -x Ni5  -yls NAO BE\
                     "
+def print_obj(job):
+    print("Instances:: ", end='')
+    if job == None:
+        ins_list=[]
+        for instance in MyClass.instances:
+            ins_name = parse_str(instance)
+            if  ins_name not in ins_list:
+                ins_list.append(ins_name)
+        ### just print the first name
+        for ins_name in ins_list:
+            print(f"{ins_name}", end=' ')
+    print("\n\t    -j for detail")
+    return 0
 
+
+'''
+#old version
 def print_obj():
     print("Instances:: ", end='')
     for instance in MyClass.instances:
         print(f"{instance}", end=' ')
     print("\n\t    -j for detail")
     return 0
-
+'''
 
 
 

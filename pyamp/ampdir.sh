@@ -18,23 +18,25 @@ j=$1
 key=$2        # Energy check: test_energy.dat, Force check: test_fstat_acc.txt
 #ndat=$3        # number of images per dir: fp 40 100
 dpre=NN     # G2p6max log200pn (des) NN (des) , part, fp (db), hl
-dpre2=Nd1000h2020  #. Nd300hl2020 Nd500hl2020 Nd500G34h202010         
+dpre2=Nd500hl88  #. Nd300hl2020 Nd500hl2020 Nd500G34h202010         
 
 #list=$(seq 11 1 20)                                # HL    , what is set?
 #list=( 200 250 300 )
-list=( 7  9 12 14 16 18 20 )
-list=( 20 ) 
+#list=( 7  9 12 14 16 18 20 )
+#list=( 20 ) 
 #list=(   7  9    12 14 )
-#list=(  5         10       15 20 )
-list2=$(seq 0 800 3999)                           # db
+list=(  5     10       15 20 )
+#list2=$(seq 0 800 3999)                           # db
 #list=( 200 )
 #list=$(seq 300 200 1000)
 #list=( 200  800 1500 1800 2500 )      # input Ndata
 #list=( 1000 1200 1500 1800 2000 )                   # input Ndata
-list2=( 20 30 40 50 )
+#list2=( 20 30 40 50 )
 
 pwd=`pwd`
-
+### scan and make list
+#list=$(ls NN* -d)
+#echo list is $list
 amp_dir=( "amp-neighborlists.ampdb" "amp-fingerprint-primes.ampdb" "amp-fingerprints.ampdb" )
 source /gpfs/home/joonho/bin/alias.sh
 #echo $j
@@ -100,8 +102,10 @@ case $j in
         done
         ;;
     "wrapper_subdir")
+        #echo ${list[@]}
         for n in ${list[@]}; do
             dname=$dpre$n
+            #dname=$n
             #if [ ! -d $dname ]; then
             #    echo "mkdir $dname"
             #fi
@@ -115,7 +119,8 @@ case $j in
             #echo "cp $dname2/amp-untrained-parameters.amp $dname2c"
             echo "cd $dname2"
             ### Training
-            echo "amp_wrapper.py -js qsub -qn Npn${n} -sf NN${n} -hl 20 20 -dl 1000 2000 3500 3800 & "
+            echo "amp_wrapper.py -js qsub -qn Npn${n} -sf NN${n} -hl 8 8 -dl 1000 2000 3500 3800 & "
+            #echo "amp_wrapper.py -js qsub -qn ${n} -sf ${n} -hl 8 8 -dl 1000 1500 3500 3800 & "
             ### Training-continue
             #echo "amp_wrapper.py -js qsub -qn NNpn${n}c -sf NN${n} -dl 1000 1300 3500 3600 & "
             ### TEST
@@ -154,7 +159,7 @@ case $j in
         ;;
     ### COPY to multiple DIR
     'subdir')
-        source /gpfs/home/joonho/bin/alias.sh
+        #source /gpfs/home/joonho/bin/alias.sh
         for n in ${list[@]}; do
             dname=$dpre$n
             cd $dname

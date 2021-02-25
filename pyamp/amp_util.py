@@ -263,6 +263,13 @@ def list2str(i_image):
     return sindex
 
 amp_pot=amp_ini.amp_amp
+def is_amppot():
+    lists = os.listdir('.')
+    for amppot in amp_pot:
+        if amppot in lists:
+            return 1
+    return 0
+
 def backup_amptr(lpot):
     newdir = 'pot_save'
     i=0

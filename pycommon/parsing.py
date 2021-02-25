@@ -27,3 +27,12 @@ def is_there_char(st):
         if char.isalpha():
             return True
     return False
+
+def str_decom(st, delimiter='.', index=0):
+    lstr = st.split(delimiter)
+    if len(lstr) < index+1:
+        print("Error: %s has more than 1 dot in file name" % st)
+        exit(1)
+    else:
+        return lstr[index]
+    

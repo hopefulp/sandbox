@@ -6,6 +6,7 @@
 """    
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.ticker as ticker
 from cycler import cycler
 import sys
 import my_chem 
@@ -50,14 +51,14 @@ def my_font(pack='amp'):
 def common_figure():
     fig = plt.figure(figsize=(15,10))
     ax = plt.axes()
-    mpl.rcParams.update({'font.size':20})
-    ax.tick_params(axis='both', which='major', labelsize=20)
+    mpl.rcParams.update({'font.size':25})
+    ax.tick_params(axis='both', which='major', labelsize=25)
     #ax.tick_params(axis='x', labelsize=30)
 
-    custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
-    #custom_cycler = (cycler(color=['r','g']))                                          # Figure 8(b)
-    #custom_cycler = (cycler(color=['darkcyan','b']))                                   # Figure S17(a)
-    #custom_cycler = (cycler(color=['r','darkcyan']))                                    # Figure 8(b)
+    #custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
+    custom_cycler = (cycler(color=['r','g']))                                          # Figure 8(b)
+    #custom_cycler = (cycler(color=['darkcyan','b']))                                   # Figure S16(a)
+    #custom_cycler = (cycler(color=['r','darkcyan']))                                    # Figure S16(b)
     #custom_cycler = (cycler(color=['orange','m','g','b']))
     ax.set_prop_cycle(custom_cycler)
     return fig, ax
@@ -222,40 +223,43 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     ### function: mplot_twinx
     plt.title(title)
     if xlabel:
-        plt.xlabel(xlabel, fontsize=20)
+        plt.xlabel(xlabel, fontsize=25)
     if isinstance(ylabel, str): ylabel1 = ylabel2 = ylabel
     elif isinstance(ylabel, list):
         ylabel1 = ylabel[0]
         ylabel2 = ylabel[1]
-    plt.ylabel(ylabel1, fontsize=20)
+    plt.ylabel(ylabel1, fontsize=25, color='r')
+    ax.tick_params(axis='y', colors='r')
     #ax.xaxis.set_major_locator(plt.NullLocator())
     #print(f"x, y shape:: {np.array(x).shape} {np.array(y).shape} and ylabel {ylabel} in {whereami()}")
     ax2=ax.twinx()
-    ax2.set_ylabel(ylabel2)
-    ax2.set_ylim(0,0.2)
+    ax2.set_ylabel(ylabel2, color='g')
+    #ax2.set_ylim(0,0.2)
     pls=[]
     print(iy_right, len(ys))
     for i in range(len(ys)):
         if i in iy_right: 
             #if Colors:  color = Colors.pop(i)       #'tab:' + Colors.pop(0)
             #else:       color='tab:green'
-            #ax2.set_ylabel(Ylabels[i])
-            p2, = ax2.plot(x, ys[i,:], 'x-', label=legend[i])
+            plt.yticks(color='g')
+            p2, = ax2.plot(x, ys[i,:], 'x-', color='g', label=legend[i])
             pls.append(p2)
         else:
             #ax2.tick_params(axis='y')
             #if Colors:  color = Colors.pop(i)       #color = 'tab:' + Colors.pop(0)
             #else:       color = 'tab:red'
             #print(f"shape of x, ys[i] = {np.array(x).shape} {ys[i,:].shape}")
-            p1, = ax.plot(x, ys[i,:], 'o-', label=legend[i])
+            plt.yticks(color='r')
+            p1, = ax.plot(x, ys[i,:], 'o-', color='r',  label=legend[i])
             pls.append(p1)
-            #ax.tick_params(axis='y')
     #plt.legend(pls, Ylabels, loc=2)
-    ax.legend(loc=3)            # 2
-    ax2.legend(loc=4)           # 1
+    #ax.legend(loc=3)            # 2
+    #ax2.legend(loc=4)           # 1
     #plt.legend()
     #common_figure_after()
-    plt.xticks(x)
+    x_ticks = ['PP', 'PPP', 'PNP', 'PNP-bridged']
+    #plt.xticks(x_ticks)
+    ax.set_xticklabels(x_ticks)
     plt.locator_params(axis='x', nbins=10)
     plt.show()
     if Lsave:
@@ -275,11 +279,11 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     else:
         xsize = ys.shape[0]
         x=range(xsize)
-
+    print(f"x={len(x)} y={ys.shape}")
     plt.title(title)
     if xlabel:
-        plt.xlabel(xlabel, fontsize=20)
-    plt.ylabel(ylabel, fontsize=20)
+        plt.xlabel(xlabel, fontsize=25)
+    plt.ylabel(ylabel, fontsize=25)
     if ys.ndim == 1:
         plt.plot(x, y, 'bo-')
         #plt.scatter(x, y)
@@ -291,6 +295,7 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     ### ADD LEGEND
     plt.legend(loc=2)                # locate after plot
     plt.xticks(x)
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(50))
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)

@@ -6,11 +6,11 @@ import re
 from common import dir_all, MyClass, dir_classify_n, whereami
 
 comment = MyClass('comment')
-mod     = MyClass('mod')
 dirjob  = MyClass('dirjob')
 jobfile = MyClass('jobfile')
 convert = MyClass('convert')
 command = MyClass('command')
+string  = MyClass('string')
 
 comment.howto       =   "=== COMMENT ===\
                         \n\treads 'comment_sys.py' or 'comment_subj.py'\
@@ -26,24 +26,38 @@ comment.comment_subj=   "\tINFO: SCIENCE JOB \
                         "
 comment.ini_pycommon=   "\texplanation of files in $SB/pycommon"
 
-mod.common="module with commonly used functions \"import common\""
 
 
-dirjob.clean    =   "=== DIRECTORY JOB ==\
-                        \n\t\tclean directory\
+dirjob.clean1d      =   "=== DIRECTORY JOB ==\
+                        \n\t\tclean one directory\
                         \n\t\t    by -prefix -suffix -middle match -e excluded -ef 'exclude these files' -work {qchem,ai} -j rm[mv] -jd new_dir\
+                        \n\t\tOptions::\
+                        \n\t\t    -d input directory\
+                        \n\t\t    -y execute command without asking: default-asking\
+                        \n\t\t    -w multiple jobs in [amp|pbs|vasp|lammps] add more in case extension\
+                        \n\t\t    -j [rm,mv,cp,ln]\
+                        \n\t\t\tln: in case the change of dirname, link files are broken\
                         \n\t\tUsage::\
-                        \n\t\t    dir_clean_p2.py -s out -ef 6-CC-NiFe-A-relax.out 5-FePNP-CO2.out -j mv -jd j631gs_v3.2\
+                        \n\t\t    clean1d.py -w pwd\
+                        \n\t\t    clean1d.py -d NN20 -w amp -j ln -y\
+                        \n\t\t    (?) clean1d.py -s out -ef 6-CC-NiFe-A-relax.out 5-FePNP-CO2.out -j mv -jd j631gs_v3.2\
                         "
-dirjob.dir_clean_r_py2= "clean dir recursively\
-                        \n\t\tdir_clean_r_py2.py -p -s -m\
+dirjob.clean_dirs   =   "clean dirs:: same with 'clean1d.py'\
+                        \n\t\t input directory is list\
                         "
-dirjob.dir_cli      =   "basic command line interface for all files in directory\
+dirjob.clean_recur  = "clean one dir recursively\
+                        \n\t\timport dir_clean() from clean1d.py to clean one directory\
+                        \n\t\tUsage::\
+                        \n\t\t    clean_recur.py -w pwd\
+                        \n\t\t    clean_recur.py -d NN20 -w amp -j ln -y\
+                        \n\t\t\trf. clean1d.py for options\
+                        "
+dirjob.cli_dir      =   "simple command inside directory\
+                        \n\t\tdir1_cli.sh gitpush\
+                        "
+dirjob.cli_dirs      =   "basic command line interface for all files in directory\
                         \n\t\tmodify script for all the files/selected files\
                         \n\t\tdir_cli.sh [0:vmake 1:incar 2:qsub 3:cp 4:rm 5:chmod\
-                        "
-dirjob.dir1_cli     =   "simple command inside directory\
-                        \n\t\tdir1_cli.sh gitpush\
                         "
 dirjob.diramp       =   "Run multiple job in amp by scanning a value in bash\
                         \n\t\tUsage::\
@@ -70,6 +84,24 @@ convert.py_2to3_nb  =   "to convert ipynb files of python2 to python3\
 
 command.command     = "show Recent Command"
 command.web_load    = "To load in web, copy files to ~/public_html/"
+
+string.common       =   "module for dir, string\
+                        \n\t    Classes\
+                        \n\t\tMyClass_obj: class has its name as class attribute\
+                        \n\t\tMyClass(MyClass_obj): inherits MyClass_obj\
+                        \n\t\tMyClass_str(dict): is not working\
+                        \n\t    Functions::\
+                        \n\t\tsearch_dirs(dir_prefix, filename)\
+                        \n\t\tyes_or_no(string): get y/n from stdio\
+                        \n\t      Get files from directory::\
+                        \n\t\tget_files_type(filetype, dirname)\
+                        \n\t\tget_files_prefix(prefix, dirname, Lshow, Ldir)\
+                        \n\t      Filename::\
+                        \n\t\tf_ext(fname): returns extension using [-1]\
+                        \n\t\tf_root(fname): returns filename without extension\
+                        \n\t\tfname_decom(fname): returns (fname, extension)\
+                        \n\t\tetc\
+                        "
 
 ### removed
 dirjob.dir_reset="reset dir as initial state by job: -j ai"
@@ -134,7 +166,6 @@ def classify(Lclassify, work):
     for instance in MyClass.instances:
         print(f"{instance.name}", end=' ')
     print("\n\t    -w for detail")
-    print(f"#Comment: -c    for classification")
     '''
     if not spec == None:
         print(f"Detail for {spec}:: ")
@@ -146,7 +177,7 @@ def classify(Lclassify, work):
 
 def main():
     parser = argparse.ArgumentParser(description="display Usage for $SB/py_qcmo  ")
-    parser.add_argument('-c', '--classify', action="store_true", help="classify files ")
+    parser.add_argument('-c', '--classify', action="store_false", help="classify files ")
     parser.add_argument('-w','--work',  help="several explanation option ")
     args = parser.parse_args()
 
