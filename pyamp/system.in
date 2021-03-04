@@ -1,0 +1,26 @@
+# settings
+units           metal
+atom_style      atomic
+boundary 	p p p 
+
+# system setup
+read_data       system.data
+
+# force field
+pair_style      nn 4.0
+pair_coeff      1 potential_H
+pair_coeff	2 potential_O
+
+# Set temperature
+velocity all create 350 200000
+
+# Assign fixes
+fix 1 all nvt temp 350.0 350.0 $(40.0*dt)
+
+# run settings
+timestep        0.001
+dump            1 all custom 1 dump.lammps id type x y z vx vy vz fx fy fz
+dump_modify     1 sort id
+thermo_style    custom step pe ke
+thermo          1
+run             1000

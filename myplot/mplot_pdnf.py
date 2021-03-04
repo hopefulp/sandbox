@@ -62,43 +62,36 @@ def fplot(fin, icx, icy, ptype, title, mpl_xticks ):
 
 def nfplot_pd(fin, icx, icy, ptype, title, mpl_xticks, data_label):
     nfile=len(fin)
-    #dfs=[]
+    dlabels=[]
     for i in range(nfile):
         ### PANDAS
         ### read_csv can read any type of delimiter
         data_label = f_root(fin[i])
         if 'dfm' in locals() and data_label in dfm.columns:
             data_label += '%s' % str(i)
+        dlabels.append(data_label)
         df = pd.read_csv(fin[i], delim_whitespace=True, names=["X", data_label])
         #dfs.append(df)
         if i == 0:
             dfm = df
         else:
-            dfm = pd.merge(dfm, df, on='X')
+            dfm = pd.merge(dfm, df, on='X', how='outer')
         print(dfm)
 
     ### extract digits in 'X' in case X = \w+\d+
     dfm["N"] = dfm.X.str.replace(r"\D", "").astype(int)
-    df = df.sort_values(by="N")
-    print(df)
+    dfm = dfm.sort_values(by="N")
+    print(dfm)
     #my_mplot2d.draw_histogram(y1, nbin, Lsave, fig_file)
     ### mpls
     #print(f"xticks spacing: {mpl_xticks['xspacing']}")
     ### categorical plotting
-    if mpl_xticks['xs_type'] == 'evenly':
-        df.plot(x="X", y="Y", ax=ax)
-        ax.set_title("Evenly spaced")
-    else:
-        if nfile ==1:
-            df.plot(x="N", y="Y", style='o-', ax=ax, label=data_label)
-        else:
-
-            ### change columns name and plot
-            df2 = df.rename(columns={'Y':data_label, 'Y2':data_label2})
-            df2.plot(x="N", y=[data_label,data_label2], style=['o-','o-'], ax=ax) # two labels are not working
-        ax.set_xticks(df.N)
-        ax.set_ylabel('Frmse (eV/A)')
-        ax.set_xticklabels(df.X)
+    #for col in dfm.columns[1:nfile+1]:
+    for col in dlabels:
+        dfm.plot(x="N", y=col, style='o-', ax=ax)
+    ax.set_xticks(dfm.N)
+    ax.set_ylabel('Frmse (eV/A)')
+    ax.set_xticklabels(dfm.X)
     ax.set_title(title)
     if 'xspacing' in mpl_xticks.keys() and mpl_xticks['xspacing'] != 1:
         print(f"control xticks spacing: {mpl_xticks['xspacing']}")

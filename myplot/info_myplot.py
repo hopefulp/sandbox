@@ -24,15 +24,21 @@ mplplot.mplot_1f="myplot.py -v|-f values|files -j job -t title\
                 \n\te.g.:(qcmo) myplot.py -f nbo-6f.dat -j qcmo -xt Model -ys -1 -yt \"Charge (e)\" -t \"CO2 charges\"\
                 "
 mplplot.mplot_f = mplplot.mplot_1f
-mplplot.mplot_pd2f  =   "Draw 2d plot using pandas by reading file\
-                        \n\tUsage:: mplot_pd2f.py fname options\
+mplplot.mplot_pdnf =    "plot multiple files using pandas for ordering\
+                        \n\t    any number of files\
+                        \n\t    pandas is default\
+                        \n\t    filename becomes columns Name\
+                        \n\t    mplot_pd2f option is available\
+                        \n\tUsage::\
+                        \n\t    mplot_pdnf.py DataAnal/tr300.dat DataAnal/tr500.dat DataAnal/te_tr300.dat\
                         \n\tOptions::\
-                        \n\t    -pd use pandas to ordering x-values\
+                        \n\t    -pd is default to use pandas to ordering x-values\
                         \n\t\t-xs xspacing to reduce xticis by devide in the N list\
                         \n\t\t-xst ['evenly','numerically'(default)] in x-values\
                         "
-mplplot.mplot_pdnf =    "extension of mplot_pd2f.py to include many files\
-                        \n\tUsage:\
+mplplot.mplot_pd2f  =   "Draw 2d plot using pandas by reading file\
+                        \n\t    will be deprecated to use mplot_pdnf.py\
+                        \n\tUsage:: mplot_pd2f.py 1-2filenames options\
                         "
 musage.qcmo="(qcmo) myplot.py -v -y -0.8058   -0.7866   -0.7860   -1.0080   -1.2482   -1.2539 -j qcmo -t \"CO2 charges\"\
             \n\t\t\t  myplot.py -f nbo-6f.dat -j qcmo -xt Model -ys -1 -yt \"Charge (e)\" -t \"CO2 charges\" "

@@ -25,6 +25,7 @@ fconv   = MyClass('fconv')
 general = MyClass('general')
 Gs      = MyClass('Gs')
 aux     = MyClass('aux')
+lammps  = MyClass('lammps')
 
 ampga.gaamp               ="===== Genetic Algoritm for AMP =====\
                         \n\t\tclass GaAmp: instance runs for generation\
@@ -140,6 +141,24 @@ general.dir_scan        = "dir_scan.sh \
                         \n\t\t\tcount the fingerprint files in .../loose\
                         \n\t\t\to check the calculated database\
                         "
+lammps.generate_lammps  =   "    ====  LAMPHET    ====\
+                            \n\tmake lammps input files: this is for water system only\
+                            \n\t    INPUT:\
+                            \n\t\tamp.amp - amp potential file\
+                            \n\t\tstarting_configuration.traj - lammps trajectory file of one image\
+                            \n\t    OUTPUT:\
+                            \n\t\tpotential_Atomname - PROPhet pot file for lammps\
+                            \n\t\tsystem.data - one of lammps input file: l.data, l.in\
+                            \n\t    Linked to Lammps\
+                            \n\t\tlmp_serial < system.in\
+                            \n\t\t    : making lammps output file of log.lammps, dump.lammps\
+                            \n\t\tthen use make_trajectory.py\
+                            "
+lammps.make_trajectory  =   "\n\t(modify script)Read lammps output and convert ASE trajectory\
+                            \n\t    Usage:: make_trajectory.py\
+                            "
+
+
 fconv.fconv2extxyz="convert file format to extxyz: im_format"
 fconv.im2extxyz="convert IM file format to extxyz"
 fconv.NucCarts2xyz="Not Used: use when View.xyz is not provide in Q-Chem, AIMD calculation"
@@ -150,6 +169,8 @@ fconv.aimd2extxyz   =   "from Q-Chem, AIMD calculation with result of EComponent
                         \n\t\t    aimd2extxyz.py -d water1_aimd\
                         "
 fconv.xyz2extxyz="from Q-Chem, AIMD change xyz to include force in extxyz format"
+
+
 
 qchem.aimd = "AIMD run:: (chi::parallel) mpirun -np 4 $QC/exe/qcprog water1_aimd.in $QCSCRATCH/w1K400 > w1k400.out\
                     \n\t\t use high T to get proper Ek for small system, generate as the number of scratch folders as -np\
