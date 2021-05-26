@@ -36,14 +36,18 @@ def dir_clean(d,works,linux_job,prefix, suffix, matches, exclude,excl_fnames,new
             pass
         elif work == 'vasp':
             f_list=os.listdir(d)
-            if excl_fnames:
-                for f in f_list:
-                    if os.access(d+'/'+f, os.X_OK):
-                        excl_fnames.append(f)
-                for efile in excl_fnames:
-                    if efile in f_list:
-                        f_list.remove(efile)
-
+            print(f_list)
+            if excl_fnames: 
+                for efile in excl_fnames: # intactable list outside
+                    for f in f_list[:]:
+                    #if os.access(d+'/'+f, os.X_OK):
+                    #    excl_fnames.append(f)
+                        print(f"\nas for {f}", end=' ')
+                        if re.search(efile, f):
+                            print(f"{f} is removed in the remove-list", end=" ")
+                            f_list.remove(f)
+            print(f_list)
+            f_list_all.extend(f_list)
         elif work == 'pbs':
             #matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI', 'sge']
             matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
@@ -136,7 +140,7 @@ def main():
         print("use %s -h for help" % os.path.basename(__file__))
         sys.exit(0)
     if 'vasp' in args.works and not args.excluded_files:
-        args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR']
+        args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR','CONTCAR']
     #if args.work == 'amp' and not args.excluded_files:
     #    args.excluded
     dir_clean(args.dir1,args.works,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes)

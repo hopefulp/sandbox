@@ -3,6 +3,7 @@
 ### 2018.4.2 makes input files by option -s(POSCAR) -p(POTCAR) -k(KPOINTS) -i(INCAR)
 ### incar is not ready
 ### 2019.10.25 update
+### 2021.05.07 update for EE
 
 import argparse
 import os
@@ -12,7 +13,7 @@ from  myvasp import *
 from common import *
 
 pseudo_pot={'new':'Pot-new', 'potpaw-pbe-new':'Pot-new', 'old':'pot-old', 'potpaw-pbe-old':'pot-old'}
-#global pwd, ini_dvasp
+global pwd, ini_dvasp
 
 def get_poscar(poscar):
     ### confirm file location

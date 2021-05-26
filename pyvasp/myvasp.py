@@ -4,6 +4,7 @@ import os
 import json
 import re
 import sys
+import argparse
 
 """ 
     repository for many vasp script 
@@ -15,6 +16,9 @@ import sys
 
 eps_H2O = 78.3
 ini_dvasp = '/tmp'
+
+TMmag = {'Li': 1, 'Ti': 2, 'V': 3, 'Cr': 4, 'Mn':5, 'Fe':4, 'Co':3, 'Ni':2, 'Cu':2} 
+TMUcorr = {'Fe': 1.8, 'Co': 2.1, 'Ni': 2.0, 'Pt':1.2}
 
 
 def get_vasp_repository():
@@ -30,7 +34,7 @@ def get_vasp_repository():
     #proc = subprocess.Popen(["cat", "/etc/services"], stdout=subprocess.PIPE, shell=True)
     #(out, err) = proc.communicate()
     #print "program output:", out
-    if hostname == 'chi':
+    if hostname == 'chi' or hostname == 'tgm-master.hpc':
         ini_dvasp = '/home/joonho/sandbox_gl/pyvasp/VaspINI'
     elif hostname == 'login':
         ini_dvasp = '/gpfs/home/joonho/sandboxg/pyvasp/VaspINI'
@@ -45,6 +49,37 @@ def get_vasp_repository():
         print("Error:: the directory cannot be found\n stop")
         exit(1)
     return ini_dvasp
+
+def get_atoms_4pos(pos='POSCAR'):
+    with open(pos, 'r') as f:
+        lines = f.readlines()
+        for index, line in enumerate(lines):
+            if index <= 4: continue
+            if line.strip().replace(' ','').isalpha():
+                atoms=line.strip().split()
+                continue
+            if 'atoms' in locals():
+                natoms=line.strip().split()
+                break
+    if 'atoms' in locals() and 'natoms' in locals():
+        return natoms, atoms
+    else:
+        return 'err' 
+                
+
+def make_mag_4pos(pos='POSCAR'):
+    natoms, atoms = get_atoms_4pos(pos)
+    magstr="MAGMOM = "
+    Lmag = False
+    for index, atom in enumerate(atoms):
+        if atom in TMmag:
+            magstr += f"{natoms[index]}*{TMmag[atom]} "
+            Lmag = True
+        else:
+            magstr += f"{natoms[index]}*0 "
+    if Lmag: return magstr + "100*0"
+    else:    return "# " + magstr
+
 
 def make_kpoints(kp, method):
     """ 
@@ -85,6 +120,31 @@ def make_kpoints(kp, method):
     return 0            
 
 vasp_gga={'pbe': 'pe', 'rpbe': 'rp',  'revpbe': 're'}
+
+def get_Ucorr(atoms):
+    '''
+    LDAU = .TRUE.
+    LDAUTYPE = 2                     ! type1=LSDA+U (U & J), type2= LSDA+U (U-J)
+    LDAUL  =  -1  -1   2  -1  -1  -1 ! No_corr(-1), p(1), d(2), f(3)
+    LDAUU  =  0.0 0.0 2.8 0.0 0.0 0.0
+    LDAUJ  =  0.0 0.0 1.0 0.0 0.0 0.0
+    LDAUPRINT = 2        ! output occupation matrix.
+    '''
+    ldaul = 'LDAUL  = '
+    ldauu = 'LDAUU  = '
+    ldauj = 'LDAUJ  = '
+    for atom in atoms:
+        if atom in TMUcorr:
+            ldaul += f'{2:^4}'
+            ldauu += f'{TMUcorr[atom]+1.0:4.1f}'
+            ldauj += f'{1.0:4.1f}'
+        else:
+            ldaul += f'{-1:^4d}'
+            ldauu += f'{0.0:4.1f}'
+            ldauj += f'{0.0:4.1f}'
+    return ldaul, ldauu, ldauj
+        
+        
 
 def make_incar(dic, rw, iofile):
     """ Make INCAR file from dictionary of command line arguments
@@ -405,3 +465,38 @@ def make_incar(dic, rw, iofile):
 
     f.close()
     return 0
+
+def main():
+    parser = argparse.ArgumentParser(description='Test function ')
+    parser.add_argument('-j', '--job', choices=['getmag','ak','Ucorr'], help='read POSCAR then get MAGMOM')
+    parser.add_argument('-s', '--poscar', default='POSCAR', help='POSCAR to be read')
+    parser.add_argument('-ind', '--index', type=int, help='return index of Ucorr list')
+    args = parser.parse_args()
+
+    if args.job == 'getmag':
+        st = make_mag_4pos(args.poscar)
+        print(st)
+    elif args.job == 'ak':
+        _, atoms = get_atoms_4pos(args.poscar)
+        print(atoms)
+    elif args.job == 'Ucorr':
+        _, atoms = get_atoms_4pos(args.poscar)
+        ### to be called in bash
+        ldaul, ldauu, ldauj = get_Ucorr(atoms)
+        if args.index == 0:
+            print(ldaul)
+            return ldaul
+        elif args.index == 1:
+            print(ldauu)
+            return ldauu
+        elif args.index == 2:
+            print(ldauj)
+            return ldauj
+        else:
+            print (ldaul, ldauu, ldauj)
+            return ldaul, ldauu, ldauj
+    return 0
+
+
+if __name__ == '__main__':
+    main()

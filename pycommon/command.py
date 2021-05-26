@@ -1,4 +1,4 @@
-#!/gpfs/home/joonho/anaconda3/bin/python
+#!/home/joonho/anaconda3/bin/python
 
 import argparse
 import os
@@ -68,7 +68,7 @@ plot.first      =   "\nPLOT\
                     \n\tampplot_dir.py -p NN -t 'Test Set    : Gs-pow' -y te -yd . Nd300hl2020 Nd500hl2020\
                     "
 
-def show_command(job, job_submit, qname, keyvalues, nodename, sftype, dtype):
+def show_command(job, job_submit, qname, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar):
     
     if keyvalues:
         kw1 = keyvalues[0]
@@ -162,6 +162,36 @@ def show_command(job, job_submit, qname, keyvalues, nodename, sftype, dtype):
             print("NBO analysis")
             print("    qcout_nbo.py nbo -f 5-NiFe.out -a C O O Ni P P Fe P P N -g C O O")
 
+    elif job == 'slurm-vasp':
+        print("=== Prepare VASP directory in platinum")
+        print(f"    (1) vas_make_ini.py -s {poscar}")
+        print("\tmake POSCAR POTCAR KPOINTS INCAR & directory")
+        #if poscar:
+        #    com = f"python -m myvasp -j getmag -p {poscar}"
+        print(f"    python -m myvasp -j getmag -p {poscar}")
+        #mag_moment = os.system(com)
+        print(f"    sed -i 's/.*MAGMOM.*/ mag_moment/' INCAR")
+        print("\tto modify MAGMON in INCAR from POSCAR in module myvasp.py")
+        if poscar and re.match('POSCAR', poscar) :
+            dirname = poscar[7:]
+        else:
+            dirname = qname
+        nXn = { '1': 8, '2': 12, '3': 20, '4':24, '5':32 }
+        if nnode == '1':
+            nproc = nXn[partition]
+            print(f"nproc = {nproc}")
+        print("=== Job submission")
+        print(f"    (2) sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch.sh")
+        print("\toptions::")
+        print("\t    -J for jobname and dirname")
+        print("\t    -p for partition: X1-8, X2-12, X3-20 process")
+        print("\t    -N number of nodes ")
+        print(f"\t    -n number of process: {nproc} <= {nnode} * {nXn[partition]}")   
+        print("    Node check")
+        print("\tpe     to get free processes")
+        print("\tpef    to get free nodes")
+        print("\tpestat to see all nodes")
+        print("\tqstat -u joonho     to check my job")
     else:
         print("build more jobs")
     return 0 
@@ -170,18 +200,22 @@ def show_command(job, job_submit, qname, keyvalues, nodename, sftype, dtype):
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', nargs='?', default='amp', choices=['amp','qchem'],  help="one of amp, qchem")
+    parser.add_argument('job', choices=['amp','qchem','slurm-vasp'],  help="one of amp, qchem")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '--qname', default='amptest', help="queue name for qsub shown by qstat")
     parser.add_argument('-k', '--keyvalues', nargs='*', help='change a keyword in print')
     parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
+    parser.add_argument('-nn', '--nnode', help='number of nodes: if needed')
+    parser.add_argument('-np', '--nproc', help='number of process: if needed')
+    parser.add_argument('-p', '--partition', help='if needed, specify nodename')
+    parser.add_argument('-s', '--poscar', help='if needed, specify nodename')
     ampg = parser.add_argument_group(title = 'AMP args')
     ampg.add_argument('-dt', '--data_type', default='int', choices=['int','div'], help="data selection type")
     ampg.add_argument('-ft', '--func_type', default='log', choices=['log','pow'], help="gaussian symmetry function parameter type")
 
     args = parser.parse_args()
 
-    show_command(args.job,args.job_submit,args.qname,args.keyvalues, args.nodename, args.func_type,args.data_type)
+    show_command(args.job,args.job_submit,args.qname,args.keyvalues, args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.partition,args.poscar)
 
 if __name__ == "__main__":
     main()
