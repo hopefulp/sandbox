@@ -20,6 +20,8 @@ models= {
 make    = MyClass('make')
 run     = MyClass('run')
 clean   = MyClass('clean')
+modify  = MyClass('modify')
+ase     = MyClass('ase')
 
 make.vas_make_ini   ="===== Start VASP:: Make directory with input files\
                     \n\twill make or copy POSCAR, POTCAR, KPOINTS, INCAR\
@@ -48,11 +50,23 @@ make.myvasp         ="modules for make vasp directory\
                     \n\tRun by 'python -m myvasp -j getmag -p poscar'\
                     \n\t    to get MAGMOM\
                     "
+make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
+                    \n\tvas_make_d2d.py old_dir new_dir job [options]\
+                    \n\tjob = {ini, cont, md, ... post process}\
+                    "
+
 run.amp_env_run         ="amp_run.py in (envs) anaconda\
                         \n\t\t   when envs is not (base), detect envs and import proper module\
                         "
 clean.clean         =" "
-
+modify.pos_sort     ="pos_sort.py POSCAR\
+                    \n\tsort atoms in POSCAR\
+                    \n\treturns POSCARnew\
+                    \n\t:when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
+                    "
+ase.ase_fconvert    =""
+ase.ase_vasp        =""
+ase.ase_zpe         =""
 classobj_dict={'MAKE': make, 'RUN': run, 'CLEAN': clean} 
 
 def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):

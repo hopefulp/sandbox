@@ -26,6 +26,7 @@ general = MyClass('general')
 Gs      = MyClass('Gs')
 aux     = MyClass('aux')
 lammps  = MyClass('lammps')
+mldyn   = MyClass('mldyn')
 
 ampga.gaamp               ="===== Genetic Algoritm for AMP =====\
                         \n\t\tclass GaAmp: instance runs for generation\
@@ -183,6 +184,14 @@ qchem.NucCarts2xyz="Convert NucCarts (AIMD) to xyz format\
                     \n\t\t\tNucCarts2xyz.py -d dirname -a atom_series such as O H H"
 
 aux.info_amp       ="info file of this directory"
+
+mldyn.ml_lorenz     ="Machine Learning for ODE\
+                    \n\tml_lorenz.py -hl n n n -s save.pt -mi max_iter ...\
+                    \n\t    -hl hidden layer\
+                    \n\t    -s  save model with a.pt\
+                    \n\t    -mi max_iteration: 10^5~6\
+                    "
+                    
 
 classobj_dict={'AMP_RUN': amp, 'FILE_CONV': fconv, 'QCHEM': qchem} 
 

@@ -3,7 +3,7 @@
 import argparse
 import os
 import re
-from common import dir_files, MyClass
+from common import dir_files, MyClass, list2str
 
 amp     =   MyClass('amp')
 plot    =   MyClass('plot')
@@ -68,7 +68,7 @@ plot.first      =   "\nPLOT\
                     \n\tampplot_dir.py -p NN -t 'Test Set    : Gs-pow' -y te -yd . Nd300hl2020 Nd500hl2020\
                     "
 
-def show_command(job, job_submit, qname, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar):
+def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar, nhl):
     
     if keyvalues:
         kw1 = keyvalues[0]
@@ -162,36 +162,70 @@ def show_command(job, job_submit, qname, keyvalues, nodename, nnode, nproc, sfty
             print("NBO analysis")
             print("    qcout_nbo.py nbo -f 5-NiFe.out -a C O O Ni P P Fe P P N -g C O O")
 
-    elif job == 'slurm-vasp':
-        print("=== Prepare VASP directory in platinum")
-        print(f"    (1) vas_make_ini.py -s {poscar}")
-        print("\tmake POSCAR POTCAR KPOINTS INCAR & directory")
-        #if poscar:
-        #    com = f"python -m myvasp -j getmag -p {poscar}"
-        print(f"    python -m myvasp -j getmag -p {poscar}")
-        #mag_moment = os.system(com)
-        print(f"    sed -i 's/.*MAGMOM.*/ mag_moment/' INCAR")
-        print("\tto modify MAGMON in INCAR from POSCAR in module myvasp.py")
-        if poscar and re.match('POSCAR', poscar) :
-            dirname = poscar[7:]
-        else:
-            dirname = qname
-        nXn = { '1': 8, '2': 12, '3': 20, '4':24, '5':32 }
-        if nnode == '1':
-            nproc = nXn[partition]
-            print(f"nproc = {nproc}")
-        print("=== Job submission")
-        print(f"    (2) sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch.sh")
-        print("\toptions::")
-        print("\t    -J for jobname and dirname")
-        print("\t    -p for partition: X1-8, X2-12, X3-20 process")
-        print("\t    -N number of nodes ")
-        print(f"\t    -n number of process: {nproc} <= {nnode} * {nXn[partition]}")   
-        print("    Node check")
-        print("\tpe     to get free processes")
-        print("\tpef    to get free nodes")
-        print("\tpestat to see all nodes")
-        print("\tqstat -u joonho     to check my job")
+    ### run VASP in SLURM
+    elif job == 'slurm':
+        print("Run in slurm")
+        if nhl:
+            hlstr1 = list2str(nhl, delimit=" ")
+            hl2str = list2str(nhl)
+            if not qname:
+                qname = 'hl'+hl2str
+        if not qname:
+            qname = 'amptest'
+        print("\tsbatch -J {qname} -p X1 -N 4 -n 96 /home/joonho/sandbox_gl/pypbs/slurm_sbatch_vasp.sh")
+        print(f"\tsbatch -J {qname} -p X2 -N 1 -n 1 /home/joonho/sandbox_gl/pypbs/slurm_sbatch_py.sh")
+        if not subjob:
+            print("use -sj subjob [vasp|mldyn]")
+        elif subjob == 'vasp':
+            print(f"=== Usage ===\
+                    \n\t{os.path.basename(__file__)} {job} -s {poscar} -p 3 -N 4 -n total_proc\
+                    \n\tN.B.:: (POSCAR.)name is dirname and qname in qsub") 
+            print("=== Prepare VASP directory in platinum")
+            print(f"    (1) vas_make_ini.py -s {poscar}")
+            print("\tmake POSCAR POTCAR KPOINTS INCAR & directory")
+            #if poscar:
+            #    com = f"python -m myvasp -j getmag -p {poscar}"
+            print(f"    python -m myvasp -j getmag -p {poscar}")
+            #mag_moment = os.system(com)
+            print(f"    sed -i 's/.*MAGMOM.*/ mag_moment/' INCAR")
+            print("\tto modify MAGMON in INCAR from POSCAR in module myvasp.py")
+            if poscar and re.match('POSCAR', poscar) :
+                if poscar[7:] != 'name':
+                    dirname = poscar[7:]
+            if 'dirname' not in locals():
+                dirname = qname
+            nXn = { '1': 8, '2': 12, '3': 20, '4':24, '5':32 }
+            if nnode == '1':
+                nproc = nXn[partition]
+                print(f"nproc = {nproc}")
+            print("=== Job submission")
+            print(f"    (2) sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch.sh")
+            print("\toptions::")
+            print("\t    -J for jobname and dirname")
+            print("\t    -p for partition: X1-8, X2-12, X3-20 process")
+            print("\t    -N number of nodes ")
+            print(f"\t    -n number of total processes: {nproc} <= {nnode} * {nXn[partition]}")
+            if nproc != nnode * nXn[partition]:
+                print("Warning!! Not using all the processes in the node")
+            print("=== Node check ===")
+            print("\tpe     to get free processes")
+            print("\tpef    to get free nodes")
+            print("\tpestat to see all nodes")
+            print("\tqstat -u joonho     to check my job")
+        elif subjob == 'mldyn':
+            print("SBATCH:")
+            print(f"\tsbatch -J {qname} -p X2 -N 1 -n 1 --export=hl='{hlstr1}',sf='hl{hl2str}.pt' /home/joonho/sandbox_gl/pypbs/slurm_sbatch_py.sh")
+            print("\t    slurm_sbatch_py.sh")
+            print("\t\tml_lorenz.py tr -hl $hl -ms $sf")
+            print("Direct run:")
+            print(f"    ml_lorenz.py tr -hl {hlstr1} -ms {qname}.pt")
+            print(f"    ml_lorenz.py te -m {qname}.pt -dbp 2")
+            print("\t-hl hidden layers")
+            print("\t-m load saved model of a.pt")
+            print("\t-ms save pytorch model such as hl101010")
+            print("\t-mi max iteration, default=10^5")
+            print("\t-dbp partition [2|3]: data to tr, [val, and] te")
+
     else:
         print("build more jobs")
     return 0 
@@ -200,22 +234,25 @@ def show_command(job, job_submit, qname, keyvalues, nodename, nnode, nproc, sfty
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', choices=['amp','qchem','slurm-vasp'],  help="one of amp, qchem")
+    parser.add_argument('job', choices=['amp','qchem','slurm'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('-sj', '--sub_job', choices=['vasp', 'mldyn'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
-    parser.add_argument('-qn', '--qname', default='amptest', help="queue name for qsub shown by qstat")
+    parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")
     parser.add_argument('-k', '--keyvalues', nargs='*', help='change a keyword in print')
     parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
-    parser.add_argument('-nn', '--nnode', help='number of nodes: if needed')
-    parser.add_argument('-np', '--nproc', help='number of process: if needed')
-    parser.add_argument('-p', '--partition', help='if needed, specify nodename')
-    parser.add_argument('-s', '--poscar', help='if needed, specify nodename')
-    ampg = parser.add_argument_group(title = 'AMP args')
-    ampg.add_argument('-dt', '--data_type', default='int', choices=['int','div'], help="data selection type")
-    ampg.add_argument('-ft', '--func_type', default='log', choices=['log','pow'], help="gaussian symmetry function parameter type")
+    ### flowing slurm option
+    parser.add_argument('-N', '--nnode', default=1, type=int, help='number of nodes: if needed')
+    parser.add_argument('-n', '--nproc', default=1, type=int, help='number of process: if needed')
+    parser.add_argument('-p', '--partition', default='1', choices=['1','2','3','4','5'], help='if needed, specify nodename')
+    parser.add_argument('-s', '--poscar', default='POSCAR.name', help='if needed, specify nodename')
+    mlg = parser.add_argument_group(title = 'machine learning args')
+    mlg.add_argument('-dt', '--data_type', default='int', choices=['int','div'], help="data selection type")
+    mlg.add_argument('-ft', '--func_type', default='log', choices=['log','pow'], help="gaussian symmetry function parameter type")
+    mlg.add_argument('-hl', '--hidden_layers', nargs='*', help="hidden layers in integer")
 
     args = parser.parse_args()
 
-    show_command(args.job,args.job_submit,args.qname,args.keyvalues, args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.partition,args.poscar)
+    show_command(args.job,args.sub_job,args.job_submit,args.qname,args.keyvalues, args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.partition,args.poscar, args.hidden_layers)
 
 if __name__ == "__main__":
     main()

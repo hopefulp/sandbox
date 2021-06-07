@@ -5,7 +5,7 @@ import os
 import re
 from common import dir_all, dir_classify_n, whereami, MyClass
 #from common import MyClass_t as MyClass
-from varname import nameof
+#from varname import nameof
 
 ### thest are globals() not locals()|vars()
 sge     = MyClass('sge')
@@ -17,6 +17,7 @@ amp     = MyClass('amp')
 qchem   = MyClass('qchem')
 qsleep  = MyClass('qsleep')
 process = MyClass('process')
+slurm   = MyClass('slurm')
 
 # if not use input variables, define here
 sge.usage="$qstat -f    # see all nodes(/used/total) and my job\
@@ -96,6 +97,14 @@ amp.amp_scan="amp_scan.sh\
 
 qchem.usage=""
 qsleep.usage=""
+
+slurm.slurm_sbatch      ="link file to slurm_sbatch_vasp.sh"
+slurm.slurm_sbatch_vasp ="to run vasp in slurm\
+                        \n\tUse: command.py slurm -sj vasp\
+                        "
+slurm.slurm_sbatch_py   ="to run python in node\
+                        \n\tUse: command.py slurm -sj mldyn\
+                        "
 
 classobj_dict={'SGE': sge, 'GRMX': grmx, 'AMP':amp, 'USAGE': usage, 'Qsub': qsub, 'QChem': qchem, 'Qsleep': qsleep}
 lclass_var=['QChem', 'AMP', 'Qsleep']

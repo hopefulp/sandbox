@@ -136,8 +136,16 @@ def yes_or_no(question):
     else:
         return False
 
-def list2str(li):
-    st = "".join(str(x) for x in li)
+def list2str(li, delimit=None):
+    '''
+    list to string
+        delimit delimiter between list elements, default=''
+    '''
+
+    if delimit == None:
+        st = "".join(str(x) for x in li)
+    else:
+        st = delimit.join(str(x) for x in li)
     return st
 
 def print_list(li):
