@@ -360,3 +360,11 @@ def f_parsing(fname, sep='num'):
                 print("in zip file to column, Error: length of colums are different")
                 sys.exit(1)
     return y
+
+def fname_index(pre, suff, cwd):
+    files = os.listdir(cwd)
+    for f in files:
+        if re.match(pre, f) and re.search(suff, f):
+            pass
+    return 0
+

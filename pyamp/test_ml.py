@@ -6,7 +6,7 @@ import argparse
 import numpy as np
 import time
 import os
-import ga_ini
+
 from scipy import integrate
 
 from sklearn.model_selection import train_test_split
@@ -15,7 +15,7 @@ from torch import cuda
 import torch
 import torch.nn as nn
 from torch import optim
-import torch.nn.functional as F
+
 
 Llog=0
 ### build MATLAB functions
@@ -154,21 +154,6 @@ def make_model(nhl):
     '''
     return model
 
-class MyModel(nn.Module):
-    def __init__(self, finp, fout, nnodes, act=nn.Tanh):
-        super(MyModel, self).__init__()
-        self.act =  act()
-        self.linears = nn.ModuleList([nn.Linear(finp, nnodes[0])])
-        self.linears.extend([nn.Linear(nnodes[i], nnodes[i+1]) for i in range(0, len(nnodes)-1)])
-        self.out = nn.Linear(nnodes[-1], fout)
-
-    def forward(self, x):
-        for l in self.linears:
-            x = self.act(l(x))
-        x = self.out(x)
-        return x
-
-
 ### Using NN Models: train, test, 
 def train_model(model, X, Y, max_iter):
     optimizer = optim.Adam(model.parameters())
@@ -185,10 +170,7 @@ def train_model(model, X, Y, max_iter):
     return model
 
 def test_model(model, nn_data, data_kind):
-    ''' 
-    test model (model(X)) with X=nn_data[0] and Y=nn_data[1]
-        error is average for each data (xi,yi,zi)-->(xf,yf,zf)
-    '''
+    ### check input
     loss = nn.MSELoss()
     with torch.no_grad():
         model.eval()
@@ -200,11 +182,18 @@ def test_model(model, nn_data, data_kind):
         y_pred = model(X)
         cost = loss(y_pred,Y)
     print(f" {data_kind} loss = {cost}")
-    
-    return torch.Tensor.cpu(cost)
+
+### to check 
+def test_data(d_Nu, model, data_kind='execution'):
+    loss = nn.MSELoss()
+    X = torch.FloatTensor(d_Nu[:,:-1,:])
+    Y = torch.FloatTensor(d_Nu[:,1:,:])
+    y_pred = model(X)
+    cost = loss(y_pred, Y)
+    print(f" {data_kind} loss ={cost}")
 
 ### Running dynamics using NN Model for trajectory: also include Governing function dynamics
-def run_NNdyn(model, fn_name, Lgraph):
+def exe_NNdyn(model, fn_name, Lgraph):
     global t                    # defined at fn=lorenz in make_db 
 
     np.random.seed(100)   # original 139
@@ -220,16 +209,12 @@ def run_NNdyn(model, fn_name, Lgraph):
 
     with torch.no_grad():
         for jj, tval in enumerate(t[:-1]):
-            inp = torch.Tensor(nn_flow[:,jj,:])     # becomes input of the next step-->error accumulates
-            if cuda.is_available():
+            inp = torch.Tensor(nn_flow[:,jj,:])
+            if is_cuda:
                 inp = inp.cuda()
-                nn_flow[:, jj+1, :] = torch.Tensor.cpu(model(inp))
-            else:
-                nn_flow[:, jj+1, :] = model(inp)     # the output of nn_flow[:, jj+1, :]
-    ### 
-    X = torch.FloatTensor(x_t[:,:-1,:])
-    Y = torch.FloatTensor(x_t[:,1:,:])
-    test_model(model, (X, Y), data_kind='Running NN dynamics')  # error for each data point
+            nn_flow[:, jj+1, :] = model(inp)
+    
+    test_data(x_t, model)  # error is accumulated in model(inp), cannot compare with test_set-MSE
 
     if Lgraph:
         import matplotlib.pyplot as plt
@@ -251,34 +236,11 @@ def run_NNdyn(model, fn_name, Lgraph):
         
         ax.view_init(10, -13)
         plt.show()
-
-        fig, axes = plt.subplots(3,3, figsize=(15,12))
-
-        for j in range(num_traj):
-            x, y, z = x_t[j, :, :].T
-            xd, yd, zd = nn_flow[j, :, :].T
-            axes[0][j].plot(t, x, t, xd)
-            axes[1][j].plot(t, y, t, yd)
-            axes[2][j].plot(t, z, label='direct solver')
-            axes[2][j].plot(t, zd, label='NN')
-        axes[0][0].set_title('Model1')
-        axes[0][1].set_title('Model2')
-        axes[0][2].set_title('Model3')
-        axes[0][0].set_ylabel('X')
-        axes[1][0].set_ylabel('Y')
-        axes[2][0].set_ylabel('Z')
-        axes[2][0].set_xlabel('t')
-        axes[2][1].set_xlabel('t')
-        axes[2][2].set_xlabel('t')
-        plt.legend()
-        print(x.shape) 
-
-        plt.show()
     ### data test
     return 0
 
 
-def NNdynamics(job, model, msave, fn_name, ndata, dt, nfeature, nhl, db_ratio, conv, max_iter, Lga, igen, Lgraph):
+def NNdyn_wrapper(job, model, msave, fn_name, ndata, dt, nfeature, nhl, db_ratio, conv, max_iter, Lgraph):
     if Lgraph:
         import matplotlib.pyplot as plt
         from matplotlib import rcParams
@@ -286,7 +248,7 @@ def NNdynamics(job, model, msave, fn_name, ndata, dt, nfeature, nhl, db_ratio, c
         rcParams.update({'font.size': 18})
         plt.rcParams['figure.figsize'] = [12, 12]
         
-    ### return governing function control parameter: (global) t, dt, T, function arguments(lorenz: beta, rho, sigma)
+    ### governing function control parameter: t, dt, T, function arguments(lorenz: beta, rho, sigma)
     fn_govern(fn_name)
    
     ### data was not saved yet: calculate Lorenz by NA
@@ -296,8 +258,7 @@ def NNdynamics(job, model, msave, fn_name, ndata, dt, nfeature, nhl, db_ratio, c
     nn_tr, nn_te, nn_val = divide_db(nn_input, nn_output, db_ratio)     # returns tuple of ndarray
     ### digress by train or load
     if job == 'tr':
-        #model = make_model(nhl)
-        model = MyModel(3, 3, nhl)
+        model = make_model(nhl)
         X = torch.FloatTensor(nn_tr[0])
         Y = torch.FloatTensor(nn_tr[1])
         ### GPU
@@ -314,18 +275,13 @@ def NNdynamics(job, model, msave, fn_name, ndata, dt, nfeature, nhl, db_ratio, c
         ### save
         if not msave:
             hl2str = list2str(nhl)
-            if Lga:
-                pre='ch'    # chromosome
-            else:
-                pre='tmp'
-            msave = f'{pre}{igen:02d}_'+hl2str+'.pt'
-            while os.path.isfile(msave):
-                i+=1
-                msave = f'tmp{i}_'+hl2str+'.pt'
+            msave = 'tmp'+hl2str+'.pt'
+            if os.path.isfile(msave):
+                msave +='.tmp'
         print(f"save model {msave}")
         torch.save(model, msave)
     #### if job == test, Load model
-    elif job == 'te' or job == 'dyn':
+    else:
         if not model:
             print("load model for test: -m a.pt")
             sys.exit(10)
@@ -333,25 +289,18 @@ def NNdynamics(job, model, msave, fn_name, ndata, dt, nfeature, nhl, db_ratio, c
             model = torch.load(model)
     ### 
     ### validation and test
-    if job == 'tr' or job == 'te':
-        if len(db_ratio) == 3:      # do not use nn_val=([],[]) is not False
-            test_model(model, nn_val, 'validate')
-        if Llog: print(nn_te[0].shape)
-        cost = test_model(model, nn_te, 'test')
-        if Lga:
-            score = ga_ini.score(cost, ref=1.0e-6)
-            with open('score.dat', 'w') as f:
-                f.write(' '.join("%2s" % str(nodes) for nodes in nhl))
-                f.write(f" {score:10.5f}\n")
-            os.system(f"cat {'score.dat'} >> {ga_ini.fitness_onegen}")
+    if len(db_ratio) == 3:      # do not use nn_val=([],[]) is not False
+        test_model(model, nn_val, 'validate')
+    if Llog: print(nn_te[0].shape)
+    test_model(model, nn_te, 'test')
 
     ### execute NN-dynamics
-    run_NNdyn(model, fn_name, Lgraph)
+    exe_NNdyn(model, fn_name, Lgraph)
     return 0
 
 def main():
     parser = argparse.ArgumentParser(description='Machine Learning for Lorenz equation')
-    parser.add_argument('job', choices=['tr','te','dyn'],   help='name of dynamical function')
+    parser.add_argument('job', choices=['tr','te'],   help='name of dynamical function')
     parser.add_argument('-m', '--model', help='to load pytorch model, input model file')
     parser.add_argument('-ms', '--savefile', help='filename to save pt file')
     parser.add_argument('-fn', '--function_name',   default='lorenz',   help='name of dynamical function')
@@ -362,17 +311,15 @@ def main():
     parser.add_argument('-dbp', '--db_partition', default=3, type=int, choices=[2,3], help='part data to training:[validation:]test')
     parser.add_argument('-acc', '--accuracy', default=0.001, type=float, help='training accuracy')
     parser.add_argument('-mi', '--max_iteration', default=100000, type=int, help='stop at max_iteration for comparison')
-    parser.add_argument('-ga', '--gen_alg', action='store_true', help='run genetic algorithm')  
-    parser.add_argument('-ig', '--igen', default=0, type=int, help='input generation number')  
     parser.add_argument('-g', '--Lgraph', choices=['1','2','12','d','x','dx'], help='plot 1,d: database, 2,x: execution')
     args = parser.parse_args()
     
     if args.db_partition == 2:
-        db_ratio=[0.85, 0.15]           # training (+validation), test
-    elif args.db_partition == 3:    
-        db_ratio=[0.7, 0.15, 0.15]      # training, validation, test
+        db_ratio=[0.7, 0.3]
+    elif args.db_partition == 3:
+        db_ratio=[0.7, 0.15, 0.15]
 
-    NNdynamics(args.job, args.model, args.savefile, args.function_name, args.ndata, args.time_step, args.num_feature, args.hidden_layers, db_ratio, args.accuracy, args.max_iteration, args.gen_alg, args.igen, args.Lgraph)
+    NNdyn_wrapper(args.job, args.model, args.savefile, args.function_name, args.ndata, args.time_step, args.num_feature, args.hidden_layers, db_ratio, args.accuracy, args.max_iteration, args.Lgraph)
     return 0
 
 if __name__ == '__main__':

@@ -23,7 +23,7 @@ ampga   = MyClass('ampga')
 qchem   = MyClass('qchem')
 fconv   = MyClass('fconv')
 general = MyClass('general')
-Gs      = MyClass('Gs')
+ampGs   = MyClass('ampGs')
 aux     = MyClass('aux')
 lammps  = MyClass('lammps')
 mldyn   = MyClass('mldyn')
@@ -39,7 +39,10 @@ ampga.ga_amp_run        ="\n\tga_amp_run.py -js sh -nc 10 -hl 5 -nn 5\
                         \n\t-nch: number of chromosome\
                         \n\t-hl: max number of hidden layers, -nn: max number of nodes in layer\
                         \n\t   old version of amp_run.py for GA\
+                        \n\tga_amp_run.py -> gaamp.GaAmp -> amp_ini.py (cli string)\
                         "
+ampga.amp_ini           =amp.amp_ini
+
 amp.ampdir              ="run scripts by case\
                         \n\t\tUsage:: ampdir.sh $1\
                         \n\t\t$1::\
@@ -123,10 +126,10 @@ ampplot.ampplot_dir     ="using input x-dir, y-[tr,te] for files\
                         \n\t    ampplot_dir.py -p NN -t 'Training Set: Gs-pow' -y tr -yd . Ndata300\
                         \n\t    ampplot_dir.py -p NN -t 'Test Set    : Gs-pow' -y te -yd . Ndata300\
                         "
-Gs.amp_gsversion         =" === Gaussian Symmetry function for AMP descriptor ===\
+ampGs.amp_gsversion         =" === Gaussian Symmetry function for AMP descriptor ===\
                         \n\tamp_gversion.py to select different versions of gaussian.py in ~/amp\
                         "
-Gs.my_descriptor        ="\n\tmodule for GS"
+ampGs.my_descriptor        ="\n\tmodule for GS"
 
                         
 general.make_dir        ="make_dir.py new_dir [old_dir] -w amp pbs -j tr\
@@ -185,14 +188,36 @@ qchem.NucCarts2xyz="Convert NucCarts (AIMD) to xyz format\
 
 aux.info_amp       ="info file of this directory"
 
-mldyn.ml_lorenz     ="Machine Learning for ODE\
+mldyn.mllorenz     ="link to the script of cpu or gpu version of ml-pytorch\
+                    \n\t$ln -s ml_lorenz_cpu.py mllorenz.py, or\
+                    \n\t$ln -s ml_lorenz_gpu.py mllorenz.py\
+                    "
+
+mldyn.ml_lorenz_cpu ="Machine Learning for ODE\
                     \n\tml_lorenz.py -hl n n n -s save.pt -mi max_iter ...\
                     \n\t    -hl hidden layer\
                     \n\t    -s  save model with a.pt\
                     \n\t    -mi max_iteration: 10^5~6\
                     "
-                    
-
+mldyn.ml_lorenz_gpu =" gpu version is included in 'ml_lorenz_cpu.py\
+                    "
+mldyn.gpu_ml_batch  = "scan nodes of hidden layers\
+                    \n\tmllorenz.py tr -hl $i $i $i $i -ms ${ptname}.pt -mi 1000000 -nd 200000 -dbp 2 > ${ptname}.out\
+                    "
+mldyn.ga            ="\n    GA:\
+                    \n\trun by 'ga_dyn_run.py'\
+                    \n\tget cli string in ga.GA.run_generation by calling ga_ini.py\
+                    "
+mldyn.ga_dyn_run    ="run ga.GA\
+                    \n\tga_dyn_run.py -e 'mllorenz.py' -js node -mi 200000 -nd 160000 -hl 8 -nn 15\
+                    \n\t    ga_dyn_run.py -> import ga.GA -> make cli string in ga_ini.py\
+                    "
+mldyn.ga_ini        ="\n\tcalled from ga.GA\
+                    \n\tmake cli string for ml-dyn\
+                    "
+mldyn.ml_dyn        ="modoles which includes the imported module\
+                    \n\tcontents inside are necessary to run the loaded torch model\
+                    "
 classobj_dict={'AMP_RUN': amp, 'FILE_CONV': fconv, 'QCHEM': qchem} 
 
 def fconvert_eg():

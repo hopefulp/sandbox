@@ -21,3 +21,17 @@ class purelin(nn.Module):
     def forward(self, x):
         return x
 
+class MyModel(nn.Module):
+    def __init__(self, finp, fout, nnodes, act=nn.Tanh):
+        super(MyModel, self).__init__()
+        self.act =  act()
+        self.linears = nn.ModuleList([nn.Linear(finp, nnodes[0])])
+        self.linears.extend([nn.Linear(nnodes[i], nnodes[i+1]) for i in range(0, len(nnodes)-1)])
+        self.out = nn.Linear(nnodes[-1], fout)
+
+    def forward(self, x):
+        for l in self.linears:
+            x = self.act(l(x))
+        x = self.out(x)
+        return x
+

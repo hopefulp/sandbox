@@ -7,6 +7,7 @@ from common import dir_files, MyClass, list2str
 
 amp     =   MyClass('amp')
 plot    =   MyClass('plot')
+ga     =   MyClass('ga')
 ### modify input-detail here
 ### AMP-NODE job
 amp_data_type={'interval': '-nt 4000 -ntr 100 -dtype int -dl 1000 1100 1200',
@@ -42,6 +43,9 @@ amp.clean       =   "\nCLEAN\
 amp.statistics  =   "\nSTATISTICS\
                     \n    stat_check.py -st [e|f|ef]\
                     "
+amp.ga          =   "\nGA: AMP\
+                    \n    ga_amp_run.py -js qsub -nch 12 -hl 7 -nn 15 -np 4\
+                    "
 
 amp.analysis    =   "\nAnalysis\
                     \n    Training set: amp-log.txt\
@@ -56,6 +60,13 @@ amp.analysis    =   "\nAnalysis\
                     \n    Test set: test_fstat_acc.txt\
                     \n\tget_TEFrmse NN subdir 2\
                     "
+ga.amp          =   amp.ga
+ga.dyn          =   "\nGA: Dynamics\
+                    \n    ga_dyn_run.py -e 'mllorenz.py' -js node -mi 200000 -nd 160000 -hl 8 -nn 15\
+                    \n\tpytorch+gpu coding\
+                    \n    GPU: iron, n076\
+                    "
+
 plot.first      =   "\nPLOT\
                     \n    TRAIN & TEST\
                     \n\tDraw file\
@@ -120,8 +131,7 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
             print("\tamp_wrapper.py -js qsub -qn HL1010 -hl 10 10 &")
             print("\t    : queue submit job HL44tr-HL44te consecutively")
 
-            print("GA")
-            print("ga_amp_run.py -js qsub -nch 12 -hl 7 -nn 15 -np 4")
+            print(amp.ga)
         elif job_submit == 'getqsub':
             print(f"sge_amp.py -qj {qname} -m 3G", amp_getqsub_str[settings['force']], amp_getqsub_datatype[settings['dtype']], amp_getqsub_symmfuncttype[settings['gs']]) 
         ### this part is for common
@@ -161,6 +171,10 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
             print("\t-n for nproc, -m for mem")
             print("NBO analysis")
             print("    qcout_nbo.py nbo -f 5-NiFe.out -a C O O Ni P P Fe P P N -g C O O")
+
+    elif job == 'ga':
+        print(ga.amp)
+        print(ga.dyn)
 
     ### run VASP in SLURM
     elif job == 'slurm':
@@ -218,13 +232,20 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
             print("\t    slurm_sbatch_py.sh")
             print("\t\tml_lorenz.py tr -hl $hl -ms $sf")
             print("Direct run:")
-            print(f"    ml_lorenz.py tr -hl {hlstr1} -ms {qname}.pt")
-            print(f"    ml_lorenz.py te -m {qname}.pt -dbp 2")
+            print("    GPU is coded in PyTorch")
+            print("\tssh pt|fe; ssh n076 (GPU). fe also has GPU")
+            print("    mllorenz.py --> ml_lorenz_gpu.py")
+            print("    Loop for nhls")
+            print("\tgpu_ml_batch.sh")
+            print(f"    mllorenz.py tr -hl {hlstr1} -ms {qname}.pt")
+            print(f"    mllorenz.py te -m {qname}.pt -dbp 2")
+            print(f"    mllorenz.py -> ml_lorenz_gpu.py|ml_lorenz_cpu.py")
             print("\t-hl hidden layers")
             print("\t-m load saved model of a.pt")
             print("\t-ms save pytorch model such as hl101010")
             print("\t-mi max iteration, default=10^5")
             print("\t-dbp partition [2|3]: data to tr, [val, and] te")
+            print(ga.dyn)
 
     else:
         print("build more jobs")
@@ -234,7 +255,7 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', choices=['amp','qchem','slurm'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('job', choices=['amp','qchem','slurm','ga'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-sj', '--sub_job', choices=['vasp', 'mldyn'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")
@@ -248,7 +269,7 @@ def main():
     mlg = parser.add_argument_group(title = 'machine learning args')
     mlg.add_argument('-dt', '--data_type', default='int', choices=['int','div'], help="data selection type")
     mlg.add_argument('-ft', '--func_type', default='log', choices=['log','pow'], help="gaussian symmetry function parameter type")
-    mlg.add_argument('-hl', '--hidden_layers', nargs='*', help="hidden layers in integer")
+    mlg.add_argument('-hl', '--hidden_layers', nargs='*', default=['4','4','4'], help="hidden layers in integer")
 
     args = parser.parse_args()
 
