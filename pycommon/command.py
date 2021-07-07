@@ -4,10 +4,15 @@ import argparse
 import os
 import re
 from common import dir_files, MyClass, list2str
+from server_env import nXn
 
 amp     =   MyClass('amp')
 plot    =   MyClass('plot')
-ga     =   MyClass('ga')
+ga      =   MyClass('ga')
+nc      =   MyClass('nc')
+dac     =   MyClass('dac')
+slurm   =   MyClass('slurm')
+
 ### modify input-detail here
 ### AMP-NODE job
 amp_data_type={'interval': '-nt 4000 -ntr 100 -dtype int -dl 1000 1100 1200',
@@ -66,6 +71,29 @@ ga.dyn          =   "\nGA: Dynamics\
                     \n\tpytorch+gpu coding\
                     \n    GPU: iron, n076\
                     "
+slurm.amp       =   " AMP in slurm\
+                    \n\t1. amp_jobs.sh fp outcar npartition idata | sh\
+                    \n\t    amp_mkdir.py $dname -w amp -j des\
+                    \n\t\tprepare pure directory by coping OUTCAR\
+                    \n\t\tcalculate 1st data section resulting ampdb's\
+                    \n\t1.9 amp_jobs.sh db OUTCARK1000Kdt.5 2 60 | sh\
+                    \n\t    Make feature directory such as NN10: serial job in master node\
+                    \n\t\tlook up to the 'amp_jobs.sh' to find out the list of features\
+                    \n\t\tamp_mkdir.py dirname -w amp -j db\
+                    \n\t\t    which makes NNfeature directory\
+                    \n\t\tamp_wrapper.py -f $outcar -js sbatch -j tr -qn $dname -p $npart -sf NN$num -dl $ndata  $(expr $ndata + 120) -t db &\
+                    \n\t\tsubmit: sbatch -J NN5tr -p X2 -N 1 -n 12 sbatch_tr.csh\
+                    \n\t\t    check wrapper code to submit to slurm\
+                    \n\t2. amp_jobs.sh db OUTCARK1000Kdt.5 1 | sh\
+                    \n\t    Make full db as for all the OUTCAR's\
+                    \n\t\tdb outcar npartition\
+                    \n\t\tdata list should be given in the script\
+                    \n\t3 Training\
+                    \n\t    amp_jobs.sh wrapper2 OUTCAR 2 | sh\
+                    \n\t\tset dirname symmetry-function inside script\
+                    \n\t    comment out idipol in VASP cal for MD, which makes energy pump -> extract positive energy in data preprocessing\
+                    "
+
 
 plot.first      =   "\nPLOT\
                     \n    TRAIN & TEST\
@@ -73,13 +101,31 @@ plot.first      =   "\nPLOT\
                     \n\t    f2d_plot.py train.dat -pd -xs 2\
                     \n\t    f2d_plot.py train.dat test.dat -pd -t 'TR-100:TE-100'\
                     \n\t\t-pd pandas, -xs xspacing, -xst xspacing type (default:numerically)\
-                    \n\tampdir.sh grep\
+                    \n\tamp_jobs.sh grep\
                     \n\tampplot_dir.py -p NN -t 'Ndata 100 (Gs-pow)'\
                     \n\tampplot_dir.py -p NN -t 'Training Set: Gs-pow' -y tr -yd . Nd300hl2020 Nd500hl2020\
                     \n\tampplot_dir.py -p NN -t 'Test Set    : Gs-pow' -y te -yd . Nd300hl2020 Nd500hl2020\
                     "
+nc.build        =   "    BUILD\
+                    \n\tnc_build.py build -n graphene -sn rect -sc n m -g -s -o name -fm\
+                    \n\t    build, etc\
+                    \n\t    -n name [graphene|]\
+                    \n\t    -sn subname [hexa,rect,gnrac,gnrzz]\
+                    \n\t    -sc size of supercell\
+                    \n\t    -g view structure via xcrysden\
+                    \n\t    -s save structure\
+                    \n\t    -o outfile\
+                    \n\t    -fm format [vasp(POSCAR)|\
+                    "
+dac.build       =   "    Build graphene using nanocore\
+                    \n\tSort poscar\
+                    \n\t    pos_sort.py POSCAR.NiNi -mv\
+                    \n\t\t(loc) pyvasp\
+                    \n\t\t-mv write to the input file\
+                    "
 
-def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar, nhl):
+
+def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar, nhl):
     
     if keyvalues:
         kw1 = keyvalues[0]
@@ -102,14 +148,14 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
             print("ga_amp_run.py -js node -nch 8 -hl 10 -nn 10 -np 5 [-c] &")
         elif job_submit == 'qsub':
             print("Structure of script to run multiple amp jobs::\
-            \n    ampdir.sh wrapper_subdir [| sh]; which runs\
+            \n    amp_jobs.sh wrapper_subdir [| sh]; which runs\
             \n    amp_wrapper.py -js qsub -qn Npn${n}hl20 -sf NN${n} -hl 20 20 -dl 1000 1300 3500 3600 &; which runs\
             \n    make mlet_tr(te).csh and run qsub\
             \n    qsub -N HL44tr -pe numa 8 -l mem=12G mlet_tr.csh\
             \n\tmlet_tr.csh should have -f force to make force_derivative directory\
             ")
             print("AMP JOBS")
-            print("    ampdir.sh job[wrapper wrapper_subdir grep sh etc]")
+            print("    amp_jobs.sh job[wrapper wrapper_subdir grep sh etc]")
             print("\nAMP WRAPPER:: train and test with failed-convergence")
             print(f"\tamp_wrapper.py -js qsub [-j [te|tr|trte]] -qn HL44 [-hl 4 4] [-dl int int]  [-s] [-c] &")
             print(f"\tamp_wrapper.py -js qsub &  !!! all options in the script")
@@ -127,7 +173,7 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
             print("    DB")
             print("\tdiramp.sh fp | sh")
             print("    TRAIN")
-            print("\tampdir.sh wrapper")
+            print("\tamp_jobs.sh wrapper")
             print("\tamp_wrapper.py -js qsub -qn HL1010 -hl 10 10 &")
             print("\t    : queue submit job HL44tr-HL44te consecutively")
 
@@ -178,6 +224,14 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
 
     ### run VASP in SLURM
     elif job == 'slurm':
+        if nnode == 1:
+            nproc = nXn[partition]
+            print(f"nproc = {nproc}")
+        if not nproc:
+            nproc = nnode * nXn[partition]
+            print(f" nproc {nproc} = nnode {nnode} * nproc/node_partition {nXn[partition]}")    
+        print(f"Usage for {job}")
+        print(f"\t {os.path.basename(__file__)} {job} -sj vasp -qn dirname -p {partition} -N {nnode} -n {nproc}")
         print("Run in slurm")
         if nhl:
             hlstr1 = list2str(nhl, delimit=" ")
@@ -186,10 +240,15 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
                 qname = 'hl'+hl2str
         if not qname:
             qname = 'amptest'
-        print("\tsbatch -J {qname} -p X1 -N 4 -n 96 /home/joonho/sandbox_gl/pypbs/slurm_sbatch_vasp.sh")
-        print(f"\tsbatch -J {qname} -p X2 -N 1 -n 1 /home/joonho/sandbox_gl/pypbs/slurm_sbatch_py.sh")
+        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch_vasp.sh")
+        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch_py.sh")
+        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch_NC.sh")
         if not subjob:
-            print("use -sj subjob [vasp|mldyn]")
+            print("use -sj subjob [vasp|mldyn|nc]")
+
+        elif subjob == 'amp':
+            print(slurm.amp)
+        
         elif subjob == 'vasp':
             print(f"=== Usage ===\
                     \n\t{os.path.basename(__file__)} {job} -s {poscar} -p 3 -N 4 -n total_proc\
@@ -208,10 +267,6 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
                     dirname = poscar[7:]
             if 'dirname' not in locals():
                 dirname = qname
-            nXn = { '1': 8, '2': 12, '3': 20, '4':24, '5':32 }
-            if nnode == '1':
-                nproc = nXn[partition]
-                print(f"nproc = {nproc}")
             print("=== Job submission")
             print(f"    (2) sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch.sh")
             print("\toptions::")
@@ -246,6 +301,16 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
             print("\t-mi max iteration, default=10^5")
             print("\t-dbp partition [2|3]: data to tr, [val, and] te")
             print(ga.dyn)
+        elif subjob == 'nc':
+            print("SBATCH:")
+            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=main={inf} /home/joonho/sandbox_gl/pypbs/slurm_sbatch_NC.sh")
+            print("\nNonoCore Package Development:")
+            print(nc.build)
+        elif subjob == 'crr':
+            print("    CRR:DAC =========================")
+            print(nc.build)
+            print(dac.build)
+                
 
     else:
         print("build more jobs")
@@ -255,16 +320,17 @@ def show_command(job, subjob, job_submit, qname, keyvalues, nodename, nnode, npr
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', choices=['amp','qchem','slurm','ga'],  help="one of amp, qchem, mldyn for ML dyn")
-    parser.add_argument('-sj', '--sub_job', choices=['vasp', 'mldyn'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('job', choices=['amp','qchem','slurm','ga','gpu'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('-sj', '--sub_job', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")
     parser.add_argument('-k', '--keyvalues', nargs='*', help='change a keyword in print')
     parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
     ### flowing slurm option
+    parser.add_argument('-inf', '--infile', default='test_HER.py', help='input file in case')
     parser.add_argument('-N', '--nnode', default=1, type=int, help='number of nodes: if needed')
-    parser.add_argument('-n', '--nproc', default=1, type=int, help='number of process: if needed')
-    parser.add_argument('-p', '--partition', default='1', choices=['1','2','3','4','5'], help='if needed, specify nodename')
+    parser.add_argument('-n', '--nproc', type=int, help='number of process: if needed')
+    parser.add_argument('-p', '--partition', default=2, type=int, choices=[1,2,3,4,5], help='if needed, specify nodename')
     parser.add_argument('-s', '--poscar', default='POSCAR.name', help='if needed, specify nodename')
     mlg = parser.add_argument_group(title = 'machine learning args')
     mlg.add_argument('-dt', '--data_type', default='int', choices=['int','div'], help="data selection type")
@@ -273,7 +339,7 @@ def main():
 
     args = parser.parse_args()
 
-    show_command(args.job,args.sub_job,args.job_submit,args.qname,args.keyvalues, args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.partition,args.poscar, args.hidden_layers)
+    show_command(args.job,args.sub_job,args.job_submit,args.qname,args.infile,args.keyvalues,args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.partition,args.poscar, args.hidden_layers)
 
 if __name__ == "__main__":
     main()

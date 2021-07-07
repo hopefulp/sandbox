@@ -201,7 +201,7 @@ def main():
         print("directory ./%s was made" % args.directory)
         shutil.copy('POSCAR', args.directory)
         shutil.copy('POTCAR', args.directory)
-        shutil.copy('KPOINTS', args.directory)
+        ehutil.copy('KPOINTS', args.directory)
         shutil.copy('INCAR', args.directory)
         print('POSCAR POTCAR KPOINTS INCAR were copied')
         

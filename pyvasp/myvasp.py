@@ -5,11 +5,12 @@ import json
 import re
 import sys
 import argparse
+from common import whereami
 
 """ 
     repository for many vasp script 
     def get_vasp_repository():
-    def make_incar(dic, rw, iofile):
+    def make_incar(dic, iofile):
     def make_kpoints(kp, MH|gamma, **args=[band])
 
 """
@@ -34,14 +35,14 @@ def get_vasp_repository():
     #proc = subprocess.Popen(["cat", "/etc/services"], stdout=subprocess.PIPE, shell=True)
     #(out, err) = proc.communicate()
     #print "program output:", out
-    if hostname == 'chi' or hostname == 'tgm-master.hpc':
+    if hostname == 'chi' or hostname == 'tgm-master.hpc' or hostname == 'iron':
         ini_dvasp = '/home/joonho/sandbox_gl/pyvasp/VaspINI'
     elif hostname == 'login':
         ini_dvasp = '/gpfs/home/joonho/sandboxg/pyvasp/VaspINI'
     elif hostname == 'login04':
         ini_dvasp = '/home01/x1813a01/sandboxg/pyvasp/VaspINI'
     else:
-        print('host is not recognized: exit')
+        print(f'host is not recognized: exit in {whereami()}')
         sys.exit(1)
 
     print("vasp repository is ", ini_dvasp, ' in system ', hostname)
@@ -146,10 +147,10 @@ def get_Ucorr(atoms):
         
         
 
-def make_incar(dic, rw, iofile):
+def make_incar(dic, iofile):
     """ Make INCAR file from dictionary of command line arguments
         automatically write "incar.key"-json string
-        when modify "incar.key (json string_", read iofile by --rw r
+        when modify "incar.key json string" 
         filename can be change with -f, --iofile """
 
     ### args list:  1. nonmag, mag(fm), afm
@@ -159,16 +160,15 @@ def make_incar(dic, rw, iofile):
     ###             5. dispersion
     ###             6.
 
-    if rw == 'w':
+    ### if iofile exists, read, otherwise, write
+    if os.path.isfile(iofile):
+        dic = json.load(open(iofile))
+        print(f"read {iofile} to make INCAR")
+    else:
         with open(iofile, 'w') as ofile:
             ofile.write(json.dumps(dic, indent=4))
-        print("run 'vmake_incar.py --rw r' after modify incar.key")
-        return 0
-    elif rw == 'r':
-        dic = json.load(open(iofile))
-    else:
-        print("w/r error for iofile")
-        exit(1)
+            print(f"write {iofile}; check it and run 'vas_make_incar.py' again")
+            sys.exit(1)
 
     print(dic)
     ################# PRE DEFINE ###############################
@@ -316,7 +316,8 @@ def make_incar(dic, rw, iofile):
         if not L_hybrid:
             comm += 'ALGO = Fast\n'
             comm += '#IALGO=48\n'
-            comm += 'NSIM = 4; NPAR = 4\n'
+            comm += 'NSIM = 4\n'
+            comm += 'NPAR = 4\n'
         else:                                       # PBE0 or revPBE0
             comm += 'LHFCALC = .TRUE.\n'
             comm += 'ALGO = D; TIME = 0.4 # IALGO=53\n'
@@ -402,9 +403,9 @@ def make_incar(dic, rw, iofile):
                 smass = -1
             comm += 'ISYM=0; SMASS = %d     for standard NVE ensemble w. const T \n\n' % smass
         else:
-            if isym in locals():
+            if 'isym' in locals():
                 comm += 'ISYM = 0'       
-            comm += '#TEBEG = %d; TEEND = %d\n' %(tebeg, teend)
+            comm += '#TEBEG = ; TEEND = \n' 
             comm += '#ISYM=0; SMASS = 0.05 ! -3\-1 for NVE, >=0 for NVT \n\n'
             
     f.write(comm)

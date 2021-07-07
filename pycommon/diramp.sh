@@ -1,1 +1,0 @@
-../pyamp/diramp.sh

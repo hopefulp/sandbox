@@ -8,9 +8,16 @@ fi
 i=$1
 n=$(expr $2 + 1)
 
+host=$(hostname)
+if [ $host == 'iron' ]; then
+    qdel=scancel
+else
+    qdel=qdel
+fi
+
 while [ $i -lt $n ]; do
-    echo qdel $i
-    qdel $i
+    echo $qdel $i
+    $qdel $i
     i=$(expr $i + 1)
     done
 

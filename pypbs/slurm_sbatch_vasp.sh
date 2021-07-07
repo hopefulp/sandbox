@@ -47,10 +47,11 @@ if [ $ucorr -eq 1 ]; then
     sed -i "s/.*LDAUJ.*/$ldauj/" INCAR
 fi
 
-#mpirun -genv I_MPI_FABRICS "shm:ofa" -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
-#mpirun -genv I_MPI_FABRICS "shm:tmi" -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
-mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+if [ $partname == 'X1' ]; then
+    mpirun -genv I_MPI_FABRICS "shm:ofa" -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+else
+    mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+fi
 date >> $logfile
-mv $outfile $pdir/$jobname.out
 
-#python test_HER.py $SLURM_NTASKS 
+mv $outfile $pdir/$jobname.out

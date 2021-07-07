@@ -293,9 +293,9 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     else:
         print(f"Error:: obscure in y-dim {ys.ndim}")
     ### ADD LEGEND
-    plt.legend(loc=2)                # locate after plot
-    plt.xticks(x)
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(50))
+    #plt.legend(loc=2)                # locate after plot
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(100))
+    #ax.yaxis.set_major_locator(ticker.MultipleLocator())
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)

@@ -3,6 +3,7 @@
 import argparse
 import sys
 import re
+import os
 import numpy as np
 
 import common
@@ -70,7 +71,7 @@ def rearrange_coord_lines(lines, atom_names, natoms):
     s=''
     for atom in coord_dict.keys():
         for line in coord_dict[atom]:
-            print(line)
+            print(line, end='')
             s += line
     return s
 
@@ -91,7 +92,7 @@ def cal_num_atoms(alist, nalist):
     return mydic            
 
 ### Just read poscar and rearrange: atom_list, natom || atom_file [ftype]
-def poscar_rearrange(pos, atom_list, natom, atom_file, ftype):
+def poscar_rearrange(pos, atom_list, natom, atom_file, ftype, suff, rename):
     ### atom list is given repetively
     if atom_list:
         if natom == len(atom_list):
@@ -110,7 +111,8 @@ def poscar_rearrange(pos, atom_list, natom, atom_file, ftype):
     
     #print(atomlist)
     ### rearrange poscar
-    outf = open("POSCARnew", 'w')
+    ofile = pos+suff
+    outf = open(ofile, 'w')
     ### extract coordinates and sort
     coordinates=[]
     with open(pos, "r") as f:
@@ -163,6 +165,11 @@ def poscar_rearrange(pos, atom_list, natom, atom_file, ftype):
     ### rearrange_coord_lines
     s = rearrange_coord_lines(coordinates, atom_all, natom_all)
     outf.write(s)
+    if rename:
+        os.system(f"mv {ofile} {pos}")
+        print(f"{pos} was changed")
+    else:
+        print(f"write to {ofile}")
 
     return 0
 
@@ -173,9 +180,11 @@ def main():
     parser.add_argument('-al', '--atom_list', nargs='+', help="atom list is given directly and repetitively")
     parser.add_argument('-na', '--natom', type=int, help="if number of atoms are known")
     parser.add_argument('-ft','--file_type', help="original coordinate file type used with --atom_file")
+    parser.add_argument('-suf', '--suffix', default='sort', help='filename suffix')
+    parser.add_argument('-mv', '--rename', action='store_true', help='change in the original filename')
     args = parser.parse_args()
 
-    poscar_rearrange(args.poscar, args.atom_list, args.natom, args.atom_file, args.file_type)
+    poscar_rearrange(args.poscar, args.atom_list, args.natom, args.atom_file, args.file_type, args.suffix, args.rename)
 
 if __name__ == "__main__":
     main()

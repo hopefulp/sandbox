@@ -165,9 +165,14 @@ server.kisti.pbs  = "=== KISTI ===\
                     \n    System::\
                     \n\tnode(queue)\
                     \n\t    KNL: massive parallel\
-                    \n\t\t-l select=4:ncpus=40:mpiprocs=40:ompthreads=1\
+                    \n\t\t-l select=4:ncpus=64:mpiprocs=64:ompthreads=1   # max=68, ncpus==mpiprocs\
+                    \n\t\t    for VASP NPAR = 8 = sqrt(64)\
+                    \n\t\t-q [normal:long]\
+                    \n\t\t-l walltime=48:00:00  (for normal)\
+                    \n\t\t-l walltime=120:00:00 (for   long)\
                     \n\t    SKL: fast as normal\
                     \n\t\t-l select=1:ncpus=40:mpiprocs=40:ompthreads=1\
+                    \n\t\t    for large memory, decrease mpiprocs: ncpus=40:mpiprocs=16\
                     \n\tLocation: PBS scripts\
                     \n\t    Q-Chem:/apps/commercial/test_samples/Q-Chem/qchem_skl.sh, qchem_knl.sh (KNL)\
                     \n    PBS::\
@@ -180,7 +185,7 @@ server.kisti.pbs  = "=== KISTI ===\
                     \n\t    $ qsub -N CCC6A -v fname=6-CCC-NiFe-A.in qchem_knl.sh\
                     \n\tVASP\
                     \n\t    $ qsub -N dirname $SB/pypbs/pbs_vasp.sh\
-                    \n\t\tnumber of process is confirmed in the script 'pbs_vasp.sh'\
+                    \n\t\tnumber of process is defined automatically by select*mpiprocs\
                     "
 server.ssh.check  = "=== SSH ===\
                     \n    alias.sh::\
