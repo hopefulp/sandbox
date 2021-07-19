@@ -48,6 +48,10 @@ def dir_clean(d,works,linux_job,prefix, suffix, matches, exclude,excl_fnames,new
                             f_list.remove(f)
             print(f_list)
             f_list_all.extend(f_list)
+        elif work == 'nc':
+            f_list=os.listdir(d)
+            excl_fnames=['test_HER_args.py','test_HER.py','slurm_sbatch.sh','slurm_sbatch.sh_NanoCore']
+            
         elif work == 'pbs':
             #matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI', 'sge']
             matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
@@ -122,7 +126,7 @@ def dir_clean(d,works,linux_job,prefix, suffix, matches, exclude,excl_fnames,new
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
     parser.add_argument('dir1', default=os.getcwd(), help='input one directory')
-    parser.add_argument('-w', '--works', nargs='+', choices=['qchem','amp','vasp','pbs','lmp'],help='remove depending on job')
+    parser.add_argument('-w', '--works', nargs='+', choices=['qchem','amp','vasp','pbs','lmp','nc'],help='remove depending on job')
     parser.add_argument('-j', '--job', default='rm', choices=['rm','mv','cp','ln'], help='how to treat files [rm|cp|mv]')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')

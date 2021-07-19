@@ -9,7 +9,9 @@ from common import whereami
 
 """ 
     repository for many vasp script 
-    def get_vasp_repository():
+    get_vasp_repository()
+    get_atoms_4pos() 
+    make_mag_4pos()
     def make_incar(dic, iofile):
     def make_kpoints(kp, MH|gamma, **args=[band])
 
@@ -168,7 +170,7 @@ def make_incar(dic, iofile):
         with open(iofile, 'w') as ofile:
             ofile.write(json.dumps(dic, indent=4))
             print(f"write {iofile}; check it and run 'vas_make_incar.py' again")
-            sys.exit(1)
+            #sys.exit(1)
 
     print(dic)
     ################# PRE DEFINE ###############################
@@ -227,11 +229,7 @@ def make_incar(dic, iofile):
         comm = '#MAGMOM:: natom*magnetism ... \n\n'
         f.write(comm)
     else:
-        if dic['nmag']:
-            natom = dic['nmag']
-        else:
-            question = "number of magnetic atom? "
-            natom = int(str(input(question)).strip())
+        
         magmom = dic['magmom']
         comm = 'MAGMOM = '
         if dic['mag'] == 'fm':

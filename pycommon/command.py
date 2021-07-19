@@ -125,7 +125,7 @@ dac.build       =   "    Build graphene using nanocore\
                     "
 
 
-def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar, nhl):
+def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar, nhl,idata,ndata):
     
     if keyvalues:
         kw1 = keyvalues[0]
@@ -248,6 +248,10 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
 
         elif subjob == 'amp':
             print(slurm.amp)
+            print(f"\t1. amp_jobs.sh fp {inf} {partition} {idata} {ndata} | sh")
+            print(f"\t1.9 amp_jobs.sh db {inf} 2 60 | sh")
+            print(f"\t2. amp_jobs.sh db {inf} 1 | sh")
+            print(f"\t3. amp_jobs.sh wrapper2 {inf} 2 | sh")
         
         elif subjob == 'vasp':
             print(f"=== Usage ===\
@@ -321,17 +325,19 @@ def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
     parser.add_argument('job', choices=['amp','qchem','slurm','ga','gpu'],  help="one of amp, qchem, mldyn for ML dyn")
-    parser.add_argument('-sj', '--sub_job', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('-k', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")
-    parser.add_argument('-k', '--keyvalues', nargs='*', help='change a keyword in print')
+    parser.add_argument('-kv', '--keyvalues', nargs='*', help='change a keyword in print')
     parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
     ### flowing slurm option
-    parser.add_argument('-inf', '--infile', default='test_HER.py', help='input file in case')
+    parser.add_argument('-inf', '--infile', help='input file in case')
     parser.add_argument('-N', '--nnode', default=1, type=int, help='number of nodes: if needed')
     parser.add_argument('-n', '--nproc', type=int, help='number of process: if needed')
     parser.add_argument('-p', '--partition', default=2, type=int, choices=[1,2,3,4,5], help='if needed, specify nodename')
     parser.add_argument('-s', '--poscar', default='POSCAR.name', help='if needed, specify nodename')
+    parser.add_argument('-id', '--idata', default=0, type=int, help='start index of data')
+    parser.add_argument('-nd', '--ndata', default=100, type=int, help='amount of data')
     mlg = parser.add_argument_group(title = 'machine learning args')
     mlg.add_argument('-dt', '--data_type', default='int', choices=['int','div'], help="data selection type")
     mlg.add_argument('-ft', '--func_type', default='log', choices=['log','pow'], help="gaussian symmetry function parameter type")
@@ -339,7 +345,17 @@ def main():
 
     args = parser.parse_args()
 
-    show_command(args.job,args.sub_job,args.job_submit,args.qname,args.infile,args.keyvalues,args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.partition,args.poscar, args.hidden_layers)
+    if not args.infile:
+        if args.subjob == 'amp':
+            infile = 'OUTCAR'
+        elif args.subjob == 'nc':
+            infile = 'test_HER.py'
+        else:
+            infile = 'OUTCAR'
+    else:
+        infile = args.infile
+
+    show_command(args.job,args.subjob,args.job_submit,args.qname,infile,args.keyvalues,args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.partition,args.poscar, args.hidden_layers, args.idata, args.ndata)
 
 if __name__ == "__main__":
     main()

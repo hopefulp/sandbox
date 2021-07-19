@@ -13,9 +13,9 @@ system.eta          = MyClass('system.eta')
 server              = MyClass('server')
 server.mlet         = MyClass('server.mlet')
 server.chi          = MyClass('server.chi')
-server.eta          = MyClass('server.eta')
 server.kisti        = MyClass('server.kisti')
 server.js_sge       = MyClass('server.js_sge')
+server.fept         = MyClass('server.fept')
 server.ssh          = MyClass('server.ssh')
 vmd                 = MyClass('vmd')
 
@@ -165,12 +165,18 @@ server.mlet.at_node =       "\n    RUN @NODE VASP::\
                     \n\t$ sge_vasp_node.csh re0D3mdk_high 36\
                     "
 server.mlet.sge     = server.js_sge
-
 server.sleep        = server.mlet.sleep
 
+server.fept         = "=== FePt ===\
+                    \n    System::\
+                    \n\tlogin node: iron, platinum\
+                    \n\thpc cal node: n001 ~ n076\
+                    \n\tpartition: X1, X2, X3, X4, X5, n076 (GPU)\
+                    \n\tnproc:     8   12  20  24  32\
+                    "
 
 
-server.kisti.pbs  = "=== KISTI ===\
+server.kisti.pbs    = "=== KISTI ===\
                     \n    System::\
                     \n\tnode(queue)\
                     \n\t    KNL: massive parallel\

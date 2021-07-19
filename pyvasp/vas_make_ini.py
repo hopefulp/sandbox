@@ -64,8 +64,7 @@ def get_potcar(pot,atoms):
 
 def get_incar(ifile):
     dic = {}
-    rw = 'r'
-    make_incar(dic, 'r', ifile)
+    make_incar(dic, ifile)
     print('INCAR is made from %s' % ifile)
 
     return 0
@@ -139,8 +138,10 @@ def main():
         ### 4. get INCAR :: use make_incar.py
         q = 'will you make INCAR? '
         if yes_or_no(q):
-            q = 'give input incar-key file or use make_incar.py: '
+            q = 'input incar-key file or use make_incar.py: '
             keyfile = get_answers(q)
+            if not keyfile:
+                keyfile = args.iofile
             get_incar(keyfile)
         files2copy.append('INCAR')
         ### 5. make work_dir
