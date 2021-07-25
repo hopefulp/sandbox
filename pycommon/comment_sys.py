@@ -14,8 +14,7 @@ server              = MyClass('server')
 server.mlet         = MyClass('server.mlet')
 server.chi          = MyClass('server.chi')
 server.kisti        = MyClass('server.kisti')
-server.js_sge       = MyClass('server.js_sge')
-server.fept         = MyClass('server.fept')
+server.iron         = MyClass('server.iron')
 server.ssh          = MyClass('server.ssh')
 vmd                 = MyClass('vmd')
 
@@ -117,14 +116,15 @@ server.chi =         "=== CHI (HOME) ===\
                     \n\t    makes 4 scratch folder in $QCSCRATCH\
                     "
 
-server.mlet.plot =   "=== MLET (SGE) ===\
+server.mlet.system =   "=== MLET (SGE) ===\
                     \n  --System:\
                     \n\tmem 188: node11, 15, 16, 20, 21, 22, 23; 16 nproc * 11.7 G mem\
                     \n\tmem 128: opt07\
                     \n\tmem  96: almost, 12 node * 8G mem\
                     \n\tmem/proc: 2G default, -l mem=nG for qsub\
                     \n\tNode 17, 18, 19 no root passwd, can't run amp\
-                    \n  --PLOT Figure\
+                    "
+server.mlet.plot = "\n  --PLOT Figure\
                     \n\t$ ssh -Y mlet (in login)\
                     \n\t    for drawing in master node\
                     \n\t    not queue-submit job including plot (matplotlib)\
@@ -164,10 +164,9 @@ server.mlet.sleep   =       "\n    SLEEP::\
 server.mlet.at_node =       "\n    RUN @NODE VASP::\
                     \n\t$ sge_vasp_node.csh re0D3mdk_high 36\
                     "
-server.mlet.sge     = server.js_sge
 server.sleep        = server.mlet.sleep
 
-server.fept         = "=== FePt ===\
+server.iron         = "=== Iron:Platinum ===\
                     \n    System::\
                     \n\tlogin node: iron, platinum\
                     \n\thpc cal node: n001 ~ n076\
@@ -238,7 +237,7 @@ server.ssh.scripts = "\n    Scripts::\
                     \n\tsee server.pbs.scripts u. -j server -k pbs\
                     "
 
-server.js_sge.sge=     "=== SGE: grid-engine (MLET) ===\
+server.mlet.sge=     "=== SGE: grid-engine (MLET) ===\
                     \n    QSUB\
                     \n\tOverwrite \#$ -option in script\
                     \n\tOptions::\
@@ -253,7 +252,7 @@ server.js_sge.sge=     "=== SGE: grid-engine (MLET) ===\
                     \n\t(amp)    $ qsub ... double nodes (-q skylake@node01 -q skylake@node02)\
                     \n\t\t\tcores={'node01':ncore,'node02':ncore}\
                     "
-server.js_sge.qstat=   "\n    SGE command in MLET\
+server.mlet.qstat=   "\n    SGE command in MLET\
                     \n\tPATH: /gpfs/opt/util\
                     \n\t$ qstat\
                     \n\t    -f: 'qstatf' is aliased\
@@ -263,7 +262,7 @@ server.js_sge.qstat=   "\n    SGE command in MLET\
                     \n\t$ qmem\
                     \n\t    available_mem/total_mem(available_proc)\
                     "
-server.js_sge.scripts  = "\n    Scripts::\
+server.mlet.sgescripts  = "\n    Scripts::\
                     \n\tSSH\
                     \n\t    ssh_node.sh\
                     \n\t\t...\

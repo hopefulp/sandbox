@@ -4,6 +4,8 @@ import argparse
 import os
 import re
 from common import dir_files, MyClass, list2str
+import comment_subj
+import comment_sys
 from server_env import nXn
 
 amp     =   MyClass('amp')
@@ -280,11 +282,6 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print(f"\t    -n number of total processes: {nproc} <= {nnode} * {nXn[partition]}")
             if nproc != nnode * nXn[partition]:
                 print("Warning!! Not using all the processes in the node")
-            print("=== Node check ===")
-            print("\tpe     to get free processes")
-            print("\tpef    to get free nodes")
-            print("\tpestat to see all nodes")
-            print("\tqstat -u joonho     to check my job")
         elif subjob == 'mldyn':
             print("SBATCH:")
             print(f"\tsbatch -J {qname} -p X2 -N 1 -n 1 --export=hl='{hlstr1}',sf='hl{hl2str}.pt' /home/joonho/sandbox_gl/pypbs/slurm_sbatch_py.sh")
@@ -314,7 +311,23 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print("    CRR:DAC =========================")
             print(nc.build)
             print(dac.build)
-                
+        print("=== Node check ===")
+        print("\tpe     to get free processes")
+        print("\tpef    to get free nodes")
+        print("\tpestat to see all nodes")
+        print("\tqstat -u joonho     to check my job")
+    elif job == 'sge':
+        if subjob == 'vasp':
+            print(comment_subj.vasp.run)
+            print(comment_sys.server.mlet.vasp)
+        print(comment_sys.server.mlet.system)
+        print(comment_sys.server.mlet.sgescripts)
+        print(comment_sys.server.mlet.sleep)
+        print(comment_sys.server.mlet.sge)
+
+        print(f"\n\t(VASP)   $ qsub -N {qname} -pe numa {nproc} -v np={nproc} -v dir={qname} $SB/pypbs/sge_vasp.csh")
+        print(f"how to run with multiple nodes?")
+        print(comment_sys.server.mlet.qstat)
 
     else:
         print("build more jobs")
@@ -324,7 +337,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', choices=['amp','qchem','slurm','ga','gpu'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('job', choices=['slurm','sge','amp','qchem','ga','gpu'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-k', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")

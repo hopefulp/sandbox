@@ -8,9 +8,10 @@ import re
 import sys
 from common import *
 from amp_ini import ampdb
-q_list=[]
 
-def dir_clean(d,works,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes):
+q_list=[]
+vas_default=['CHG','CHGCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR','XDATCAR']
+def dir_clean(d,works,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, default):
 
     pwd = os.getcwd()
     if not d:
@@ -35,17 +36,20 @@ def dir_clean(d,works,linux_job,prefix, suffix, matches, exclude,excl_fnames,new
         elif work == 'qchem':
             pass
         elif work == 'vasp':
-            f_list=os.listdir(d)
-            print(f_list)
-            if excl_fnames: 
-                for efile in excl_fnames: # intactable list outside
-                    for f in f_list[:]:
-                    #if os.access(d+'/'+f, os.X_OK):
-                    #    excl_fnames.append(f)
-                        print(f"\nas for {f}", end=' ')
-                        if re.search(efile, f):
-                            print(f"{f} is removed in the remove-list", end=" ")
-                            f_list.remove(f)
+            if default:
+                f_list=vas_default
+            else:
+                f_list=os.listdir(d)
+                print(f_list)
+                if excl_fnames: 
+                    for efile in excl_fnames: # intactable list outside
+                        for f in f_list[:]:
+                        #if os.access(d+'/'+f, os.X_OK):
+                        #    excl_fnames.append(f)
+                            print(f"\nas for {f}", end=' ')
+                            if re.search(efile, f):
+                                print(f"{f} is removed in the remove-list", end=" ")
+                                f_list.remove(f)
             print(f_list)
             f_list_all.extend(f_list)
         elif work == 'nc':
@@ -137,6 +141,7 @@ def main():
     parser.add_argument('-ms', '--match_show', action='store_true')
     parser.add_argument('-a', '--all_remove', action='store_true', help='remove all the files')
     parser.add_argument('-y', '--yes', action='store_true', help='execute command')
+    parser.add_argument('-d', '--default', action='store_true', help='remove default files')
     args = parser.parse_args()
 
     if args.works==None and args.prefix==None and args.suffix==None and args.match==None:
@@ -147,7 +152,7 @@ def main():
         args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR','CONTCAR']
     #if args.work == 'amp' and not args.excluded_files:
     #    args.excluded
-    dir_clean(args.dir1,args.works,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes)
+    dir_clean(args.dir1,args.works,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes, args.default)
     return 0
 
 if __name__ == '__main__':
