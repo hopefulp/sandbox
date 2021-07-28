@@ -185,7 +185,7 @@ def amp_md(atoms, nstep, dt, amp_pot):
         tot = pot + kin
         f.write(f"{step:5d}{tot:15.4f}{pot:15.4f}{kin:10.4f}\n")
         print(f"{step:5d}{tot:15.4f}{pot:15.4f}{kin:10.4f}")
-        dyn.run(2)
+        dyn.run(1)
         traj.write(atoms)                   # write kinetic energy, but pot is not seen in ase
     f.close()        
 
