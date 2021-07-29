@@ -257,9 +257,9 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     #ax2.legend(loc=4)           # 1
     #plt.legend()
     #common_figure_after()
-    x_ticks = ['PP', 'PPP', 'PNP', 'PNP-bridged']
+    #x_ticks = ['PP', 'PPP', 'PNP', 'PNP-bridged']
     #plt.xticks(x_ticks)
-    ax.set_xticklabels(x_ticks)
+    #ax.set_xticklabels(x_ticks)
     plt.locator_params(axis='x', nbins=10)
     plt.show()
     if Lsave:

@@ -19,7 +19,8 @@ import amp_util
 import amp_descriptor as my_des
 from common import whereami
 import amp_ini 
-from myplot2D import mplot_nvector
+from myplot2D import mplot_nvector, draw_amp_twinx
+#import myplot2D
 from amp_datprocess import outcar_trim
 
 ### in case changing amp package name
@@ -156,10 +157,11 @@ def calc_test_images(images, calc, f_conv_list, title, suptitle,ncore,na_in_mol,
     
     ### this runs only in master(login) node
     if Lgraph:
-        modulename='myplot2D'   ### FOR MLET
-        if modulename not in sys.modules:
-            import myplot2D
-        e_rmse, e_maxres = myplot2D.draw_amp_twinx(y, y_bar, title, suptitle, natom=natom, Ltwinx=Ltwinx,Ldiff=True)
+        #modulename='myplot2D'   ### FOR MLET
+        #if modulename not in sys.modules:
+        #    import myplot2D
+        #e_rmse, e_maxres = myplot2D.draw_amp_twinx(y, y_bar, title, suptitle, natom=natom, Ltwinx=Ltwinx,Ldiff=True)
+        e_rmse, e_maxres = draw_amp_twinx(y, y_bar, title, suptitle, natom=natom, Ltwinx=None,Ldiff=True)
     return 0
 
 ### Amp job 3: MD

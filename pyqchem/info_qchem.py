@@ -61,7 +61,8 @@ qcrun.qcrun_mols    =   "Read *.mol files in directory and qsub\
                         "
 qcrun.qcrun_ins     =   "Read *.in in directory and qsub\
                         /n/tUsage::\
-                        /n/    qcrun_ins.sh [1:
+                        /n/    qcrun_ins.sh [1:\
+                        "
 qcrun.aimd="refer to py_ai_ini.py"
 
 

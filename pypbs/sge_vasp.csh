@@ -20,7 +20,7 @@ echo start >> $queue_file
 date >> $queue_file
 
 cd $dir
-mpirun -np $np /gpfs/home/joonho/vasp.5.4.4/bin/vasp  > ../$log_file
+mpirun -np $np /gpfs/home/joonho/vasp.5.4.4/bin/vasp_std  > ../$log_file
 cd ..
 mv $log_file $dir.out
 echo end >> $queue_file

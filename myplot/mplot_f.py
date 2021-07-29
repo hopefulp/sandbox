@@ -238,8 +238,10 @@ def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
                 ### read data line from file                        
                 items = line.strip().split()
                 if items:
-                    if not x and 'icx' in locals():
+                    #if not x and 'icx' in locals():
+                    if 'icx' in locals():
                         x.append(float(items[icx]))
+                        #print("add x:", x)
                         #x_value.append(float(items[icx-1]))
                     #y_line = []     # convert string to float for a list
                     ### if one file, get ys
@@ -300,6 +302,7 @@ def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
         yl2=[]
         yl2.append(ylabel)
         yl2.append(ylabel_r)
+        #print(f"x {np.array(x).shape}, y {np.array(y).shape}, y2 {np.array(icy2).shape}")
         mplot_twinx(x, y, icy2, title=title, xlabel=xlabel, ylabel=yl2, legend=line_label, Lsave=Lsave, Colors=colors)
     else:
         print(f"x={x}")
@@ -342,7 +345,7 @@ def main():
     g_twin = parser.add_argument_group('Twin-X', description='to plot using two y-axes')
     g_twin.add_argument('-tx', '--twinx', action="store_true", help='using two y-axes with twin x ticks')
     #g_twin.add_argument('-icy2', '--second_iy', default=[2], nargs="+", type=int, help='designate the index of y for 2nd y-axis')
-    g_twin.add_argument('-icfy2', '--second_iy', default=[1], type=int, help='designate the index of y[columns or files] for 2nd y-axis')
+    g_twin.add_argument('-icfy2', '--second_iy', default=[1], nargs='+', type=int, help='designate the index of y[columns or files] for 2nd y-axis')
     g_twin.add_argument('-yl2', '--second_yl', default='E(ev)', help='input left y-axis title')
     parser.add_argument('-j', '--job', help='job of qcmo|ai|gromacs')
     parser.add_argument('-t', '--title', help='title of figure would be filename')
