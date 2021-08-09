@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # written by Joonho Park
-# read .msi and write .lxyz .pos(vasp) as cartesian coordinate
+# read .msi and write .lxyz POSCAR_name(vasp) as cartesian coordinate
 # usage: msi2pos.pl a.msi Mn O C H
 # poscar will be written in the order of argument
 # if you miss an atom in the a.msi, it will report a certain atom is missing.
@@ -38,7 +38,7 @@ print "   ",$atoms,"\n";
 #exit;
 
 $flxyz=$fname.".lxyz";
-$fvasp=$fname.".pos";
+$fvasp="POSCAR.".$fname;
 open(IN,"<$fmsi");
 open(OUTlxyz,">$lxyz");
 open(OUTvasp,">$fvasp");
