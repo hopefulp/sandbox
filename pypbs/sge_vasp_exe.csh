@@ -19,7 +19,11 @@ echo $dir > $queue_file
 echo start >> $queue_file
 date >> $queue_file
 
-set EXE = /gpfs/home/joonho/vasp.5.4.4/bin/vasp_std
+if ( $vas == "gam" ) then
+    set EXE = /gpfs/home/joonho/vasp.5.4.4/bin/vasp_gam
+else
+    set EXE = /gpfs/home/joonho/vasp.5.4.4/bin/vasp_std
+endif
 
 cd $dir
 mpirun -np $np $EXE  > ../$log_file

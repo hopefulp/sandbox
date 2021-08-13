@@ -326,7 +326,8 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(comment_sys.server.mlet.sge)
 
         print(f"\n\t(VASP)   $ qsub -N {qname} -pe numa {nproc} -v np={nproc} -v dir={qname} $SB/pypbs/sge_vasp.csh")
-        print(f"how to run with multiple nodes?")
+        print(f"\t(VASP)   $ qsub -N {qname} -pe numa {nproc} -v np={nproc} -v dir={qname} -v vas=gam $SB/pypbs/sge_vasp_exe.csh")
+        print(f"\nhow to run with multiple nodes?")
         print(comment_sys.server.mlet.qstat)
 
     else:

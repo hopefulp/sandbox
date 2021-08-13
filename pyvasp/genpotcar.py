@@ -12,9 +12,11 @@ Potential directory should be located. (listed below)
 import os, sys, argparse
 
 # Potential path
-LDA_path  = "/home2/starnmj/bin/VASPPOT/PAW_LDA"
-PBE_path  = "/TGM/Apps/VASP/POTCAR/2.POTPAW.PBE.54.RECOMMEND"
-PW91_path = "/home2/starnmj/bin/VASPPOT/PAW_PW91"
+sb="/home/joonho/sandboxg/"
+LDA_path  = sb + "pyvasp/vasppot/1.POTPAW.LDA.54.RECOMMEND"
+#PBE_path  = "/TGM/Apps/VASP/POTCAR/2.POTPAW.PBE.54.RECOMMEND"
+PBE_path  = sb + "pyvasp/vasppot/2.POTPAW.PBE.54.RECOMMEND"
+PW91_path = sb + "pyvasp/vasppot/5.OUTDATED.POTPAW.GGA"
 
 sv_list = ["Li", "K", "Rb", "Cs", "Sr", "Ba", "Sc", "Y", "Zr"]
 pv_list = ["Na", "Ca", "Ti", "V", "Cr", "Mn", "Nb", "Mo", "Tc", "Hf", "Ta", "W", "Os"]
