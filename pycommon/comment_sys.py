@@ -255,7 +255,8 @@ server.mlet.sge=     "=== SGE: grid-engine (MLET) ===\
 server.mlet.qstat=   "\n    SGE command in MLET\
                     \n\tPATH: /gpfs/opt/util\
                     \n\t$ qstat\
-                    \n\t    -f: 'qstatf' is aliased\
+                    \n\t$     : aliased as 'qs' to check my job running\
+                    \n\t    -f: 'qstatf' and 'qf' is aliased to show the available cpu's. used/tot free_proc\
                     \n\t    -r: details of job\
                     \n\t$ qhist\
                     \n\t$ qfree\

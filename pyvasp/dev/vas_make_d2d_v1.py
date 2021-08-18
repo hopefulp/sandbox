@@ -11,40 +11,45 @@ import re
 from  myvasp import *
 from common import *
 
-
-def make_vas_dir(old_dir, new_dir, job, incar, poscar, kpoints, potcar, Lvdw, Lquestion):
+def main():
+    global ini_dvasp, pwd
+    parser = argparse.ArgumentParser(description='make directory for continous job from CONTCAR POTCAR KPOINTS and new INCAR')
+    parser.add_argument('odir', help='copy from old dir')
+    parser.add_argument('ndir', help='mkdir and cp')
+    parser.add_argument('job', choices=["hybrid","dos","band","pchg","md","cont","ini"], help='inquire for each file')
+    parser.add_argument('-q', '--question', action='store_true', help='inquire for each file')
+    parser.add_argument('-v', '--vdw', action='store_true', help="in case vdW-DF,copy vdw_kernel.bindat")
+    parser.add_argument('-s', '--poscar', help='use CONTCAR for 2nd job')
+    parser.add_argument('-p', '--potcar', help='use the same POTCAR')
+    parser.add_argument('-k', '--kpoints', help='use the same KPOINTS for default')
+    #parser.add_argument('-l', '--ksub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
+    parser.add_argument('-i', '--incar', default='INCAR', choices=["INCAR","incar.key"], help='first run make_incar.py then use incar.key')
+    args = parser.parse_args()
 
     pwd = os.getcwd()
+    old_dir = args.odir
+    new_dir = args.ndir 
 
     files=[]
     ### Define POSCAR, KPOINTS, INCAR
-    if job == 'ini':
+    if args.job == 'ini':
         poscar = 'POSCAR'
         kpoints = 'KPOINTS'
         incar = 'INCAR'
     else:
         poscar = 'CONTCAR'
         kpoints = 'IBZKPT'
-        if job == 'zpe':
-            incarname = 'INCAR.zpe'
-        elif job == 'md':
-            incarname = 'INCAR.md'
-            
-        if os.path.isfile(incarname):
-            incar = incarname
-        else:
-            incar = 'INCAR'
-        print(f"incar == {incar}, modify {incar}")
+        print("modify INCAR")
     ### Define POTCAR
-    if potcar:
+    if args.potcar:
         print("generate POTCAR")
     else:
         potcar = "POTCAR"
     ### Extra files for Continous Job
-    if job=="hybrid" or job=="md" or job=="dos":
+    if args.job=="hybrid" or args.job=="md" or args.job=="dos":
         files.append("WAVECAR")
     ### if vdW-DF
-    if Lvdw:
+    if args.vdw:
         f_vdw = old_dir+'/'+"vdw_kernel.bindat"
         if os.path.isfile(f_vdw):
             files.append("vdw_kernel.bindat")
@@ -56,13 +61,13 @@ def make_vas_dir(old_dir, new_dir, job, incar, poscar, kpoints, potcar, Lvdw, Lq
         os.system(s)
         print(f"directory {new_dir} was made")
     
-    if Lquestion:
+    if args.question:
         ### Use the CONTCAR for POSCAR
         q = 'will you use CONTCAR?'
         if yes_or_no(q):
             pass
         elif yes_or_no('will you use POSCAR?'):
-            poscar='POSCAR'    
+            args.poscar='POSCAR'    
             print("What else?")
             sys.exit(0)
         ### Use the same POTCAR
@@ -108,23 +113,21 @@ def make_vas_dir(old_dir, new_dir, job, incar, poscar, kpoints, potcar, Lvdw, Lq
             print(f"There is not {fo}")
         ### KPOINTS
         fo = old_dir + '/'  + kpoints
-        if job == 'zpe':
-            fo = 'KPOINTS.gam'
         if os.path.isfile(fo):
             s = f"cp {fo} {new_dir}/KPOINTS"
             os.system(s)
             print(f"{fo} will be copied to {new_dir}/KPOINTS")
         else:
             print("make KPOINTS file ")
-        ### INCAR :: copy INCAR or incar.key
-        ### INCAR is normally different job so read on the work directory
-        #fo = old_dir + '/'  + incar
-        if os.path.isfile(incar) :
-            s = f"cp {incar} {new_dir}/INCAR"
+        ### INCAR :: copy INCAR or incar.key       
+        fo = old_dir + '/'  + args.incar
+        if os.path.isfile(fo) :
+            s = f"cp {fo} {new_dir}"
             os.system(s)
-            print(f"{incar} will be  copied to {new_dir}/INCAR")
+            print(f"{fo} will be  copied to {new_dir}/INCAR")
+            print("Modify INCAR for different Job")
         else:
-            print(f"There is not {incar}")
+            print(f"There is not {fo}")
             
     if files:
         for f in files:
@@ -133,22 +136,5 @@ def make_vas_dir(old_dir, new_dir, job, incar, poscar, kpoints, potcar, Lvdw, Lq
             print(f"{fo} is copied to {new_dir}")
             os.system(s)
                 
-def main():
-    global ini_dvasp, pwd
-    parser = argparse.ArgumentParser(description='make directory for continous job from CONTCAR POTCAR KPOINTS and new INCAR')
-    parser.add_argument('odir', help='copy from old dir')
-    parser.add_argument('ndir', help='mkdir and cp')
-    parser.add_argument('job', choices=["hybrid","dos","band","pchg","md","cont","ini","zpe","mol"], help='inquire for each file')
-    parser.add_argument('-s', '--poscar', help='use CONTCAR for 2nd job')
-    parser.add_argument('-p', '--potcar', help='use the same POTCAR')
-    parser.add_argument('-i', '--incar', default='INCAR', choices=["INCAR","incar.key"], help='first run make_incar.py then use incar.key')
-    parser.add_argument('-k', '--kpoints', help='use the same KPOINTS for default')
-    parser.add_argument('-q', '--question', action='store_true', help='inquire for each file')
-    parser.add_argument('-v', '--vdw', action='store_true', help="in case vdW-DF,copy vdw_kernel.bindat")
-    #parser.add_argument('-l', '--ksub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
-    
-    args = parser.parse_args()
-
-    make_vas_dir(args.odir, args.ndir, args.job, args.incar, args.poscar, args.potcar, args.kpoints, args.vdw, args.question)
 if __name__ == '__main__':
     main()
