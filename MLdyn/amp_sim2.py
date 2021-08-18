@@ -50,6 +50,73 @@ def calc_train_images(images, HL, Elist=None, flist=None ) :
     print("Train in finished")
     return 0
 
+### AMP job 2: Test
+def calc_test_images(images, calc, f_conv_list, title, suptitle,ncore,na_in_mol,Lgraph, outf='test_result.txt', Ltwinx=None, Lga=False, val_id=None):
+    ### in case other name of amp pot is used
+    #calc = amp_util.get_amppot(amp_pes)
+    Lforce = False
+    Lhack_force = False
+    if f_conv_list:
+        Lforce = True
+        Lhack_force = True
+
+    escale = 1                  # my_chem.ev2kj
+    y=[]            # QM  image energy
+    y_bar=[]        # AMP image energy
+    yf3d=[]         # QM  force in 3D
+    yf3d_bar=[]     # AMP force in 3D
+    ### as for all the same molecule
+    ### control display unit: E(ev) per atom(amp), mol, system(all the atoms in image)
+    natom = len(images[0]) # Atoms == image, len(Atoms) == number of Atom
+    print(f"Lforce = {Lforce}, {Lhack_force}")
+    for i, image in enumerate(images):
+        ### get QM-pot
+        y.append(image.get_potential_energy()/natom*na_in_mol)
+        ### get QM-forces in a image
+        if Lforce:
+            y_forces = image.get_forces()       # 2D list
+            yf3d.append(y_forces)               # 3D list 
+        ### get AMP-pot
+        image.set_calculator(calc)
+        y_bar.append(image.get_potential_energy()/natom*na_in_mol)
+        ### get AMP-forces
+        if Lforce:
+            ybar_forces = image.get_forces()    # 2D
+            yf3d_bar.append(ybar_forces)        # 3D
+    ### write energy (all images): scale np.square(meV)
+    e_rmse, e_maxres = amp_util.write_energy(amp_ini.ampout_te_e_chk, y, y_bar, scale=np.power(10,3))
+    if Lforce:
+        ### write force file of averate and of each image if fpre
+        f_rmse, f_maxres = amp_util.stat_forces_filesum(yf3d, yf3d_bar,fpre="test_force_img")
+        ###### cal Score
+        e_aim   = 0.0005
+        f_aim   = 0.1       # 0.1 eV/A
+        f2_aim  = 0.3       # 3 sigma
+        ### higher score is better 
+        score = amp_util.get_score(f_rmse, f_maxres, rmse_target=f_aim, maxres_target=f2_aim)
+        amp_util.write_result(outf, score, e_rmse, e_maxres, f_err=f_rmse, f_maxres=f_maxres)
+    else:
+        score = amp_util.get_score_e(e_rmse, e_maxres)
+        amp_util.write_result(outf, score, e_rmse, e_maxres)
+     
+    ### amp_ini.ampout_score = "ga_fit.txt" >> every test reports "score.dat"
+    ### get hl directory from images, amp.amp
+    hl = calc.model.parameters.hiddenlayers[images[0][0].symbol]  # hl is tuple, 
+    with open('score.dat', 'w') as f:
+        f.write(' '.join("%2s" % str(nodes) for nodes in hl))
+        f.write(f" {score:10.5f}\n")
+    if Lga:
+        os.system(f"cat {'score.dat'} >> ../{amp_ini.ampout_onegeneration_fitness}")  # GA checks this file
+    
+    ### this runs only in master(login) node
+    if Lgraph:
+        #modulename='myplot2D'   ### FOR MLET
+        #if modulename not in sys.modules:
+        #    import myplot2D
+        #e_rmse, e_maxres = myplot2D.draw_amp_twinx(y, y_bar, title, suptitle, natom=natom, Ltwinx=Ltwinx,Ldiff=True)
+        e_rmse, e_maxres = draw_amp_twinx(y, y_bar, title, suptitle, natom=natom, Ltwinx=None,Ldiff=True)
+    return 0
+
 ### Amp job 3: MD
 def amp_md(atoms, nstep, dt, amp_pot):
     from ase import units
@@ -67,15 +134,13 @@ def amp_md(atoms, nstep, dt, amp_pot):
     f = open("md.ene", "w")
     f.write(f"{'time':^5s}{'Etot':^15s}{'Epot':^15s}{'Ekin':^10s}\n")
     print(f"   {'time':^5s}{'Etot':^15s}{'Epot':^15s}{'Ekin':^10s}")
-    dump_freq = 50
-    nstep = nstep/dump_freq
-    for step in range(int(nstep)):
+    for step in range(nstep):
         pot = atoms.get_potential_energy()  # 
         kin = atoms.get_kinetic_energy()
         tot = pot + kin
         f.write(f"{step:5d}{tot:15.4f}{pot:15.4f}{kin:10.4f}\n")
         print(f"{step:5d}{tot:15.4f}{pot:15.4f}{kin:10.4f}")
-        dyn.run(dump_freq)
+        dyn.run(2)
         traj.write(atoms)                   # write kinetic energy, but pot is not seen in ase
     f.close()        
 
@@ -140,7 +205,7 @@ def main():
     md_group = parser.add_argument_group(title='MD')
     md_group.add_argument('-p', '--pot', help="input amp potential")
     md_group.add_argument('-i','--index', default=0, help='select start configuration from input file')
-    md_group.add_argument('-ns','--nstep', default=1000, type=int, help='number of step with dt')
+    md_group.add_argument('-ns','--nstep', default=100, type=int, help='number of step with dt')
     md_group.add_argument('-dt','--dt', default=1.0, type=float, help='time interval in fs')
 
     args = parser.parse_args()
