@@ -11,24 +11,21 @@ from amp_ini import ampdb
 
 q_list=[]
 vas_default=['CHG','CHGCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR','XDATCAR']
-def dir_clean(d,works,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, default):
+def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, default):
 
-    pwd = os.getcwd()
-    if not d:
-        d = pwd
-    print(f"{d} directory in {whereami()}")
+    print(f"{pwd} directory in {whereami()}")
     matches=[]
     f_list_all=[]
     for work in works:
         if work == None:
             if prefix:
-                f_list=get_files_prefix(prefix, d)
+                f_list=get_files_prefix(prefix, pwd)
             if suffix:
-                f_list=get_files_suffix(suffix, d)
+                f_list=get_files_suffix(suffix, pwd)
             if matches:
-                f_list=get_files_match(matches, d,Lshowmatch)
+                f_list=get_files_match(matches, pwd ,Lshowmatch)
             if exclude:
-                f_list=get_files_exclude(exclude, d)
+                f_list=get_files_exclude(exclude, pwd)
             if f_list and excl_fnames:
                 for f in excl_fnames:
                     if f in f_list:
@@ -39,7 +36,7 @@ def dir_clean(d,works,linux_job,prefix, suffix, matches, exclude,excl_fnames,new
             if default:
                 f_list=vas_default
             else:
-                f_list=os.listdir(d)
+                f_list=os.listdir(pwd)
                 print(f_list)
                 if excl_fnames: 
                     for efile in excl_fnames: # intactable list outside
@@ -53,31 +50,36 @@ def dir_clean(d,works,linux_job,prefix, suffix, matches, exclude,excl_fnames,new
             print(f_list)
             f_list_all.extend(f_list)
         elif work == 'nc':
-            f_list=os.listdir(d)
+            f_list=os.listdir(pwd)
             excl_fnames=['test_HER_args.py','test_HER.py','slurm_sbatch.sh','slurm_sbatch.sh_NanoCore']
             
         elif work == 'pbs':
             #matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI', 'sge']
             matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
-            f_list = get_files_match(matches, d, Lshow=Lshowmatch)
+            f_list = get_files_match(matches, pwd, Lshow=Lshowmatch)
             f_list_all.extend(f_list)
         elif work == 'amp':
-            if linux_job == 'ln':
-                for ampdir in ampdb:
-                    if os.path.islink(ampdir):
-                        f_list_all.append(ampdir)
-            else:
-                fmatches=['amp','pdf','dat', 'ga', 'GA' ]
-                ### if Lall_rm: remove directory also
-                f_list = get_files_match(fmatches, d, Lshow=Lshowmatch)
+            if subwork == 'ini':
+                fsuffix = ['ampdb', 'amp-log.txt']
+                f_list = get_files_suffix(fsuffix, pwd, Lshow=Lshowmatch, Ldir=True)
                 f_list_all.extend(f_list)
-                #dmatches=['ch']
-                #f_list = get_files_match(dmatches, d, Lshowmatch, Ldir=Lall_rm)
-                #f_list_all.extend(f_list)
+            else:
+                if linux_job == 'ln':
+                    for ampdir in ampdb:
+                        if os.path.islink(ampdir):
+                            f_list_all.append(ampdir)
+                else:
+                    fmatches=['amp','pdf','dat', 'ga', 'GA' ]
+                    ### if Lall_rm: remove directory also
+                    #dmatches=['ch']
+                    #f_list = get_files_match(dmatches, pwd, Lshowmatch, Ldir=Lall_rm)
+                    #f_list_all.extend(f_list)
+                    f_list = get_files_match(fmatches, pwd, Lshow=Lshowmatch)
+                    f_list_all.extend(f_list)
                 
         elif work == 'lmp':
             matches=['trj', 'log']
-            f_list = get_files_match(matches, d, Lshowmatch)
+            f_list = get_files_match(matches, pwd, Lshowmatch)
 
     ### Make directory for 'cp', 'mv'        
     if linux_job == 'mv' or linux_job == 'cp':
@@ -129,8 +131,9 @@ def dir_clean(d,works,linux_job,prefix, suffix, matches, exclude,excl_fnames,new
 
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
-    parser.add_argument('dir1', default=os.getcwd(), help='input one directory')
+    parser.add_argument('dir1', nargs='?', default=os.getcwd(), help='input one directory')
     parser.add_argument('-w', '--works', nargs='+', choices=['qchem','amp','vasp','pbs','lmp','nc'],help='remove depending on job')
+    parser.add_argument('-sw', '--subwork', choices=['ini','ga'], default='ini', help='subwork condition for works')
     parser.add_argument('-j', '--job', default='rm', choices=['rm','mv','cp','ln'], help='how to treat files [rm|cp|mv]')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     parser.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')
@@ -152,7 +155,7 @@ def main():
         args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR','CONTCAR']
     #if args.work == 'amp' and not args.excluded_files:
     #    args.excluded
-    dir_clean(args.dir1,args.works,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes, args.default)
+    dir_clean(args.dir1,args.works,args.subwork,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes, args.default)
     return 0
 
 if __name__ == '__main__':

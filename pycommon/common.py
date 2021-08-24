@@ -258,7 +258,7 @@ def find_file(dname, f_root):
             return f
     return None
 
-def get_files_suffix(suffixes, dname, Lshow, Ldir=False):
+def get_files_suffix(suffixes, dname, Lshow=False, Ldir=False):
     """
         receive list of suffixes & directory
         suffixes : list of suffix
@@ -266,8 +266,9 @@ def get_files_suffix(suffixes, dname, Lshow, Ldir=False):
     matched_files=[]
     for suff in suffixes:
         for fname in os.listdir(dname):
-            if fname.endswith(suff) and not os.path.isdir(fname):
-                matched_files.append(fname)
+            if fname.endswith(suff):
+                if Ldir or not os.path.isdir(fname):
+                    matched_files.append(fname)
     return matched_files                
 
 def get_files_match(matches, dname, Lshow, Ldir=False):

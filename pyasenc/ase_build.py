@@ -8,6 +8,8 @@ from ase.io.formats import read, iread, write, string2index
 from random import uniform
 import numpy as np
 
+metals = {'Pt': 'fcc'}
+
 def make_random_coordinates(natoms, alattice):
     atoms_coord=[]
     for i in range(natoms):
@@ -22,12 +24,13 @@ def make_ordered_coordinates(natoms, alattice):
     atoms_coord=[]
     nx = int(np.pow(natoms, 1/3))
 
-    for i in range(nx):
+    #for i in range(nx):
             
+def build_structure(name=None, dim=None, status=None, size=[1], atom=10, latt=50):
+    if len(size) == 1:
+        size0 = size[0]
+        size = (size0, size0, size0) 
 
-
-
-def build_structure(dim, status=None, name=None, natom=10, latt=50):
     if dim == 'mol':
         pass
     elif dim == '1d':
@@ -39,7 +42,11 @@ def build_structure(dim, status=None, name=None, natom=10, latt=50):
     elif dim == 'slab':
         pass
     elif dim == 'bulk':
-        if status == 'gas':
+        if name in metals.keys():
+            if metals[name] == 'fcc':
+                from ase.lattice.cubic import FaceCenteredCubic
+                image = FaceCenteredCubic(symbol=name, size=size, pbc=True)
+        elif status == 'gas':
             #coord = make_random_coordinates(natom, latt)
             coord = make_ordered_coordinates(natom, latt)
             #print(coord)
@@ -49,14 +56,17 @@ def build_structure(dim, status=None, name=None, natom=10, latt=50):
 
 def main():
     parser = argparse.ArgumentParser('ASE builder for structure')
-    parser.add_argument('module', default='build', choices=['build'], help='ASE jobs')
-    parser.add_argument('-d', '--dim', default='2d', choices=['mol', '1d', '2d', 'slab', 'bulk'], help='basic structure of system')
+    #parser.add_argument('module', default='build', choices=['build'], help='ASE jobs')
     parser.add_argument('-n', '--name', help='structure name')
+    parser.add_argument('-d', '--dim', default='2d', choices=['mol', '1d', '2d', 'slab', 'bulk'], help='basic structure of system')
+    parser.add_argument('-s', '--size', nargs='*', default=1, type=int, help='size of supercell')
     args = parser.parse_args()
 
-    if args.module == 'build':
-        image = build_structure(args.dim, args.name)
-        write('POSCAR', image, format='vasp')
+    #if args.module == 'build':
+    if args.name in metals.keys():
+        args.dim = 'bulk'
+    image = build_structure(args.name, args.dim, args.size)
+    write('POSCAR', image, format='vasp')
 
     return 0
 
