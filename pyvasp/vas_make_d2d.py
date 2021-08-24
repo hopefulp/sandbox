@@ -25,23 +25,23 @@ def make_vas_dir(old_dir, new_dir, job, incar, poscar, kpoints, potcar, Lvdw, Lq
     else:
         poscar = 'CONTCAR'
         kpoints = 'IBZKPT'
-        if job == 'zpe':
-            incarname = 'INCAR.zpe'
-        elif job == 'md':
-            incarname = 'INCAR.md'
+        incar = 'INCAR'
+        if job == 'zpe' or job == 'md' or job == 'chg':
+            incar = 'INCAR.' + job 
             
-        if os.path.isfile(incarname):
-            incar = incarname
+        if os.path.isfile(incar):
+            print(f"incar == {incar}, modify {incar}")
         else:
-            incar = 'INCAR'
-        print(f"incar == {incar}, modify {incar}")
+            print(f"No incar file {incar}")
+            sys.exit(0)
     ### Define POTCAR
     if potcar:
         print("generate POTCAR")
     else:
         potcar = "POTCAR"
     ### Extra files for Continous Job
-    if job=="hybrid" or job=="md" or job=="dos":
+    #if job=="hybrid" or job=="md" or job=="dos":
+    if job=="hybrid" or job=="md":
         files.append("WAVECAR")
     ### if vdW-DF
     if Lvdw:
@@ -138,7 +138,7 @@ def main():
     parser = argparse.ArgumentParser(description='make directory for continous job from CONTCAR POTCAR KPOINTS and new INCAR')
     parser.add_argument('odir', help='copy from old dir')
     parser.add_argument('ndir', help='mkdir and cp')
-    parser.add_argument('job', choices=["hybrid","dos","band","pchg","md","cont","ini","zpe","mol"], help='inquire for each file')
+    parser.add_argument('job', choices=["hybrid","dos","band","pchg","chg","md","cont","ini","zpe","mol"], help='inquire for each file')
     parser.add_argument('-s', '--poscar', help='use CONTCAR for 2nd job')
     parser.add_argument('-p', '--potcar', help='use the same POTCAR')
     parser.add_argument('-i', '--incar', default='INCAR', choices=["INCAR","incar.key"], help='first run make_incar.py then use incar.key')
