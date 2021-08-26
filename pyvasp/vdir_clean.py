@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/home/joonho/anaconda3/bin/python
 
 import argparse
 import os

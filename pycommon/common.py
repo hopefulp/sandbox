@@ -181,6 +181,29 @@ def get_files_type(ftype, dirname):
     print(matched_files)
     return matched_files            
 
+def get_dirs_prefix(wdir, prefix, excludes=None, Lshow=True, Ldir=True):
+    """
+        receive list of prefix & directory
+        prefixes: list of prefix
+    """
+    matched_dirs=[]
+    for fname in os.listdir(wdir):
+        # re.match finds only prefix
+        if os.path.isdir(fname) and re.match(prefix, fname):
+            if excludes:
+                tag=False
+                for ex in excludes:
+                    if re.search(ex, fname):
+                        tag=True
+                        break
+                if not tag :
+                    matched_dirs.append(fname)
+                    print (fname)
+            else:
+                matched_dirs.append(fname)
+                print (fname)
+    return matched_dirs
+
 def get_files_prefix(prefixes, dirname, Lshow, Ldir):
     """
         receive list of prefix & directory

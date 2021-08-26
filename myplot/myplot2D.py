@@ -266,6 +266,56 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
         plt.savefig(figname, dpi=150)
     return 0
 
+def make_double(x, y):
+    xnew = []
+    ynew = []
+    line_pairs=[]
+    for i, (x1, y1) in enumerate(zip(x, y)):
+        xnew.append(x1)
+        xnew.append(x1)
+        ynew.append(y1)
+        ynew.append(y1)
+        if y1 is not None:
+            line_pairs.append([[2*i, 2*i+1],[y1,y1]])
+    return xnew, np.array(ynew), line_pairs
+
+
+def mplot_levels(x, ys, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, Colors=None):
+    '''
+    plot table 
+    x   from 1st column
+    y   other columns [0,1,2...] in  [[column],[size],...[size]]
+    '''
+    fig, ax = common_figure()
+    ys = np.array(ys)
+    if len(x) != ys.shape[1]:
+        print(f"error in shape: x {len(x)}, ys.shape {ys.shape}")
+    
+    plt.title(title)
+    if xlabel:
+        plt.xlabel(xlabel, fontsize=25)
+    plt.ylabel(ylabel, fontsize=25)
+    
+    ### make levels: x=list, ys=array
+    for i, y in enumerate(ys):
+        xd, yd, linepair = make_double(x, y)
+        print(f"Double: xd {xd} yd {yd}")
+        xs = np.arange(len(xd))
+        print(f"{np.max(xs)}")
+        series = yd.astype(np.double)
+        mask = np.isfinite(series)
+        plt.plot(xs[mask], series[mask], 'k--', label=legend[i])
+        ### overdraw thick level
+        for xl, yl in linepair: 
+            plt.plot(xl,yl, 'k-', lw=5 )
+    #ax.yaxis.set_major_locator(ticker.MultipleLocator())
+    #ax.set_xlim(-0.5, np.max(xs)+0.5)
+    plt.show()
+    if Lsave:
+        plt.savefig(figname, dpi=150)
+    return 0
+
+
 def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, Colors=None):
     '''
     call with x=[] and y=[ [...

@@ -14,4 +14,5 @@ def get_atomlist4str(st):
             prech = list0.pop()
             newch = prech + ch
             list0.append(newch)
-    return list0            
+    return list0
+
