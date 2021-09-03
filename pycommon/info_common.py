@@ -28,13 +28,13 @@ comment.ini_pycommon=   "\texplanation of files in $SB/pycommon"
 
 
 
-dirjob.clean1d      =   "=== DIRECTORY JOB ==\
+dirjob.dir_clean      =   "=== DIRECTORY JOB ==\
                         \n\t\tclean one directory\
                         \n\t\t    by -prefix -suffix -middle match -e excluded -ef 'exclude these files' -work {qchem,ai,amp,pbs} -j rm[mv] -jd new_dir\
                         \n\t\tOptions::\
                         \n\t\t    -d input directory\
                         \n\t\t    -y execute command without asking: default-asking\
-                        \n\t\t    -w multiple jobs in [amp|pbs|vasp|lammps] add more in case extension\
+                        \n\t\t    -w multiple jobs in [amp|pbs|slurm|vasp|lammps] add more in case extension\
                         \n\t\t    -sw subwork: amp-ini,ag\
                         \n\t\t    -j [rm,mv,cp,ln] default='rm'\
                         \n\t\t    -a: remove all such as 'rm -r'\
@@ -56,6 +56,9 @@ dirjob.clean_recur  = "clean one dir recursively\
                         "
 dirjob.cli_dir      =   "simple command inside directory\
                         \n\t\tdir1_cli.sh gitpush\
+                        "
+dirjob.git_push     =   "cli_dir.py gitpush was copied for only gitpush\
+                        \n\t\t run in git directory\
                         "
 dirjob.cli_dirs      =   "basic command line interface for all files in directory\
                         \n\t\tmodify script for all the files/selected files\

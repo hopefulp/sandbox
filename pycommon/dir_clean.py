@@ -58,6 +58,10 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
             matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
             f_list = get_files_match(matches, pwd, Lshow=Lshowmatch)
             f_list_all.extend(f_list)
+        elif work == 'slurm':
+            matches=['\.X\d', 'slurm-\d+\.out']
+            f_list = get_files_match(matches, pwd, Lshow=Lshowmatch)
+            f_list_all.extend(f_list)
         elif work == 'amp':
             if subwork == 'ini':
                 fsuffix = ['ampdb', 'amp-log.txt']
@@ -132,7 +136,7 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
 def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
     parser.add_argument('dir1', nargs='?', default=os.getcwd(), help='input one directory')
-    parser.add_argument('-w', '--works', nargs='+', choices=['qchem','amp','vasp','pbs','lmp','nc'],help='remove depending on job')
+    parser.add_argument('-w', '--works', nargs='+', choices=['qchem','amp','vasp','pbs','slurm','lmp','nc'],help='remove depending on job')
     parser.add_argument('-sw', '--subwork', choices=['ini','ga'], default='ini', help='subwork condition for works')
     parser.add_argument('-j', '--job', default='rm', choices=['rm','mv','cp','ln'], help='how to treat files [rm|cp|mv]')
     parser.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')

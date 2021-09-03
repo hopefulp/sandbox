@@ -275,6 +275,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
                 dirname = qname
             print("=== Job submission")
             print(f"    (2) sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch.sh")
+            print(f"        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch_sim.sh")
             print("\toptions::")
             print("\t    -J for jobname and dirname")
             print("\t    -p for partition: X1-8, X2-12, X3-20 process")

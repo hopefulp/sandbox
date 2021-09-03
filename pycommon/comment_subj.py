@@ -385,6 +385,12 @@ vasp.scripts.make_2ndDir =  "\n\tMAKE VASP Dir from Dir\
                     \n\t\t cont: copy CONTCAR\
                     \n\t\t hybrid: copy WAVECAR etc\
                     " 
+vasp.scripts.zpe    = "\n\tContinue to ZPE\
+                    \n\t    vas_make_cont.py -p FPt -ex - zpe -j zpe\
+                    \n\t\t-p    for prefix make directory\
+                    \n\t\t-ex   exlcude for searching '-', 'zpe'\
+                    \n\t\t-j    zpe; now works for only zpe\
+                    "
 vasp.scripts.etc =  "\n\t ase_fconvert.py\
                     \n\t ase_vasp.py\
                     \n\t ase_zpe.py\
