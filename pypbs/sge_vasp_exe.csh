@@ -19,10 +19,10 @@ echo $dir > $queue_file
 echo start >> $queue_file
 date >> $queue_file
 
-if ( $vas == "gam" ) then
-    set EXE = /gpfs/home/joonho/vasp.5.4.4/bin/vasp_gam
-else
+if ( ! $?vas ) then
     set EXE = /gpfs/home/joonho/vasp.5.4.4/bin/vasp_std
+else
+    set EXE = /gpfs/home/joonho/vasp.5.4.4/bin/vasp_gam
 endif
 
 cd $dir
