@@ -7,9 +7,10 @@ import sys
 import numpy as np
 from myplot2D import mplot_levels
 from plot_job import get_jobtitle
-#from plot_job import Ni_6x
+from plot_job import Ni_6x
 from my_chem import *
 from common import *
+import parsing 
 
 
 def convert2value(st):
@@ -26,6 +27,7 @@ def convert2value(st):
     #print(f"return scale {val}")
     return val
 
+
 def get_yv_scale(yscale):
     ''' treat yscale, values as list '''
     values=[]
@@ -38,11 +40,22 @@ def get_title(name):
     title = fname_pre(name)
     return title.upper()
 
-def fwhite2table(f):
+"""
+    This works for one file with several y-values
+    if x is included in file, modify
+    if 1st line is label, modify
+"""    
+def draw_table(inf,fmt,icx,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,colors,Ltwinx,icy_right,ylabel_r):
+    '''
+    flist: file list
+    '''
+    ### modify get title
+    if not title:
+        title = inf.split('.')[0]
     
     x=[]
     y2d=[]
-    
+    ### scan file list
     with open(inf,"r") as f:
         lines=f.readlines()
         table_lines = []     # y as 2d [ [y1], [y2], ...] this needs to be transposed
@@ -57,43 +70,7 @@ def fwhite2table(f):
             #print(f"use icx {icx}")
             x.append(tabline.pop(0))
             y2d.append(tabline)
-    return x, y2d
 
-def fcsv2table(f):
-    fields=[]
-    rows=[]
-    with open(f, 'r') as f:
-        csvreader = csv.reader(f)
-        fields = next(csvreader)
-        for row in csvreader:
-            rows.append(row)
-        print("Total no. of rows: %d"%(csvreader.line_num))
-    print('Field names are:' + ', '.join(field for field in fields))
-
-    for row in rows:
-        for col in rows:
-            print("%10s"%col),
-        print("\n")
-
-    return fields, rows
-
-
-def draw_table(inf,fmt,icx,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,colors,Ltwinx,icy_right,ylabel_r):
-    '''
-    inf : table format
-    fmt : white space or csv
-    '''
-    ### modify get title
-    if not title:
-        title = inf.split('.')[0]
-    
-    ### scan file list
-
-    if fmt == 'white':
-        x, y2d = fwhite2table(f)
-    elif fmt == 'csv':
-        x, y2d = csv2table(f)
-    sys.exit(1)
     y2 = np.array(y2d).T
 
     print(f"size: x {len(x)}, y: {len(ylegend)}, shape of data {y2.shape}")

@@ -9,6 +9,7 @@ my_mpl  = MyClass('my_mpl')
 mplplot = MyClass('mplplot')
 musage  = MyClass('musage')
 amp     = MyClass('amp')
+table   = MyClass('table')
 
 my_mpl.ini = "initialize mpl in ~/.config/matplotlib/matplotlibrc \
                 \n\t\t:: check by ipython>>>matplotlib.matplotlib_fname()\
@@ -40,6 +41,15 @@ mplplot.mplot_pd2f  =   "Draw 2d plot using pandas by reading file\
                         \n\t    will be deprecated to use mplot_pdnf.py\
                         \n\tUsage:: mplot_pd2f.py 1-2filenames options\
                         "
+table.mplot_table   =   "Plot table: CSV from MS Excel\
+                        \n\t    import plot_level.mplot_level\
+                        "
+table.plot_level    =   "modules for table plot\
+                        \n\t    imported in mplot_table\
+                        \n\t    modified from mplot_f.py\
+                        "
+
+
 musage.qcmo="(qcmo) myplot.py -v -y -0.8058   -0.7866   -0.7860   -1.0080   -1.2482   -1.2539 -j qcmo -t \"CO2 charges\"\
             \n\t\t\t  myplot.py -f nbo-6f.dat -j qcmo -xt Model -ys -1 -yt \"Charge (e)\" -t \"CO2 charges\" "
 musage.eda="(eda) grep Polar *out | awk '{print $6}'\
