@@ -8,6 +8,10 @@ def get_atoms_poscar(line):
     return alist
 
 def fixedMD_POSCAR(poscar, atom, atoms=None):
+    '''
+    poscar  to be modified
+    atom    kind to be moved for zpe calculation
+    '''
     with open(poscar, 'r') as f:
         lines = f.readlines()
     with open('POSCAR', 'w') as f:

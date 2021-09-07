@@ -4,7 +4,7 @@ import argparse
 import os
 from common import get_dirs_prefix, yes_or_no
 from mod_vas    import fixedMD_POSCAR
-
+import sys
 
 def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np):
     #print(f"{exclude}")
@@ -16,11 +16,15 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np):
         for odir in dirs:
             ndir = odir + 'zpe'
             commands=[]
+            if os.path.isdir(ndir):
+                print(f"{ndir} for {odir} exists")
+                continue
             commands.append(f'mkdir {ndir}')
             commands.append(f'cp {odir}/POTCAR {ndir}/')
             commands.append(f'cp {odir}/KPOINTS {ndir}/')
             
             fixedMD_POSCAR(f"{odir}/CONTCAR", fixatom)
+            print(f"{odir}/CONTCAR was modified to POSCAR")
             commands.append(f'cp POSCAR {ndir}')
             
             ### make INCAR or use INCAR.zpe
@@ -28,8 +32,12 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np):
                 modify_INCAR(f"{odir}/INCAR", job)
                 commands.append( f'cp INCAR {ndir}')
             else:
-                commands.append(f"cp INCAR.{job} {ndir}/INCAR")
-                print(f"INCAR.{job} is copied")
+                if os.path.isfile(f"INCAR.{job}"):
+                    commands.append(f"cp INCAR.{job} {ndir}/INCAR")
+                else:
+                    print(f"INCAR.{job} doesnot exist, so STOP.")
+                    sys.exit(0)
+                print(f"INCAR.{job} will be copied")
             
             ### qsub
             commands.append(f"qsub -N {ndir} -pe numa {np} -v np={np} -v dir={ndir} -v vas=gam $SB/pypbs/sge_vasp_exe.csh")
