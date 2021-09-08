@@ -60,49 +60,81 @@ def make_vas_dir(old_dir, new_dir, job, incar, poscar, kpoints, potcar, Lvdw, Lq
         s = f"mkdir {new_dir}"
         os.system(s)
         print(f"directory {new_dir} was made")
-   
-   
-    ### CONTCAR
-    fo = old_dir +'/'+ poscar
-    if os.path.isfile(fo):
-        s = f"cp {fo} {new_dir}/POSCAR"
-        os.system(s)
-        print(f"{fo} will be copied to {new_dir}/POSCAR")
+    
+    if Lquestion:
+        ### Use the CONTCAR for POSCAR
+        q = 'will you use CONTCAR?'
+        if yes_or_no(q):
+            pass
+        elif yes_or_no('will you use POSCAR?'):
+            poscar='POSCAR'    
+            print("What else?")
+            sys.exit(0)
+        ### Use the same POTCAR
+        ### Use the same KPOINTS
+        q = 'will you use the same KPOINTS?'
+        if yes_or_no(q):
+            pass
+        else:
+            q = 'input nummber of kpoints: [gamma|3 digits]'
+            kp_in = get_answers(q)
+            if re.match("g", kp_in, re.IGNORECASE) :
+                method = "gamma"
+                kps = "1  1  1"
+            else:
+                lkp = kp_in.split()
+                if len(lkp) == 3:
+                    method = 'MH'
+                    kps = kp_in
+                    print('default is MH')
+                else:
+                    print("input error for KPOINTS")
+                    exit(11)
+            print(kps, method)
+            make_kpoints(kps, method)
+    ### This is running without -q            
     else:
-        print(f"There is not {fo}")
+        ### CONTCAR
+        fo = old_dir +'/'+ poscar
+        if os.path.isfile(fo):
+            s = f"cp {fo} {new_dir}/POSCAR"
+            os.system(s)
+            print(f"{fo} will be copied to {new_dir}/POSCAR")
+        else:
+            print(f"There is not {fo}")
 
-    ### POTCAR
-    fo = old_dir + '/'  + potcar
-    if os.path.isfile(fo):
-        s = f"cp {fo} {new_dir}/POTCAR"
-        os.system(s)
-        print(f"{fo} was be copied to {new_dir}/POTCAR")
-    else:
-        print(f"There is not {fo}")
-    ### KPOINTS
-    if kpoints == 'IBZKPT' or job == 'ini':
-        fo = old_dir + '/'  + kpoints
-    elif os.path.isfile(kpoints):
-        fo = kpoints
-    else:
-        fo = 'KPOINTS'
-    if os.path.isfile(fo):
-        s = f"cp {fo} {new_dir}/KPOINTS"
-        os.system(s)
-        print(f"{fo} was be copied to {new_dir}/KPOINTS")
-    else:
-        print("make KPOINTS file ")
-    ### INCAR :: copy INCAR or incar.key
-    ### INCAR is normally different job so read on the work directory
-    if job == 'ini':
-        fo = old_dir + '/'  + incar
-    elif os.path.isfile(incar) :
-        fo = incar
-    else:
-        print(f"There is not {fo}")
-    s = f"cp {fo} {new_dir}/INCAR"
-    os.system(s)
-    print(f"{fo} was  copied to {new_dir}/INCAR")
+        ### POTCAR
+        fo = old_dir + '/'  + potcar
+        if os.path.isfile(fo):
+            s = f"cp {fo} {new_dir}/POTCAR"
+            os.system(s)
+            print(f"{fo} was be copied to {new_dir}/POTCAR")
+        else:
+            print(f"There is not {fo}")
+        ### KPOINTS
+        if kpoints == 'IBZKPT' or job == 'ini':
+            fo = old_dir + '/'  + kpoints
+        elif os.path.isfile(kpoints):
+            fo = kpoints
+        else:
+            fo = 'KPOINTS'
+        if os.path.isfile(fo):
+            s = f"cp {fo} {new_dir}/KPOINTS"
+            os.system(s)
+            print(f"{fo} was be copied to {new_dir}/KPOINTS")
+        else:
+            print("make KPOINTS file ")
+        ### INCAR :: copy INCAR or incar.key
+        ### INCAR is normally different job so read on the work directory
+        if job == 'ini':
+            fo = old_dir + '/'  + incar
+        elif os.path.isfile(incar) :
+            fo = incar
+            s = f"cp {incar} {new_dir}/INCAR"
+            os.system(s)
+            print(f"{incar} was  copied to {new_dir}/INCAR")
+        else:
+            print(f"There is not {incar}")
             
     if files:
         for f in files:

@@ -121,6 +121,7 @@ def poscar_rearrange(pos, atom_list, natom, atom_file, ftype, suff, rename):
         for i, line in enumerate(lines):
             if i == 0:
                 ### if the 0-th line is atom list, get atom list
+                if not 
                 if len(line.split()) >= 2:
                     alist_all = line.strip().split()
                     atoms = []

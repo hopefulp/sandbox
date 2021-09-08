@@ -1,0 +1,11 @@
+#!/bin/sh
+#PBS -V
+#PBS -A vasp
+#PBS -N FeORR     
+#PBS -q normal  
+#PBS -l select=10:ncpus=60:mpiprocs=60:ompthreads=1
+#PBS -l walltime=48:00:00
+
+cd $PBS_O_WORKDIR
+
+mpirun /home01/g129a30/bin/vasp_5.4.4_GRP7_NORMAL_20170903.x > stdout.txt

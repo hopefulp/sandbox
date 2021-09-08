@@ -25,7 +25,8 @@ date >> $log_file
 EXEC="/home01/x1813a01/vasp.5.4.4/bin/vasp"
 
 cd $log_dir/$wdir
-mpirun -np 64 $EXEC > $log_dir/$jobname.log
+#mpirun -np 64 $EXEC > $log_dir/$jobname.log
+mpirun  $EXEC > $log_dir/$jobname.log
 mv $log_dir/$jobname.log $log_dir/$jobname.out 
 echo end >> $log_file
 date >> $log_file
