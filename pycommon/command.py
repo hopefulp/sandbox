@@ -226,9 +226,6 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
 
     ### run VASP in SLURM
     elif job == 'slurm':
-        if nnode == 1:
-            nproc = nXn[partition]
-            print(f"nproc = {nproc}")
         if not nproc:
             nproc = nnode * nXn[partition]
             print(f" nproc {nproc} = nnode {nnode} * nproc/node_partition {nXn[partition]}")    
