@@ -267,7 +267,7 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     return 0
 
 
-def mplot_level(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, Colors=None):
+def mplot_levels(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, Colors=None):
     '''
     call with x=[] and y=[ [...
     x:: [] or [size]
@@ -303,23 +303,6 @@ def mplot_level(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,
     return 0
 
 
-
-
-
-
-def mplot_nvector_v1(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None, Ltwinx=None):
-    '''
-    call with x=[] and y=[ [...
-    x:: [] or [size]
-    y:: [size] or [[multi],[multi],...size]
-    '''
-    if Ltwinx:
-        ax2 = ax.twinx()
-        ax2.set_ylabel("Kinetic energy(kJ/mol)")
-        ax2.tick_params(axis='y', labelcolor='g', labelsize=10)
-
-    ys = np.array(y)
-    if len(x) != 0:
 
 def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, Colors=None):
     '''

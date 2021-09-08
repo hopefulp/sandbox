@@ -390,6 +390,11 @@ vasp.scripts.zpe    = "\n\tContinue to ZPE\
                     \n\t\t-p    for prefix make directory\
                     \n\t\t-ex   exlcude for searching '-', 'zpe'\
                     \n\t\t-j    zpe; now works for only zpe\
+                    \n\t    Analysis:\
+                    \n\t\tzpe_ts_outcar.py dirname -na N ! Only zpe sum for 3*N modes\
+                    \n\t    Thermodynamics plot\
+                    \n\t\tmplot_table.py FullC54-Ptcp.csv csv -t 'H2 diffusion on Ct-Pt-c'\
+                    \n\t\t    positional: dirname format=['white(default)', 'csv']\
                     "
 vasp.scripts.etc =  "\n\t ase_fconvert.py\
                     \n\t ase_vasp.py\

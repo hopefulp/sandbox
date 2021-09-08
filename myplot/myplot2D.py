@@ -296,6 +296,7 @@ def mplot_levels(x, ys, title=None, xlabel=None, ylabel=None, legend=None,Lsave=
         plt.xlabel(xlabel, fontsize=25)
     plt.ylabel(ylabel, fontsize=25)
     
+    colors = ["red", "blue", "green", "orange", "purple"]
     ### make levels: x=list, ys=array
     for i, y in enumerate(ys):
         xd, yd, linepair = make_double(x, y)
@@ -304,12 +305,13 @@ def mplot_levels(x, ys, title=None, xlabel=None, ylabel=None, legend=None,Lsave=
         print(f"{np.max(xs)}")
         series = yd.astype(np.double)
         mask = np.isfinite(series)
-        plt.plot(xs[mask], series[mask], 'k--', label=legend[i])
+        plt.plot(xs[mask], series[mask], '--', color=colors[i], label=legend[i])
         ### overdraw thick level
         for xl, yl in linepair: 
-            plt.plot(xl,yl, 'k-', lw=5 )
+            plt.plot(xl,yl, '-', color=colors[i], lw=5 )
     #ax.yaxis.set_major_locator(ticker.MultipleLocator())
     #ax.set_xlim(-0.5, np.max(xs)+0.5)
+    plt.legend(loc=1)
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)
