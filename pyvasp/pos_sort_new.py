@@ -94,15 +94,8 @@ def cal_num_atoms(alist, nalist):
 
 ### Just read poscar and rearrange: atom_list, natom || atom_file [ftype]
 def poscar_rearrange(pos, atom_list, natom, atom_file, ftype, suff, rename):
-    ### atom list is given repetively
-    if atom_list:
-        if natom == len(atom_list):
-            atomlist=atom_list
-        ### make full atomlist
-        else:
-            atomlist=expand_atoms(atom_list, natom)
     ### get atom list from bgf file 
-    elif atom_file:
+    if atom_file:
         if ftype == None:
             ftype = common.f_ext(atom_file)
         atomlist = get_atomlist4file(atom_file, ftype)
@@ -121,15 +114,18 @@ def poscar_rearrange(pos, atom_list, natom, atom_file, ftype, suff, rename):
         for i, line in enumerate(lines):
             if i == 0:
                 ### if the 0-th line is atom list, get atom list
-                if len(line.split()) >= 2:
-                    alist_all = line.strip().split()
-                    atoms = []
-                    for atom in alist_all:
-                        if atom not in atoms:
-                            atoms.append(atom)
-                el_st = ''.join(atoms)
-                s = el_st + "   from " + pos + "\n"
-                #print(s)
+                if not atom_list: 
+                    if len(line.split()) >= 2:
+                        alist_all = line.strip().split()
+                        atoms = []
+                        for atom in alist_all:
+                            if atom not in atoms:
+                                atoms.append(atom)
+                    el_st = ''.join(atoms)
+                    s = el_st + "   from " + pos + "\n"
+                    #print(s)
+                else:
+                    s = 'atomlist from outside'
                 outf.write(s)               # write() doesnot make "\n"
             ### copy cell parameters
             elif i < 5:
@@ -137,12 +133,8 @@ def poscar_rearrange(pos, atom_list, natom, atom_file, ftype, suff, rename):
             ### filter unique atom species in the order in POSCAR
             elif i == 5 and not any(s.isdigit() for s in line) :
                 ### keep atom list with index
-                atom_all = line.strip().split()
-                atoms = []
-                for atom in atom_all:
-                    if atom not in atoms:
-                        atoms.append(atom)
-                s = "  " + "  ".join(atoms) + "\n"
+                atoms_all = line.strip().split()
+                s = "  " + "  ".join(atom_list) + "\n"
                 outf.write(s)
             ### calculate sum of atom-kinds
             elif i == 6 and any(d.isdigit() for d in line):

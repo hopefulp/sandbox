@@ -57,6 +57,11 @@ make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
 make.vas_make_incar ="\n\t    If not 'incar.key', make it, check it and modify it before run this again\
                     \n\t    based on 'incar.key', make INCAR\
                     "
+make.vas_make_cont = "old_dir new_dir job\
+                    \n\tchange of d2d to make_cont\
+                    \n\tzpe: after opt, calculage zpe\
+                    \n\tband: after LCHARG=.TRUE., calculate band structure\
+                    "
 run.amp_env_run         ="amp_run.py in (envs) anaconda\
                         \n\t\t   when envs is not (base), detect envs and import proper module\
                         "
