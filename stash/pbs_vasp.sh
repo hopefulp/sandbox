@@ -1,8 +1,10 @@
 #!/bin/sh
 #PBS -V
 #PBS -A vasp
+##PBS -N pe500
 #PBS -q normal
-#PBS -l select=10:ncpus=40:mpiprocs=20:ompthreads=1
+##PBS -l select=10:ncpus=34:mpiprocs=34:ompthreads=1
+#PBS -l select=10:ncpus=20:mpiprocs=20:ompthreads=1
 #PBS -l walltime=48:00:00
 
 if [ -z $PBS_JOBNAME ]; then

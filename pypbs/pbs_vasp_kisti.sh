@@ -1,12 +1,13 @@
 #!/bin/sh
 #PBS -V
 #PBS -A vasp
+##PBS -N pe500
 #PBS -q normal
-#PBS -l select=10:ncpus=40:mpiprocs=20:ompthreads=1
+#PBS -l select=10:ncpus=64:mpiprocs=64:ompthreads=1
 #PBS -l walltime=48:00:00
 
 if [ -z $PBS_JOBNAME ]; then
-    echo "Usage:: qsub -N dirname $SB/pypbs/pbs_vasp.sh"
+    echo "Usage:: qsub -N dirname $SB/pypbs/pbs_vasp.py"
     exit 1
 fi
 
@@ -22,13 +23,11 @@ echo start >> $log_file
 date >> $log_file
 
 #EXEC="/home01/g129a89/vasp.5.4.4/bin/vasp"
-EXEC="/home01/x2232a02/bin/vasp_5.4.4_GRP7_NORMAL_20170903.x"
+
 cd $log_dir/$wdir
-
 mpirun $EXEC > $log_dir/$jobname.log
-
+#mpirun -np 640 $EXEC > $log_dir/$jobname.log
 mv $log_dir/$jobname.log $log_dir/$jobname.out 
-
 echo end >> $log_file
 date >> $log_file
 
