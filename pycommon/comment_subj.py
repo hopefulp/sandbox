@@ -411,6 +411,9 @@ vasp.postproc.p4vasp = "\n    == VASP Post Processig ==\
 vasp.postproc.vaspkit = "\n\t = VASP KIT\
                     \n\t    vaspkit \
                     "
+vasp.server         = "How to run VASP in each server\
+                    \n\tUSE: showall.py -j server -k kisti"
+
 qchem.server.mlet   = "=== Q-Chem ===\
                     \n    SERVER: \
                     \n\tMLET::   \
