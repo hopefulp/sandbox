@@ -73,7 +73,7 @@ def get_incar(ifile):
     return 0
 
 
-def make_vasp_dir(aposcar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub, directory, iofile, atoms):
+def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub, dirname, iofile, atoms):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -82,21 +82,24 @@ def make_vasp_dir(aposcar, apotcar, kpoints, incar, allprepared, Lquestion, kpsu
     ### Now this is running
     if Lquestion:
         ### 1. get POSCAR: make dirname using poscar
-        if aposcar:
-            poscar = aposcar
+        if poscar:
+            pass
         else:
             q = 'will you make POSCAR? '
             if yes_or_no(q):
                 q = 'input file: '
                 poscar = get_answers(q)
         if 'poscar' in locals():
-            if not re.match("POSCAR", poscar):
-                 dirname = poscar
-                 poscar = "POSCAR." + poscar
-            else:
-                ### obtain dirname from POSCAR.dir
-                dirname = poscar[7:]
-                get_poscar(poscar)      # cp poscar POSCAR
+            ### cp input poscar to 'POSCAR'
+            get_poscar(poscar)
+            if not dirname:
+                if re.match("POSCAR", poscar):
+                    ### obtain dirname from POSCAR.dir
+                    dirname = poscar[7:]
+                else:
+                    if not dirname:
+                        dirname = poscar
+                     #poscar = "POSCAR." + poscar
         files2copy.append('POSCAR')
         ### 2. get POTCAR
         q = 'will you make POTCAR? '
@@ -145,15 +148,18 @@ def make_vasp_dir(aposcar, apotcar, kpoints, incar, allprepared, Lquestion, kpsu
         ### 5. make work_dir
         q = 'will you make dir? '
         if yes_or_no(q):
+            print(f"dirname {dirname}")
             if not "dirname" in locals():
                 q = 'input dirname: '
                 dirname = get_answers(q)
             if not os.path.isdir(dirname):
                 com1 = "mkdir " + dirname
+                print(com1)
                 os.system(com1)
-            for f in files2copy:
-                com2 = f"cp {f} " + dirname
-                os.system(com2)
+            
+        for f in files2copy:
+            com2 = f"cp {f} " + dirname
+            os.system(com2)
         ### 6. check dir
         os.chdir(dirname)
         if not os.path.isfile('POTCAR'):
@@ -195,16 +201,16 @@ def make_vasp_dir(aposcar, apotcar, kpoints, incar, allprepared, Lquestion, kpsu
             get_incar("incar.key")
                 
     ### 6. mkdir and cp POSCAR POTCAR KPOINTS INCAR
+    '''
     if directory:
         os.mkdir(directory)
         print("directory ./%s was made" % directory)
         shutil.copy('POSCAR', directory)
         shutil.copy('POTCAR', directory)
-        ehutil.copy('KPOINTS', directory)
+        shutil.copy('KPOINTS', directory)
         shutil.copy('INCAR', directory)
         print('POSCAR POTCAR KPOINTS INCAR were copied')
-        
-
+    '''
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
     #parser.add_argument('new_dir', help='mkdir and cp to new directory')

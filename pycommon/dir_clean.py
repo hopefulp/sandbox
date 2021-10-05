@@ -58,6 +58,7 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
             matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
             f_list = get_files_match(matches, pwd, Lshow=Lshowmatch)
             f_list_all.extend(f_list)
+            print(f'{f_list_all}')
         elif work == 'slurm':
             matches=['\.X\d', 'slurm-\d+\.out']
             f_list = get_files_match(matches, pwd, Lshow=Lshowmatch)

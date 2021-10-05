@@ -1,4 +1,12 @@
-from mplt_mo_ini import *
+#from mplt_mo_ini import *
+
+def print_dict(dic):
+    '''
+    print dictionary for each key, value pairs
+    '''
+    for k, v in dic.items():
+        print(f"{k:>10} {v:>10}")
+
 
 def lprint(obj):
     if type(obj) == dict:

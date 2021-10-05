@@ -22,6 +22,11 @@ ini_dvasp = '/tmp'
 
 TMmag = {'Li': 1, 'Ti': 2, 'V': 3, 'Cr': 4, 'Mn':5, 'Fe':4, 'Co':3, 'Ni':2, 'Cu':2} 
 TMUcorr = {'Fe': 1.8, 'Co': 2.1, 'Ni': 2.0, 'Pt':1.2}
+natom = 999
+incar_kw={  'ISTART': '0', 'ICHARG': '2', 'ISPIN': '1', 'MAGMOM': f'{natom} * 0',
+            'GGA'   : 'PE', 'PREC': 'Accurate', 'ALGO': 'Fast', 'NPAR': 4, 'LPLANE': '.TRUE.',
+            'ENCUT' : '400', 'NELMIN': '4', 'NELM' : '500', 'EDIFF': '1E-4', 'ISYM': '0', 'ADDGRID':'.TRUE.', 'LREAL':'Auto'
+            }
 
 
 def get_vasp_repository():
@@ -38,7 +43,7 @@ def get_vasp_repository():
     #(out, err) = proc.communicate()
     #print "program output:", out
     if hostname == 'chi' or hostname == 'tgm-master.hpc' or hostname == 'iron':
-        ini_dvasp = '/home/joonho/sandbox_gl/pyvasp/VaspINI'
+        ini_dvasp = '/home/joonho/sandbox_gl/pyvasp/ini'
     elif hostname == 'login':
         ini_dvasp = '/gpfs/home/joonho/sandboxg/pyvasp/VaspINI'
     elif hostname == 'login04':
