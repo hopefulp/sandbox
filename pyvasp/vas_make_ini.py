@@ -12,6 +12,7 @@ import re
 from  myvasp import *
 from common import *
 
+home = os.environ['HOME']
 pseudo_pot={'new':'Pot-new', 'potpaw-pbe-new':'Pot-new', 'old':'pot-old', 'potpaw-pbe-old':'pot-old'}
 global pwd, ini_dvasp
 
@@ -163,7 +164,9 @@ def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub
         ### 6. check dir
         os.chdir(dirname)
         if not os.path.isfile('POTCAR'):
-            os.system("genpotcar.py -pp pbe")
+            #os.system("genpotcar.py -pp pbe")
+            s = home + "/sandboxg/pyvasp/genpotcar.py -pp pbe"
+            os.system(s)
             print(f"in {dirname}")
         os.chdir(pwd)
     ### without -q            

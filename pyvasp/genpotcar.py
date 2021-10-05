@@ -12,7 +12,8 @@ Potential directory should be located. (listed below)
 import os, sys, argparse
 
 # Potential path
-sb="/home/joonho/sandboxg/"
+home = os.environ['HOME']
+sb=home + "/sandbox/"
 LDA_path  = sb + "pyvasp/vasppot/1.POTPAW.LDA.54.RECOMMEND"
 #PBE_path  = "/TGM/Apps/VASP/POTCAR/2.POTPAW.PBE.54.RECOMMEND"
 PBE_path  = sb + "pyvasp/vasppot/2.POTPAW.PBE.54.RECOMMEND"

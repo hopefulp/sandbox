@@ -32,11 +32,14 @@ def make_vas_dir(old_dir, new_dir, job, incar, poscar, kpoints, potcar, Lvdw, Lq
                 kpoints = 'KPOINTS.gam'
             elif job=='band':
                 kpoints = 'KPOINTS.band'
+            if not os.path.isfile(kpoints):
+                print(f"prepare {kpoints} file at pwd")
+                sys.exit(1)
         if os.path.isfile(incar):
             print(f"incar == {incar}, modify {incar}")
         else:
-            print(f"No incar file {incar}")
-            sys.exit(0)
+            print(f"prepare {incar} file at pwd")
+            sys.exit(2)
     ### Define POTCAR
     if potcar:
         print("generate POTCAR")

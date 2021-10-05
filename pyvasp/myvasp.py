@@ -46,8 +46,8 @@ def get_vasp_repository():
         ini_dvasp = '/home/joonho/sandbox_gl/pyvasp/ini'
     elif hostname == 'login':
         ini_dvasp = '/gpfs/home/joonho/sandboxg/pyvasp/VaspINI'
-    elif hostname == 'login04':
-        ini_dvasp = '/home01/x1813a01/sandboxg/pyvasp/VaspINI'
+    elif re.match('login0', hostname):
+        ini_dvasp = '/home01/x2232a02/sandboxg/pyvasp/ini'
     else:
         print(f'host is not recognized: exit in {whereami()}')
         sys.exit(1)
