@@ -11,8 +11,10 @@ import shutil
 import re
 from  myvasp import *
 from common import *
+from vas_qsub import qsub_command
 
 home = os.environ['HOME']
+hostname = get_hostname()
 pseudo_pot={'new':'Pot-new', 'potpaw-pbe-new':'Pot-new', 'old':'pot-old', 'potpaw-pbe-old':'pot-old'}
 global pwd, ini_dvasp
 
@@ -74,7 +76,7 @@ def get_incar(ifile):
     return 0
 
 
-def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub, dirname, iofile, atoms):
+def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub, dirname, iofile, atoms, Lrun, qopt):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -102,7 +104,8 @@ def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub
                         dirname = poscar
                      #poscar = "POSCAR." + poscar
         files2copy.append('POSCAR')
-        ### 2. get POTCAR
+        ### 2. get POTCAR will be made from scratch
+        """
         q = 'will you make POTCAR? '
         if allprepared:
             print(f"POTCAR will be made at {dirname} is not exist")
@@ -113,6 +116,7 @@ def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub
             atoms = get_answers(q).split()
             get_potcar(pot, atoms)
             files2copy.append('POTCAR')
+        """
         ### 3. get KPOINTS
         q = 'will you make KPOINTS?'
         if allprepared:
@@ -164,8 +168,11 @@ def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub
         ### 6. check dir
         os.chdir(dirname)
         if not os.path.isfile('POTCAR'):
-            #os.system("genpotcar.py -pp pbe")
-            s = home + "/sandboxg/pyvasp/genpotcar.py -pp pbe"
+            if hostname == 'kisti':
+                s = f"python {home}/sandboxg/pyvasp/genpotcar.py -pp pbe"
+            else:
+                #s = home + "/sandboxg/pyvasp/genpotcar.py -pp pbe"
+                s = "genpotcar.py -pp pbe"
             os.system(s)
             print(f"in {dirname}")
         os.chdir(pwd)
@@ -202,18 +209,15 @@ def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub
         if iofile:
             print("Used 'incar.key'")
             get_incar("incar.key")
-                
-    ### 6. mkdir and cp POSCAR POTCAR KPOINTS INCAR
-    '''
-    if directory:
-        os.mkdir(directory)
-        print("directory ./%s was made" % directory)
-        shutil.copy('POSCAR', directory)
-        shutil.copy('POTCAR', directory)
-        shutil.copy('KPOINTS', directory)
-        shutil.copy('INCAR', directory)
-        print('POSCAR POTCAR KPOINTS INCAR were copied')
-    '''
+    ##################################################
+    ### run ?
+    if Lrun:
+        s = qsub_command(dirname, qopt=qopt)
+        print(f"{s}")
+        os.system(s)
+        
+
+
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
     #parser.add_argument('new_dir', help='mkdir and cp to new directory')
@@ -228,9 +232,11 @@ def main():
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
     parser.add_argument('-d', '--directory', help='mkdir and cp')
     parser.add_argument('-al', '--all', action='store_true', help="skip if KPOINTS, POTCAR, INCAR were ready")
+    parser.add_argument('-o', '--qopt', action='store_true', help="use different qsub file in kisti")
+    parser.add_argument('-r', '--run', action='store_true', help="submit job")
     args = parser.parse_args()
 
-    make_vasp_dir(args.poscar, args.potcar, args.kpoints, args.incar, args.all, args.question, args.kpsub, args.directory, args.iofile, args.atoms)
+    make_vasp_dir(args.poscar, args.potcar, args.kpoints, args.incar, args.all, args.question, args.kpsub, args.directory, args.iofile, args.atoms, args.run, args.qopt)
     return 0
 
 if __name__ == '__main__':

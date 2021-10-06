@@ -28,29 +28,37 @@ incar_kw={  'ISTART': '0', 'ICHARG': '2', 'ISPIN': '1', 'MAGMOM': f'{natom} * 0'
             'ENCUT' : '400', 'NELMIN': '4', 'NELM' : '500', 'EDIFF': '1E-4', 'ISYM': '0', 'ADDGRID':'.TRUE.', 'LREAL':'Auto'
             }
 
+def get_hostname():
+    
+    hostname = os.popen('hostname').read().rstrip()
+
+    if hostname == 'login':
+        hname = 'mlet'
+    elif re.match('login0', hostname):
+        hname = 'kisti'
+    elif hostname == 'tgm-master':
+        hname = 'pt'
+    else:
+        hname = hostname
+    return hname    
 
 def get_vasp_repository():
     """ 
         my vasp repository for POTCAR & KPOTINS 
     """
     global ini_dvasp
-    hostname = os.popen('hostname').read().rstrip()
-    #print 'hostname is', hostname
 
     ### subprocess is not working
     #hostname = subprocess.popen('hostname', stdout=subprocess.PIPE, shell=True)
     #proc = subprocess.Popen(["cat", "/etc/services"], stdout=subprocess.PIPE, shell=True)
     #(out, err) = proc.communicate()
     #print "program output:", out
-    if hostname == 'chi' or hostname == 'tgm-master.hpc' or hostname == 'iron':
-        ini_dvasp = '/home/joonho/sandbox_gl/pyvasp/ini'
-    elif hostname == 'login':
-        ini_dvasp = '/gpfs/home/joonho/sandboxg/pyvasp/VaspINI'
-    elif re.match('login0', hostname):
+    hostname = get_hostname()
+    #if hostname == 'chi' or hostname == 'pt' or hostname == 'iron' or hostname == 'mlet':
+    if hostname == 'kisti':
         ini_dvasp = '/home01/x2232a02/sandboxg/pyvasp/ini'
     else:
-        print(f'host is not recognized: exit in {whereami()}')
-        sys.exit(1)
+        ini_dvasp = '/home/joonho/sandbox_gl/pyvasp/ini'
 
     print("vasp repository is ", ini_dvasp, ' in system ', hostname)
     if not os.access(ini_dvasp, os.F_OK):
