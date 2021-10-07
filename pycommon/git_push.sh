@@ -4,7 +4,7 @@ SB=/gpfs/home/joonho/sandboxg
 
 message="more in server"
 
-arg1=$1{:-$message}
+arg1=${1:-$message}
 
 echo "git add . -A"
 git add . -A
