@@ -17,12 +17,12 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
     for odir in dirs:
         if not ndir :
             ndir = odir + job
-        commands=[]
+        com=[]
         if os.path.isdir(ndir):
-            print(f"{ndir} for {odir} exists")
+            print(f"{ndir} for {odir} exicoms")
             continue
         ### 0: make a new dir
-        commands.append(f'mkdir {ndir}')
+        com.append(f'mkdir {ndir}')
         ### 1: POSCAR
         if job == 'zpe':
             fixedMD_POSCAR(f"{odir}/CONTCAR", fixatom)
@@ -31,10 +31,10 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
         else:
             poscar = odir + '/CONTCAR'
             print(f"{odir}/CONTCAR will be copied")
-        commands.append(f'cp {poscar} {ndir}/POSCAR')
+        com.append(f'cp {poscar} {ndir}/POSCAR')
         ### 2: POTCAR
         potcar = odir + '/POTCAR'
-        commands.append(f'cp {potcar} {ndir}/POTCAR')
+        com.append(f'cp {potcar} {ndir}/POTCAR')
         print(f"{potcar} was copied")
         ### 3: KPOINTS
         if job == 'zpe':
@@ -44,7 +44,7 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
                 kpoints = 'KPOINTS.'+job
             elif os.path.isfile('KPOINTS'):
                 kpoints = 'KPOINTS'
-        commands.append(f'cp {kpoints} {ndir}/KPOINTS')
+        com.append(f'cp {kpoints} {ndir}/KPOINTS')
         print(f"{kpoints} was used")
         ### 4: INCAR
         if job == 'zpe':
@@ -56,17 +56,25 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
                 incar = 'INCAR.' + job
             elif os.path.isfile('INCAR'):
                 incar = 'INCAR'
-        commands.append(f"cp {incar} {ndir}/INCAR")
+        com.append(f"cp {incar} {ndir}/INCAR")
         print(f"{incar} was used")
-        
+
+        ### make directory and copy
+        for st in com:
+            os.system(st)
+
+        ### 5: More Extra files
+        if job == 'band':
+            os.chdir(ndir)
+            s = f"ln -s ../{odir}/CHGCAR ."
+            os.system(s)
+            print(f"CHGCAR is linked to {ndir}")
+
         ### qsub depends on server
         s = qsub_command(ndir, np)
-        commands.append(s)
-        for command in commands:
-            print(command)
+        print(s)
         if Lrun or yes_or_no("Will you run"):
-            for command in commands:
-                os.system(command)
+            os.system(s)
 
 
 
@@ -76,7 +84,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='remove files except initial files')
     parser.add_argument('-j', '--job', choices=["hybrid","dos","band","pchg","chg","md","cont","ini","zpe","mol"], help='inquire for each file')
-    parser.add_argument('-d', '--dirs', nargs='*', help='select directories')
+    parser.add_argument('-d', '--dirs', nargs='+', help='select directories')
     parser.add_argument('-nd', '--newdir', help='select directories')
     parser.add_argument('-p', '--prefix', help='select directories using prefix')
     parser.add_argument('-ex', '--exclude', nargs='*', help='exclude if already exist')
