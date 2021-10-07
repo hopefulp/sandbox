@@ -69,19 +69,16 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
             s = f"ln -s ../{odir}/CHGCAR ."
             os.system(s)
             print(f"CHGCAR is linked to {ndir}")
-
+            os.chdir(pwd)
         ### qsub depends on server
         s = qsub_command(ndir, np)
         print(s)
         if Lrun or yes_or_no("Will you run"):
             os.system(s)
 
-
-
     return 0
 
 def main():
-
     parser = argparse.ArgumentParser(description='remove files except initial files')
     parser.add_argument('-j', '--job', choices=["hybrid","dos","band","pchg","chg","md","cont","ini","zpe","mol"], help='inquire for each file')
     parser.add_argument('-d', '--dirs', nargs='+', help='select directories')
