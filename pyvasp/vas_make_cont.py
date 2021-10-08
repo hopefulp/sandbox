@@ -24,10 +24,12 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
         ### 0: make a new dir
         com.append(f'mkdir {ndir}')
         ### 1: POSCAR
+        ### zpe: modify POSCAR
         if job == 'zpe':
             fixedMD_POSCAR(f"{odir}/CONTCAR", fixatom)
             print(f"{odir}/CONTCAR was modified to POSCAR")
             poscar = 'POSCAR'
+        ### else: just copy CONTCAR
         else:
             poscar = odir + '/CONTCAR'
             print(f"{odir}/CONTCAR will be copied")
@@ -37,7 +39,7 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
         com.append(f'cp {potcar} {ndir}/POTCAR')
         print(f"{potcar} was copied")
         ### 3: KPOINTS
-        if job == 'zpe':
+        if job == 'zpe' or job == 'wav':
             kpoints = odir + '/KPOINTS'
         else:
             if os.path.isfile(f'KPOINTS.{job}'):
@@ -80,7 +82,7 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
 
 def main():
     parser = argparse.ArgumentParser(description='remove files except initial files')
-    parser.add_argument('-j', '--job', choices=["hybrid","dos","band","pchg","chg","md","cont","ini","zpe","mol"], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=["dos","band","pchg","chg","md","cont","ini","zpe","mol","wav"], help='inquire for each file')
     parser.add_argument('-d', '--dirs', nargs='+', help='select directories')
     parser.add_argument('-nd', '--newdir', help='select directories')
     parser.add_argument('-p', '--prefix', help='select directories using prefix')
