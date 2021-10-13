@@ -11,7 +11,10 @@ import shutil
 import re
 from  myvasp import *
 from common import *
+from vas_qsub import qsub_command
 
+home = os.environ['HOME']
+hostname = get_hostname()
 pseudo_pot={'new':'Pot-new', 'potpaw-pbe-new':'Pot-new', 'old':'pot-old', 'potpaw-pbe-old':'pot-old'}
 global pwd, ini_dvasp
 
@@ -72,48 +75,39 @@ def get_incar(ifile):
 
     return 0
 
-def main():
+
+def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub, dirname, iofile, atoms, Lrun, qopt):
     global ini_dvasp, pwd
-    parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    #parser.add_argument('new_dir', help='mkdir and cp to new directory')
-    parser.add_argument('-q', '--question', action='store_false', help='inquire for each file')
-    parser.add_argument('-s', '--poscar', help='poscar is required')
-    parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
-    parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
-    parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz')
-    parser.add_argument('-l', '--ksub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
-
-    parser.add_argument('-i', '--incar', action='store_true',  help='first run make_incar.py then use incar.key')
-    parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
-    parser.add_argument('-d', '--directory', help='mkdir and cp')
-    parser.add_argument('-sk', '--skip', action='store_true', help="skip if KPOINTS, POTCAR, INCAR were ready")
-    args = parser.parse_args()
-
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
     pwd = os.getcwd()
     files2copy=[]
-    if args.question:
+    ### Now this is running
+    if Lquestion:
         ### 1. get POSCAR: make dirname using poscar
-        if args.poscar:
-            poscar = args.poscar
+        if poscar:
+            pass
         else:
             q = 'will you make POSCAR? '
             if yes_or_no(q):
                 q = 'input file: '
                 poscar = get_answers(q)
         if 'poscar' in locals():
-            if not re.match("POSCAR", poscar):
-                 dirname = poscar
-                 poscar = "POSCAR." + poscar
-            else:
-                ### obtain dirname from POSCAR.dir
-                dirname = poscar[7:]
-                get_poscar(poscar)      # cp poscar POSCAR
+            ### cp input poscar to 'POSCAR'
+            get_poscar(poscar)
+            if not dirname:
+                if re.match("POSCAR", poscar):
+                    ### obtain dirname from POSCAR.dir
+                    dirname = poscar[7:]
+                else:
+                    if not dirname:
+                        dirname = poscar
+                     #poscar = "POSCAR." + poscar
         files2copy.append('POSCAR')
-        ### 2. get POTCAR
+        ### 2. get POTCAR will be made from scratch
+        """
         q = 'will you make POTCAR? '
-        if args.skip:
+        if allprepared:
             print(f"POTCAR will be made at {dirname} is not exist")
         elif yes_or_no(q):
             q = 'input pseudo-potential type (new, old, gga, etc): '
@@ -122,9 +116,10 @@ def main():
             atoms = get_answers(q).split()
             get_potcar(pot, atoms)
             files2copy.append('POTCAR')
+        """
         ### 3. get KPOINTS
         q = 'will you make KPOINTS?'
-        if args.skip:
+        if allprepared:
             print(f"KPOINTS in cwd will be copied to {dirname}")
         elif yes_or_no(q):
             q = 'input nummber of kpoints: [gamma|3 digits such as "4 4 1" ]? '
@@ -146,77 +141,103 @@ def main():
         files2copy.append('KPOINTS')
         ### 4. get INCAR :: use make_incar.py
         q = 'will you make INCAR? '
-        if args.skip:
+        if allprepared:
             print(f"INCAR in cwd will be copied to {dirname}")
         elif yes_or_no(q):
             q = 'input incar-key file or use make_incar.py: '
             keyfile = get_answers(q)
             if not keyfile:
-                keyfile = args.iofile
+                keyfile = iofile
             get_incar(keyfile)
         files2copy.append('INCAR')
         ### 5. make work_dir
         q = 'will you make dir? '
         if yes_or_no(q):
+            print(f"dirname {dirname}")
             if not "dirname" in locals():
                 q = 'input dirname: '
                 dirname = get_answers(q)
             if not os.path.isdir(dirname):
                 com1 = "mkdir " + dirname
+                print(com1)
                 os.system(com1)
-            for f in files2copy:
-                com2 = f"cp {f} " + dirname
-                os.system(com2)
+            
+        for f in files2copy:
+            com2 = f"cp {f} " + dirname
+            os.system(com2)
         ### 6. check dir
         os.chdir(dirname)
         if not os.path.isfile('POTCAR'):
-            os.system("genpotcar.py -pp pbe")
+            if hostname == 'kisti':
+                s = f"python {home}/sandboxg/pyvasp/genpotcar.py -pp pbe"
+            else:
+                #s = home + "/sandboxg/pyvasp/genpotcar.py -pp pbe"
+                s = "genpotcar.py -pp pbe"
+            os.system(s)
             print(f"in {dirname}")
         os.chdir(pwd)
     ### without -q            
     else:
         ### 1. get POSCAR
         dirname = 'tmp_vasp'
-        if args.poscar:
-            get_poscar(args.poscar)
+        if aposcar:
+            get_poscar(aposcar)
         else:
             get_poscar("")
 
         ### 2. get POTCAR
-        if args.potcar:
-            if not args.atoms:
+        if apotcar:
+            if not atoms:
                 q = 'input atoms in the order of poscar: '
                 atoms = get_answers(q).split()
-                get_potcar(args.potcar, atoms)
+                get_potcar(apotcar, atoms)
             else:            
-                get_potcar(args.potcar, args.atoms)
+                get_potcar(apotcar, atoms)
         else:
-            if not args.atoms:
+            if not atoms:
                 print("Use -a atom list as minimum requirement")
             else:
-                get_potcar('new', args.atoms) 
+                get_potcar('new', atoms) 
             
         ### 3. get KPOINTS
-        if args.kpoints:
-            make_kpoints(args.kpoints, args.ksub)
+        if kpoints:
+            make_kpoints(kpoints, kpsub)
         else:
             print("KPOINTS will be made from gamma")
             make_kpoints("", 'gamma')
         ### 4. get INCAR :: use make_incar.py        
-        if args.iofile:
+        if iofile:
             print("Used 'incar.key'")
             get_incar("incar.key")
-                
-    ### 6. mkdir and cp POSCAR POTCAR KPOINTS INCAR
-    if args.directory:
-        os.mkdir(args.directory)
-        print("directory ./%s was made" % args.directory)
-        shutil.copy('POSCAR', args.directory)
-        shutil.copy('POTCAR', args.directory)
-        ehutil.copy('KPOINTS', args.directory)
-        shutil.copy('INCAR', args.directory)
-        print('POSCAR POTCAR KPOINTS INCAR were copied')
+    ##################################################
+    ### run ?
+    if Lrun:
+        s = qsub_command(dirname, qopt=qopt)
+        print(f"{s}")
+        os.system(s)
         
+
+
+def main():
+    parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
+    #parser.add_argument('new_dir', help='mkdir and cp to new directory')
+    parser.add_argument('-q', '--question', action='store_false', help='inquire for each file')
+    parser.add_argument('-s', '--poscar', help='poscar is required')
+    parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
+    parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
+    parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz')
+    parser.add_argument('-ks', '--kpsub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
+
+    parser.add_argument('-i', '--incar', action='store_true',  help='first run make_incar.py then use incar.key')
+    parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
+    parser.add_argument('-d', '--directory', help='mkdir and cp')
+    parser.add_argument('-al', '--all', action='store_true', help="skip if KPOINTS, POTCAR, INCAR were ready")
+    parser.add_argument('-o', '--qopt', action='store_true', help="use different qsub file in kisti")
+    parser.add_argument('-r', '--run', action='store_true', help="submit job")
+    args = parser.parse_args()
+
+    make_vasp_dir(args.poscar, args.potcar, args.kpoints, args.incar, args.all, args.question, args.kpsub, args.directory, args.iofile, args.atoms, args.run, args.qopt)
+    return 0
 
 if __name__ == '__main__':
     main()

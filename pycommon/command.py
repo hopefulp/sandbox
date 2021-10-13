@@ -226,9 +226,6 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
 
     ### run VASP in SLURM
     elif job == 'slurm':
-        if nnode == 1:
-            nproc = nXn[partition]
-            print(f"nproc = {nproc}")
         if not nproc:
             nproc = nnode * nXn[partition]
             print(f" nproc {nproc} = nnode {nnode} * nproc/node_partition {nXn[partition]}")    
@@ -340,7 +337,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
     parser.add_argument('job', choices=['slurm','sge','amp','qchem','ga','gpu'],  help="one of amp, qchem, mldyn for ML dyn")
-    parser.add_argument('-k', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('-j', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")
     parser.add_argument('-kv', '--keyvalues', nargs='*', help='change a keyword in print')
@@ -349,7 +346,7 @@ def main():
     parser.add_argument('-inf', '--infile', help='input file in case')
     parser.add_argument('-N', '--nnode', default=1, type=int, help='number of nodes: if needed')
     parser.add_argument('-n', '--nproc', type=int, help='number of process: if needed')
-    parser.add_argument('-p', '--partition', default=2, type=int, choices=[1,2,3,4,5], help='if needed, specify nodename')
+    parser.add_argument('-x', '--xpartition', default=3, type=int, choices=[1,2,3,4,5], help='if needed, specify nodename')
     parser.add_argument('-s', '--poscar', default='POSCAR.name', help='if needed, specify nodename')
     parser.add_argument('-id', '--idata', default=0, type=int, help='start index of data')
     parser.add_argument('-nd', '--ndata', default=100, type=int, help='amount of data')
@@ -370,7 +367,7 @@ def main():
     else:
         infile = args.infile
 
-    show_command(args.job,args.subjob,args.job_submit,args.qname,infile,args.keyvalues,args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.partition,args.poscar, args.hidden_layers, args.idata, args.ndata)
+    show_command(args.job,args.subjob,args.job_submit,args.qname,infile,args.keyvalues,args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.xpartition,args.poscar, args.hidden_layers, args.idata, args.ndata)
 
 if __name__ == "__main__":
     main()

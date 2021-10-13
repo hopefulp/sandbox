@@ -10,7 +10,9 @@ from common import *
 from amp_ini import ampdb
 
 q_list=[]
-vas_default=['CHG','CHGCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR','XDATCAR']
+vas_default=['CHG','CHGCAR','CONTCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR','XDATCAR']
+vas_ini=['POSCAR','KPOINTS','INCAR','POTCAR']
+
 def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, default):
 
     print(f"{pwd} directory in {whereami()}")
@@ -33,22 +35,17 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
         elif work == 'qchem':
             pass
         elif work == 'vasp':
-            if default:
-                f_list=vas_default
-            else:
-                f_list=os.listdir(pwd)
-                print(f_list)
-                if excl_fnames: 
-                    for efile in excl_fnames: # intactable list outside
-                        for f in f_list[:]:
-                        #if os.access(d+'/'+f, os.X_OK):
-                        #    excl_fnames.append(f)
-                            print(f"\nas for {f}", end=' ')
-                            if re.search(efile, f):
-                                print(f"{f} is removed in the remove-list", end=" ")
-                                f_list.remove(f)
-            print(f_list)
-            f_list_all.extend(f_list)
+            fkeep = vas_ini[:]
+            f_list=os.listdir(pwd)
+            print(f"total: {f_list}")
+            if excl_fnames: 
+                for efile in excl_fnames: # intactable list outside
+                    fkeep.append(efile)
+            for f in f_list:
+                if f not in fkeep:
+                    matches.append(f)
+            print(f"matches: {matches}")
+            f_list_all = matches
         elif work == 'nc':
             f_list=os.listdir(pwd)
             excl_fnames=['test_HER_args.py','test_HER.py','slurm_sbatch.sh','slurm_sbatch.sh_NanoCore']
@@ -58,6 +55,7 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
             matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
             f_list = get_files_match(matches, pwd, Lshow=Lshowmatch)
             f_list_all.extend(f_list)
+            print(f'{f_list_all}')
         elif work == 'slurm':
             matches=['\.X\d', 'slurm-\d+\.out']
             f_list = get_files_match(matches, pwd, Lshow=Lshowmatch)
@@ -155,8 +153,6 @@ def main():
         print("input -w|-p|-s|-m")
         print("use %s -h for help" % os.path.basename(__file__))
         sys.exit(0)
-    if 'vasp' in args.works and not args.excluded_files:
-        args.excluded_files=['POSCAR','POTCAR','KPOINTS','INCAR','CONTCAR']
     #if args.work == 'amp' and not args.excluded_files:
     #    args.excluded
     dir_clean(args.dir1,args.works,args.subwork,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes, args.default)

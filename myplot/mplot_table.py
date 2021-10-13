@@ -6,6 +6,7 @@ import re
 import sys
 import numpy as np
 from myplot2D import mplot_levels
+from myplot2D import mplot_nvector as mplot_2d
 #from plot_level import mplot_levels
 from plot_job import get_jobtitle
 #from plot_job import Ni_6x
@@ -40,7 +41,9 @@ def get_title(name):
     return title.upper()
 
 def fwhite2table(f):
-    
+    '''
+    convert white space to table
+    '''
     x=[]
     y2d=[]
     
@@ -61,6 +64,9 @@ def fwhite2table(f):
     return x, y2d
 
 def fcsv2table(f):
+    '''
+    convert csv to table
+    '''
     fields=[]
     rows=[]
     with open(f, 'r') as f:
@@ -79,7 +85,7 @@ def fcsv2table(f):
     return fields, rows
 
 
-def draw_table(inf,fmt,icx,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,colors,Ltwinx,icy_right,ylabel_r):
+def draw_table(inf,Llevel,icx,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,colors,Ltwinx,icy_right,ylabel_r):
     '''
     inf : table format
     fmt : white space or csv
@@ -87,7 +93,16 @@ def draw_table(inf,fmt,icx,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,c
     ### modify get title
     if not title:
         title = inf.split('.')[0]
-    
+    ### define file format
+    fnamelist = inf.split('.')
+    if len(fnamelist) == 2:
+        if fnamelist[1] == 'csv':
+            fmt = 'csv'
+        else:
+            fmt = 'white'
+    else:
+        print(f"can't find extension using single . in {inf}")
+        sys.exit(1)
     ### scan file list
 
     if fmt == 'white':
@@ -119,14 +134,17 @@ def draw_table(inf,fmt,icx,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,c
     print(f"x {x}, yplot {yplot}, legend {y_legend}")
     ### x, yplot, y_legend are lists
     ### x will be used for just len(x)
-    mplot_levels(x, yplot, title=title, xlabel=xlabel, ylabel=ylabel, legend=y_legend,Colors=colors)
+    if Llevel:
+        mplot_levels(x, yplot, title=title, xlabel=xlabel, ylabel=ylabel, legend=y_legend,Colors=colors)
+    else:
+        mplot_2d(x, yplot, title=title, xlabel=xlabel, ylabel=ylabel, legend=y_legend,Colors=colors)
     return 0
 
 def main():
     parser = argparse.ArgumentParser(description='Drawing files of table')
 
     parser.add_argument('inf', help='read table from file')
-    parser.add_argument('fmt', default='white', nargs='?', choices=['white', 'csv'], help='format of input file')
+    parser.add_argument('-l', '--level', action='store_true', help='turn on to draw energy levels')
     parser.add_argument('-icx', '--icolumn_x', type=int, default=0, help='column index of X')
     g_file=parser.add_argument_group('Files', description="get input files")
     g_file.add_argument('-icy', '--icolumn_y', type=int, help='column index of Y')
@@ -139,14 +157,14 @@ def main():
     parser.add_argument('-j', '--job', help='job of qcmo|ai|gromacs')
     parser.add_argument('-t', '--title', default='H2-diffusion on C54', help='title of figure would be filename')
     parser.add_argument('-xl', '--xlabel', default='Reaction Coordinate', help='X title, label in mpl')
-    parser.add_argument('-yl', '--ylabel', default='E(eV)', help='Y title, label in mpl')
+    parser.add_argument('-yl', '--ylabel', default='Eb(eV)', help='Y title, label in mpl')
     parser.add_argument('-yls', '--ylabels', nargs='*', help='Y labels for legend')
     parser.add_argument('-c', '--colors', nargs='*', help='Y label for legend')
     parser.add_argument('-s', '--save', action='store_true', help='Save figure')
     args = parser.parse_args()
 
     ### n columns in 1 file, twinx
-    draw_table(args.inf,args.fmt,args.icolumn_x,args.icolumn_y,args.job,args.title,args.xlabel,args.ylabel,args.ylabels,args.save,args.y_scale, args.colors, args.twinx, args.second_iy, args.second_yl)
+    draw_table(args.inf,args.level,args.icolumn_x,args.icolumn_y,args.job,args.title,args.xlabel,args.ylabel,args.ylabels,args.save,args.y_scale, args.colors, args.twinx, args.second_iy, args.second_yl)
     return 0
 
 if __name__=='__main__':

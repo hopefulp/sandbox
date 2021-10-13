@@ -76,6 +76,7 @@ def rearrange_coord_lines(lines, atom_names, natoms):
     return s
 
 def expand_atoms(atom_list, natom):
+    ''' make it fold for atoms '''
     atoms=[]
     times = natom / len(atom_list)
     atoms = atom_list * int(times)

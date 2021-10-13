@@ -14,6 +14,7 @@ pdir=$SLURM_SUBMIT_DIR
 jobname=$SLURM_JOB_NAME
 wdir=$pdir/$jobname
 partname=$SLURM_JOB_PARTITION
+nodelist=$SLURM_JOB_NODELIST
 
 logfile=${pdir}/${SLURM_JOB_ID}.${jobname}.${partname}
 outfile=$pdir/$jobname.log
@@ -21,6 +22,7 @@ date >> $logfile
 #echo "pdir $pdir, jobname $jobname, wdir $wdir" > $logfile
 echo "HOSTNAME    JOB_NAME   Nproc" >> $logfile
 echo "$partname  $jobname $SLURM_NTASKS " >> $logfile
+echo "NODELIST: $nodelist"
 cd $wdir
 
 ###### Modify INCAR
@@ -35,6 +37,19 @@ if [ -z "$npar" ]; then
 fi
 echo "npar = $npar" >> $logfile
 sed -i "s/.*NPAR.*/NPAR = $npar/" INCAR
+#npar=2
+hmem=0
+if [ $hmem -eq 1 ]; then
+    if [ $partname == 'X1' ]; then
+        nppn=2
+    elif [ $partname == 'X2' ]; then
+        nppn=2
+    else
+        nppn=4
+    fi
+    nproc=$(expr $SLURM_JOB_NUM_NODES \* $nppn )
+    echo "high memory = $hmem; nproc per node $nppn for total $nproc " >> $logfile
+fi
 ### change U-correction
 ucorr=0
 if [ $ucorr -eq 1 ]; then
@@ -50,7 +65,11 @@ fi
 if [ $partname == 'X1' ]; then
     mpirun -genv I_MPI_FABRICS "shm:ofa" -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
 else
-    mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+    if [ $hmem -eq 0 ]; then
+        mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+    else
+        mpirun -np $nproc  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+    fi
 fi
 date >> $logfile
 

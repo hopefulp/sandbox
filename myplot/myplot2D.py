@@ -293,10 +293,13 @@ def mplot_levels(x, ys, title=None, xlabel=None, ylabel=None, legend=None,Lsave=
     
     plt.title(title)
     if xlabel:
-        plt.xlabel(xlabel, fontsize=25)
-    plt.ylabel(ylabel, fontsize=25)
+        plt.xlabel(xlabel, fontsize=35)
+    plt.ylabel(ylabel, fontsize=35)
     
-    colors = ["red", "blue", "green", "orange", "purple"]
+    if not Colors:
+        colors = ["blue", "red", "green", "orange", "purple"]
+    else:
+        colors = Colors
     ### make levels: x=list, ys=array
     for i, y in enumerate(ys):
         xd, yd, linepair = make_double(x, y)
@@ -346,7 +349,7 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
         print(f"Error:: obscure in y-dim {ys.ndim}")
     ### ADD LEGEND
     #plt.legend(loc=2)                # locate after plot
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(100))
+    #ax.xaxis.set_major_locator(ticker.MultipleLocator(100))
     #ax.yaxis.set_major_locator(ticker.MultipleLocator())
     plt.show()
     if Lsave:

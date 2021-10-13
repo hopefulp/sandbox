@@ -32,16 +32,18 @@ dirjob.dir_clean      =   "=== DIRECTORY JOB ==\
                         \n\t\tclean one directory\
                         \n\t\t    by -prefix -suffix -middle match -e excluded -ef 'exclude these files' -work {qchem,ai,amp,pbs} -j rm[mv] -jd new_dir\
                         \n\t\tOptions::\
-                        \n\t\t    -d input directory\
+                        \n\t\t    -d input directory: default=pwd\
                         \n\t\t    -y execute command without asking: default-asking\
                         \n\t\t    -w multiple jobs in [amp|pbs|slurm|vasp|lammps] add more in case extension\
                         \n\t\t    -sw subwork: amp-ini,ag\
                         \n\t\t    -j [rm,mv,cp,ln] default='rm'\
                         \n\t\t    -a: remove all such as 'rm -r'\
+                        \n\t\t    -ef: excluded files\
                         \n\t\t\tln: in case the change of dirname, link files are broken\
                         \n\t\tUsage::\
-                        \n\t\t    clean1d.py [dir] -w amp -sw ini\
-                        \n\t\t    clean1d.py -d NN20 -w amp -j ln -y\
+                        \n\t\t    dir_clean.py [dir] -w amp -sw ini\
+                        \n\t\t    dir_clean.py -d NN20 -w amp -j ln -y\
+                        \n\t\t    dir_clean.py -w vasp -ef CHGCAR\
                         \n\t\t    (?) clean1d.py -s out -ef 6-CC-NiFe-A-relax.out 5-FePNP-CO2.out -j mv -jd j631gs_v3.2\
                         "
 dirjob.clean_dirs   =   "clean dirs:: same with 'clean1d.py'\

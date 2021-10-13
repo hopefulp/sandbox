@@ -393,8 +393,12 @@ vasp.scripts.zpe    = "\n\tContinue to ZPE\
                     \n\t    Analysis:\
                     \n\t\tzpe_ts_outcar.py dirname -na N ! Only zpe sum for 3*N modes\
                     \n\t    Thermodynamics plot\
-                    \n\t\tmplot_table.py FullC54-Ptcp.csv csv -t 'H2 diffusion on Ct-Pt-c'\
-                    \n\t\t    positional: dirname format=['white(default)', 'csv']\
+                    \n\t\tmplot_table.py FullC54-Ptcp.csv -l -t 'H2 diffusion on Ct-Pt-c'\
+                    \n\t\t    import myplot2D --> mplot_levels, mplot_nvector\
+                    \n\t\t    input file can deal with a.csv\
+                    \n\t\t    -l draws energy level by duplicating the energy\
+                    \n\t\t    Usage:\
+                    \n\t\t\tmplot_table.py EbPt.csv -xl 'Pt anchoring site'\
                     "
 vasp.scripts.etc =  "\n\t ase_fconvert.py\
                     \n\t ase_vasp.py\
@@ -407,6 +411,9 @@ vasp.postproc.p4vasp = "\n    == VASP Post Processig ==\
 vasp.postproc.vaspkit = "\n\t = VASP KIT\
                     \n\t    vaspkit \
                     "
+vasp.server         = "How to run VASP in each server\
+                    \n\tUSE: showall.py -j server -k kisti"
+
 qchem.server.mlet   = "=== Q-Chem ===\
                     \n    SERVER: \
                     \n\tMLET::   \
