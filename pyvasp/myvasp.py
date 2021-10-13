@@ -58,7 +58,7 @@ def get_vasp_repository():
     if hostname == 'kisti':
         ini_dvasp = '/home01/x2232a02/sandboxg/pyvasp/ini'
     else:
-        ini_dvasp = '/home/joonho/sandbox_gl/pyvasp/ini'
+        ini_dvasp = '/home/joonho/sandbox/pyvasp/ini'
 
     print("vasp repository is ", ini_dvasp, ' in system ', hostname)
     if not os.access(ini_dvasp, os.F_OK):
