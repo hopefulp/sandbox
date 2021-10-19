@@ -14,7 +14,7 @@ ga      =   MyClass('ga')
 nc      =   MyClass('nc')
 dac     =   MyClass('dac')
 slurm   =   MyClass('slurm')
-
+kisti   =   MyClass('kisti')
 ### modify input-detail here
 ### AMP-NODE job
 amp_data_type={'interval': '-nt 4000 -ntr 100 -dtype int -dl 1000 1100 1200',
@@ -327,7 +327,12 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(f"\t(VASP)   $ qsub -N {qname} -pe numa {nproc} -v np={nproc} -v dir={qname} -v vas=gam $SB/pypbs/sge_vasp_exe.csh")
         print(f"\nhow to run with multiple nodes?")
         print(comment_sys.server.mlet.qstat)
-
+    elif job == 'kisti':
+        if subjob == 'vasp':
+            print(comment_subj.vasp.run)
+            print(comment_sys.server.kisti.pbs)
+        print(f"\t(VASP)$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh")
+        print(f"\t\tcontrol the number of nodes and proc in pbs_vasp.sh")
     else:
         print("build more jobs")
     return 0 
@@ -336,7 +341,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', choices=['slurm','sge','amp','qchem','ga','gpu'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('job', choices=['slurm','sge','kisti','amp','qchem','ga','gpu'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-j', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")
