@@ -76,7 +76,8 @@ def cal_zpe_ts(dir1, natom, infile):
     kT = kB * T
 
     TS = 0.0
-    for i in range(len(THz2meV)):
+    #for i in range(len(THz2meV)):
+    for i in range(dof):
         x = THz2meV[i][1] / kT
         v1 = x / (math.exp(x) - 1)
         v2 = 1 - math.exp(-x)
