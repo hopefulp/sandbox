@@ -281,6 +281,27 @@ def find_file(dname, f_root):
             return f
     return None
 
+def get_files_suffix_list(suffixes, flist, Lshow=False, Ldir=False):
+    """
+        receive list of suffixes & files 
+        suffixes : list of suffix
+    """
+    matched_files=[]
+    dirs=[]
+    files=[]
+    for fname in flist:
+        if os.path.isdir(fname):
+            dirs.append(fname)
+        else:
+            files.append(fname)
+    for suff in suffixes:
+        for fname in files:
+            #print(f" {suff} in {fname} ?")
+            if fname.endswith(suff):
+                matched_files.append(fname)
+    matched_files.extend(dirs)                
+    return matched_files    
+
 def get_files_suffix(suffixes, dname, Lshow=False, Ldir=False):
     """
         receive list of suffixes & directory

@@ -34,21 +34,29 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
                         f_list.remove(f)
         elif work == 'qchem':
             pass
-        elif work == 'vasp':
+        elif work == 'vasp' or work =='nc':
             fkeep = vas_ini[:]
             f_list=os.listdir(pwd)
             print(f"total: {f_list}")
+            if work == 'nc':
+                fkeep=[]
+                exc_suff=['sh', 'py']
+                exc_sufile=get_files_suffix_list(exc_suff, f_list)
+                #print(f"exc_sufile {exc_sufile}")
+                if excl_fnames:
+                    excl_fnames.extend(exc_sufile)
+                else:
+                    excl_fnames = exc_sufile
+            #print(f"excl files {excl_fnames}")
             if excl_fnames: 
                 for efile in excl_fnames: # intactable list outside
                     fkeep.append(efile)
+            #print(f"keeps {fkeep}")
             for f in f_list:
                 if f not in fkeep:
                     matches.append(f)
-            print(f"matches: {matches}")
+            #print(f"matches: {matches}")
             f_list_all = matches
-        elif work == 'nc':
-            f_list=os.listdir(pwd)
-            excl_fnames=['test_HER_args.py','test_HER.py','slurm_sbatch.sh','slurm_sbatch.sh_NanoCore']
             
         elif work == 'pbs':
             #matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI', 'sge']
