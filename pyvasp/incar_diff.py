@@ -38,7 +38,7 @@ def get_incar_dic(files):
                                 #print(f'{lst[0]:^10} = {lst[1]:>10}')
                                 dic[k] = v
         dic_list.append(dic)                            
-    return (*dic_list, )
+    return dic_list
 
 def compare_incar(files, Ldiff=False):
     tup = get_incar_dic(files)
@@ -54,17 +54,16 @@ def compare_incar(files, Ldiff=False):
     diff_1 = d1keys.difference(d2keys)
     diff_2 = d2keys.difference(d1keys)
     union  = d1keys.union(d2keys)
-    s = ' '*10
+    s = ' '
     for key in union:
         if key in shared:
             if d1[key] == d2[key]:
                 diff="-"
             else:
                 diff="diff"
-            print(f'{"    "}{key:<8} {d1[key]:>10} {d2[key]:>10} {diff:>10}')
+            print(f'{s:4}{key:<8} {d1[key]:>10} {d2[key]:>10} {diff:>10}')
         elif key in diff_1:
             diff=""    # "1st"  
-            s=' '*10
             print(f'{key:<12} {d1[key]:>10} {s:10} {diff:^10}')
         else:
             diff=""    # 'last'
