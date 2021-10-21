@@ -50,10 +50,10 @@ SYSTEM = Optimize
  NELM    = 500       ! max SC steps
  EDIFF   = 1E-4      ! tolerance of ground state(1E-4).  Si 1E-7
                      ! For Frequency calculation,(<= 1E-6)
- ISYM    =  -1       ! -- The way VASP treats symmetry --
-                     ! -1 = completely off 
+ ISYM    =  1        ! -- The way VASP treats symmetry --
+                     ! -1 = completely off, for molecule
                      !  0 = off, reduces sampling Brilouin zone (for Molecular Dynamics)
-                     !  1 = on, with USPPs 
+                     !  1 = on, with USPPs, for crystal
                      !  2 = on, more efficient, memory saving
                      !  3 = Indirect-symmetrize charge densinty
  ADDGRID = .TRUE.    ! add grid for charge augmentation. (** Issue on IVDW = 2/20)

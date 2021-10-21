@@ -63,10 +63,10 @@ def compare_incar(files, Ldiff=False):
                 diff="diff"
             print(f'{s:4}{key:<8} {d1[key]:>10} {d2[key]:>10} {diff:>10}')
         elif key in diff_1:
-            diff=""    # "1st"  
-            print(f'{key:<12} {d1[key]:>10} {s:10} {diff:^10}')
+            diff="L"    # "1st"  
+            print(f'{key:<12} {d1[key]:>10} {s:10} {s:6}{diff:<4}')
         else:
-            diff=""    # 'last'
+            diff="R"    # 'last'
             print(f'{key:>12} {s:10} {d2[key]:>10} {diff:>10}')
 
     return 0
