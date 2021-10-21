@@ -6,6 +6,14 @@ import subprocess
 ### partition and number of process per node
 nXn = { 1: 8, 2: 12, 3: 20, 4:24, 5:32 }
 
+###### KISTI
+_HOSTname = subprocess.check_output('hostname', shell=True)
+if _HOSTname == 'login02':
+    host = 'kisti'
+
+if host == 'kisti':    
+    home = /home01/x2232a02
+
 '''
 PPNs={'chi':1, 'login':4, 'iron':''}
 PBS_QChem_scripts={'chi':'None', 'login':'', 'iron':''}
@@ -18,7 +26,6 @@ class Machines:
         self.qc_pbs = qc_pbs
         self.vasp_pbs = vasp_pbs
 
-_HOSTname = subprocess.check_output('hostname', shell=True)
 _HOST = _HOSTname.split()[0].decode('utf-8')
 _USER = os.getenv('USER')
 

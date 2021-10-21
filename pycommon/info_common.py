@@ -11,6 +11,18 @@ jobfile = MyClass('jobfile')
 convert = MyClass('convert')
 command = MyClass('command')
 string  = MyClass('string')
+server  = MyClass('server')
+
+
+server.server_env   =   "=== Server-related ===\
+                        \n\t\tobtain server hostname, home etc\
+                        "
+server.pypath       =   "pypath.sh command\
+                        \n\t\ta.py args: Python command error\
+                        \n\t\t    due to the python path in #!/...home/anaconda/bin/python\
+                        \n\t\tpypath.sh $python_command\
+                        \n\t\t    python $(which pycommand) args\
+                        "
 
 comment.howto       =   "=== COMMENT ===\
                         \n\treads 'comment_sys.py' or 'comment_subj.py'\
@@ -24,8 +36,7 @@ comment.comment_sys =   "\tINFO: SYSTEM\
 comment.comment_subj=   "\tINFO: SCIENCE JOB \
                         \n\tshowall.py -s\
                         "
-comment.ini_pycommon=   "\texplanation of files in $SB/pycommon"
-
+comment.info_common=   "\tInformation file for $SB/pycommon"
 
 
 dirjob.dir_clean      =   "=== DIRECTORY JOB ==\
