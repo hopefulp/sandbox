@@ -45,7 +45,7 @@ dirjob.dir_clean      =   "=== DIRECTORY JOB ==\
                         \n\t\tOptions::\
                         \n\t\t    -d input directory: default=pwd\
                         \n\t\t    -y execute command without asking: default-asking\
-                        \n\t\t    -w multiple jobs in [amp|pbs|slurm|vasp|lammps] add more in case extension\
+                        \n\t\t    -w multiple jobs in [amp|pbs|slurm|vasp|nc|lammps] add more in case extension\
                         \n\t\t    -sw subwork: amp-ini,ag\
                         \n\t\t    -j [rm,mv,cp,ln] default='rm'\
                         \n\t\t    -a: remove all such as 'rm -r'\
@@ -56,6 +56,8 @@ dirjob.dir_clean      =   "=== DIRECTORY JOB ==\
                         \n\t\t    dir_clean.py -d NN20 -w amp -j ln -y\
                         \n\t\t    dir_clean.py -w vasp -ef CHGCAR\
                         \n\t\t    (?) clean1d.py -s out -ef 6-CC-NiFe-A-relax.out 5-FePNP-CO2.out -j mv -jd j631gs_v3.2\
+                        \n\t\t    dir_clean.py -w vasp -d\
+                        \n\t\t    : remove only vasp output files\
                         "
 dirjob.clean_dirs   =   "clean dirs:: same with 'clean1d.py'\
                         \n\t\t input directory is list\

@@ -13,7 +13,7 @@ q_list=[]
 vas_default=['CHG','CHGCAR','CONTCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR','XDATCAR']
 vas_ini=['POSCAR','KPOINTS','INCAR','POTCAR']
 
-def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, default):
+def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, Ldefault):
 
     print(f"{pwd} directory in {whereami()}")
     matches=[]
@@ -38,24 +38,31 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
             fkeep = vas_ini[:]
             f_list=os.listdir(pwd)
             print(f"total: {f_list}")
-            if work == 'nc':
-                fkeep=[]
-                exc_suff=['sh', 'py']
-                exc_sufile=get_files_suffix_list(exc_suff, f_list)
-                #print(f"exc_sufile {exc_sufile}")
-                if excl_fnames:
-                    excl_fnames.extend(exc_sufile)
-                else:
-                    excl_fnames = exc_sufile
-            #print(f"excl files {excl_fnames}")
-            if excl_fnames: 
-                for efile in excl_fnames: # intactable list outside
-                    fkeep.append(efile)
-            #print(f"keeps {fkeep}")
-            for f in f_list:
-                if f not in fkeep:
-                    matches.append(f)
-            #print(f"matches: {matches}")
+            if Ldefault:    # remove only files in vas_default
+                matches = []
+                for f in f_list:
+                    if f in vas_default:
+                        matches.append(f)
+            else:
+                if work == 'nc':
+                    fkeep=[]
+                    exc_suff=['sh', 'py']
+                    exc_sufile=get_files_suffix_list(exc_suff, f_list)
+                    #print(f"exc_sufile {exc_sufile}")
+                    if excl_fnames:
+                        excl_fnames.extend(exc_sufile)
+                    else:
+                        excl_fnames = exc_sufile
+                #print(f"excl files {excl_fnames}")
+                if excl_fnames: 
+                    for efile in excl_fnames: # intactable list outside
+                        fkeep.append(efile)
+                #print(f"keeps {fkeep}")
+                for f in f_list:
+                    if f not in fkeep:
+                        matches.append(f)
+                #print(f"matches: {matches}")
+            
             f_list_all = matches
             
         elif work == 'pbs':

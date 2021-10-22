@@ -10,9 +10,11 @@ nXn = { 1: 8, 2: 12, 3: 20, 4:24, 5:32 }
 _HOSTname = subprocess.check_output('hostname', shell=True)
 if _HOSTname == 'login02':
     host = 'kisti'
+else:
+    host = _HOSTname
 
 if host == 'kisti':    
-    home = /home01/x2232a02
+    home = "/home01/x2232a02"
 
 '''
 PPNs={'chi':1, 'login':4, 'iron':''}
