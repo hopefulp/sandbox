@@ -332,6 +332,8 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print(comment_subj.vasp.run)
             print(comment_sys.server.kisti.pbs)
         print(f"\t(VASP)$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh")
+        print(f"\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl.sh")
+        print(f"\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh")
         print(f"\t\tcontrol the number of nodes and proc in pbs_vasp.sh")
     else:
         print("build more jobs")
