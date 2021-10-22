@@ -75,8 +75,16 @@ def get_incar(ifile):
 
     return 0
 
+def pos2dirname(poscar):
+   ### obtain dirname from POSCAR.dir
+   if re.match("POSCAR", poscar):
+       dirname = poscar[7:]
+   else:
+       dirname = poscar
+   return dirname 
 
-def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub, dirname, iofile, atoms, Lrun, qopt):
+
+def make_vasp_dir(job, poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub, dirname, iofile, atoms, Lrun, qopt):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -85,42 +93,28 @@ def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub
     ### Now this is running
     if Lquestion:
         ### 1. get POSCAR: make dirname using poscar
-        if poscar:
-            pass
-        else:
+        if not poscar:
             q = 'will you make POSCAR? '
             if yes_or_no(q):
                 q = 'input file: '
                 poscar = get_answers(q)
-        if 'poscar' in locals():
+        else:
             ### cp input poscar to 'POSCAR'
             get_poscar(poscar)
             if not dirname:
-                if re.match("POSCAR", poscar):
-                    ### obtain dirname from POSCAR.dir
-                    dirname = poscar[7:]
-                else:
-                    if not dirname:
-                        dirname = poscar
-                     #poscar = "POSCAR." + poscar
+                dirname = pos2dirname(poscar)
+        ### use filename as it is
         files2copy.append('POSCAR')
         ### 2. get POTCAR will be made from scratch
-        """
-        q = 'will you make POTCAR? '
-        if allprepared:
-            print(f"POTCAR will be made at {dirname} is not exist")
-        elif yes_or_no(q):
-            q = 'input pseudo-potential type (new, old, gga, etc): '
-            pot = get_answers(q)
-            q = 'input atoms in the order of poscar: '
-            atoms = get_answers(q).split()
-            get_potcar(pot, atoms)
-            files2copy.append('POTCAR')
-        """
+        # POTCAR will be made after POSCAR moves to job directory
         ### 3. get KPOINTS
         q = 'will you make KPOINTS?'
+        kpointjob = 'KPOINTS.' + job
+        q2 = f'will you use {kpointjob}?'
         if allprepared:
             print(f"KPOINTS in cwd will be copied to {dirname}")
+        elif os.path.isfile(kpointjob) and yes_or_no(q2):
+            os.system(f'cp {kpointjob} KPOINTS')
         elif yes_or_no(q):
             q = 'input nummber of kpoints: [gamma|3 digits such as "4 4 1" ]? '
             kp_in = get_answers(q)
@@ -141,8 +135,14 @@ def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub
         files2copy.append('KPOINTS')
         ### 4. get INCAR :: use make_incar.py
         q = 'will you make INCAR? '
+        incarjob = 'INCAR.' + job
+        q2 = f'will you use {incarjob}?'
         if allprepared:
             print(f"INCAR in cwd will be copied to {dirname}")
+            incar = 'INCAR'
+        elif os.path.isfile(incarjob) and yes_or_no(q2):
+            incar = incarjob
+            os.system(f'cp {incar} INCAR')
         elif yes_or_no(q):
             q = 'input incar-key file or use make_incar.py: '
             keyfile = get_answers(q)
@@ -220,7 +220,7 @@ def make_vasp_dir(poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    #parser.add_argument('new_dir', help='mkdir and cp to new directory')
+    parser.add_argument('-j', '--job', default="opt", choices=["dos","band","pchg","chg","md","ini","zpe","mol","wav","opt"], help='inquire for each file')
     parser.add_argument('-q', '--question', action='store_false', help='inquire for each file')
     parser.add_argument('-s', '--poscar', help='poscar is required')
     parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
@@ -236,7 +236,7 @@ def main():
     parser.add_argument('-r', '--run', action='store_true', help="submit job")
     args = parser.parse_args()
 
-    make_vasp_dir(args.poscar, args.potcar, args.kpoints, args.incar, args.all, args.question, args.kpsub, args.directory, args.iofile, args.atoms, args.run, args.qopt)
+    make_vasp_dir(args.job, args.poscar, args.potcar, args.kpoints, args.incar, args.all, args.question, args.kpsub, args.directory, args.iofile, args.atoms, args.run, args.qopt)
     return 0
 
 if __name__ == '__main__':
