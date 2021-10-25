@@ -62,16 +62,3 @@ def fixedMD_POSCAR(poscar, atom, atoms=None):
     return
 
 
-def modify_INCAR(INCAR, job):
-    '''
-    job zpe
-        with CHGCAR: 0 1, without: 0 2
-        NSW = 1 : not compatable with ICHRGE 11
-            NSW=0, IBRION = -1
-        K at gamma
-        !NPAR   will use default
-        IBRION = 5, 6: takes long time
-    '''
-    os.system(f"cp {INCAR} INCAR")
-    line_change_dict('INCAR', vasp_job.zpe)
-    return

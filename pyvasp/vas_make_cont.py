@@ -7,8 +7,9 @@ from mod_vas    import fixedMD_POSCAR
 import sys
 from myvasp import get_hostname
 from vas_qsub import qsub_command
+from incar_mod import modify_incar
 
-def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
+def vasp_jobs( job, dirs, prefix, exclude, fixatom, opt_incar, Lrun, np, ndir):
     #print(f"{exclude}")
     pwd = os.getcwd()
     if prefix:
@@ -19,7 +20,7 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
             ndir = odir + job
         com=[]
         if os.path.isdir(ndir):
-            print(f"{ndir} for {odir} exicoms")
+            print(f"{ndir} for {odir} exists")
             continue
         ### 0: make a new dir
         com.append(f'mkdir {ndir}')
@@ -50,11 +51,13 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, Lincar, Lrun, np, ndir):
         print(f"{kpoints} was used")
         ### 4: INCAR
         if job == 'zpe':
-            modify_INCAR(f"{odir}/INCAR", job)
+            modify_incar(f"{odir}/INCAR", job)
             incar = 'INCAR'
             print(f"{incar} was modified from {odir}/INCAR")
         else:
-            if os.path.isfile(f"INCAR.{job}"):
+            if opt_incar:
+                incar = modify_incar(f"{odir}/INCAR", job)
+            elif os.path.isfile(f"INCAR.{job}"):
                 incar = 'INCAR.' + job
             elif os.path.isfile('INCAR'):
                 incar = 'INCAR'
@@ -88,12 +91,12 @@ def main():
     parser.add_argument('-p', '--prefix', help='select directories using prefix')
     parser.add_argument('-ex', '--exclude', nargs='*', help='exclude if already exist')
     parser.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
-    parser.add_argument('-i', '--Lincar', action='store_true', help='Future incar option ')
+    parser.add_argument('-i', '--incar', help='Future incar option ')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
     parser.add_argument('-n', '--nproc', default=16, help='nprocess in qsub')
     args = parser.parse_args()
 
-    vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.Lincar, args.run, args.nproc, args.newdir )
+    vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.incar, args.run, args.nproc, args.newdir )
     return 0
 
 if __name__ == '__main__':

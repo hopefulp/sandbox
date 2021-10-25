@@ -62,10 +62,21 @@ make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
 make.vas_make_incar ="\n\t    If not 'incar.key', make it, check it and modify it before run this again\
                     \n\t    based on 'incar.key', make INCAR\
                     "
-make.vas_make_cont = "old_dir new_dir job\
+make.vas_make_cont = " -d dir_list -j job -i\
                     \n\tchange of d2d to make_cont\
-                    \n\tzpe: after opt, calculage zpe\
-                    \n\tband: after LCHARG=.TRUE., calculate band structure\
+                    \n\toptions:\
+                    \n\t    -d all the directory list\
+                    \n\t    -j band, zpe etc\
+                    \n\t    -i change old_dir/INCAR\
+                    \n\te.g.:\
+                    \n\t    pypath.sh vas_make_cont.py -d SnO2sc22FH -j band -i i\
+                    \n\t\tzpe: after opt, calculage zpe\
+                    \n\t\tband: after LCHARG=.TRUE., calculate band structure\
+                    \n\tChange INCAR:\
+                    \n\t    read incar_mod.py\
+                    "
+make.incar_mod    ="old_dir/INCAR is modified\
+                    \n\tINCAR is changed by INCAR-keys following job=band, zpe etc\
                     "
 run.amp_env_run         ="amp_run.py in (envs) anaconda\
                         \n\t\t   when envs is not (base), detect envs and import proper module\
