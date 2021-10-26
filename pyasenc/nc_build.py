@@ -1,9 +1,9 @@
 #!/home/joonho/anaconda3/bin/python
 
 import argparse
-import nanocore as nc
-from nanocore import io, carbonlab
-from nanocore.vasp import Vasp
+import NanoCore as nc
+from NanoCore import io, carbonlab
+from NanoCore.simulator.vasp import Vasp
 
 def print_image(image):
     pos = image.get_positions()
@@ -59,8 +59,8 @@ def main():
     parser.add_argument('-n', '--name', help='structure name')
     parser.add_argument('-sn', '--subname', default='hexa', help='structure subname')
     parser.add_argument('-sc', '--supercell', nargs='+', default=[3,4,1], type=int, help='size of supercell')
-    parser.add_argument('-t', '--translate', default=0.4, help='shift of plane in z-axis')
-    parser.add_argument('-v', '--vacuum', default=10.0, help='shift of plane in z-axis')
+    parser.add_argument('-t', '--translate', default=0.2, help='shift of plane in z-axis')
+    parser.add_argument('-v', '--vacuum', default=10.0, type=float,  help='shift of plane in z-axis')
     parser.add_argument('-g', '--visual', action='store_true', help='view structure via xcrysden')
     parser.add_argument('-s', '--save', action='store_true', help='write built structure to a file format')
     parser.add_argument('-o', '--outfile', default='tmp', help='output filename')
