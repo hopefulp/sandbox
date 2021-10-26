@@ -15,6 +15,8 @@ def get_kv(strline):
 def get_incar_dic(files):
     dic_list = []
     for fname in files:
+        if fname != 'INCAR' and os.path.isdir(fname):
+            fname = fname + '/INCAR'
         dic={}
         if os.path.isfile(fname):
             with open(fname, 'r') as f:
