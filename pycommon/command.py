@@ -334,7 +334,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(f"\t(VASP)$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh")
         print(f"\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl.sh")
         print(f"\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh")
-        print(f"\t\tcontrol the number of nodes and proc in pbs_vasp.sh")
+        print(f"\t\tpbs_vasp_kisti_skl2 for half use of cpu for memory issue")
     else:
         print("build more jobs")
     return 0 
