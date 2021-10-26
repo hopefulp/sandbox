@@ -9,15 +9,17 @@ from myvasp import get_hostname
 from vas_qsub import qsub_command
 from incar_mod import modify_incar
 
-def vasp_jobs( job, dirs, prefix, exclude, fixatom, opt_incar, Lrun, np, ndir):
+def vasp_jobs( job, dirs, prefix, exclude, fixatom, opt_incar, Lrun, np, newdir):
     #print(f"{exclude}")
     pwd = os.getcwd()
     if prefix:
         dirs = get_dirs_prefix(pwd, prefix, excludes=exclude)
 
     for odir in dirs:
-        if not ndir :
+        if not newdir:
             ndir = odir + job
+        else:
+            ndir = newdir
         com=[]
         if os.path.isdir(ndir):
             print(f"{ndir} for {odir} exists")
