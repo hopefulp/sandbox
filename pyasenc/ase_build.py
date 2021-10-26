@@ -7,6 +7,7 @@ from ase.visualize import view
 from ase.io.formats import read, iread, write, string2index
 from random import uniform
 import numpy as np
+import sys
 
 metals = {'Pt': 'fcc'}
 
@@ -36,7 +37,10 @@ def build_structure(name=None, dim=None, status=None, size=[1], atom=10, latt=50
     elif dim == '1d':
         pass
     elif dim == '2d':
-        if name == 'graphene':
+        if name == None:
+            print(f"input structure name using -n ")
+            sys.exit(1)
+        elif name == 'graphene':
             image = bd.graphene(size=(4,4,1), vacuum=10.0)       # does not make z-axis
             view(image)
     elif dim == 'slab':
