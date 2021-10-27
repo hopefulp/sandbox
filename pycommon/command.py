@@ -239,9 +239,10 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
                 qname = 'hl'+hl2str
         if not qname:
             qname = 'amptest'
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch_vasp.sh")
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch_py.sh")
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch_NC.sh")
+        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_vasp.sh")
+        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_py.sh")
+        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
+        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} slurm_sbatch_NanoCore.sh")
         if not subjob:
             print("use -sj subjob [vasp|mldyn|nc]")
 
