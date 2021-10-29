@@ -12,16 +12,16 @@ import re
 from  myvasp import *
 from common import *
 from vas_qsub import qsub_command
+from mod_vas import get_poscar, pos2dirname
 
 home = os.environ['HOME']
 hostname = get_hostname()
 pseudo_pot={'new':'Pot-new', 'potpaw-pbe-new':'Pot-new', 'old':'pot-old', 'potpaw-pbe-old':'pot-old'}
 global pwd, ini_dvasp
 
+#    copy {poscar} to POSCAR at cwd
+"""
 def get_poscar(poscar):
-    '''
-    copy {poscar} to POSCAR at cwd
-    '''
     ### confirm file location
     ### if poscar is Null, use POSCAR
     if not poscar :
@@ -39,7 +39,7 @@ def get_poscar(poscar):
         exit(21)
             
     return 0    
-
+"""
 def get_potcar(pot,atoms):
     potfiles=[]
     potdir = ini_dvasp + '/' + pseudo_pot[pot]
@@ -74,7 +74,7 @@ def get_incar(ifile):
     print('INCAR is made from %s' % ifile)
 
     return 0
-
+"""
 def pos2dirname(poscar):
    ### obtain dirname from POSCAR.dir
    if re.match("POSCAR", poscar):
@@ -82,7 +82,7 @@ def pos2dirname(poscar):
    else:
        dirname = poscar
    return dirname 
-
+"""
 
 def make_vasp_dir(job, poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub, dirname, iofile, atoms, Lrun, qopt):
     global ini_dvasp, pwd
@@ -220,7 +220,7 @@ def make_vasp_dir(job, poscar, apotcar, kpoints, incar, allprepared, Lquestion, 
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', default="opt", choices=["dos","band","pchg","chg","md","ini","zpe","mol","wav","opt"], help='inquire for each file')
+    parser.add_argument('-j', '--job', default="opt", choices=["dos","band","pchg","chg","md","ini","zpe","mol","wav","opt","sp"], help='inquire for each file')
     parser.add_argument('-q', '--question', action='store_false', help='inquire for each file')
     parser.add_argument('-s', '--poscar', help='poscar is required')
     parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')

@@ -67,7 +67,7 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
             
         elif work == 'pbs':
             #matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI', 'sge']
-            matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI']
+            matches=['\.e\d', '\.o\d', '\.pe\d', '\.po\d', 'PI', '\.pbs']  #'^\d'
             f_list = get_files_match(matches, pwd, Lshow=Lshowmatch)
             f_list_all.extend(f_list)
             print(f'{f_list_all}')

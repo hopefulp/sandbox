@@ -1,11 +1,44 @@
 #### to modify vasp input file
 import sys
 import vasp_job
+import re
 
 def get_atoms_poscar(line):
     if atom in lines[0]:
         alist = lines[0].split()
     return alist
+
+def get_poscar(poscar):
+    '''
+    copy {poscar} to POSCAR at cwd
+    '''
+    ### confirm file location
+    ### if poscar is Null, use POSCAR
+    if not poscar :
+        print("POSCAR will be used")
+    elif not os.access('%s' % poscar, os.F_OK):
+        print('poscar is not detectable')
+        exit(2)
+    else:
+        comm = 'cp %s POSCAR' % poscar
+        os.system(comm)
+        print('POSCAR is made')
+    # confirm POSCAR is made        
+    if not os.access('POSCAR', os.F_OK):
+        print('POSCAR is not here')
+        exit(21)
+
+    return 0
+
+def pos2dirname(poscar):
+   ### obtain dirname from POSCAR.dir
+   if re.match("POSCAR", poscar):
+       dirname = poscar[7:]
+   else:
+       dirname = poscar
+   return dirname
+
+
 
 def fixedMD_POSCAR(poscar, atom, atoms=None):
     '''
