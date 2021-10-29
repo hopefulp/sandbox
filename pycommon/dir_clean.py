@@ -107,6 +107,9 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
             os.mkdir(new_dir)
             print(f"Dir {new_dir} was made")
     f_list_all.sort()
+    if exclude:
+        for f in exclude:
+            f_list_all.remove(f)
     ### Make command list
     for f in f_list_all:
         #fname = d+'/'+f
