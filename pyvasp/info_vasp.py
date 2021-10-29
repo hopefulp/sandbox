@@ -41,6 +41,35 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\te.g. (KISTI)\
                     \n\t    python $sbvas/vas_make_ini.py -r -o -al -s POSCAR.pdh2sidetop\
                     "
+make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
+                    \n\tvas_make_d2d.py old_dir new_dir job [options]\
+                    \n\tjob = {ini, cont, md, ... post process}\
+                    "
+make.vas_make_incar ="\n\t    If not 'incar.key', make it, check it and modify it before run this again\
+                    \n\t    based on 'incar.key', make INCAR\
+                    "
+make.vas_make_cont = " -d dir_list -j job -i incar_option -o option_poscar\
+                    \n\tchange of d2d to make_cont\
+                    \n\toptions:\
+                    \n\t    -d all the directory list\
+                    \n\t    -j band, zpe, ini, opt etc\
+                    \n\t    -i change old_dir/INCAR\
+                    \n\tUsage:\
+                    \n\t    pypath.sh vas_make_cont.py -d SnO2sc22FH -j band -i i\
+                    \n\tJobs:\
+                    \n\t    ini\
+                    \n\t\tcopy odir [INCAR, KPOINTS, POTCAR] w. given -s POSCAR\
+                    \n\t\t<eg> -d odir -j ini -s POSCAR.newmodel\
+                    \n\t\t    : default ndir is newmodel\
+                    \n\t    opt\
+                    \n\t\tcopy odir [CONTCAR, KPOINTS, POTCAR] w. change of INCAR\
+                    \n\t    ZPE:\
+                    \n\t\tafter opt, calculage zpe\
+                    \n\t    band:\
+                    \n\t\tafter LCHARG=.TRUE., calculate band structure\
+                    \n\tChange INCAR:\
+                    \n\t    import mod_incar\
+                    "
 make.myvasp         ="modules for make vasp directory\
                     \n\tcalled by 'vas_make_ini.py'\
                     \n\tfunctions:\
@@ -55,28 +84,19 @@ make.myvasp         ="modules for make vasp directory\
                     \n\tRun by 'python -m myvasp -j getmag -p poscar'\
                     \n\t    to get MAGMOM\
                     "
-make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
-                    \n\tvas_make_d2d.py old_dir new_dir job [options]\
-                    \n\tjob = {ini, cont, md, ... post process}\
+make.mod_incar     ="module for INCAR modification\
+                    \n\tdef modify_incar(incar_in, job, dic=None, opt='ac')\
+                    \n\t    incar_in is modified by job_dict\
                     "
-make.vas_make_incar ="\n\t    If not 'incar.key', make it, check it and modify it before run this again\
-                    \n\t    based on 'incar.key', make INCAR\
-                    "
-make.vas_make_cont = " -d dir_list -j job -i\
-                    \n\tchange of d2d to make_cont\
-                    \n\toptions:\
-                    \n\t    -d all the directory list\
-                    \n\t    -j band, zpe etc\
-                    \n\t    -i change old_dir/INCAR\
-                    \n\te.g.:\
-                    \n\t    pypath.sh vas_make_cont.py -d SnO2sc22FH -j band -i i\
-                    \n\t\tzpe: after opt, calculage zpe\
-                    \n\t\tband: after LCHARG=.TRUE., calculate band structure\
-                    \n\tChange INCAR:\
-                    \n\t    read incar_mod.py\
-                    "
-make.incar_mod    ="old_dir/INCAR is modified\
-                    \n\tINCAR is changed by INCAR-keys following job=band, zpe etc\
+make.mod_poscar    ="module for POSCAR modification\
+                    \n\tget_atoms_poscar\
+                    \n\tget_poscar(poscar)\
+                    \n\t    : read input POSCAR.job and write to wdir as 'POSCAR'\
+                    \n\tpos2dirname(poscar)\
+                    \n\t    : input POSCAR.job gives dirname of 'job'\
+                    \n\tfixedMD_POSCAR(poscar, atom, atoms=None)\
+                    \n\t    : poscar is modified\
+                    \n\t    : all the atoms except atom will be fixed for ZPE\
                     "
 run.amp_env_run         ="amp_run.py in (envs) anaconda\
                         \n\t\t   when envs is not (base), detect envs and import proper module\

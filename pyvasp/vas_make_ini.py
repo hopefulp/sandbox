@@ -12,7 +12,7 @@ import re
 from  myvasp import *
 from common import *
 from vas_qsub import qsub_command
-from mod_vas import get_poscar, pos2dirname
+from mod_poscar import get_poscar, pos2dirname
 
 home = os.environ['HOME']
 hostname = get_hostname()
@@ -20,26 +20,6 @@ pseudo_pot={'new':'Pot-new', 'potpaw-pbe-new':'Pot-new', 'old':'pot-old', 'potpa
 global pwd, ini_dvasp
 
 #    copy {poscar} to POSCAR at cwd
-"""
-def get_poscar(poscar):
-    ### confirm file location
-    ### if poscar is Null, use POSCAR
-    if not poscar :
-        print("POSCAR will be used")
-    elif not os.access('%s' % poscar, os.F_OK):
-        print('poscar is not detectable')
-        exit(2)
-    else:
-        comm = 'cp %s POSCAR' % poscar
-        os.system(comm)
-        print('POSCAR is made')
-    # confirm POSCAR is made        
-    if not os.access('POSCAR', os.F_OK):
-        print('POSCAR is not here')
-        exit(21)
-            
-    return 0    
-"""
 def get_potcar(pot,atoms):
     potfiles=[]
     potdir = ini_dvasp + '/' + pseudo_pot[pot]
@@ -74,15 +54,6 @@ def get_incar(ifile):
     print('INCAR is made from %s' % ifile)
 
     return 0
-"""
-def pos2dirname(poscar):
-   ### obtain dirname from POSCAR.dir
-   if re.match("POSCAR", poscar):
-       dirname = poscar[7:]
-   else:
-       dirname = poscar
-   return dirname 
-"""
 
 def make_vasp_dir(job, poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub, dirname, iofile, atoms, Lrun, qopt):
     global ini_dvasp, pwd

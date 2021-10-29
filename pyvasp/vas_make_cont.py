@@ -4,11 +4,11 @@ import argparse
 import os
 import re
 from common import get_dirs_prefix, yes_or_no
-from mod_vas    import fixedMD_POSCAR, pos2dirname, get_poscar
+from mod_incar import modify_incar
+from mod_poscar    import fixedMD_POSCAR, pos2dirname, get_poscar
 import sys
 from myvasp import get_hostname
 from vas_qsub import qsub_command
-from incar_mod import modify_incar
 
 incar_job = ['vdw', 'opt', 'mag']
 
@@ -190,7 +190,7 @@ def main():
         if args.poscar:
             vasp_job_pos( args.dirs, args.poscar, args.newdir, args.run)
         else:
-            print("input POSCAR.name")
+            print("input -s POSCAR.name")
             sys.exit(1)
     else:
         vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.option, args.run, args.nproc, args.newdir )
