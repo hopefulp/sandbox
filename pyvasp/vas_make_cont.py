@@ -60,11 +60,11 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, opt_incar, Lrun, np, newdir)
             incar = 'INCAR'
             print(f"{incar} was modified from {odir}/INCAR")
         else:
-            if opt_incar:
+            if (not opt_incar or opt_incar== 'm') and os.path.isfile(f"{odir}/INCAR"):
                 incar = modify_incar(f"{odir}/INCAR", job)
-            elif os.path.isfile(f"INCAR.{job}"):
+            elif opt_incar == 'c' and os.path.isfile('INCAR.'+job):
                 incar = 'INCAR.' + job
-            elif os.path.isfile('INCAR'):
+            else:
                 incar = 'INCAR'
         com.append(f"cp {incar} {ndir}/INCAR")
         print(f"{incar} was used")

@@ -13,7 +13,8 @@ def qsub_command(ndir, np=24, qopt=None):
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp.sh"
     else:
         print(f"No qsub command for {hostname}")
-        sys.exit(1)
+        s=''
+        #sys.exit(1)
     return s        
 
 

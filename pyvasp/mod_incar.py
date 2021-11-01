@@ -110,7 +110,7 @@ def modify_incar(incar, job, dic=None, opt='ac'):
                         line = replace_line(paramch, key, job) + "\n"
             ### param comment out
             if  'paramout' in locals() and paramout :
-                for param in paramout.keys():
+                for param in paramout:
                     if param in line:
                         line = comment_out_line(mline, job)
             #print(f"{line}", end='')
