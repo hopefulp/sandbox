@@ -39,6 +39,36 @@ class MyClass_str(dict):
         self.__class__.instances.append(name)                   # this is name, can't be used for obj.name 
         self.name = name
 
+class CaseInsensitiveKey(object):
+    def __init__(self, key):
+        self.key = key
+    def __hash__(self):
+        return hash(self.key.lower())
+    def __eq__(self, other):
+        return self.key.lower() == other.key.lower()
+    def __str__(self):
+        return self.key
+
+class CaseInsensitiveDict(dict):
+    def __setitem__(self, key, value):
+        key = CaseInsensitiveKey(key)
+        super(CaseInsensitiveDict, self).__setitem__(key, value)
+    def __getitem__(self, key):
+        key = CaseInsensitiveKey(key)
+        return super(CaseInsensitiveDict, self).__getitem__(key)
+
+
+'''
+    compare key 
+    dic original dictionary
+    key to find a key in dic
+def compareKey(dic, key):
+    keys = dic.keys()
+    for k in keys:
+        exp = re.compile(k, re.I)
+
+'''
+
 def get_digits_4str(word, string):
     ''' obtain digits after key-word '''
     if word in string:

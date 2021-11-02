@@ -65,7 +65,7 @@ def modify_incar(incar, job, dic=None, opt='ac'):
     ### in case uncomment: dict
     if f'{job}_active' in globals():
         paramin   = eval(f'{job}_active')
-    print(f"setting: paramch {paramch}")
+    #print(f"setting: paramch {paramch}")
     if dic:
         if 'a' in opt:
             if 'paramin' in locals():
@@ -83,7 +83,7 @@ def modify_incar(incar, job, dic=None, opt='ac'):
                 paramout.update(dic)
             else:
                 paramout = dic
-    print(f"param active {paramin} param change {paramch}")
+    #print(f"param active {paramin} param change {paramch}")
     # print(f"param comment out {paramout}")
     with open(incar) as f:
         lines = f.readlines()
@@ -99,7 +99,7 @@ def modify_incar(incar, job, dic=None, opt='ac'):
                             line = mline[1:] +'\n'
                             #print(f"paramin:{line}")
                         ### if option == 'ac', in activation, replace at the same time
-                        if 'c' in opt:
+                        if opt and 'c' in opt:
                             line = replace_line(paramin, key, job) + "\n"
                             
             ### param change

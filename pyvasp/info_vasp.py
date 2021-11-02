@@ -22,6 +22,7 @@ run     = MyClass('run')
 clean   = MyClass('clean')
 modify  = MyClass('modify')
 ase     = MyClass('ase')
+check   = MyClass('check')
 
 make.vas_make_ini   ="==================== Start VASP =======================================\
                     \n\t===== Make VASP initial directory ====\
@@ -108,10 +109,13 @@ modify.pos_sort     ="pos_sort.py POSCAR\
                     \n\treturns POSCARnew\
                     \n\t:when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
                     "
-modify.incar_diff   ="incar_diff.py INCAR1 [INCAR2]\
-                    \n\t: compare two INCAR keywords\
-                    \n\t  if one INCAR, just it shows keywords\
+check.diff_incar   ="diff_incar.py INCAR1 [INCAR2] -p keys\
+                    \n\tOptions:\
+                    \n\t    one dir : show INCAR\
+                    \n\t    two dirs: compare two INCAR\
+                    \n\t    -p INCAR keys: to check whether the keys exist\
                     "
+
 ase.ase_fconvert    =""
 ase.ase_vasp        =""
 ase.ase_zpe         =""
