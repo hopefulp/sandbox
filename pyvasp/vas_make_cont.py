@@ -133,7 +133,7 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, option, Lrun, np, newdi
     return 0
 
 
-def vasp_job_pos(dirs, poscar, newdir, Lrun):
+def vasp_job_ini(job, dirs, poscar, newdir, Lrun):
     '''
     in case POSCAR or KPOINTS changes
     '''
@@ -142,6 +142,11 @@ def vasp_job_pos(dirs, poscar, newdir, Lrun):
     odir = dirs[0]
     if newdir:
         ndir = newdir
+    elif not poscar:
+        if job == 'ini':
+            ndir = odir+'n'
+        elif job == 'cont':
+            ndir = odir+'c'
     else:
         ndir = pos2dirname(poscar)
     if os.path.isdir(ndir):
@@ -153,15 +158,25 @@ def vasp_job_pos(dirs, poscar, newdir, Lrun):
     ### COPY 1,2,3 input files
     for f in copyfiles:
         com = f"cp {odir}/{f} {ndir}"
+        print(f"{com}")
         os.system(com)
     ### 4: POSCAR
-    com = f"cp {poscar} {ndir}/POSCAR"
+    if poscar:
+        Poscar = poscar
+    elif job == 'ini':
+        Poscar = f"{odir}/POSCAR"
+    elif job == 'cont':
+        Poscar = f"{odir}/CONTCAR"
+    com = f"cp {Poscar} {ndir}/POSCAR"
+    print(f"{com}")
     os.system(com)
     ### only works for KISTI
     com = qsub_command(ndir)
     print(com)
     if Lrun:
         os.system(com)
+    elif not poscar:
+        print(f"made a new ini {ndir} directory")
     else:
         q = "will you run?"
         if yes_or_no(q):
@@ -186,12 +201,8 @@ def main():
     ### only INCAR changes in no-vdw -> vdw, sp -> opt,
     if args.job in incar_job :
         vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.option, args.run, args.nproc, args.newdir )
-    elif args.job == 'ini':
-        if args.poscar:
-            vasp_job_pos( args.dirs, args.poscar, args.newdir, args.run)
-        else:
-            print("input -s POSCAR.name")
-            sys.exit(1)
+    elif args.job == 'ini' or args.job =='cont':
+        vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.run)
     else:
         vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.option, args.run, args.nproc, args.newdir )
     return 0

@@ -57,8 +57,9 @@ make.vas_make_cont = " -d dir_list -j job -i incar_option -o option_poscar\
                     \n\tUsage:\
                     \n\t    pypath.sh vas_make_cont.py -d SnO2sc22FH -j band -i i\
                     \n\tJobs:\
-                    \n\t    ini\
+                    \n\t    ini, cont: (def ini)\
                     \n\t\tcopy odir [INCAR, KPOINTS, POTCAR] w. given -s POSCAR\
+                    \n\t\t     if not -s POSCAR, use odir/POSCAR(ini) or CONTCAR(cont)\
                     \n\t\t<eg> -d odir -j ini -s POSCAR.newmodel\
                     \n\t\t    : default ndir is newmodel\
                     \n\t    opt\
