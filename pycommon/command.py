@@ -147,8 +147,8 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     if 'dirname' not in locals():
         dirname = qname
     slurm.vas = " === Job submission"
-    slurm.vas += f"\n    (2) sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch.sh"
-    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox_gl/pypbs/slurm_sbatch_sim.sh"
+    slurm.vas += f"\n    (2) sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
     slurm.vas += "\n\toptions::"
     slurm.vas += "\n\t    -J for jobname and dirname"
     slurm.vas += "\n\t    -p for partition: X1-8, X2-12, X3-20 process"
@@ -294,7 +294,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print(slurm.vas)
         elif subjob == 'mldyn':
             print("SBATCH:")
-            print(f"\tsbatch -J {qname} -p X2 -N 1 -n 1 --export=hl='{hlstr1}',sf='hl{hl2str}.pt' /home/joonho/sandbox_gl/pypbs/slurm_sbatch_py.sh")
+            print(f"\tsbatch -J {qname} -p X2 -N 1 -n 1 --export=hl='{hlstr1}',sf='hl{hl2str}.pt' /home/joonho/sandbox/pypbs/slurm_sbatch_py.sh")
             print("\t    slurm_sbatch_py.sh")
             print("\t\tml_lorenz.py tr -hl $hl -ms $sf")
             print("Direct run:")
@@ -314,7 +314,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print(ga.dyn)
         elif subjob == 'nc':
             print("SBATCH:")
-            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=main={inf} /home/joonho/sandbox_gl/pypbs/slurm_sbatch_NC.sh")
+            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=main={inf} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
             print("\nNonoCore Package Development:")
             print(nc.build)
         elif subjob == 'crr':
