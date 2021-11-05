@@ -114,6 +114,7 @@ def make_vasp_dir(job, poscar, apotcar, kpoints, incar, allprepared, Lquestion, 
         elif os.path.isfile(incarjob) and yes_or_no(q2):
             incar = incarjob
             os.system(f'cp {incar} INCAR')
+            print(f'{incar} was copied to INCAR')
         elif yes_or_no(q):
             q = 'input incar-key file or use make_incar.py: '
             keyfile = get_answers(q)
@@ -182,16 +183,15 @@ def make_vasp_dir(job, poscar, apotcar, kpoints, incar, allprepared, Lquestion, 
             get_incar("incar.key")
     ##################################################
     ### run ?
-    if Lrun:
-        s = qsub_command(dirname, qopt=qopt)
-        print(f"{s}")
+    s = qsub_command(dirname, qopt=qopt)
+    print(f"{s}")
+    if Lrun or yes_or_no("Will you run ?"):
         os.system(s)
-        
 
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', default="opt", choices=["dos","band","pchg","chg","md","ini","zpe","mol","wav","opt","sp"], help='inquire for each file')
+    parser.add_argument('-j', '--job', default="opt", choices=["dos","band","pchg","chg","md","ini","zpe","mol","wav","opt","sp", 'noD'], help='inquire for each file')
     parser.add_argument('-q', '--question', action='store_false', help='inquire for each file')
     parser.add_argument('-s', '--poscar', help='poscar is required')
     parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
