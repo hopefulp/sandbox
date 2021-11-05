@@ -2,6 +2,7 @@
 import sys
 import vasp_job
 import re
+import os
 
 def get_atoms_poscar(line):
     if atom in lines[0]:

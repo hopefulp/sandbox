@@ -42,14 +42,45 @@ def get_incar_dic(files):
         dic_list.append(dic)                            
     return dic_list
 
-def compare_incar(files, Ldiff=False):
+def print_key2(dic, params):
+    for p in params: 
+        if p.upper() in dic.keys():
+            print(f"{p.upper()} {dic[p.upper()]}") 
+        else: 
+            print(f"{p.upper()} does not exist")
+    return 0
+
+def print_key(dic, params):
+    for p in params:
+        tag_search = False
+        for key in dic.keys():
+            if re.search(p.upper(), key):
+                print(f"{key} {dic[key]}")
+                tag_search = True
+            if tag_search:
+                break
+        if tag_search:
+            break
+        else:
+            print(f"{p.upper()} does not exist")
+    return 0
+
+def compare_incar(files, key, Ldiff=False):
     tup = get_incar_dic(files)
     if len(tup) == 1:
-        print_dict(tup[0])
+        if key:
+            print_key(tup[0], key)
+        else:
+            print_dict(tup[0])
         return 0
     elif len(tup) == 2:
         d1 = tup[0]
         d2 = tup[1]
+        if key:
+            for t in tup:
+                print_key(t)
+            return 0
+
     d1keys = set(d1.keys())
     d2keys = set(d2.keys())
     shared = d1keys.intersection(d2keys)
@@ -78,6 +109,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="Compare two INCAR")
     parser.add_argument('files', nargs='*',  help="one or two INCAR file ")
+    parser.add_argument('-p', '--params', nargs='*',  help="check the key and values ")
     args = parser.parse_args()
 
     if not args.files:
@@ -85,7 +117,7 @@ def main():
     else:
         files=args.files
 
-    compare_incar(files)
+    compare_incar(files, args.params)
 
 if __name__ == "__main__":
     main()
