@@ -61,9 +61,9 @@ def build_structure(dim, structure, name, size, vac, akind, status=None,  atom=1
         if structure == None:
             print(f"input structure name using -n ")
             sys.exit(1)
-        elif sturucture == 'graphene':
-            atoms = bd.graphene(size=(4,4,1), vacuum=vac)       # does not make z-axis
-            view(image)
+        elif structure == 'graphene':
+            atoms = bd.graphene(size=size, vacuum=vac0)       # does not make z-axis
+            view(atoms)
         elif structure == 'slab':
             pass
     elif dim == 'bulk':
@@ -86,8 +86,8 @@ def main():
     parser.add_argument('-d', '--dim', default=2, type=int, choices=[0,1,2,3], help='basic structure of system')
     parser.add_argument('-s', '--structure', help='structure name following dimension')
     parser.add_argument('-n', '--name', help='structure name')
-    parser.add_argument('-si', '--size', nargs='*', default=[1], type=int, help='size of supercell')
-    parser.add_argument('-v', '--vacuum', nargs='*', default=[10.0], type=float, help='size of supercell')
+    parser.add_argument('-sc', '--supercell', nargs='*', default=[1], type=int, help='size of supercell')
+    parser.add_argument('-v', '--vacuum', nargs='*', default=[10.0], type=float, help='size of vacuum')
     parser.add_argument('-ak', '--atomkind', default='Pt', help='atom species')
     parser.add_argument('-u', '--usage', action='store_true', help='shows usage and exit')
     args = parser.parse_args()
@@ -99,15 +99,15 @@ def main():
     if args.usage:
         print(Usage.cluster)
     else:
-        image = build_structure(args.dim, args.structure, args.name, args.size, args.vacuum, args.atomkind)
+        image = build_structure(args.dim, args.structure, args.name, args.supercell, args.vacuum, args.atomkind)
         ### make output filename with suffix after POSCAR
         suff=''
         if args.atomkind:
             suff += args.atomkind
         if args.structure:
             suff += args.structure
-        if args.size:
-            st = list2str(args.size)
+        if args.supercell:
+            st = list2str(args.supercell)
             suff += st
         ### if suffix exists, use it
         if args.out_suffix:

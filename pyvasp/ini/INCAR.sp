@@ -48,9 +48,9 @@ SYSTEM = Single Point
  ENCUT   = 400       ! energy cutoff. (** CellOpt: ENCUT= ENMAX*1.3 **)
  NELMIN  = 4         ! min SC setps (4:Ionic relaxation, MD= 5~8, DOS>5)
  NELM    = 500       ! max SC steps
- EDIFF   = 1E-5      ! tolerance of ground state(1E-4). 
+ EDIFF   = 1E-4      ! tolerance of ground state(1E-4). 
                      ! For Frequency calculation,(<= 1E-6)
- ISYM    =  -1       ! -- The way VASP treats symmetry --
+ ISYM    =  1        ! -- The way VASP treats symmetry --
                      ! -1 = completely off 
                      !  0 = off, reduces sampling Brilouin zone (for Molecular Dynamics)
                      !  1 = on, with USPPs 
