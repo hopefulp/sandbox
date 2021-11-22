@@ -10,135 +10,72 @@ import shutil
 import re
 from  myvasp import *
 from common import *
+from mod_poscar import get_poscar
 
-
-def make_vas_dir(old_dir, new_dir, job, incar, poscar, kpoints, potcar, Lvdw, Lquestion, cp_opt):
+def make_vas_d2d(odir, ndir, job, poscar, kpoints, potcar, incar):
 
     pwd = os.getcwd()
-
+    if potcar and potcar=='lda':
+        pp = 'lda'
+    else:
+        pp = 'gga'
     files=[]
-    ### Define POSCAR, KPOINTS, INCAR
-    if job == 'ini':
-        poscar = 'POSCAR'
-        kpoints = 'KPOINTS'
-        incar = 'INCAR'
-    else:
-        poscar = 'CONTCAR'
-        kpoints = 'IBZKPT'
-        incar = 'INCAR'
-        if job=='zpe' or job=='md' or job=='chg' or job=='band' :
-            incar = 'INCAR.' + job
-            if job=='zpe' or job=='md':
-                kpoints = 'KPOINTS.gam'
-            elif job=='band':
-                kpoints = 'KPOINTS.band'
-            if not os.path.isfile(kpoints):
-                print(f"prepare {kpoints} file at pwd")
-                sys.exit(1)
-        if os.path.isfile(incar):
-            print(f"incar == {incar}, modify {incar}")
-        else:
-            print(f"prepare {incar} file at pwd")
-            sys.exit(2)
-    ### Define POTCAR
-    if potcar:
-        print("generate POTCAR")
-    else:
-        potcar = "POTCAR"
 
     ### Extra files for Continous Job: CHGCAR, WAVECAR
-    if job=="hybrid" or job=="md":
-        files.append("WAVECAR")
-    elif job=='dos' or job=='band':
-        files.append("CHGCAR")
-    ### if vdW-DF
-    if Lvdw:
-        f_vdw = old_dir+'/'+"vdw_kernel.bindat"
-        if os.path.isfile(f_vdw):
-            files.append("vdw_kernel.bindat")
 
-    if os.path.isdir(new_dir):
-        print(f"overwrite {new_dir}")
+    if os.path.isdir(ndir):
+        print(f"overwrite {ndir}")
     else:
-        s = f"mkdir {new_dir}"
+        s = f"mkdir {ndir}"
         os.system(s)
-        print(f"directory {new_dir} was made")
+        print(f"directory {ndir} was made")
    
-   
-    ### CONTCAR
-    fo = old_dir +'/'+ poscar
-    if os.path.isfile(fo):
-        s = f"cp {fo} {new_dir}/POSCAR"
+    ### 1. POSCAR
+    get_poscar(poscar, job='new', sub=1)    #1 for CONTCAR
+    s = f"cp POSCAR {ndir}"
+    os.system(s)
+    print(f"POSCAR  from {'wdir':>15} to {ndir}")
+    ### 2. KPOINTS    
+    if not kpoints:
+        s = f"cp {odir:>15}/KPOINTS {ndir}"
+    os.system(s)
+    print(f"KPOINTS from {odir:>15} to {ndir}")
+    ### 3. POTCAR
+    if not potcar:
+        s = f"cp {odir}/POTCAR {ndir}"
         os.system(s)
-        print(f"{fo} will be copied to {new_dir}/POSCAR")
+        print(f"POTCAR  from {odir:>15} to {ndir}")
     else:
-        print(f"There is not {fo}")
-
-    ### POTCAR
-    fo = old_dir + '/'  + potcar
-    if os.path.isfile(fo):
-        s = f"cp {fo} {new_dir}/POTCAR"
+        s = f"genpotcar.py -pp {pp}"
+        os.chdir(ndir)
         os.system(s)
-        print(f"{fo} was be copied to {new_dir}/POTCAR")
-    else:
-        print(f"There is not {fo}")
-    ### KPOINTS
-    if kpoints == 'IBZKPT' or job == 'ini':
-        fo = old_dir + '/'  + kpoints
-    elif os.path.isfile(kpoints):
-        fo = kpoints
-    else:
-        fo = 'KPOINTS'
-    if os.path.isfile(fo):
-        s = f"cp {fo} {new_dir}/KPOINTS"
-        os.system(s)
-        print(f"{fo} was be copied to {new_dir}/KPOINTS")
-    else:
-        print("make KPOINTS file ")
+        os.chdir(pwd)
+        print(f"POTCAR was generated in {ndir} with {pp}")
     ### INCAR :: copy INCAR or incar.key
     ### INCAR is normally different job so read on the work directory
-    if job == 'ini':
-        fo = old_dir + '/'  + incar
-    elif os.path.isfile(incar) :
-        fo = incar
+    if incar:
+        print("Use vas_make_cont.py")
+        sys.exit(1)
     else:
-        print(f"There is not {fo}")
-    s = f"cp {fo} {new_dir}/INCAR"
-    os.system(s)
-    print(f"{fo} was  copied to {new_dir}/INCAR")
+        s = f"cp {odir}/INCAR {ndir}"
+        os.system(s)
+        print(f"INCAR   from {odir:>15} to {ndir}")
+    return 0        
             
-    if files:
-        for f in files:
-            fo = old_dir + '/'  + f
-            if f == 'CHGCAR' or f == 'WAVECAR':
-                os.chdir(new_dir)
-                ### cp_opt
-                s = f"{cp_opt} ../{old_dir}/{f} ."
-                os.system(s)
-                print(f"{fo} is {cp_opt}ed to {new_dir}")
-                os.chdir(pwd)
-            else:
-                s = f"cp {fo} {new_dir}"
-                print(f"{fo} is copied to {new_dir}")
-                os.system(s)
                 
 def main():
     global ini_dvasp, pwd
-    parser = argparse.ArgumentParser(description='make directory for continous job from CONTCAR POTCAR KPOINTS and new INCAR')
+    parser = argparse.ArgumentParser(description='make directory from other directory ')
     parser.add_argument('odir', help='copy from old dir')
     parser.add_argument('ndir', help='mkdir and cp')
-    parser.add_argument('job', choices=["hybrid","dos","band","pchg","chg","md","cont","ini","zpe","mol"], help='inquire for each file')
-    parser.add_argument('-s', '--poscar', help='use CONTCAR for 2nd job')
-    parser.add_argument('-p', '--potcar', help='use the same POTCAR')
-    parser.add_argument('-i', '--incar', default='INCAR', choices=["INCAR","incar.key"], help='first run make_incar.py then use incar.key')
-    parser.add_argument('-k', '--kpoints', help='use the same KPOINTS for default')
-    parser.add_argument('-q', '--question', action='store_true', help='inquire for each file')
-    parser.add_argument('-v', '--vdw', action='store_true', help="in case vdW-DF,copy vdw_kernel.bindat")
-    parser.add_argument('-o', '--cp_option', default='ln -s', choices=['cp','ln -s'], help="make directory option")
-    #parser.add_argument('-l', '--ksub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
+    parser.add_argument('-j', '--job', choices=['lda',"hybrid","md","mol"], help='inquire for each file')
+    parser.add_argument('-s', '--poscar', help='copy odir/CONTCAR or input')
+    parser.add_argument('-p', '--potcar', help='copy odir/potcaruse or make POTCAR')
+    parser.add_argument('-i', '--incar',  help='use the same INCAR in d2d')
+    parser.add_argument('-k', '--kpoints', help='copy odir/KPOINTS or make')
     
     args = parser.parse_args()
 
-    make_vas_dir(args.odir, args.ndir, args.job, args.incar, args.poscar, args.potcar, args.kpoints, args.vdw, args.question, args.cp_option)
+    make_vas_d2d(args.odir, args.ndir, args.job, args.poscar, args.kpoints, args.potcar, args.incar)
 if __name__ == '__main__':
     main()
