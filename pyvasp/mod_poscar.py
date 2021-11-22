@@ -9,7 +9,38 @@ def get_atoms_poscar(line):
         alist = lines[0].split()
     return alist
 
-def get_poscar(poscar):
+def get_poscar(poscar, job='new', sub=0):
+    '''
+    copy {poscar} to POSCAR at cwd
+    poscar  input of POSCAR.name
+        if dir:
+            read dir/POSCAR or read dir/CONTCAR
+    return new dirname
+    '''
+    ### 
+    if not poscar :
+        print("POSCAR will be used")
+    ### if poscar is dir
+    else:
+        if os.path.isdir(poscar):
+            if sub == 0:
+                nposcar = f'{poscar}/POSCAR'
+            else:
+                nposcar = f'{poscar}/CONTCAR'
+            dname = poscar + job
+        else:
+            nposcar = poscar
+            dname = pos2dirname(poscar)
+        comm = 'cp %s POSCAR' % nposcar
+        os.system(comm)
+        print(f'POSCAR was made from {nposcar}')
+    # confirm POSCAR is made        
+    if not os.access('POSCAR', os.F_OK):
+        print('POSCAR is not here')
+        exit(21)
+    return dname
+
+def get_poscar0(poscar):
     '''
     copy {poscar} to POSCAR at cwd
     '''

@@ -3,6 +3,7 @@
 import argparse
 import os
 import re
+import json
 from common import get_dirs_prefix, yes_or_no
 from mod_incar import modify_incar
 from mod_poscar    import fixedMD_POSCAR, pos2dirname, get_poscar
@@ -88,7 +89,7 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, optin,opt_kp, Lrun, np, newd
 
 
 ### 2 only incar is changed for jobs: vdw, 
-def vasp_job_incar( job, dirs, prefix, exclude, fixatom, option, Lrun, np, newdir):
+def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun, np, newdir, dict_cli, incar_list):
     '''
     in case only incar is changed
     job     vdw
@@ -122,21 +123,38 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, option, Lrun, np, newdi
             os.system(com)
         ### 4: INCAR
         if job == 'mag':
-            dic = {'MAGMOM': option[0]}
+            dic = {'MAGMOM': inc_option[0]}
             opt='ac' # activate and change
         else:
-            dic = None
+            dic = {}
             opt = None
-        if option:
-            opt = option
+        if dict_cli:
+            kv = json.load(dict_cli)
+            dic.update(dict_cli)
+        elif incar_list:
+            dic = incar_list
+            ### in case LDA: change POTCAR
+            print(f"incar list {dic} and incar option {inc_option}")
+            if 'GGA' in dic and 'o' in inc_option:
+                s = "genpotcar.py -pp lda"
+                os.chdir(ndir)
+                os.system(s)
+                os.chdir(pwd)
+                print("POTCAR was changed with LDA")
+            else:
+                print("this is not working")
+        if inc_option:
+            opt = inc_option
         incar = modify_incar(f"{odir}/INCAR", job, dic=dic, opt=opt)
         print(f"{incar} was modified from {odir}/INCAR")
         com = f"cp {incar}  {ndir}/INCAR"
         print(f"{incar} was used")
         os.system(com)
+
+
     return 0
 
-### 3 only POSCAR or KPOINTS is changed for job ini & cont
+### 3:: only POSCAR or KPOINTS is changed for job ini & cont
 def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun):
     '''
     in case POSCAR or KPOINTS changes
@@ -196,13 +214,15 @@ def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun):
 
 def main():
     parser = argparse.ArgumentParser(description='remove files except initial files')
-    parser.add_argument('-j', '--job', choices=['sp',"dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=['sp','incar',"dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file')
     parser.add_argument('-d', '--dirs', nargs='+', help='select directories')
     parser.add_argument('-nd', '--newdir', help='select directories')
     parser.add_argument('-p', '--prefix', help='select directories using prefix')
     parser.add_argument('-ex', '--exclude', nargs='*', help='exclude if already exist')
     parser.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
-    parser.add_argument('-o', '--option', nargs='*', help='params a: append, c: change, o: out, r: reverse, u:use INCAR.job')
+    parser.add_argument('-o', '--ioption', nargs='*', help='params a: append, c: change, o: out, r: reverse, u:use INCAR.job')
+    parser.add_argument('-id', '--incar_dict', help='input dict from command line')
+    parser.add_argument('-il', '--incar_list', nargs='*', help='input list for comment out')
     parser.add_argument('-ok', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
     parser.add_argument('-s', '--poscar', help='incar POSCAR.name for job==ini')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
@@ -210,23 +230,23 @@ def main():
     args = parser.parse_args()
 
 
-    ### option
-    if not args.option and 'opt' in args.job:
-        option = 'ac'
+    ### incar option
+    if not args.ioption and 'opt' in args.job:
+        inc_option = 'ac'
     else:
-        option = args.option
+        inc_option = args.ioption
     ### only INCAR changes in no-vdw -> vdw, sp -> opt,
-    incar_jobs = ['vdw','noD', 'opt','copt', 'mag', 'kisti']
+    incar_jobs = ['vdw','noD', 'opt','copt', 'mag', 'kisti','incar']
     ### copy initial job: POSCAR or CONTCAR
     ### cont + ok to change KPOINTS
     ini_jobs = ['ini', 'cont']
 
     if args.job in incar_jobs :
-        vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, option, args.run, args.nproc, args.newdir )
+        vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option, args.run, args.nproc, args.newdir,args.incar_dict, args.incar_list)
     elif args.job in ini_jobs:
         vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.optkpoints, args.run)
     else:
-        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, option,args.optkpoints, args.run, args.nproc, args.newdir )
+        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option,args.optkpoints, args.run, args.nproc, args.newdir )
     return 0
 
 if __name__ == '__main__':
