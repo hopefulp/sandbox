@@ -201,13 +201,13 @@ def main():
 
     parser.add_argument('-i', '--incar', action='store_true',  help='first run make_incar.py then use incar.key')
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
-    parser.add_argument('-d', '--directory', help='mkdir and cp')
+    parser.add_argument('-n', '--dname', help='get directory name')
     parser.add_argument('-al', '--all', action='store_true', help="skip if KPOINTS, POTCAR, INCAR were ready")
     parser.add_argument('-o', '--qopt', action='store_true', help="use different qsub file in kisti")
     parser.add_argument('-r', '--run', action='store_true', help="submit job")
     args = parser.parse_args()
 
-    make_vasp_dir(args.job, args.poscar, args.potcar, args.kpoints, args.incar, args.all, args.question, args.kpsub, args.directory, args.iofile, args.atoms, args.run, args.qopt)
+    make_vasp_dir(args.job, args.poscar, args.potcar, args.kpoints, args.incar, args.all, args.question, args.kpsub, args.dname, args.iofile, args.atoms, args.run, args.qopt)
     return 0
 
 if __name__ == '__main__':

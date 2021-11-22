@@ -86,12 +86,15 @@ def compare_incar(files, key, Ldiff=False):
     shared = d1keys.intersection(d2keys)
     diff_1 = d1keys.difference(d2keys)
     diff_2 = d2keys.difference(d1keys)
+    ### all the keys in common
     union  = d1keys.union(d2keys)
     s = ' '
     for key in union:
         if key in shared:
             if d1[key] == d2[key]:
                 diff="-"
+                if Ldiff:
+                    continue
             else:
                 diff="diff"
             print(f'{s:4}{key:<8} {d1[key]:>10} {d2[key]:>10} {diff:>10}')
@@ -110,6 +113,7 @@ def main():
     parser = argparse.ArgumentParser(description="Compare two INCAR")
     parser.add_argument('files', nargs='*',  help="one or two INCAR file ")
     parser.add_argument('-p', '--params', nargs='*',  help="check the key and values ")
+    parser.add_argument('-d', '--Ldiffer', action='store_true',  help="show only differences")
     args = parser.parse_args()
 
     if not args.files:
@@ -117,7 +121,7 @@ def main():
     else:
         files=args.files
 
-    compare_incar(files, args.params)
+    compare_incar(files, args.params, args.Ldiffer)
 
 if __name__ == "__main__":
     main()
