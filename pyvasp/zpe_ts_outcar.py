@@ -1,20 +1,10 @@
 #!/home/joonho/anaconda3/bin/python
 
-### Update : 2019 / 03 / 08
-# Min Jong Noh #
-# starnmj@kaist.ac.kr
+# Updated by Min Jong Noh : 2019.03.08 mailto:starnmj@kaist.ac.kr
+# Updated by Joonho Park  : 2021.11.23, Fvib was modified, 
 
-##################################################################################
-# This is a script   #
-##################################################################################
-
-###
 import os, sys, math
 import argparse
-###
-
-
-###################################
 
 #### Get a total number of lines in read-file ####
 
@@ -37,63 +27,80 @@ def cal_zpe_ts(dir1, natom, infile):
 
     TN_lines = file_len('THz.txt') # Total Number of Lines
 
-    THz2meV = []
+    THz2eV = []
     with open('THz.txt', 'r') as f:
         lines = f.readlines()
         for line in lines:
             print(line.rstrip())
             words = line.split()
-            THz2meV.append((int(words[0]), 0.001*float(words[-2])))  # Serial, eV
+            THz2eV.append((int(words[0]), 0.001*float(words[-2])))  # Serial, convert to eV
 
     ####################################################
 
-
     #### Zero Point Energy (ZPE) ####
-    #### += 0.5 * Summation of Frequency Energy [eV] ####
-
-    ZPE = 0.0
-    #for i in range(len(THz2meV)):
+    #### += 0.5 * Summation of Frequency Energy [eV]  eV or meV
+    
+    #### Entropy Term (modified by JP)
+    #                  x             
+    # T*dS  =  kT [----------  -  ln(1 - exp(-x)) ]
+    #              [exp(x)-1]
+    # 
+    #  x  = energy / kT = beta*hbar*omega
+    #
+    # <E(T)> = ZPE + kT ( x/[exp(x) - 1] )
+    #
+    # F_vib = <E(t)> -T<S(T)> = ZPE + kT *  ln(1 - exp(-x))
+    #
+    # K. Reuter et al. PRB (2001); S.-J. Woo et al. PRL (2013)
+    ######################
+    #for i in range(len(THz2eV)):
     ### Normal mode = 3 * Natom
     if natom:
         dof = natom * 3
     else:
-        dof = len(THz2meV)
-    for i in range(dof):
-        E = 0.5 * THz2meV[i][1]
-        ZPE += E
-    ##################################
+        dof = len(THz2eV)
 
-    #### Entropy Term ####
-    #              x             
-    # T*dS  =  ----------  -  ln(1 - exp(-x))
-    #          [exp(x)-1]
-    # 
-    #  x  = energy / kT
-    #
-    ######################
     kB = 0.0000861733576020577 # eV K-1
     T = 298.15 # Temeprature, K
     kT = kB * T
 
+    Evib = 0.0      # Evib = E(T)
     TS = 0.0
-    #for i in range(len(THz2meV)):
+    TS1 = 0.0
+    TS2 = 0.0
+    zpe = 0.0       # double of zpe
+    #for i in range(len(THz2eV)):
     for i in range(dof):
-        x = THz2meV[i][1] / kT
-        v1 = x / (math.exp(x) - 1)
-        v2 = 1 - math.exp(-x)
-        E = v1 - math.log(v2)
-        TS += kT*E
+        hw = THz2eV[i][1]
+        zpe += hw               # sum of ZPE
+        x = hw / kT
+        den0 = math.exp(x) -1
+        Evib += hw * (0.5 + 1./den0)
 
+        ts1 = x / den0
+        ts2 = -math.log(1. - math.exp(-x))
+        ts = ts1 + ts2 
+        TS += kT*ts
+        TS1 += kT * ts1
+        TS2 += kT * ts2
+    zpe *= 0.5
+    Fvib = Evib - TS    # == zpe - TS2
     #### Print Output ###
     print('----------------------------------------------')
-    print('Zero Point Energy (ZPE) : %15.9f  eV' % ZPE)
-    print('Entropy Energy (TS)     : %15.9f  eV' % TS)
+    print(f'{"Zero Point Energy (ZPE)":>25} : {zpe:7.3f} eV (1)')
+    print(f'{"Fvib 2nd logterm":>25} : {TS2:7.3f} eV (2)')
+    print(f'{"E_vib (<E(T)>)":>25} : {Evib:7.3f} eV (3)')
+    #print(f'{"Delta":>25} : {Evib-zpe:7.3f} eV')
+    print(f'{"Entropy Energy (T<S>)":>25} : {TS:7.3f} eV (4)')
+    #print(f'{"Entropy terms (TS1, TS2)":>25} : {TS1:7.3f} {TS2:7.3f} eV')
+    print(f'{"Helmholtz free E (Fvib)":>25} : {Fvib:7.3f} eV', '(1)-(2) or (3)-(4)')
     print('----------------------------------------------')
-    print("Don't forget to remember: Degree of Freedom == 3 * Natom")
+    print(f"Don't forget to remember: Degree of Freedom == 3 *{natom} Natom ")
     with open("zpe.dat","w") as f:
         f.write('----------------------------------------------\n')
-        f.write('Zero Point Energy (ZPE) : %15.9f  eV\n' % ZPE)
+        f.write('Zero Point Energy (ZPE) : %15.9f  eV\n' % zpe)
         f.write('Entropy Energy (TS)     : %15.9f  eV\n' % TS)
+        f.write('Helmholtz Energy (Fvib) : %15.9f  eV\n' % Fvib)
         f.write('----------------------------------------------\n')
     
     os.chdir(cwd)

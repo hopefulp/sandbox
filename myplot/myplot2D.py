@@ -51,7 +51,7 @@ def my_font(pack='amp'):
 def common_figure():
     fig = plt.figure(figsize=(15,10))
     ax = plt.axes()
-    mpl.rcParams.update({'font.size':25})
+    mpl.rcParams.update({'font.size':20})
     ax.tick_params(axis='both', which='major', labelsize=25)
     #ax.tick_params(axis='x', labelsize=30)
 
@@ -348,7 +348,7 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     else:
         print(f"Error:: obscure in y-dim {ys.ndim}")
     ### ADD LEGEND
-    #plt.legend(loc=2)                # locate after plot
+    plt.legend(loc=2)                # locate after plot
     #ax.xaxis.set_major_locator(ticker.MultipleLocator(100))
     #ax.yaxis.set_major_locator(ticker.MultipleLocator())
     plt.show()
