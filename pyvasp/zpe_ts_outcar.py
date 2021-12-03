@@ -34,7 +34,7 @@ def cal_zpe_ts(dir1, natom, infile):
             print(line.rstrip())
             words = line.split()
             THz2eV.append((int(words[0]), 0.001*float(words[-2])))  # Serial, convert to eV
-
+    print(THz2eV)
     ####################################################
 
     #### Zero Point Energy (ZPE) ####
@@ -71,7 +71,7 @@ def cal_zpe_ts(dir1, natom, infile):
     zpe = 0.0       # double of zpe
     #for i in range(len(THz2eV)):
     for i in range(dof):
-        hw = THz2eV[i][1]
+        hw = THz2eV[i][1]       # eV
         zpe += hw               # sum of ZPE
         x = hw / kT
         den0 = math.exp(x) -1
@@ -83,6 +83,7 @@ def cal_zpe_ts(dir1, natom, infile):
         TS += kT*ts
         TS1 += kT * ts1
         TS2 += kT * ts2
+        print(f"ts1 {ts1*kT:10.4f} ts2 {ts2*kT:10.4f}")
     zpe *= 0.5
     Fvib = Evib - TS    # == zpe - TS2
     #### Print Output ###
