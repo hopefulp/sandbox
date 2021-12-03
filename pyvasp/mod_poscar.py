@@ -17,6 +17,7 @@ def get_poscar(poscar, job='new', sub=0):
             read dir/POSCAR or read dir/CONTCAR
     return new dirname
     '''
+    dname=None
     ### 
     if not poscar :
         print("POSCAR will be used")
