@@ -55,17 +55,12 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, optin,opt_kp, Lrun, np, newd
         com.append(f'cp {kpoints} {ndir}/KPOINTS')
         print(f"{kpoints} was used")
         ### 4: INCAR
-        if job == 'zpe':
-            modify_incar(f"{odir}/INCAR", job)
-            incar = 'INCAR'
-            print(f"{incar} was modified from {odir}/INCAR")
+        if (not optin or optin== 'm') and os.path.isfile(f"{odir}/INCAR"):
+            incar = modify_incar(f"{odir}/INCAR", job)
+        elif optin == 'u' and os.path.isfile('INCAR.'+job):
+            incar = 'INCAR.' + job
         else:
-            if (not optin or optin== 'm') and os.path.isfile(f"{odir}/INCAR"):
-                incar = modify_incar(f"{odir}/INCAR", job)
-            elif optin == 'u' and os.path.isfile('INCAR.'+job):
-                incar = 'INCAR.' + job
-            else:
-                incar = 'INCAR'
+            incar = 'INCAR'
         com.append(f"cp {incar} {ndir}/INCAR")
         print(f"{incar} was used")
 

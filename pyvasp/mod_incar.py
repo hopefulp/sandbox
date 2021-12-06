@@ -43,8 +43,12 @@ noD_out     = ['IVDW']
 opt_change  = {'NSW': 1000}
 opt_active  = {'ISIF': 2, 'IBRION': 2, 'POTIM': 0.3}
 ### Cell OPT
-copt_change  = {'NSW': 1000}
-copt_active  = {'ISIF': 3, 'IBRION': 2, 'POTIM': 0.3}
+copt_change = {'NSW': 1000}
+copt_active = {'ISIF': 3, 'IBRION': 2, 'POTIM': 0.3}
+### zpe
+zpe_change  = {'ICHARG': 1,'POTIM': 0.015, 'IBRION':5, 'NSW':1}
+zpe_active  = {'NFREE': 2}
+zpe_out     = ['NPAR']
 ### MAGMOM
 #mag_active = {'ISPIN': 2}
 mag_change = {'ISPIN': 2}
