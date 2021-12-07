@@ -178,6 +178,11 @@ def list2str(li, delimit=None):
         st = delimit.join(str(x) for x in li)
     return st
 
+def list2dict(li):
+    it = iter(li)
+    dic = dict(zip(it,it))
+    return dic
+
 def print_list(li):
     st = list2str(li)
     print(st)

@@ -60,6 +60,7 @@ make.vas_make_cont = " -d dir_list -j job -i incar_option -o option_poscar\
                     \n\t    -id change of INCAR dict\
                     \n\tUsage:\
                     \n\t    pypath.sh vas_make_cont.py -d SnO2sc22FH -j band -i i\
+                    \n\t    python $sbvas/vas_make_cont.py -d sc34 -nd sc34E5 -j incar -id '{\"ENCUT\": \"500\"}' -io c\
                     \n\tJobs:\
                     \n\t    ini, cont: (def ini)\
                     \n\t\tcopy odir [INCAR, KPOINTS, POTCAR] w. given -s POSCAR\
