@@ -136,7 +136,7 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
             ### param change
             if 'paramch' in locals() and paramch:
                 for key in paramch.keys():
-                    tag_match == False
+                    tag_match = False
                     ### replace finds only the first letter is active
                     if re.match(key, mline):
                         line = replace_line(paramch, key, job) + "\n"

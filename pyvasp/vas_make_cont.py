@@ -124,7 +124,8 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun, np, n
             dic = {}
             opt = None
         if dict_cli:
-            kv = json.load(dict_cli)
+            print(f"{dict_cli}")
+            #kv = json.load(dict_cli)
             dic.update(dict_cli)
         elif incar_list:
             dic = incar_list
@@ -209,14 +210,14 @@ def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun):
 
 def main():
     parser = argparse.ArgumentParser(description='remove files except initial files')
-    parser.add_argument('-j', '--job', choices=['sp','incar',"dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=['sp','incar',"dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
     parser.add_argument('-d', '--dirs', nargs='+', help='select directories')
     parser.add_argument('-nd', '--newdir', help='select directories')
     parser.add_argument('-p', '--prefix', help='select directories using prefix')
     parser.add_argument('-ex', '--exclude', nargs='*', help='exclude if already exist')
     parser.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
-    parser.add_argument('-o', '--ioption', nargs='*', help='params a: append, c: change, o: out, r: reverse, u:use INCAR.job')
-    parser.add_argument('-id', '--incar_dict', help='input dict from command line')
+    parser.add_argument('-io', '--ioption', nargs='*', help='params a: append, c: change, o: out, r: reverse, u:use INCAR.job')
+    parser.add_argument('-id', '--incar_dict', type=json.loads, help='input dict from command line')
     parser.add_argument('-il', '--incar_list', nargs='*', help='input list for comment out')
     parser.add_argument('-ok', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
     parser.add_argument('-s', '--poscar', help='incar POSCAR.name for job==ini')
