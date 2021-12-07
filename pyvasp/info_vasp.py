@@ -112,11 +112,15 @@ modify.pos_sort     ="pos_sort.py POSCAR\
                     \n\treturns POSCARnew\
                     \n\t:when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
                     "
-check.diff_incar   ="diff_incar.py INCAR1 [INCAR2] -p keys\
+check.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\tOptions:\
                     \n\t    one dir : show INCAR\
                     \n\t    two dirs: compare two INCAR\
-                    \n\t    -p INCAR keys: to check whether the keys exist\
+                    \n\t    -k  keys: to check whether the keys exist\
+                    \n\t    -a  : search all directories as for -k keys\
+                    \n\tUsage:\
+                    \n\t    incar_diff.py FPtb2H2 FPtb2H2hb\
+                    \n\t    incar_diff.py -a -k ENCUT ISTART\
                     "
 
 ase.ase_fconvert    =""
