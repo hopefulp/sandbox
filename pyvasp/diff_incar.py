@@ -67,6 +67,7 @@ def print_key(dic, params):
 
 def compare_incar(files, key, Ldiff=False):
     tup = get_incar_dic(files)
+    print(f"{len(tup)}")
     if len(tup) == 1:
         if key:
             print_key(tup[0], key)

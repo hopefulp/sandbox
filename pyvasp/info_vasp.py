@@ -53,8 +53,11 @@ make.vas_make_cont = " -d dir_list -j job -i incar_option -o option_poscar\
                     \n\tchange of d2d to make_cont\
                     \n\toptions:\
                     \n\t    -d all the directory list\
-                    \n\t    -j band, zpe, ini, opt etc\
-                    \n\t    -i change old_dir/INCAR\
+                    \n\t    -j band, zpe, ini, opt,  etc\
+                    \n\t\tonly INCAR modified: vdw,noD, opt,copt, mag, kisti,incar\
+                    \n\t\t    incar: no preexist values, given from cli\
+                    \n\t    -il change of INCAR list for delete\
+                    \n\t    -id change of INCAR dict\
                     \n\tUsage:\
                     \n\t    pypath.sh vas_make_cont.py -d SnO2sc22FH -j band -i i\
                     \n\tJobs:\
