@@ -53,8 +53,11 @@ make.vas_make_cont = " -d dir_list -j job -i incar_option -o option_poscar\
                     \n\tchange of d2d to make_cont\
                     \n\toptions:\
                     \n\t    -d all the directory list\
-                    \n\t    -j band, zpe, ini, opt etc\
-                    \n\t    -i change old_dir/INCAR\
+                    \n\t    -j band, zpe, ini, opt,  etc\
+                    \n\t\tonly INCAR modified: vdw,noD, opt,copt, mag, kisti,incar\
+                    \n\t\t    incar: no preexist values, given from cli\
+                    \n\t    -il change of INCAR list for delete\
+                    \n\t    -id change of INCAR dict\
                     \n\tUsage:\
                     \n\t    pypath.sh vas_make_cont.py -d SnO2sc22FH -j band -i i\
                     \n\tJobs:\
@@ -109,11 +112,15 @@ modify.pos_sort     ="pos_sort.py POSCAR\
                     \n\treturns POSCARnew\
                     \n\t:when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
                     "
-check.diff_incar   ="diff_incar.py INCAR1 [INCAR2] -p keys\
+check.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\tOptions:\
                     \n\t    one dir : show INCAR\
                     \n\t    two dirs: compare two INCAR\
-                    \n\t    -p INCAR keys: to check whether the keys exist\
+                    \n\t    -k  keys: to check whether the keys exist\
+                    \n\t    -a  : search all directories as for -k keys\
+                    \n\tUsage:\
+                    \n\t    incar_diff.py FPtb2H2 FPtb2H2hb\
+                    \n\t    incar_diff.py -a -k ENCUT ISTART\
                     "
 
 ase.ase_fconvert    =""

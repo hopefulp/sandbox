@@ -18,6 +18,7 @@ qchem   = MyClass('qchem')
 qsleep  = MyClass('qsleep')
 process = MyClass('process')
 slurm   = MyClass('slurm')
+kisti   = MyClass('kisti')
 
 # if not use input variables, define here
 sge.usage="$qstat -f    # see all nodes(/used/total) and my job\
@@ -94,6 +95,21 @@ amp.sge_amp="sge_amp.py \
 amp.amp_scan="amp_scan.sh\
             \n\t\tdirect run at node with scan\
             "
+# kisti  = " " makes error: 149: gkey==instance.name if not instance
+kisti.pbs_vasp_kisti_skl = "Usage:: python $sbvas/vasp_script.py args\
+                            \n\t\tSkylake for VASP\
+                            \n\t\tsetting: nnode=20, nproc=40 in 40\
+                            " 
+kisti.pbs_vasp_kisti_skl2 = "setting: nnode=20, nproc=20 in 40 for memory overflow\
+                            "  
+
+kisti.pbs_vasp_kisti_knl = "setting: nnode=10, nproc=68 in 68\
+                            \n\t\tKnight for parallel process such as LAMMPS\
+                            "  
+kisti.pbs_vasp_kisti_knl2 = "setting: nnode=10, nproc=64 in 68\
+                            \n\t\tfor fast calculation?\
+                            "  
+
 
 qchem.usage=""
 qsleep.usage=""
