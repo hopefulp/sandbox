@@ -8,7 +8,7 @@ import argparse
 import os
 import shutil
 import re
-from  myvasp import *
+from  envvasp import *
 from common import *
 from mod_poscar import get_poscar
 

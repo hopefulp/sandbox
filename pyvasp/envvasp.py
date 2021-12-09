@@ -31,12 +31,12 @@ incar_kw={  'ISTART': '0', 'ICHARG': '2', 'ISPIN': '1', 'MAGMOM': f'{natom} * 0'
 def get_hostname():
     
     hostname = os.popen('hostname').read().rstrip()
-
+    print(hostname)
     if hostname == 'login':
         hname = 'mlet'
     elif re.match('login0', hostname):
         hname = 'kisti'
-    elif hostname == 'tgm-master':
+    elif re.match('tgm-master',hostname):
         hname = 'pt'
     else:
         hname = hostname

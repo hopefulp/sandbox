@@ -8,11 +8,18 @@ from common import get_dirs_prefix, yes_or_no, list2dict
 from mod_incar import modify_incar
 from mod_poscar    import fixedMD_POSCAR, pos2dirname, get_poscar
 import sys
-from myvasp import get_hostname
+from envvasp import get_hostname
 from vas_qsub import qsub_command
 
+def run_vasp(ndir, np, x, nnode):
+    s = qsub_command(ndir, np=np, X=x, nnode=nnode)
+    print(s)
+    if yes_or_no("Will you run"):
+        os.system(s)
+    return 0
+
 ### 1. for general job process
-def vasp_jobs( job, dirs, prefix, exclude, fixatom, optin,opt_kp, Lrun, np, newdir):
+def vasp_jobs( job, dirs, prefix, exclude, fixatom, optin,opt_kp, Lrun, newdir,np,xpart,nnode):
     #print(f"{exclude}")
     pwd = os.getcwd()
     if prefix:
@@ -76,15 +83,12 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, optin,opt_kp, Lrun, np, newd
             print(f"CHGCAR is linked to {ndir}")
             os.chdir(pwd)
         ### qsub depends on server
-        s = qsub_command(ndir, np)
-        print(s)
-        if Lrun or yes_or_no("Will you run"):
-            os.system(s)
+        run_vasp(ndir, np, xpart, nnode)
     return 0
 
 
 ### 2 only incar is changed for jobs: vdw, 
-def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun, np, newdir, incar_kws, incar_list):
+def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun,newdir, incar_kws, incar_list,np,xpart,nnode):
     '''
     in case only incar is changed
     job     vdw
@@ -149,12 +153,14 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun, np, n
         com = f"cp {incar}  {ndir}/INCAR"
         print(f"{incar} was used")
         os.system(com)
-
+        
+        ### qsub depends on server
+        run_vasp(ndir, np, xpart, nnode)
 
     return 0
 
 ### 3:: only POSCAR or KPOINTS is changed for job ini & cont
-def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun):
+def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun, np, xpart, nnode):
     '''
     in case POSCAR or KPOINTS changes
     '''
@@ -198,16 +204,9 @@ def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun):
     print(f"{com}")
     os.system(com)
     ### only works for KISTI
-    com = qsub_command(ndir)
-    print(com)
-    if Lrun:
-        os.system(com)
-    elif not poscar:
-        print(f"made a new ini {ndir} directory")
-    else:
-        q = "will you run?"
-        if yes_or_no(q):
-            os.system(com)
+    ### qsub depends on server
+    run_vasp(ndir, np, xpart, nnode)
+
     return 0
 
 
@@ -227,6 +226,8 @@ def main():
     parser.add_argument('-s', '--poscar', help='incar POSCAR.name for job==ini')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
     parser.add_argument('-n', '--nproc', default=16, help='nprocess in qsub')
+    parser.add_argument('-x', '--partition', default=3, type=int, help='nprocess in qsub')
+    parser.add_argument('-N', '--nnode', default=4, type=int, help='nprocess in qsub')
     args = parser.parse_args()
 
 
@@ -245,11 +246,11 @@ def main():
     # dos:  INCAR + KPOINTS
 
     if args.job in incar_jobs:
-        vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option, args.run, args.nproc, args.newdir,args.incar_kws, args.incar_list)
+        vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option, args.run, args.newdir,args.incar_kws, args.incar_list,args.nproc,  args.partition, args.nnode)
     elif args.job in ini_jobs:
-        vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.optkpoints, args.run)
+        vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.optkpoints, args.run, args.nproc,  args.partition, args.nnode)
     else:
-        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option,args.optkpoints, args.run, args.nproc, args.newdir )
+        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option,args.optkpoints, args.run,args.newdir,args.nproc,  args.partition, args.nnode)
     return 0
 
 if __name__ == '__main__':

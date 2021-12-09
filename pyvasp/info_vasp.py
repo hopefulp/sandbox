@@ -63,11 +63,7 @@ make.vas_make_cont = " -d dir_list -j job -i incar_option -o option_poscar\
                     \n\tUsage:\
                     \n\t    pypath.sh vas_make_cont.py -d SnO2sc22FH -j band -i i\
                     \n\t    python $sbvas/vas_make_cont.py -d sc34 -nd sc34E5 -j incar -id '{\"ENCUT\": \"500\"}' -io c\
-<<<<<<< HEAD
                     \n\tJobs Detail:\
-=======
-                    \n\tJobs:\
->>>>>>> 543298850fa1b38bb1c931bd703f02c5b62221fc
                     \n\t    ini, cont: (def ini)\
                     \n\t\tcopy odir [INCAR, KPOINTS, POTCAR] w. given -s POSCAR\
                     \n\t\t     if not -s POSCAR, use odir/POSCAR(ini) or CONTCAR(cont)\
@@ -110,9 +106,14 @@ make.mod_poscar    ="module for POSCAR modification\
                     \n\t    : poscar is modified\
                     \n\t    : all the atoms except atom will be fixed for ZPE\
                     "
-run.amp_env_run         ="amp_run.py in (envs) anaconda\
-                        \n\t\t   when envs is not (base), detect envs and import proper module\
-                        "
+run.amp_env_run     ="amp_run.py in (envs) anaconda\
+                    \n\t\t   when envs is not (base), detect envs and import proper module\
+                    "
+run.vas_qsub        = " run vasp in queue\
+                    \n\t called by vas_make_cont.py\
+                    "
+run.envvasp         = " imported from vasp run, make\
+                    "
 clean.clean         =" "
 modify.pos_sort     ="pos_sort.py POSCAR\
                     \n\tsort atoms in POSCAR\
