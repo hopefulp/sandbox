@@ -44,7 +44,7 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     "
 make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
                     \n\tvas_make_d2d.py old_dir new_dir job [options]\
-                    \n\tjob = {ini, cont, md, ... post process}\
+                    \n\tjob = {cont, md, ... post process}\
                     "
 make.vas_make_incar ="\n\t    If not 'incar.key', make it, check it and modify it before run this again\
                     \n\t    based on 'incar.key', make INCAR\
@@ -53,14 +53,17 @@ make.vas_make_cont = " -d dir_list -j job -i incar_option -o option_poscar\
                     \n\tchange of d2d to make_cont\
                     \n\toptions:\
                     \n\t    -d all the directory list\
-                    \n\t    -j band, zpe, ini, opt,  etc\
+                    \n\t    -j [ini,cont] calls vasp_job_ini()\
+                    \n\t    -j [incar,sp,chg,opt,copt,vdw,noD,mag,kisti] changes only INCAR vasp_job_incar()\
+                    \n\t    -j [band,dos,zpe] changes INCAR, KPOINTS,POSCAR in vasp_jobs()\
                     \n\t\tonly INCAR modified: vdw,noD, opt,copt, mag, kisti,incar\
                     \n\t\t    incar: no preexist values, given from cli\
                     \n\t    -il change of INCAR list for delete\
                     \n\t    -id change of INCAR dict\
                     \n\tUsage:\
                     \n\t    pypath.sh vas_make_cont.py -d SnO2sc22FH -j band -i i\
-                    \n\tJobs:\
+                    \n\t    python $sbvas/vas_make_cont.py -d sc34 -nd sc34E5 -j incar -id '{\"ENCUT\": \"500\"}' -io c\
+                    \n\tJobs Detail:\
                     \n\t    ini, cont: (def ini)\
                     \n\t\tcopy odir [INCAR, KPOINTS, POTCAR] w. given -s POSCAR\
                     \n\t\t     if not -s POSCAR, use odir/POSCAR(ini) or CONTCAR(cont)\
