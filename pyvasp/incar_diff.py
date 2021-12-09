@@ -5,7 +5,7 @@ import os
 import re
 from common import dir_files
 from my_print import print_dict
-
+from mod_incar import ordered_incar
 reg='[=\s]+'
 
 def get_kv(strline):
@@ -92,8 +92,17 @@ def compare_incar(files, key, Ldiff=False):
     diff_2 = d2keys.difference(d1keys)
     ### all the keys in common
     union  = d1keys.union(d2keys)
+    ### sort the union in the order
+    ordered_keys=[]
+    for u in union:
+        if not u in ordered_incar:
+            print(f"Err: {u} is not listed in ordered_incar of mod_incar.py")
+    for k in ordered_incar:
+        if k in union:
+            ordered_keys.append(k)
+        
     s = ' '
-    for key in union:
+    for key in ordered_keys:
         if key in shared:
             if d1[key] == d2[key]:
                 diff="-"
@@ -111,7 +120,7 @@ def compare_incar(files, key, Ldiff=False):
 
     return 0
    
-def show_incar(f, Lall, kws):
+def show_incars(f, Lall, kws):
     pwd = os.getcwd()
     if Lall:
         dirs = os.listdir(pwd)
@@ -151,7 +160,7 @@ def main():
     #print(f"{args.kws}")
     if args.all:
         f = args.files
-        show_incar(f,args.all, args.kws) 
+        show_incars(f,args.all, args.kws) 
     else:
         compare_incar(args.files, args.kws, args.Ldiffer)
 

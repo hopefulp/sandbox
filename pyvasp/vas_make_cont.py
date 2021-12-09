@@ -88,6 +88,8 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun, np, n
     '''
     in case only incar is changed
     job     vdw
+    copy POTCAR KPOINTS CONTCAR change INCAR
+        chg
     '''
     pwd = os.getcwd()
     if prefix:
@@ -233,11 +235,14 @@ def main():
         inc_option = 'ac'
     else:
         inc_option = args.ioption
-    ### only INCAR changes in no-vdw -> vdw, sp -> opt,
-    incar_jobs = ['vdw','noD', 'opt','copt', 'mag', 'kisti','incar']
+    ### only INCAR changes in no-vdw -> vdw, sp -> opt, opt->sp
+    incar_jobs = ['vdw','noD', 'opt','copt','mag', 'kisti','incar','sp','chg']
     ### copy initial job: POSCAR or CONTCAR
     ### cont + ok to change KPOINTS
     ini_jobs = ['ini', 'cont']
+    ### others
+    # band: INCAR + KPOINTS
+    # dos:  INCAR + KPOINTS
 
     if args.job in incar_jobs:
         vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option, args.run, args.nproc, args.newdir,args.incar_kws, args.incar_list)
