@@ -75,7 +75,6 @@ def main():
     parser.add_argument('-k', '--kpoints', help='copy odir/KPOINTS or make')
     
     args = parser.parse_args()
-
     make_vas_d2d(args.odir, args.ndir, args.job, args.poscar, args.kpoints, args.potcar, args.incar)
 if __name__ == '__main__':
     main()

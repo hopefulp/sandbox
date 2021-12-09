@@ -23,6 +23,9 @@ import re
 import os
 import sys
 
+### INCAR ORDER for display
+ordered_incar=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','NSIM','LPLANE','ISTART','ICHARG','ISPIN','ENCUT','NELMIN','NELM','EDIFF','ISYM','ADDGRID','LREAL','LASPH','LMAXMIX','NELECT','MAGMOM','ISMEAR','SIGMA','AMIX','BMIX','AMIN','IWAVPRE','ISIF','IBRION','NSW','POTIM','EDIFFG','NWRITE','LPETIM','LWAVE','LCHARG','LAECHG','LVTOT','LVHAR','LORBIT','NEDOS','EMIN','EMAX','LPARD','NBMOD','EINT','LSEPB','LSEPK','NFREE','LEPSILON','LMONO','IDIPOL','LDIPOL','GGA_COMPAT','LSORBIT','IVDW','LVDWSCS','LDAU','LDAUTYPE','LDAUL','LDAUU','LDAUJ','LDAUPRINT']
+
 ###### DICT for each job
 ### job_mod for the existing value
 ### job_comment for comment out
@@ -42,6 +45,11 @@ noD_out     = ['IVDW']
 ### OPT
 opt_change  = {'NSW': 1000}
 opt_active  = {'ISIF': 2, 'IBRION': 2, 'POTIM': 0.3}
+### chg, sp
+chg_out     = ['ISIF', 'IBRION', 'EDIFFG', 'POTIM']
+chg_change  = {'LCHARG': '.T.'}
+sp_out      = chg_out
+sp_change   = {'LCHARG': '.F.'}
 ### Cell OPT
 copt_change = {'NSW': 1000}
 copt_active = {'ISIF': 3, 'IBRION': 2, 'POTIM': 0.3}
@@ -62,8 +70,13 @@ def replace_line(dic, key, job=None):
     return newline
 
 def comment_out_line(line, job):
-    newline = f"#{line} + in {job} "+ "\n"
-    return newline
+    ''' if commented out already, return itself '''
+    sline = line.strip()
+    if re.match("#", sline):
+        return line + "\n"
+    else:
+        newline = f"#{line} ! in {job} "+ "\n"
+        return newline
 '''
 def dict_update(param, dic):
     if param in globals():
@@ -112,7 +125,8 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
     # print(f"param comment out {paramout}")
     with open(incar) as f:
         lines = f.readlines()
-    print(f"write to {outf}")        
+    print(f"write to {outf}")
+    ### open output file and write line by line of input INCAR
     with open(outf, 'w') as f:    
         for line in lines:
             mline = line.strip()

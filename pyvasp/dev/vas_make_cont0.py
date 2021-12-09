@@ -4,7 +4,7 @@ import argparse
 import os
 import re
 import json
-from common import get_dirs_prefix, yes_or_no, list2dict
+from common import get_dirs_prefix, yes_or_no
 from mod_incar import modify_incar
 from mod_poscar    import fixedMD_POSCAR, pos2dirname, get_poscar
 import sys
@@ -84,12 +84,10 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, optin,opt_kp, Lrun, np, newd
 
 
 ### 2 only incar is changed for jobs: vdw, 
-def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun, np, newdir, incar_kws, incar_list):
+def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun, np, newdir, dict_cli, incar_list):
     '''
     in case only incar is changed
     job     vdw
-    copy POTCAR KPOINTS CONTCAR change INCAR
-        chg
     '''
     pwd = os.getcwd()
     if prefix:
@@ -125,11 +123,10 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun, np, n
         else:
             dic = {}
             opt = None
-        if incar_kws:
-            print(f"{incar_kws}")
-            #kv = json.load(incar_kws)
-            kws = list2dict(incar_kws)
-            dic.update(kws)
+        if dict_cli:
+            print(f"{dict_cli}")
+            #kv = json.load(dict_cli)
+            dic.update(dict_cli)
         elif incar_list:
             dic = incar_list
             ### in case LDA: change POTCAR
@@ -220,8 +217,7 @@ def main():
     parser.add_argument('-ex', '--exclude', nargs='*', help='exclude if already exist')
     parser.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
     parser.add_argument('-io', '--ioption', nargs='*', help='params a: append, c: change, o: out, r: reverse, u:use INCAR.job')
-    #parser.add_argument('-id', '--incar_dict', type=json.loads, help='input dict from command line')
-    parser.add_argument('-ikw', '--incar_kws', nargs='*', help='input key-value pairs in the list from command line')
+    parser.add_argument('-id', '--incar_dict', type=json.loads, help='input dict from command line')
     parser.add_argument('-il', '--incar_list', nargs='*', help='input list for comment out')
     parser.add_argument('-ok', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
     parser.add_argument('-s', '--poscar', help='incar POSCAR.name for job==ini')
@@ -235,17 +231,14 @@ def main():
         inc_option = 'ac'
     else:
         inc_option = args.ioption
-    ### only INCAR changes in no-vdw -> vdw, sp -> opt, opt->sp
-    incar_jobs = ['vdw','noD', 'opt','copt','mag', 'kisti','incar','sp','chg']
+    ### only INCAR changes in no-vdw -> vdw, sp -> opt,
+    incar_jobs = ['vdw','noD', 'opt','copt', 'mag', 'kisti','incar']
     ### copy initial job: POSCAR or CONTCAR
     ### cont + ok to change KPOINTS
     ini_jobs = ['ini', 'cont']
-    ### others
-    # band: INCAR + KPOINTS
-    # dos:  INCAR + KPOINTS
 
-    if args.job in incar_jobs:
-        vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option, args.run, args.nproc, args.newdir,args.incar_kws, args.incar_list)
+    if args.job in incar_jobs :
+        vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option, args.run, args.nproc, args.newdir,args.incar_dict, args.incar_list)
     elif args.job in ini_jobs:
         vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.optkpoints, args.run)
     else:

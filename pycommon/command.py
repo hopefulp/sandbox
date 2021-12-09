@@ -127,6 +127,12 @@ dac.build       =   "    Build graphene using nanocore\
                     \n\t\t-mv write to the input file\
                     "
 
+kisti.py  =     "\t(PYTHON) Running script\
+                \n\t    1st: make a cli-command\
+                \n\t\tpython_script.py args\
+                \n\t    2nd: add 'pypath.sh'\
+                \n\t\tpypath.sh cli-command\
+                "
 
 def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar, nhl,idata,ndata):
     
@@ -346,6 +352,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     elif job == 'vasp':
         print("KISTI: vasp")
         print(kisti.vas)
+        print(kisti.py)
         print("IRON(slurm): vasp")
         print(slurm.vas)
         print("MLET(mlet): vasp")
