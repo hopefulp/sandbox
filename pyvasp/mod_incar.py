@@ -99,7 +99,7 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
     ### in case uncomment: dict
     if f'{job}_active' in globals():
         paramin   = eval(f'{job}_active')
-    #print(f"setting: paramch {paramch}")
+    print(f"setting: paramch {paramch} add {dic}")
     if dic:
         print(f"is this True {dic}")
         ### append params

@@ -18,8 +18,48 @@ def run_vasp(ndir, np, x, nnode):
         os.system(s)
     return 0
 
+def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
+    ### if incar_opt='u..', just use it
+    if incar_opt and re.match('u', incar_opt):
+        incar = 'INCAR.' + job
+        print(f"{incar} is used")
+    else:
+        incaro = f"{odir}/INCAR"
+        ### This should be < in case INCAR.job needs to be modified
+        if job == 'mag':
+            dic = {'MAGMOM': inc_option[0]}
+            opt='ac' # activate and change
+        else:
+            dic = {}
+            opt = None
+        ### INCAR kw and list is exclusive option
+        if incar_kws:
+            print(f"{incar_kws}")
+            #kv = json.load(incar_kws)
+            kws = list2dict(incar_kws)
+            dic.update(kws)
+
+        elif incar_list:
+            dic = incar_list
+            ### in case LDA: change POTCAR
+            print(f"incar list {dic} and incar option {inc_option}")
+            if 'GGA' in dic and 'o' in inc_option:
+                s = "genpotcar.py -pp lda"
+                os.chdir(ndir)
+                os.system(s)
+                os.chdir(pwd)
+                print("POTCAR was changed with LDA")
+            else:
+                print("this is not working")
+        if incar_opt:
+            opt = incar_opt
+        incar = modify_incar(incaro, job, dic=dic, opt=opt)
+        print(f"{incaro} was modified and {incar} was used")
+    sp = f"cp {incar}  {ndir}/INCAR"
+    return sp
+
 ### 1. for general job process
-def vasp_jobs( job, dirs, prefix, exclude, fixatom, optin,opt_kp, Lrun, newdir,np,xpart,nnode):
+def vasp_jobs( job, dirs, prefix, exclude, fixatom, opt_kp,incar_opt,incar_kws,incar_list,Lrun, newdir,np,xpart,nnode):
     #print(f"{exclude}")
     pwd = os.getcwd()
     if prefix:
@@ -62,14 +102,11 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, optin,opt_kp, Lrun, newdir,n
         com.append(f'cp {kpoints} {ndir}/KPOINTS')
         print(f"{kpoints} was used")
         ### 4: INCAR
-        if (not optin or optin== 'm') and os.path.isfile(f"{odir}/INCAR"):
-            incar = modify_incar(f"{odir}/INCAR", job)
-        elif optin == 'u' and os.path.isfile('INCAR.'+job):
-            incar = 'INCAR.' + job
-        else:
-            incar = 'INCAR'
-        com.append(f"cp {incar} {ndir}/INCAR")
-        print(f"{incar} was used")
+        #if (not incar_opt or incar_opt== 'm') and os.path.isfile(f"{odir}/INCAR"):
+        #    incar = modify_incar(f"{odir}/INCAR", job)
+        #elif incar_opt == 'u' and os.path.isfile('INCAR.'+job):
+        st = change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list)
+        com.append(st)
 
         ### make directory and copy
         for st in com:
@@ -88,7 +125,7 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, optin,opt_kp, Lrun, newdir,n
 
 
 ### 2 only incar is changed for jobs: vdw, 
-def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun,newdir, incar_kws, incar_list,np,xpart,nnode):
+def vasp_job_incar( job, dirs, prefix, exclude, fixatom, incar_opt, Lrun,newdir, incar_kws, incar_list,np,xpart,nnode):
     '''
     in case only incar is changed
     job     vdw
@@ -123,37 +160,9 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, inc_option, Lrun,newdir
             print(com)
             os.system(com)
         ### 4: INCAR
-        if job == 'mag':
-            dic = {'MAGMOM': inc_option[0]}
-            opt='ac' # activate and change
-        else:
-            dic = {}
-            opt = None
-        if incar_kws:
-            print(f"{incar_kws}")
-            #kv = json.load(incar_kws)
-            kws = list2dict(incar_kws)
-            dic.update(kws)
-        elif incar_list:
-            dic = incar_list
-            ### in case LDA: change POTCAR
-            print(f"incar list {dic} and incar option {inc_option}")
-            if 'GGA' in dic and 'o' in inc_option:
-                s = "genpotcar.py -pp lda"
-                os.chdir(ndir)
-                os.system(s)
-                os.chdir(pwd)
-                print("POTCAR was changed with LDA")
-            else:
-                print("this is not working")
-        if inc_option:
-            opt = inc_option
-        incar = modify_incar(f"{odir}/INCAR", job, dic=dic, opt=opt)
-        print(f"{incar} was modified from {odir}/INCAR")
-        com = f"cp {incar}  {ndir}/INCAR"
-        print(f"{incar} was used")
+        com = change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list)
         os.system(com)
-        
+
         ### qsub depends on server
         run_vasp(ndir, np, xpart, nnode)
 
@@ -218,7 +227,7 @@ def main():
     parser.add_argument('-p', '--prefix', help='select directories using prefix')
     parser.add_argument('-ex', '--exclude', nargs='*', help='exclude if already exist')
     parser.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
-    parser.add_argument('-io', '--ioption', nargs='*', help='params a: append, c: change, o: out, r: reverse, u:use INCAR.job')
+    parser.add_argument('-io', '--ioption', help='in the order: u:use INCAR.job,a:append,c:change,o:out,r:reverse')
     #parser.add_argument('-id', '--incar_dict', type=json.loads, help='input dict from command line')
     parser.add_argument('-ikw', '--incar_kws', nargs='*', help='input key-value pairs in the list from command line')
     parser.add_argument('-il', '--incar_list', nargs='*', help='input list for comment out')
@@ -250,7 +259,7 @@ def main():
     elif args.job in ini_jobs:
         vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.optkpoints, args.run, args.nproc,  args.partition, args.nnode)
     else:
-        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option,args.optkpoints, args.run,args.newdir,args.nproc,  args.partition, args.nnode)
+        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.optkpoints,inc_option, args.incar_kws, args.incar_list, args.run,args.newdir,args.nproc,  args.partition, args.nnode)
     return 0
 
 if __name__ == '__main__':
