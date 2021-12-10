@@ -142,6 +142,8 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     ### KISTI
     kisti.vas = f"\t(VASP)$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh"
     kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t      $ qsub -N {qname} -l select=20:ncpus=40:mpiprocs=20:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t      $ qsub -N {qname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
     kisti.vas += f"\n\t\tpbs_vasp_kisti_skl2 for half use of cpu for memory issue"
     ### IRON(slurm)
