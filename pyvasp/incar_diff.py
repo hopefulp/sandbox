@@ -124,11 +124,12 @@ def show_incars(f, Lall, kws):
     pwd = os.getcwd()
     if Lall:
         dirs = os.listdir(pwd)
+        dirs.sort()
     else:
         dirs = f
     #print(f"{dirs}")
     i = 0
-    kw0 = kws[0]
+    value_ini=[]
     for d in dirs:
         if os.path.isdir(d):
             incar = pwd + '/'+d+'/INCAR'
@@ -136,13 +137,19 @@ def show_incars(f, Lall, kws):
                 i += 1
                 dic = get_incar_dict(incar)
                 #print(f"{dic}")
-                for kw in kws:
-                    if i == 1 and kw == kw0:
-                        tmpkw0 = dic[kw]
-                    if kw == kw0 and tmpkw0 != dic[kw]:
-                        print(f"{d:20}: {kw:10} {dic[kw]:>5}  diff")
+                print(f"{d:20}:",end='')
+                ### kws loop
+                for j, kw in enumerate(kws):
+                    if i == 1 :
+                        value_ini.append(dic[kw])
+                    if kw in dic.keys():
+                        if value_ini[j] == dic[kw]:
+                            print(f" {kw:10} {dic[kw]:>5} {'':10}", end='')
+                        else:
+                            print(f" {kw:10} {dic[kw]:>5} {'diff':<10}", end='')
                     else:
-                        print(f"{d:20}: {kw:10} {dic[kw]:>5}")
+                        print(f" {kw:10} {'None':>5}", end='')
+                print("")
     return 0            
 
 def main():
@@ -159,8 +166,7 @@ def main():
     #    files=['INCAR']
     #print(f"{args.kws}")
     if args.all:
-        f = args.files
-        show_incars(f,args.all, args.kws) 
+        show_incars(args.files ,args.all, args.kws) 
     else:
         compare_incar(args.files, args.kws, args.Ldiffer)
 
