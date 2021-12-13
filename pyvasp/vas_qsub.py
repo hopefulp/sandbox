@@ -11,7 +11,7 @@ def qsub_command(ndir, np=24, qopt=None, X=3, nnode=4):
         if qopt:
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
         else:
-            s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp.sh"
+            s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_skl.sh"
     elif hostname == 'pt':
         nproc = nnode * nXn[X]
         s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
