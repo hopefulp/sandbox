@@ -55,100 +55,110 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscar, apotcar, kpoints, incar, allprepared, Lquestion, kpsub, dirname, iofile, atoms, Lrun, qopt):
+def make_vasp_dir(job, poscar, apotcar, kpoints, opt_incar, allprepared, kpsub, dirname, iofile, atoms, Lrun,qx,qN,qn):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
     pwd = os.getcwd()
     files2copy=[]
     ### Now this is running
-    if Lquestion:
-        ### 1. get POSCAR: make dirname using poscar
-        if not poscar:
-            q = 'will you make POSCAR? '
-            if yes_or_no(q):
-                q = 'input file: '
-                poscar = get_answers(q)
-        else:
-            ### cp input poscar to 'POSCAR'
-            get_poscar(poscar)
-            if not dirname:
-                dirname = pos2dirname(poscar)
-        ### use filename as it is
-        files2copy.append('POSCAR')
-        ### 2. get POTCAR will be made from scratch
-        # POTCAR will be made after POSCAR moves to job directory
-        ### 3. get KPOINTS
-        q = 'will you make KPOINTS?'
-        kpointjob = 'KPOINTS.' + job
-        q2 = f'will you use {kpointjob}?'
-        if allprepared:
-            print(f"KPOINTS in cwd will be copied to {dirname}")
-        elif os.path.isfile(kpointjob) and yes_or_no(q2):
-            os.system(f'cp {kpointjob} KPOINTS')
-        elif yes_or_no(q):
-            q = 'input nummber of kpoints: [gamma|3 digits such as "4 4 1" ]? '
-            kp_in = get_answers(q)
-            if re.match("g", kp_in, re.IGNORECASE) :
-                method = "gamma"
-                kps = "1  1  1"
-            else:
-                lkp = kp_in.split()
-                if len(lkp) == 3:
-                    method = 'MH'
-                    kps = kp_in
-                    print('default is MH')
-                else:
-                    print(f"input error for KPOINTS: {lkp} of length {len(lkp)}")
-                    exit(11)
-            print(kps, method)
-            make_kpoints(kps, method)
-        files2copy.append('KPOINTS')
-        ### 4. get INCAR :: use make_incar.py
-        q = 'will you make INCAR? '
-        incarjob = 'INCAR.' + job
-        q2 = f'will you use {incarjob}?'
-        if allprepared:
-            print(f"INCAR in cwd will be copied to {dirname}")
-            incar = 'INCAR'
-        elif os.path.isfile(incarjob) and yes_or_no(q2):
-            incar = incarjob
-            os.system(f'cp {incar} INCAR')
-            print(f'{incar} was copied to INCAR')
-        elif yes_or_no(q):
-            q = 'input incar-key file or use make_incar.py: '
-            keyfile = get_answers(q)
-            if not keyfile:
-                keyfile = iofile
-            get_incar(keyfile)
-        files2copy.append('INCAR')
-        ### 5. make work_dir
-        q = 'will you make dir? '
+    ### 1. get POSCAR: make dirname using poscar
+    if not poscar:
+        q = 'will you make POSCAR? '
         if yes_or_no(q):
-            print(f"dirname {dirname}")
-            if not "dirname" in locals():
-                q = 'input dirname: '
-                dirname = get_answers(q)
-            if not os.path.isdir(dirname):
-                com1 = "mkdir " + dirname
-                print(com1)
-                os.system(com1)
-            
-        for f in files2copy:
-            com2 = f"cp {f} " + dirname
-            os.system(com2)
-        ### 6. check dir
-        os.chdir(dirname)
-        if not os.path.isfile('POTCAR'):
-            if hostname == 'kisti':
-                s = f"python {home}/sandboxg/pyvasp/genpotcar.py -pp pbe"
+            q = 'input file: '
+            poscar = get_answers(q)
+    else:
+        ### cp input poscar to 'POSCAR'
+        get_poscar(poscar)
+        if not dirname:
+            dirname = pos2dirname(poscar)
+    ### use filename as it is
+    files2copy.append('POSCAR')
+    ### 2. get POTCAR will be made from scratch
+    # POTCAR will be made after POSCAR moves to job directory
+    ### 3. get KPOINTS
+    q = 'will you make KPOINTS?'
+    kpointjob = 'KPOINTS.' + job
+    q2 = f'will you use {kpointjob}?'
+    if allprepared:
+        print(f"KPOINTS in cwd will be copied to {dirname}")
+    elif os.path.isfile(kpointjob) and yes_or_no(q2):
+        os.system(f'cp {kpointjob} KPOINTS')
+    elif yes_or_no(q):
+        q = 'input nummber of kpoints: [gamma|3 digits such as "4 4 1" ]? '
+        kp_in = get_answers(q)
+        if re.match("g", kp_in, re.IGNORECASE) :
+            method = "gamma"
+            kps = "1  1  1"
+        else:
+            lkp = kp_in.split()
+            if len(lkp) == 3:
+                method = 'MH'
+                kps = kp_in
+                print('default is MH')
             else:
-                #s = home + "/sandboxg/pyvasp/genpotcar.py -pp pbe"
-                s = "genpotcar.py -pp pbe"
-            os.system(s)
-            print(f"in {dirname}")
-        os.chdir(pwd)
-    ### without -q            
+                print(f"input error for KPOINTS: {lkp} of length {len(lkp)}")
+                exit(11)
+        print(kps, method)
+        make_kpoints(kps, method)
+    files2copy.append('KPOINTS')
+    ### 4. get INCAR :: use make_incar.py
+    ### 4.1: use INCAR.job
+    if opt_incar:
+        if re.match('j', opt_incar):   # option in incar
+            incar = 'INCAR.' + job
+        ### 4.2: use dirname/INCAR
+        elif os.path.isdir(opt_incar):
+            incar = opt_incar + '/INCAR'
+    ### 4.3: use INCAR in wdir
+    elif allprepared:
+        print(f"INCAR in cwd will be used")
+        incar = 'INCAR'
+    ### 4.4: make INCAR (not comlete)
+    else:
+        q = 'input incar-key file or use make_incar.py: '
+        keyfile = get_answers(q)
+        if not keyfile:
+            keyfile = iofile
+        get_incar(keyfile)
+    os.system(f'cp {incar} INCAR')
+    print(f'{incar} was copied to INCAR')
+    files2copy.append('INCAR')
+    ### 5. make work_dir
+    q = 'will you make dir? '
+    if yes_or_no(q):
+        print(f"dirname {dirname}")
+        if not "dirname" in locals():
+            q = 'input dirname: '
+            dirname = get_answers(q)
+        if not os.path.isdir(dirname):
+            com1 = "mkdir " + dirname
+            print(com1)
+            os.system(com1)
+        
+    for f in files2copy:
+        com2 = f"cp {f} " + dirname
+        os.system(com2)
+    ### 6. check dir
+    os.chdir(dirname)
+    if not os.path.isfile('POTCAR'):
+        if hostname == 'kisti':
+            s = f"python {home}/sandboxg/pyvasp/genpotcar.py -pp pbe"
+        else:
+            #s = home + "/sandboxg/pyvasp/genpotcar.py -pp pbe"
+            s = "genpotcar.py -pp pbe"
+        os.system(s)
+        print(f"in {dirname}")
+    os.chdir(pwd)
+    ##################################################
+    ### run ?
+    s = qsub_command(dirname,X=qx,nnode=qN,np=qn)
+    print(f"{s}")
+    if Lrun or yes_or_no("Will you run ?"):
+        os.system(s)
+    ### Running without question
+    '''
     else:
         ### 1. get POSCAR
         dirname = 'tmp_vasp'
@@ -181,33 +191,30 @@ def make_vasp_dir(job, poscar, apotcar, kpoints, incar, allprepared, Lquestion, 
         if iofile:
             print("Used 'incar.key'")
             get_incar("incar.key")
-    ##################################################
-    ### run ?
-    s = qsub_command(dirname, qopt=qopt)
-    print(f"{s}")
-    if Lrun or yes_or_no("Will you run ?"):
-        os.system(s)
+    '''            
 
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
     parser.add_argument('-j', '--job', default="opt", choices=["dos","band","pchg","chg","md","ini","zpe","mol","wav","opt","sp", 'noD'], help='inquire for each file')
-    parser.add_argument('-q', '--question', action='store_false', help='inquire for each file')
     parser.add_argument('-s', '--poscar', help='poscar is required')
     parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
-    parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
     parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz')
     parser.add_argument('-ks', '--kpsub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
 
-    parser.add_argument('-i', '--incar', action='store_true',  help='first run make_incar.py then use incar.key')
+    parser.add_argument('-i', '--incar',  help='j: use INCAR.job, dirname: use d/INCAR')
+    parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
-    parser.add_argument('-n', '--dname', help='get directory name')
-    parser.add_argument('-al', '--all', action='store_true', help="skip if KPOINTS, POTCAR, INCAR were ready")
-    parser.add_argument('-o', '--qopt', action='store_true', help="use different qsub file in kisti")
+    parser.add_argument('-d', '--dname', help='get directory name')
+    parser.add_argument('-al', '--all', action='store_true', help="skip if not -s, -p, -k, -i")
     parser.add_argument('-r', '--run', action='store_true', help="submit job")
+    g_queue = parser.add_argument_group(title='QUEUE')
+    g_queue.add_argument('-x', '--xpartition', default=3, type=int, help="partition in platinum")
+    g_queue.add_argument('-N', '--nnode', default=4, type=int, help="number of nodes, can be used to calculate total nproc")
+    g_queue.add_argument('-np', '--nproc', default=24, type=int, help="number of nproc, total for pt, per node for kisti ")
     args = parser.parse_args()
 
-    make_vasp_dir(args.job, args.poscar, args.potcar, args.kpoints, args.incar, args.all, args.question, args.kpsub, args.dname, args.iofile, args.atoms, args.run, args.qopt)
+    make_vasp_dir(args.job, args.poscar, args.potcar, args.kpoints, args.incar, args.all, args.kpsub, args.dname, args.iofile, args.atoms, args.run, args.xpartition, args.nnode, args.nproc)
     return 0
 
 if __name__ == '__main__':

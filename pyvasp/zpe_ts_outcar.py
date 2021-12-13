@@ -83,7 +83,7 @@ def cal_zpe_ts(dir1, natom, infile):
         TS += kT*ts
         TS1 += kT * ts1
         TS2 += kT * ts2
-        print(f"ts1 {ts1*kT:10.4f} ts2 {ts2*kT:10.4f}")
+        #print(f"ts1 {ts1*kT:10.4f} ts2 {ts2*kT:10.4f}")
     zpe *= 0.5
     Fvib = Evib - TS    # == zpe - TS2
     #### Print Output ###
