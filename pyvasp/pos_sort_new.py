@@ -125,7 +125,8 @@ def poscar_rearrange(pos, atom_list, natom, atom_file, ftype, suff, rename):
                     s = el_st + "   from " + pos + "\n"
                     #print(s)
                 else:
-                    s = 'atomlist from outside'
+                    s = 'atomlist from command line' + '\n'
+                    atoms = atom_list
                 outf.write(s)               # write() doesnot make "\n"
             ### copy cell parameters
             elif i < 5:
@@ -139,7 +140,7 @@ def poscar_rearrange(pos, atom_list, natom, atom_file, ftype, suff, rename):
             ### calculate sum of atom-kinds
             elif i == 6 and any(d.isdigit() for d in line):
                 natom_all = list(map(int, line.strip().split()))
-                number_dic = cal_num_atoms(atom_all, natom_all)
+                number_dic = cal_num_atoms(atoms_all, natom_all)
                 print(number_dic)
                 s=''
                 number_list=[]
@@ -156,7 +157,7 @@ def poscar_rearrange(pos, atom_list, natom, atom_file, ftype, suff, rename):
                 coordinates.append(line)
     print(f"{ntatom} {len(coordinates)}")
     ### rearrange_coord_lines
-    s = rearrange_coord_lines(coordinates, atom_all, natom_all)
+    s = rearrange_coord_lines(coordinates, atoms, natom_all)
     outf.write(s)
     if rename:
         os.system(f"mv {ofile} {pos}")

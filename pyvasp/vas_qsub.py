@@ -13,7 +13,7 @@ def qsub_command(ndir, X=3, nnode=4, np=40, nmpi=None):
         np=40
         if not nmpi:
             if re.search('bd', ndir) or re.search('band', ndir):
-                nmpi = np/2
+                nmpi = int(np/2)
             else:
                 nmpi = np
         if np == nmpi:
