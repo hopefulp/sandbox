@@ -8,7 +8,7 @@
 # for atom  a=25 or a=1:25
 
 $suffix="";
-use lib '/qcfs/joonho/modules';
+use lib '/home/joonho/sandbox/mod_perl';
 use GetHash;
 use VaspDos;
 
@@ -51,11 +51,13 @@ for($i=0;$i <= $#ARGV; $i++){
         }elsif($quantum eq "a"){
 	    $atom_list=$num;
     	    if($atom_list =~ /:/){
-	    	($a_start,$a_end)=&GetHash::get_2values($atom_list,':');
-	    	for($j=$a_start;$j<=$a_end;$j++){
-	    	    push(@a_list,$j);
-	    	}
-    	    }else{ push(@a_list,$num);}
+	    	    ($a_start,$a_end)=&GetHash::get_2values($atom_list,':');
+	    	    for($j=$a_start;$j<=$a_end;$j++){
+	    	        push(@a_list,$j);
+	    	    }
+    	    }elsif($atom_list =~ /,/){
+                @a_list=split(', ', $atom_list)
+            }else{ push(@a_list,$num);}
 	}elsif($quantum eq "dir"){
 	    $fin="$num/DOSCAR";
 	}
@@ -253,34 +255,34 @@ for($i=0;$i<$Nene;$i++){
     	#print $energy[$i]-$ene_Fermi,"\t", $tdos[0][$i][0],"\n";
     	### tdos[0] is for TDOS and others for atoms
     	### tdos[][][0] is for DOS at the energy ; tdos[][][1] is for accumulated DOS
-	### if there is no atom list, write Tdos
-	if($#a_list < 0){
-    	    print OUT $energy[$i]-$ene_Fermi,"\t", $tdos[0][$i][0],"\n";
-            if($Fermi_shift eq "F" and $#a_list < 0){
-                if($Fermi_check==0 and $energy[$i] < $EF_test){
-                    print EFOUT $energy[$i]-$ene_Fermi,"\t 0\n";
-                }elsif($Fermi_check==0 and $energy[$i] >= $EF_test){
-                    print EFOUT "$EF_test\t", $Max_Tdos*2, "\n";
-                    $Fermi_check=1;
-                }else{
-                    print EFOUT $energy[$i]-$ene_Fermi,"\t 0\n";
-                }
-            }
-	### For atom list, get LDOS or PDOS depending on l quantum number
+        ### if there is no atom list, write Tdos
+        if($#a_list < 0){
+           print OUT $energy[$i]-$ene_Fermi,"\t", $tdos[0][$i][0],"\n";
+           if($Fermi_shift eq "F" and $#a_list < 0){
+               if($Fermi_check==0 and $energy[$i] < $EF_test){
+                   print EFOUT $energy[$i]-$ene_Fermi,"\t 0\n";
+               }elsif($Fermi_check==0 and $energy[$i] >= $EF_test){
+                   print EFOUT "$EF_test\t", $Max_Tdos*2, "\n";
+                   $Fermi_check=1;
+               }else{
+                   print EFOUT $energy[$i]-$ene_Fermi,"\t 0\n";
+               }
+           }
+        ### For atom list, get LDOS or PDOS depending on l quantum number
         }else{
-	    $pdos=0;
+	        $pdos=0;
             $pdosm=0;
             $ldos=0;
-	    ### as for an energy, loop atom lists, add l columns
-	    for($j=0;$j<=$#a_list;$j++){
-		for($ic=0;$ic<=$#nl_col;$ic++){
+            ### as for an energy, loop atom lists [whethe not sorted], add l columns
+            for($j=0;$j<=$#a_list;$j++){
+                for($ic=0;$ic<=$#nl_col;$ic++){
                     $k=$nl_col[$ic];
                     $ldos += $tdos[$a_list[$j]][$i][$k];
                     #print "ldos $ldos\n";
+                    }
                 }
-            }
-	    print OUT   $energy[$i]-$ene_Fermi,"\t", $ldos,"\n";
-	}
+            print OUT   $energy[$i]-$ene_Fermi,"\t", $ldos,"\n";
+	    }
 
     ### This is for magnetic DOSCAR
     }else{

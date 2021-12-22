@@ -94,8 +94,11 @@ dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp\
                         \n\t\t    -[p|s|m] for matching type\
                         \n\t\t    -rp for replacement of matching part\
                         \n\t\t    -id to include dir in scanning dir\
+                        \n\t\t    -e exception list\
+                        \n\t\t    -eo default=m exception by matching or fullname\
                         \n\t\tUsage::\
                         \n\t\t    dir_fname.py rename -p G4 -rp G2 -id              ! to rename directories\
+                        \n\t\t    dir_fname.py rename -m sc34c -rp sc34 -id -e sc34ch ! rename dir & file with exception\
                         \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'      ! to remove pbs files \
                         "
 convert.py_2to3_nb  =   "to convert ipynb files of python2 to python3\

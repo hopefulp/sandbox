@@ -6,7 +6,7 @@ import os
 import sys
 from common import *
 
-def cmd(job, m_tag, pattern, new_pattern, L_dir, exceptions, dir_out,run):
+def cmd(job, m_tag, pattern, new_pattern, L_dir, exceptions,ex_opt, dir_out,run):
     pwd = os.getcwd()
     # pattern should have 1 element
     print(pattern)
@@ -18,8 +18,17 @@ def cmd(job, m_tag, pattern, new_pattern, L_dir, exceptions, dir_out,run):
 
     #print("\n".join(l_file))                       
     if exceptions:
-        for fex in exceptions:
-            l_file.remove(fex)
+        ### using whole word or matching word
+        if ex_opt == 'm':
+            for fex in exceptions:
+                ### exclude by matching
+                for i in range(len(l_file)-1,-1,-1):
+                    if re.match(fex, l_file[i]):
+                        l_file.remove(l_file[i])
+        # remove by whole name
+        else:
+            for fex in exceptions:
+                l_file.remove(fex)         
     # run job for the file list
     #print("\n".join(l_file))
     print(len(l_file), " files are selected")
@@ -84,9 +93,10 @@ def main():
     group.add_argument( '-s', '--suffix', nargs='*', help='list several suffixes')
     group.add_argument( '-m', '--match', nargs='*', help='find matching string')
     group.add_argument( '-i', '--infiles', nargs='*', help='input file list')
-    parser.add_argument( '-rp', '--replace', help='input file list')
+    parser.add_argument( '-rp', '--replace', help='string for replacement')
     parser.add_argument( '-id', '--include_dir', action='store_true', help='include dirname to filename')
-    parser.add_argument( '-xcl', '--excluded', nargs='*', help='filename to be excluded')
+    parser.add_argument( '-e', '--excluded', nargs='*', help='filename to be excluded')
+    parser.add_argument( '-eo', '--excluded_opt', default='m',help='excluded fname option: matching or fullname')
     parser.add_argument( '-d', '--directory', type=str, default='tmppy', help='target directory to move files')
     parser.add_argument('-a', '--append', help="add suffix by -a to the original filename without extension")
     parser.add_argument( '-r', '--run', action='store_true', help='run or not-False')
@@ -113,7 +123,7 @@ def main():
     #        new_name = args.append
     #        rn_type = 'a'   # for append except extension
     #cmd(args.job, m_tag, matching, args.excluded, args.directory,args.rename,rn_type,new_name,args.run)
-    cmd(args.job, m_tag, matching, args.replace, args.include_dir, args.excluded, args.directory,args.run)
+    cmd(args.job, m_tag, matching, args.replace, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.run)
 
 if __name__ == "__main__":
     main()

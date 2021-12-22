@@ -1,3 +1,4 @@
+#!/home/joonho/anaconda3/bin/python
 import NanoCore as nc
 
 at = nc.io.read_poscar('POSCAR')
