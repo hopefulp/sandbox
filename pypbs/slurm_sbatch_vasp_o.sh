@@ -3,7 +3,6 @@
 ##SBATCH -p X3               # X2(16), X3(22), X4(4)  
 ##SBATCH -N 6               # total number of nodesmpi tasks requested
 ##SBATCH -n 64               # total number of mpi tasks requested
-##SBATCH --nodelist=n[053-068]
 
 ## HPC ENVIRONMENT
 . /etc/profile.d/SLURM.sh
@@ -20,42 +19,36 @@ nodelist=$SLURM_JOB_NODELIST
 logfile=${pdir}/${SLURM_JOB_ID}.${jobname}.${partname}
 outfile=$pdir/$jobname.log
 date >> $logfile
-
-###### Modify INCAR and mpinproc
-### change NPAR = NNode * npar_in_partition
-hmem=1      # if 1, use mpirin nproc(nppn)
-if [ $partname == 'X1' ]; then
-    par=2; SLURM_CPUS_PER_NODE=8
-elif [ $partname == 'X2' ]; then
-    par=2; SLURM_CPUS_PER_NODE=12
-elif [ $partname == 'X3' ]; then
-    par=4; SLURM_CPUS_PER_NODE=20
-    if [ $hmem -eq 1 ]; then
-        par=2
-    fi
-elif [ $partname == 'X4' ]; then
-    par=4; SLURM_CPUS_PER_NODE=24
-    if [ $hmem -eq 1 ]; then
-        par=2
-    fi
-else    # if X5
-    par=4; SLURM_CPUS_PER_NODE=32
-fi
-npar=$(expr $SLURM_JOB_NUM_NODES \* $par )
-
+#echo "pdir $pdir, jobname $jobname, wdir $wdir" > $logfile
 echo "HOSTNAME    JOB_NAME   Nproc" >> $logfile
 echo "$partname  $jobname $SLURM_NTASKS " >> $logfile
-echo "ncpu per node: $SLURM_CPUS_PER_NODE in $partname" >> $logfile
 echo "NODELIST: $nodelist"
 cd $wdir
 
-
-
+###### Modify INCAR
+### change NPAR = NNode * npar_in_partition
+if [ -z "$npar" ]; then
+    if [ $partname == 'X1' -o $partname == 'X2' ]; then
+        par=2
+    else
+        par=4
+    fi
+    npar=$(expr $SLURM_JOB_NUM_NODES \* $par )
+fi
 echo "npar = $npar" >> $logfile
 sed -i "s/.*NPAR.*/NPAR = $npar/" INCAR
+#npar=2
+hmem=0
 if [ $hmem -eq 1 ]; then
-    mpiproc=$(expr $SLURM_JOB_NUM_NODES \* $SLURM_CPUS_PER_NODE / 2 )
-    echo "high memory = $hmem; mpiproc $mpiproc per node is half of $SLURM_CPUS_PER_NODE" >> $logfile
+    if [ $partname == 'X1' ]; then
+        nppn=2
+    elif [ $partname == 'X2' ]; then
+        nppn=2
+    else
+        nppn=4
+    fi
+    nproc=$(expr $SLURM_JOB_NUM_NODES \* $nppn )
+    echo "high memory = $hmem; nproc per node $nppn for total $nproc " >> $logfile
 fi
 ### change U-correction
 ucorr=0
@@ -75,7 +68,7 @@ else
     if [ $hmem -eq 0 ]; then
         mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
     else
-        mpirun -np $mpiproc  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+        mpirun -np $nproc  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
     fi
 fi
 date >> $logfile

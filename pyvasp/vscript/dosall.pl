@@ -12,7 +12,7 @@ use lib '/home/joonho/sandbox/mod_perl';
 use GetHash;
 use VaspDos;
 
-$Fermi_shift='F';	# T for shift, F for no-shift
+$Fermi_shift='T';	# T for shift, F for no-shift
 $Fermi_check=0;		# write Fermi.dat at value EF with value 1.2 * max(Tdos)
 $Max_Tdos=0;		# control of y-axis of Dos.dat
 
