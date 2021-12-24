@@ -102,6 +102,8 @@ def make_vasp_dir(job, poscar, apotcar, kpoints, opt_incar, allprepared, kpsub, 
                 exit(11)
         print(kps, method)
         make_kpoints(kps, method)
+    else:
+        print("Use wdir KPOINTS")
     files2copy.append('KPOINTS')
     ### 4. get INCAR :: use make_incar.py
     ### 4.1: use INCAR.job
@@ -196,13 +198,13 @@ def make_vasp_dir(job, poscar, apotcar, kpoints, opt_incar, allprepared, kpsub, 
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', default="opt", choices=["dos","band","pchg","chg","md","ini","zpe","mol","wav","opt","sp", 'noD'], help='inquire for each file')
+    parser.add_argument('-j', '--job', default="opt", choices=["pchg","chg","md","ini","zpe","mol","wav","opt","sp", 'noD'], help='inquire for each file')
     parser.add_argument('-s', '--poscar', help='poscar is required')
     parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
     parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz')
     parser.add_argument('-ks', '--kpsub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
 
-    parser.add_argument('-i', '--incar',  help='j: use INCAR.job, dirname: use d/INCAR')
+    parser.add_argument('-i', '--incar', default='j', help='j: use INCAR.job, dirname: use d/INCAR')
     parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
     parser.add_argument('-d', '--dname', help='get directory name')
