@@ -23,7 +23,7 @@ date >> $logfile
 
 ###### Modify INCAR and mpinproc
 ### change NPAR = NNode * npar_in_partition
-hmem=1      # if 1, use mpirin nproc(nppn)
+hmem=0      # if 1, use mpirin nproc(nppn)
 if [ $partname == 'X1' ]; then
     par=2; SLURM_CPUS_PER_NODE=8
 elif [ $partname == 'X2' ]; then
