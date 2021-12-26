@@ -115,10 +115,13 @@ run.vas_qsub        = " run vasp in queue\
 run.envvasp         = " imported from vasp run, make\
                     "
 clean.clean         =" "
-modify.pos_sort     ="pos_sort.py POSCAR\
+modify.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
                     \n\tsort atoms in POSCAR\
-                    \n\treturns POSCARnew\
-                    \n\t:when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
+                    \n\treturns POSCARsort\
+                    \n\tOptions:\
+                    \n\t    -al new atom list for sorted POSCAR\
+                    \n\t    -z  True for z-sort in the atom group\
+                    \n\tNB: when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
                     "
 check.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\tOptions:\
