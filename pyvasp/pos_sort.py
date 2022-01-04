@@ -60,16 +60,18 @@ def contract_atom_numbers(numbers, atomlist):
     return num_atom_kinds, atom_kinds
 
 def sortz_atom_coord(lines):
-    ''' for single atom group '''
+    ''' for a same atom group '''
     line2d=[]
     for line in lines:
-        coord3 = line.strip().split()
-        line2d.append(coord3)
+        coords = line.strip().split()   # sometimes including T T F
+        line2d.append(coords)
     new_coord2d = sorted(line2d, key=lambda l:float(l[2]))
     ### transform into 1d
     s=[]
-    for line in new_coord2d:
-        st = f"  {line[0]}  {line[1]} {line[2]} \n"
+    for line_ele in new_coord2d:
+        ### use join to make a string regardless of number of data
+        space = "  "
+        st = space.join(line_ele) + "\n"
         s.append(st)
     return s
 
@@ -77,6 +79,7 @@ def rearrange_coord_lines(lines, atom_klist, atom_names_orig, natom_orig, sort_z
     #print(katoms)
     ### from Null connect each line string to each index of atom kind
     coord_dict={}
+    ### make dict[atom_name]=[coordinate_string, ... ]
     for aname, natom in zip(atom_names_orig, natom_orig):
         if aname not in coord_dict.keys():
             coord_dict[aname]=[]
@@ -101,7 +104,10 @@ def expand_atoms(atom_list, natom):
     atoms = atom_list * int(times)
     return atoms
 
-def cal_num_atoms(alist, nalist):
+def cal_num_atoms_orig(alist, nalist):
+    ''' return
+            dict of dict[atoms_species]=natom for original poscar
+    '''
     mydic = {}
     print(alist, nalist)
     for atom, natom in zip(alist, nalist):
@@ -153,9 +159,9 @@ def poscar_rearrange(pos, atom_klist, natom, atom_file, ftype, suff, rename, sor
                 print(s)
                 outf.write(s)
             ### calculate sum of atom-kinds
-            elif i == 6 and any(d.isdigit() for d in line):
+            elif i == 6 and any(d.isdigit() for d in line): # line includes space
                 natom_orig = list(map(int, line.strip().split()))
-                number_dic = cal_num_atoms(katom_orig, natom_orig)
+                number_dic = cal_num_atoms_orig(katom_orig, natom_orig)
                 print(number_dic)
                 s=''
                 sort_natom_list=[]
@@ -194,7 +200,7 @@ def main():
     parser.add_argument('-al', '--atom_klist', nargs='+', help="atom kind list")
     parser.add_argument('-na', '--natom', type=int, help="if number of atoms are known")
     parser.add_argument('-ft','--file_type', help="original coordinate file type used with --atom_file")
-    parser.add_argument('-suf', '--suffix', default='sort', help='filename suffix')
+    parser.add_argument('-suf', '--suffix', default='s', help='filename suffix')
     parser.add_argument('-mv', '--rename', action='store_true', help='change in the original filename')
     parser.add_argument('-z', '--sortz', action='store_true', help='increasing order in z-axis')
     args = parser.parse_args()
