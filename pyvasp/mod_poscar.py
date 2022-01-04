@@ -4,10 +4,60 @@ import vasp_job
 import re
 import os
 
+def get_ntatom(st):
+    natom_list = list(map(int, st.strip().split()))
+    ntotal = sum(natom_list)
+    return ntotal, natom_list
+
+def read_poscar(part, pos):
+    '''
+    extract lattice vectors, pre-part, atom_list, coordinates
+    part    pre, coord,
+    '''
+    with open(pos, "r") as f:
+        lines = f.readlines()
+        p_axes=[]
+
+        for i in range(2,5):
+            paxis = list(map(float,lines[i].strip().split()))
+            p_axes.append(paxis)
+
+        if part == 'paxes':
+            return p_axes
+        else:
+            for i in [5, 0]:
+                if not any(s.isdigit() for s in lines[i]):
+                    atom_list = lines[i].strip().split()
+                    break
+            for i in [5, 6]:
+                if any(s.isdigit() for s in lines[i]):
+                    ntatom, natom_list = get_ntatom(lines[i])
+                    break
+            for i in [8, 9]:
+                if any(s.isdigit() for s in lines[i]):
+                    iend_pre = i-1
+                    break
+            if re.match('D', lines[iend_pre], re.I):
+                p_z = p_axes[2][2]
+            else:
+                p_z = 1.0
+            pre = lines[:iend_pre+1]
+            coord = lines[iend_pre+1:iend_pre+ntatom+1]
+
+            if part == 'pre':
+                return pre
+            elif part == 'coord':
+                return coord
+            elif part == 'atomcoord':
+                return atom_list, natom_list, coord, p_z
+
+     
+
 def get_atoms_poscar(line):
     if atom in lines[0]:
         alist = lines[0].split()
     return alist
+
 
 def get_poscar(poscar, job='new', sub=0):
     '''

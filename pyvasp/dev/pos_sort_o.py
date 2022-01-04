@@ -59,40 +59,18 @@ def contract_atom_numbers(numbers, atomlist):
     print(num_atom_kinds)
     return num_atom_kinds, atom_kinds
 
-def sortz_atom_coord(lines):
-    ''' for a same atom group '''
-    line2d=[]
-    for line in lines:
-        coords = line.strip().split()   # sometimes including T T F
-        line2d.append(coords)
-    new_coord2d = sorted(line2d, key=lambda l:float(l[2]))
-    ### transform into 1d
-    s=[]
-    for line_ele in new_coord2d:
-        ### use join to make a string regardless of number of data
-        space = "  "
-        st = space.join(line_ele) + "\n"
-        s.append(st)
-    return s
-
-def rearrange_coord_lines(lines, atom_klist, atom_names_orig, natom_orig, sort_z):
+def rearrange_coord_lines(lines, atom_names, natoms):
     #print(katoms)
     ### from Null connect each line string to each index of atom kind
     coord_dict={}
-    ### make dict[atom_name]=[coordinate_string, ... ]
-    for aname, natom in zip(atom_names_orig, natom_orig):
+    for aname, natom in zip(atom_names, natoms):
         if aname not in coord_dict.keys():
             coord_dict[aname]=[]
         coord_dict[aname].extend(lines[:natom])
         del lines[:natom]
     s=''
-    for atom in atom_klist:
-        if sort_z:
-            print("z sort")
-            lines = sortz_atom_coord(coord_dict[atom])
-        else:
-            lines = coord_dict[atom]
-        for line in lines:
+    for atom in coord_dict.keys():
+        for line in coord_dict[atom]:
             print(line, end='')
             s += line
     return s
@@ -104,10 +82,7 @@ def expand_atoms(atom_list, natom):
     atoms = atom_list * int(times)
     return atoms
 
-def cal_num_atoms_orig(alist, nalist):
-    ''' return
-            dict of dict[atoms_species]=natom for original poscar
-    '''
+def cal_num_atoms(alist, nalist):
     mydic = {}
     print(alist, nalist)
     for atom, natom in zip(alist, nalist):
@@ -117,17 +92,25 @@ def cal_num_atoms_orig(alist, nalist):
             mydic[atom] = natom
     return mydic            
 
-def get_atomlist(line):
-    alist_all = line.strip().split()
-    atoms = []
-    for atom in alist_all: # also needs to check whether it is atom symbol
-        if atom not in atoms:
-            atoms.append(atom)
-    return atoms, alist_all  
-
 ### Just read poscar and rearrange: atom_list, natom || atom_file [ftype]
-def poscar_rearrange(pos, atom_klist, natom, atom_file, ftype, suff, rename, sort_z):
-    ### atom list is given repetively --> atom kinds list
+def poscar_rearrange(pos, atom_list, natom, atom_file, ftype, suff, rename):
+    ### atom list is given repetively
+    if atom_list:
+        if natom == len(atom_list):
+            atomlist=atom_list
+        ### make full atomlist
+        else:
+            atomlist=expand_atoms(atom_list, natom)
+    ### get atom list from bgf file 
+    elif atom_file:
+        if ftype == None:
+            ftype = common.f_ext(atom_file)
+        atomlist = get_atomlist4file(atom_file, ftype)
+    #else:
+    #    print("one of -al and -af should be given")
+    #    sys.exit(1)
+    
+    #print(atomlist)
     ### rearrange poscar
     ofile = pos+suff
     outf = open(ofile, 'w')
@@ -139,12 +122,14 @@ def poscar_rearrange(pos, atom_klist, natom, atom_file, ftype, suff, rename, sor
             if i == 0:
                 ### if the 0-th line is atom list, get atom list
                 if len(line.split()) >= 2:
-                    atom_sort, katom_orig = get_atomlist(line)
-                if not atom_klist:
-                    atom_klist = atom_sort
-                el_st = ''.join(atom_klist)
+                    alist_all = line.strip().split()
+                    atoms = []
+                    for atom in alist_all:
+                        if atom not in atoms:
+                            atoms.append(atom)
+                el_st = ''.join(atoms)
                 s = el_st + "   from " + pos + "\n"
-                print(s)
+                #print(s)
                 outf.write(s)               # write() doesnot make "\n"
             ### copy cell parameters
             elif i < 5:
@@ -152,37 +137,34 @@ def poscar_rearrange(pos, atom_klist, natom, atom_file, ftype, suff, rename, sor
             ### filter unique atom species in the order in POSCAR
             elif i == 5 and not any(s.isdigit() for s in line) :
                 ### keep atom list with index
-                atom_sort, katom_orig = get_atomlist(line)
-                if not atom_klist:
-                    atom_klist = atom_sort
-                s = "  " + "  ".join(atom_klist) + "\n"
-                print(s)
+                atom_all = line.strip().split()
+                atoms = []
+                for atom in atom_all:
+                    if atom not in atoms:
+                        atoms.append(atom)
+                s = "  " + "  ".join(atoms) + "\n"
                 outf.write(s)
             ### calculate sum of atom-kinds
-            elif i == 6 and any(d.isdigit() for d in line): # line includes space
-                natom_orig = list(map(int, line.strip().split()))
-                number_dic = cal_num_atoms_orig(katom_orig, natom_orig)
+            elif i == 6 and any(d.isdigit() for d in line):
+                natom_all = list(map(int, line.strip().split()))
+                number_dic = cal_num_atoms(atom_all, natom_all)
                 print(number_dic)
                 s=''
-                sort_natom_list=[]
-                for atom in atom_klist:
+                number_list=[]
+                for atom in atoms:
                     s += f"  {number_dic[atom]} "
-                    sort_natom_list.append(number_dic[atom])
-                ntatom = sum(sort_natom_list)
+                    number_list.append(number_dic[atom])
+                ntatom = sum(number_list)
                 s += "\n"
                 outf.write(s)
-            ### write cartesian or direct if not digit
             elif not re.search('\d', line):
                 outf.write(line)
             ### sort coordinates
-            elif len(coordinates) < ntatom:
-                coordinates.append(line)
             else:
-                ### if POSCAR does not end with coordinates
-                break
-    print(f"total {ntatom} atoms with {len(coordinates)}-coordinates in original")
+                coordinates.append(line)
+    print(f"{ntatom} {len(coordinates)}")
     ### rearrange_coord_lines
-    s = rearrange_coord_lines(coordinates, atom_klist, katom_orig, natom_orig, sort_z)
+    s = rearrange_coord_lines(coordinates, atom_all, natom_all)
     outf.write(s)
     if rename:
         os.system(f"mv {ofile} {pos}")
@@ -196,16 +178,14 @@ def main():
     parser = argparse.ArgumentParser(description="rearange poscar atoms: (vmd,qchem)-poscar need to be rearranged")
     parser.add_argument('poscar', help="poscar to be modified")
     parser.add_argument('-af','--atom_file', help="atom list in the order of original coordinate file ")
-    #parser.add_argument('-al', '--atom_list', nargs='+', help="atom list is given directly and repetitively")
-    parser.add_argument('-al', '--atom_klist', nargs='+', help="atom kind list")
+    parser.add_argument('-al', '--atom_list', nargs='+', help="atom list is given directly and repetitively")
     parser.add_argument('-na', '--natom', type=int, help="if number of atoms are known")
     parser.add_argument('-ft','--file_type', help="original coordinate file type used with --atom_file")
-    parser.add_argument('-suf', '--suffix', default='s', help='filename suffix')
+    parser.add_argument('-suf', '--suffix', default='sort', help='filename suffix')
     parser.add_argument('-mv', '--rename', action='store_true', help='change in the original filename')
-    parser.add_argument('-z', '--sortz', action='store_true', help='increasing order in z-axis')
     args = parser.parse_args()
 
-    poscar_rearrange(args.poscar, args.atom_klist, args.natom, args.atom_file, args.file_type, args.suffix, args.rename, args.sortz)
+    poscar_rearrange(args.poscar, args.atom_list, args.natom, args.atom_file, args.file_type, args.suffix, args.rename)
 
 if __name__ == "__main__":
     main()
