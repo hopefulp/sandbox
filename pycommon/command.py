@@ -154,14 +154,20 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             dirname = poscar[7:]
     if 'dirname' not in locals():
         dirname = qname
+    ncpu =  int(nXn[partition]/2)
     slurm.vas = " === Job submission"
-    slurm.vas += f"\n    (2) sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
+    slurm.vas +=  "\n        For memory issue"
+    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -c {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} --ntasks-per-node {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     slurm.vas += "\n\toptions::"
     slurm.vas += "\n\t    -J for jobname and dirname"
     slurm.vas += "\n\t    -p for partition: X1-8, X2-12, X3-20 process"
     slurm.vas += "\n\t    -N number of nodes "
-    slurm.vas += f"\t    -n number of total processes: {nproc} <= {nnode} * {nXn[partition]}"
+    slurm.vas += f"\n\t    -n number of total processes: {nproc} <= {nnode} * {nXn[partition]}, which proceed -c"
+    slurm.vas += f"\n\t    -c (--cpus-per-task: ncpu/2 per node for memory {ncpu}"
+    slurm.vas += f"\n\t    --ntasks-per-node {nXn[partition]/2} in case doesnot know ncpu/node"
     if nproc != nnode * nXn[partition]:
         print("Warning!! Not using all the processes in the node")
     ### SGE(mlet)
@@ -355,7 +361,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print("KISTI: vasp")
         print(kisti.vas)
         print(kisti.py)
-        print("IRON(slurm): vasp")
+        print("Pt(platinum:slurm): vasp")
         print(slurm.vas)
         print("MLET(mlet): vasp")
         print(mlet.vas)

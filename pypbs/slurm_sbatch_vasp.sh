@@ -23,19 +23,20 @@ date >> $logfile
 
 ###### Modify INCAR and mpinproc
 ### change NPAR = NNode * npar_in_partition
-hmem=1      # if 1, use mpirin nproc(nppn)
+#hmem=1      # if 1, use mpirin nproc(nppn)
 if [ $partname == 'X1' ]; then
     par=2; SLURM_CPUS_PER_NODE=8
 elif [ $partname == 'X2' ]; then
     par=2; SLURM_CPUS_PER_NODE=12
 elif [ $partname == 'X3' ]; then
     par=4; SLURM_CPUS_PER_NODE=20
-    if [ $hmem -eq 1 ]; then
+    #if [ $hmem -eq 1 ]; then
+    if [ $hmem ]; then
         par=2
     fi
 elif [ $partname == 'X4' ]; then
     par=4; SLURM_CPUS_PER_NODE=24
-    if [ $hmem -eq 1 ]; then
+    if [ $hmem  ]; then
         par=2
     fi
 else    # if X5
@@ -43,8 +44,8 @@ else    # if X5
 fi
 npar=$(expr $SLURM_JOB_NUM_NODES \* $par )
 
-echo "HOSTNAME    JOB_NAME   Nproc" >> $logfile
-echo "$partname  $jobname $SLURM_NTASKS " >> $logfile
+echo "XPARTITION    JOB_NAME   NNODE  Nproc" >> $logfile
+echo "$partname      $jobname  $SLURM_JOB_NUM_NODES  $SLURM_NTASKS " >> $logfile
 echo "ncpu per node: $SLURM_CPUS_PER_NODE in $partname" >> $logfile
 echo "NODELIST: $nodelist"
 cd $wdir
@@ -53,7 +54,7 @@ cd $wdir
 
 echo "npar = $npar" >> $logfile
 sed -i "s/.*NPAR.*/NPAR = $npar/" INCAR
-if [ $hmem -eq 1 ]; then
+if [ $hmem ]; then
     mpiproc=$(expr $SLURM_JOB_NUM_NODES \* $SLURM_CPUS_PER_NODE / 2 )
     echo "high memory = $hmem; mpiproc $mpiproc per node is half of $SLURM_CPUS_PER_NODE" >> $logfile
 fi
@@ -72,10 +73,10 @@ fi
 if [ $partname == 'X1' ]; then
     mpirun -genv I_MPI_FABRICS "shm:ofa" -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
 else
-    if [ $hmem -eq 0 ]; then
-        mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
-    else
+    if [ $hmem ]; then
         mpirun -np $mpiproc  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+    else
+        mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
     fi
 fi
 date >> $logfile

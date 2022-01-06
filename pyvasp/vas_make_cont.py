@@ -59,7 +59,7 @@ def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
     return sp
 
 ### 1. for general job process
-def vasp_jobs( job, dirs, prefix, exclude, fixatom, opt_kp,incar_opt,incar_kws,incar_list,Lrun, newdir,np,xpart,nnode):
+def vasp_jobs( job, dirs, prefix, exclude, fixatom, kopt,incar_opt,incar_kws,incar_list,Lrun, newdir,np,xpart,nnode):
     #print(f"{exclude}")
     pwd = os.getcwd()
     if prefix:
@@ -92,13 +92,24 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, opt_kp,incar_opt,incar_kws,i
         com.append(f'cp {potcar} {ndir}/POTCAR')
         print(f"{potcar} was copied")
         ### 3: KPOINTS
-        if job == 'zpe' or job == 'wav':
-            kpoints = odir + '/KPOINTS'
+        if kopt:
+            ### if kpoints file
+            kfname = kopt
+            kfsuff = f'KPOINTS.{kopt}'
+            if os.path.isfile(kfname):
+                kpoints = kfname
+            ### if kpoints suffix
+            elif os.path.isfile(kfsuff):
+                kpoints = kfsuff
+        ### use -j job
         else:
-            if os.path.isfile(f'KPOINTS.{job}'):
-                kpoints = 'KPOINTS.'+job
-            elif os.path.isfile('KPOINTS'):
-                kpoints = 'KPOINTS'
+            if job == 'zpe' or job == 'wav':
+                kpoints = odir + '/KPOINTS'
+            else:
+                if os.path.isfile(f'KPOINTS.{job}'):
+                    kpoints = 'KPOINTS.'+job
+                elif os.path.isfile('KPOINTS'):
+                    kpoints = 'KPOINTS'
         com.append(f'cp {kpoints} {ndir}/KPOINTS')
         print(f"{kpoints} was used")
         ### 4: INCAR
@@ -231,7 +242,9 @@ def main():
     #parser.add_argument('-id', '--incar_dict', type=json.loads, help='input dict from command line')
     parser.add_argument('-ikw', '--incar_kws', nargs='*', help='input key-value pairs in the list from command line')
     parser.add_argument('-il', '--incar_list', nargs='*', help='input list for comment out')
-    parser.add_argument('-ok', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
+    #kgroup = parser.add_mutually_exclusive_group('input kpoint option')
+    parser.add_argument('-k', '--kopt', help='k option: fname, extension name, 3 values')
+    #parser.add_argument('-k', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
     parser.add_argument('-s', '--poscar', help='incar POSCAR.name for job==ini')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
     parser.add_argument('-n', '--nproc', default=16, help='nprocess in qsub')
@@ -257,9 +270,9 @@ def main():
     if args.job in incar_jobs:
         vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option, args.run, args.newdir,args.incar_kws, args.incar_list,args.nproc,  args.partition, args.nnode)
     elif args.job in ini_jobs:
-        vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.optkpoints, args.run, args.nproc,  args.partition, args.nnode)
+        vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.kopt, args.run, args.nproc,  args.partition, args.nnode)
     else:
-        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.optkpoints,inc_option, args.incar_kws, args.incar_list, args.run,args.newdir,args.nproc,  args.partition, args.nnode)
+        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.kopt,inc_option, args.incar_kws, args.incar_list, args.run,args.newdir,args.nproc,  args.partition, args.nnode)
     return 0
 
 if __name__ == '__main__':
