@@ -58,7 +58,7 @@ def main():
     parser.add_argument('-dft', '--dft_name', default='pbe', help='dft name')
     parser.add_argument('-m', '--model', default='pt', help='name for material system')
     parser.add_argument('-kp', '--kpoints', default='1 1 1', help='kpoints')
-    parser.add_argument('-r', '--run', action='store_true', help="execute the command")
+    parser.add_argument('-r', '--run', action='store_true', help="execute    the command")
     args = parser.parse_args()
 
     data_moving(args.job, args.dir_home, args.dir_target, args.author, args.dft_p, args.dft_name, args.model, args.kpoints, args.run)
