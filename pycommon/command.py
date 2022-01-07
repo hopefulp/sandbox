@@ -140,7 +140,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         kw1 = keyvalues[0]
     ###### make command line in advance
     ### KISTI
-    kisti.vas = f"\t(VASP)$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh"
+    kisti.vas = f"\t(VASP)$ qsub -N {qname} -v exe=1 $SB/pypbs/pbs_vasp.sh for different vasp exe file"
     kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t      $ qsub -N {qname} -l select=20:ncpus=40:mpiprocs=20:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t      $ qsub -N {qname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
