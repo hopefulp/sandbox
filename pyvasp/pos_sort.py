@@ -172,7 +172,7 @@ def poscar_rearrange(pos, atom_klist, natom, atom_file, ftype, suff, rename, sor
                 s += "\n"
                 outf.write(s)
             ### write cartesian or direct if not digit
-            elif not re.search('\d', line):
+            elif re.match('[SD]', line, re.I):
                 outf.write(line)
             ### sort coordinates
             elif len(coordinates) < ntatom:
