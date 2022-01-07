@@ -6,7 +6,7 @@ import re
 import os
 import numpy as np
 
-import common
+from common import whereami
 import chem_space as cs
 
 def get_atomlist4bgf(fname):
@@ -65,6 +65,7 @@ def sortz_atom_coord(lines):
     for line in lines:
         coords = line.strip().split()   # sometimes including T T F
         line2d.append(coords)
+    #print(f"{line2d} in {whereami()}")
     new_coord2d = sorted(line2d, key=lambda l:float(l[2]))
     ### transform into 1d
     s=[]
@@ -88,7 +89,7 @@ def rearrange_coord_lines(lines, atom_klist, atom_names_orig, natom_orig, sort_z
     s=''
     for atom in atom_klist:
         if sort_z:
-            print("z sort")
+            print(f"z sort in {whereami()}")
             lines = sortz_atom_coord(coord_dict[atom])
         else:
             lines = coord_dict[atom]
@@ -172,7 +173,8 @@ def poscar_rearrange(pos, atom_klist, natom, atom_file, ftype, suff, rename, sor
                 s += "\n"
                 outf.write(s)
             ### write cartesian or direct if not digit
-            elif re.match('[SD]', line, re.I):
+            elif re.match('[SDC]', line, re.I):     # write and skip if Selective|Direct|Cartesion
+                print(f"line: {line} in {whereami()}")
                 outf.write(line)
             ### sort coordinates
             elif len(coordinates) < ntatom:
