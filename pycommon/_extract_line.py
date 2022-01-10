@@ -6,7 +6,6 @@ import os
 py module to extract lines from a file
 """
 
-
 def extract_one_line(fname, kw, nline=1, opt=1):
     """
     if there is keyword, get lines

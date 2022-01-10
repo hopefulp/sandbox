@@ -7,12 +7,11 @@ from common import dir_all, MyClass, dir_classify_n, whereami
 
 comment = MyClass('comment')
 dirjob  = MyClass('dirjob')
-jobfile = MyClass('jobfile')
+filejob = MyClass('filejob')
 convert = MyClass('convert')
 command = MyClass('command')
 string  = MyClass('string')
 server  = MyClass('server')
-
 
 server.server_env   =   "=== Server-related ===\
                         \n\t\tobtain server hostname, home etc\
@@ -22,6 +21,9 @@ server.pypath       =   "pypath.sh command\
                         \n\t\t    due to the python path in #!/...home/anaconda/bin/python\
                         \n\t\tpypath.sh $python_command\
                         \n\t\t    python $(which pycommand) args\
+                        "
+server.git_push     =   "cli_dir.py gitpush was copied for only gitpush\
+                        \n\t\t run in git directory\
                         "
 
 comment.howto       =   "=== COMMENT ===\
@@ -72,9 +74,6 @@ dirjob.clean_recur  = "clean one dir recursively\
 dirjob.cli_dir      =   "simple command inside directory\
                         \n\t\tdir1_cli.sh gitpush\
                         "
-dirjob.git_push     =   "cli_dir.py gitpush was copied for only gitpush\
-                        \n\t\t run in git directory\
-                        "
 dirjob.cli_dirs      =   "basic command line interface for all files in directory\
                         \n\t\tmodify script for all the files/selected files\
                         \n\t\tdir_cli.sh [0:vmake 1:incar 2:qsub 3:cp 4:rm 5:chmod\
@@ -101,10 +100,31 @@ dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp\
                         \n\t\t    dir_fname.py rename -m sc34c -rp sc34 -id -e sc34ch ! rename dir & file with exception\
                         \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'      ! to remove pbs files \
                         "
+filejob.fline_edit  =   "Job to treat file:\
+                        \n\tfind a line and substitute\
+                        "
+filejob.fline_sub   =   "template for line substitution"
+filejob.fline_cut   =   "extract a certain part in a file\
+                        \n\tusing keyword for start and end\
+                        "
+filejob.fline_part =    "extract a part from files: type=molden|band\
+                        \n\tfname -j jobtype[molden, band] -k1 keyword -k2 keyword -i band_index\
+                        \n\t    jobtype can be given by fname\
+                        \n\t    keyword can be given by fname\
+                        \n\tUsage::\
+                        \n\t    fline_part.py BAND.dat -i 24\
+                        \n\t\tto extract certain band from BAND.dat into 'BAND.idb01' only one band\
+                        "                        
+filejob._extract_line   = "to extract a certain part in a file"
+filejob.f_kw        =   "gather keywords to cut part of file\
+                        \n\tQ-Chem outfile, also refer to ~/dev/\
+                        \n\tBAND.dat from vaspkit to get part of bands\
+                        "
+
 convert.py_2to3_nb  =   "to convert ipynb files of python2 to python3\
                         \n\t\t to change .py file, use 2to3 in anaconda: source anaconda.sh and activate\
                         "
-
+convert.perl2python  =   " perl script to convert perl to python"
 command.command     = "show Recent Command"
 command.web_load    = "To load in web, copy files to ~/public_html/"
 
