@@ -314,12 +314,14 @@ def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
 def draw_v(y_val, job, title, xtitle, ytitle, Lsave,yscale):
     job_title=get_jobtitle(job,title, xtitle, ytitle)
 
-    if job == 'eda':
-        if yscale:
-            ys = np.array(yscale) * j2cal
-    x=Nix
-    y=np.array(y_val)*ys
-    mplot_nvector(x, y, Title=job_title.title, Xtitle=job_title.xtitle, Ytitle=job_title.ytitle, Lsave=Lsave)
+    #if job == 'eda':
+    #    if yscale:
+    #        ys = np.array(yscale) * j2cal
+    #x=Nix
+    #ys = 1
+    #y=np.array(y_val)*ys
+    #mplot_nvector(x, y, Title=job_title.title, Xtitle=job_title.xtitle, Ytitle=job_title.ytitle, Lsave=Lsave)
+    mplot_nvector(y_val, y_val, title=job_title.title, xlabel=job_title.xtitle, ylabel=job_title.ytitle, Lsave=Lsave)
     
     return 0
 
@@ -327,12 +329,12 @@ def main():
     parser = argparse.ArgumentParser(description='Drawing files with values/files')
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-v', '--values', action='store_true', help='use input values as y')
+    group.add_argument('-v', '--values', nargs='*', help=' input y-values as y')
     group.add_argument('-f', '--files', nargs='+',help='add all the files')
     #parser.add_argument('-xv', '--xvalues', nargs='*', help='X values')
 
-    g_value=parser.add_argument_group('Values', description="get argument as y-values")
-    g_value.add_argument('-yv', nargs='+', type=float, help='list y-values')
+    #g_value=parser.add_argument_group('Values', description="get argument as y-values")
+    #g_value.add_argument('-yv', nargs='+', type=float, help='list y-values')
     
     xvalues=parser.add_mutually_exclusive_group()
     xvalues.add_argument('-icx', '--icolumn_x', type=int, default=0, help='column index of X')
@@ -359,7 +361,7 @@ def main():
     ### use input values as y[]
     print(f"yscales {args.y_scale}")
     if args.values:
-        draw_v(args.y,args.job,args.title,args.xlabel,args.ylabel,args.save,args.y_scale)
+        draw_v(args.values,args.job,args.title,args.xlabel,args.ylabel,args.save,args.y_scale)
     ### use input files
     elif args.files:
         print(f"read files {args.files}")

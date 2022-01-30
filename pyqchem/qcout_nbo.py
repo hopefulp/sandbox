@@ -6,7 +6,7 @@ import re
 import sys
 from common import dir_all, MyClass, yes_or_no
 from qcout_mod import *
-import mystring
+import parsing
 
 Ni_files = MyClass()
 
@@ -109,7 +109,7 @@ def main():
 
     if len(args.chg_atoms) == 1 and len(args.chg_atoms[0]) > 1:
         print("change atoms to atom list")
-        chg_atoms = mystring.get_atomlist4str(args.chg_atoms[0])
+        chg_atoms = parsing.get_atomlist4str(args.chg_atoms[0])
     else:
         chg_atoms = args.chg_atoms
 

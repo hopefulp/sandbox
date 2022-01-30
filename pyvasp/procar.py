@@ -8,9 +8,9 @@ import re
 import sys
 import numpy as np
 from common         import dir_files
-from mod_poscar     import read_poscar
+from mod_poscar     import read_poscar, obtain_atomlist
 from mod_kpoints    import read_kpoints
-
+'''
 def get_iatoms_in_group(zmin, zmax, coord, job):
     ind=[]
     for i, xyzs in enumerate(coord):
@@ -23,15 +23,7 @@ def get_iatoms_in_group(zmin, zmax, coord, job):
             if float(line_ele[2]) < zmin or zmax < float(line_ele[2]):
                 ind.append(i)
     return ind
-
 def obtain_atomlist(zminmax, poscar, atom_species, job):
-    '''
-    input
-        read poscar
-    return
-        atom list inbetween zmin & zmax
-        principal axes    
-    '''
     if len(zminmax) == 2:
         zmin, zmax = (zminmax[0], zminmax[1])
     else:
@@ -54,6 +46,7 @@ def obtain_atomlist(zminmax, poscar, atom_species, job):
             
     print(f"indices {ind_select} total {len(ind_select)}")
     return ind_select
+'''
 
 def cal_kspacing(paxes2d):
     '''
@@ -139,7 +132,7 @@ def main():
     parser.add_argument('procar', nargs='?', default="PROCAR", help="input PROCAR")
     parser.add_argument('poscar', nargs='?', default="POSCAR", help="input POSCAR")
     parser.add_argument('kpoints', nargs='?', default="KPOINTS", help="input KPOINTS file for band")
-    parser.add_argument('-j','--job', default='bulk',choices=['bulk','surf','ads'], help="selective band structure")
+    parser.add_argument('-loc','--location', default='in',choices=['in','out'], help="selective band structure")
     atoms = parser.add_mutually_exclusive_group()
     atoms.add_argument('-al','--atom_list', nargs='*', type=int, help="list atoms: index from 0 ")
     atoms.add_argument('-z', '--zintv', nargs=2, type=float, help='atoms between zmax * zmin')
@@ -154,7 +147,7 @@ def main():
             print("Error: input z values for zmin and zmax")
             sys.exit(1)
         else:
-            alist = obtain_atomlist(args.zintv, args.poscar, args.atom_species, args.job)
+            alist = obtain_atomlist(args.zintv, args.poscar, args.atom_species, args.location)
     ### change atom index [1,2,...] for PROCAR
     atom_index = [ x+1 for x in alist ]
     ### index from 1 in procar

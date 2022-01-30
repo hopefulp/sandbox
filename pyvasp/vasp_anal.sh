@@ -1,7 +1,7 @@
 #!/bin/bash
 
 job_list=( bader bader2 convasp dos bchg end )
-vbin=/qcfs/joonho/binvasp
+vbin=/home/joonho/sandbox/pyvasp/vscript
 
 if [ $# -lt 2 ]; then
     echo "Usage:: $0 job_name dir_name"
@@ -9,7 +9,7 @@ if [ $# -lt 2 ]; then
     exit
 else
     for job in ${job_list[@]} 
-	do
+	    do
 	    #echo $job
 	    if [ $1 == $job ]; then
 		break
@@ -18,7 +18,7 @@ else
 		echo "Job list:: bader bader2 convasp dos bchg"
 		exit
 	    fi
-	done
+	    done
     job=$1
     echo "first argument $job is shifted as job name"
     shift
@@ -38,7 +38,8 @@ for dir in  $@
 	    echo "cd $dir"
 	    cd $dir
 	    	chgsum.pl AECCAR0 AECCAR2
-		bader CHGCAR -ref CHGCAR_sum
+		    bader CHGCAR -ref CHGCAR_sum
+            pcharge_bader.py
 		cd ..
 	    ;;
 	"${job_list[1]}")

@@ -28,13 +28,16 @@ $nspecies=$#ARGV;
 for($i=0;$i<=$nspecies;$i++){
     if($ARGV[$i] =~ /=/){
     	@list=split(/=/,$ARGV[$i]);
-	push(@atom_kinds,$list[0]);
-	$atom_kinds{$list[0]}=$list[1];
+        push(@atom_kinds,$list[0]);
+        $atom_kinds{$list[0]}=$list[1];
     }else{
-	push(@atom_kinds,$ARGV[$i]);
-	$atom_kinds{$ARGV[$i]}=0;
+        push(@atom_kinds,$ARGV[$i]);
+        $atom_kinds{$ARGV[$i]}=0;
     }
 }
+
+### T or False
+$dyn = 'F';
 
 $atom_kinds = join("   ",@atom_kinds);
 print "   ",$atom_kinds,"\n";
@@ -45,13 +48,13 @@ for($i=0;$i<=$#atom_kinds;$i++){
 #exit;
 
 $flxyz=$fmsi[0].".lxyz";
-$fvasp=$fmsi[0].".pos";
+$fvasp="POSCAR.".$fmsi[0];
 open(IN,"<$fmsi");
 open(OUTlxyz,">$lxyz");
 open(OUTvasp,">$fvasp");
 
 print OUTvasp @atom_kinds,"\n";
-
+print "Output to ", $fvasp, " ", $flxyz, "\n";
 
 $key_lattice1="A3";
 $key_lattice2="B3";
@@ -152,23 +155,29 @@ for($i=0;$i<=$#atom_kinds;$i++){
 print OUTvasp "Selective Dynamics\n" ;
 print OUTvasp "Cartesian\n";
 
+if($dyn eq 'T'){
+    $str = "  T T T";
+}else{
+    $str = "  F F F";
+}
+
 for($j=0;$j<=$#atom_kinds;$j++){
     for($i=0;$i<$natom;$i++){
-	if($natom_kind[$i] eq $atom_kinds[$j]){
-	    $i_kind[$j]++;
-#	    print $max_kind[$j],"\t",$atom_kinds{$atom_kinds[$j]}."\n";
-	    for($k=0;$k<3;$k++){
-		print "\t$coord[$i][$k]";
-		print OUTvasp "\t$coord[$i][$k]";
-	    }
-	    if($i_kind[$j] <= ($max_kind[$j]-$atom_kinds{$atom_kinds[$j]})){
-		print OUTvasp "\tT\tT\tT\n";
-	        print  "\tT\tT\tT\n";
-	    }else{
-		print OUTvasp "\tT\tT\tT\n";
-		print "\tT\tT\tT\n";
-	    }
- 	}
+	    if($natom_kind[$i] eq $atom_kinds[$j]){
+            $i_kind[$j]++;
+#           print $max_kind[$j],"\t",$atom_kinds{$atom_kinds[$j]}."\n";
+            for($k=0;$k<3;$k++){
+                printf "  %10.5f", $coord[$i][$k];
+                printf OUTvasp "  %10.5f", $coord[$i][$k];
+            }
+            if($i_kind[$j] <= ($max_kind[$j]-$atom_kinds{$atom_kinds[$j]})){
+                print           "$str\n";
+                print OUTvasp   "$str\n";
+            }else{
+                print OUTvasp "$str\n";
+                print OUTvasp "$str\n";
+            }
+        }
     }
 }
 

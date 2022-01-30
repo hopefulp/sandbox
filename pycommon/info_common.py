@@ -8,6 +8,7 @@ from common import dir_all, MyClass, dir_classify_n, whereami
 comment = MyClass('comment')
 dirjob  = MyClass('dirjob')
 filejob = MyClass('filejob')
+linejob = MyClass('linejob')
 convert = MyClass('convert')
 command = MyClass('command')
 string  = MyClass('string')
@@ -120,7 +121,14 @@ filejob.f_kw        =   "gather keywords to cut part of file\
                         \n\tQ-Chem outfile, also refer to ~/dev/\
                         \n\tBAND.dat from vaspkit to get part of bands\
                         "
-
+linejob.parsing     =   "line(string) parsing::\
+                        \n\tdef is_int_el: \
+                        \n\tdef is_int:\
+                        \n\tdef is_there_char:\
+                        \n\tdef str_decom:\
+                        \n\tdef convert_s2l:\
+                        \n\tdef get_atomlist4str:\
+                        "
 convert.py_2to3_nb  =   "to convert ipynb files of python2 to python3\
                         \n\t\t to change .py file, use 2to3 in anaconda: source anaconda.sh and activate\
                         "

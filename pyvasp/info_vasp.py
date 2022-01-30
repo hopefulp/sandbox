@@ -20,9 +20,12 @@ models= {
 make    = MyClass('make')
 run     = MyClass('run')
 clean   = MyClass('clean')
-modify  = MyClass('modify')
+poscar  = MyClass('poscar')
+incar   = MyClass('incar')
+doscar  = MyClass('doscar')
+procar  = MyClass('procar')
 ase     = MyClass('ase')
-check   = MyClass('check')
+charge  = MyClass('charge')
 
 make.vas_make_ini   ="==================== Start VASP =======================================\
                     \n\t===== Make VASP initial directory ====\
@@ -96,7 +99,7 @@ make.mod_incar     ="module for INCAR modification\
                     \n\tdef modify_incar(incar_in, job, dic=None, opt='ac')\
                     \n\t    incar_in is modified by job_dict\
                     "
-make.mod_poscar    ="module for POSCAR modification\
+poscar.mod_poscar    ="module for POSCAR modification\
                     \n\tget_atoms_poscar\
                     \n\tget_poscar(poscar)\
                     \n\t    : read input POSCAR.job and write to wdir as 'POSCAR'\
@@ -115,7 +118,7 @@ run.vas_qsub        = " run vasp in queue\
 run.envvasp         = " imported from vasp run, make\
                     "
 clean.clean         =" "
-modify.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
+poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
                     \n\tsort atoms in POSCAR\
                     \n\treturns POSCARsort\
                     \n\tOptions:\
@@ -123,7 +126,7 @@ modify.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
                     \n\t    -z  True for z-sort in the atom group\
                     \n\tNB: when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
                     "
-check.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
+incar.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\tOptions:\
                     \n\t    one dir : show INCAR\
                     \n\t    two dirs: compare two INCAR\
@@ -133,6 +136,48 @@ check.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\t    incar_diff.py FPtb2H2 FPtb2H2hb\
                     \n\t    incar_diff.py -a -k ENCUT ISTART\
                     "
+doscar.dosall       =   "perl script to decompose lm-decomposded DOSCAR"
+doscar.doslm        =   "extact pdos then plot\
+                        \n\tUsage:\
+                        \n\t    doslm.py -z 3.69 -p\
+                        \n\t    doslm.py -z 3.69 -p -e f\
+                        \n\t    doslm.py -al 8 23 9 10 21 22 -als 2 4 -j l -p\
+                        \n\tOptions:\
+                        \n\t    (exclusive)\
+                        \n\t\t-z zmin [zmax]  to include atoms inbetween zmin ~ zmax\
+                        \n\t\t    if only zmin, zmin-=dz, zmax+=dz\
+                        \n\t\t-al atom list index start from 0 from ase gui\
+                        \n\t\t-ash atom list shape\
+                        \n\t\t    len(atomlist) == sum(atomlist_shape)\
+                        \n\t    -e [f|float_value]: f for Fermi level, value for VBM shift\
+                        \n\t    -p store_true for plot\
+                        \n\t\tcalls myplot2D.mplot_nvector\
+                        "
+doscar.doslm_1l       =   "saved doslm.py for one atom list\
+                        \n\t\tupgrade to multiple atomlist sets in doslm.py\
+                        "
+doscar.doscar_split =   "decompose DOSCAR for each atoms written by starmj"
+doscar.doscar_modi  =   "remove the first line of each energy loop for removing abnormal value\
+                        \n\t\tdefault: read DOSCAR\
+                        \n\t\tmove original DOSCAR to DOSCAR_o\
+                        \n\t\tmake a new DOSCAR with 1 line less in each block, (natom+1) less line\
+                        "
+procar.procar       =   "To extract and draw band\
+                        \n\tload PROCAR can make a memory problem\
+                        "
+procar.procar_byline=   "the same as procar.py\
+                        \n\tread by line and calculate to save memory\
+                        "
+charge.vasp_anal    =   "(.sh) Charge analysis of Bader\
+                        \n\tjobs: bader bader2(spin) convasp dos bchg end\
+                        \n\tUsage: Run out of directory\
+                        \n\t    vasp_anal.sh bader dirname\
+                        "
+charge.bader_charge =   "included in vasp_anal.sh\
+                        \n\tRead POTCAR for ZVAL\
+                        \n\tRead POSCAR for atom list\
+                        \n\toutput: Bader charge in 'pcharge_bader.dat'\
+                        "
 
 ase.ase_fconvert    =""
 ase.ase_vasp        =""

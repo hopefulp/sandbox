@@ -136,12 +136,13 @@ print OUTvasp "   ",$natom_species,"\n";
 print OUTvasp "Cartesian\n";
 for($j=0;$j<=$#atoms;$j++){
     for($i=0;$i<$natom;$i++){
-	if($coord[$i][3] eq $atoms[$j]){
-	    for($k=0;$k<3;$k++){
-		printf "\t%10.5f", $coord[$i][$k];
-		printf OUTvasp "\t%10.5f", $coord[$i][$k];
-	    }   print "  $coord[$i][3]\n"; print OUTvasp "\n";
- 	}
+        if($coord[$i][3] eq $atoms[$j]){
+            for($k=0;$k<3;$k++){
+                printf "\t%10.5f", $coord[$i][$k];
+                printf OUTvasp "\t%10.5f", $coord[$i][$k];
+            }   
+            print "  $coord[$i][3]\n"; print OUTvasp "\n";
+        }
     }
 }
 

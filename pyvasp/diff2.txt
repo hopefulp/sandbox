@@ -1,0 +1,53 @@
+19,21c19,21
+< from common import list2str, whereami
+< from myplot2D import mplot_nvector, auto_nvector
+< 
+---
+> from common     import list2str, whereami
+> from myplot2D   import mplot_nvector, auto_nvector
+> from parsing    import convert_2lst_2Dlist
+52c52,61
+<                 alstr = alstr + '_' + str(arr_atom[-1])
+---
+>                 atom_imax = arr_atom.max()
+>                 atom_imin = arr_atom.min()
+>                 natom_in = arr_atom.size - 2
+>                 if natom_in == 0:
+>                     alstr = alstr + '_' + str(arr_atom[-1])
+>                 else:
+>                     if arr_atom.size == atom_imax - atom_imax:
+>                         alstr = alstr + '-' + str(atom_imax)
+>                     else:
+>                         alstr = alstr + '_N' + str(arr_atom.size) + '_' + str(atom_imax)
+72c81,84
+< 
+---
+>                 ### escape after getting all the atoms in arr_atomlist
+>                 if iatom_in == len(arr_atom):
+>                     break
+>                 ### decide atom box is in or not
+171c183
+<     ldos.add_argument('-al','--atom_list0', nargs='*', type=int, help="list atoms: index from 0 ")
+---
+>     ldos.add_argument('-al','--atom_list0', nargs='*', help="list atoms with num and '-', index from 0 ")
+185c197
+<     ### obtain atom list
+---
+>     ### obtain atom 2D list
+188,197c200
+<             if sum(args.atom_list0_sh) != len(args.atom_list0):
+<                 print(f"sum of atom list shape {sum(args.atom_list0_sh)} should be same as num of atoms in the list0 {len(args.atom_list0)}")
+<                 sys.exit(1)
+<             alist0 = []
+<             for i in range(len(args.atom_list0_sh)):
+<                 alist = []
+<                 for j in range(args.atom_list0_sh[i]):
+<                     alist.append(args.atom_list0.pop(0))
+<                 alist0.append(alist)
+<             print(f"{whereami():>15}(): {alist0}")
+---
+>             alist0 = convert_2lst_2Dlist(args.atom_list0, args.atom_list0_sh)
+201c204
+<             alist0.append(args.atom_list0)
+---
+>             alist0.append(list(map(int, args.atom_list0)))

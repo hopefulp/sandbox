@@ -3,26 +3,27 @@ import sys
 import vasp_job
 import re
 import os
+from common import whereami
 
 def get_ntatom(st):
     natom_list = list(map(int, st.strip().split()))
     ntotal = sum(natom_list)
     return ntotal, natom_list
 
-def read_poscar(part, pos):
+def parse_poscar(pos, opt):
     '''
     extract lattice vectors, pre-part, atom_list, coordinates
-    part    pre, coord,
+    opt    pre, coord,
     '''
     with open(pos, "r") as f:
         lines = f.readlines()
-        p_axes=[]
+        p_axes=[]   # principal axis
 
         for i in range(2,5):
             paxis = list(map(float,lines[i].strip().split()))
             p_axes.append(paxis)
 
-        if part == 'paxes':
+        if opt == 'paxes':
             return p_axes
         else:
             for i in [5, 0]:
@@ -37,6 +38,7 @@ def read_poscar(part, pos):
                 if any(s.isdigit() for s in lines[i]):
                     iend_pre = i-1
                     break
+            ### if direct, use z-size of paxis_c to scale down the z_coord of cartesian from visual program: ase gui
             if re.match('D', lines[iend_pre], re.I):
                 p_z = p_axes[2][2]
             else:
@@ -44,12 +46,60 @@ def read_poscar(part, pos):
             pre = lines[:iend_pre+1]
             coord = lines[iend_pre+1:iend_pre+ntatom+1]
 
-            if part == 'pre':
+            if opt == 'pre':
                 return pre
-            elif part == 'coord':
+            elif opt == 'coord':
                 return coord
-            elif part == 'atomcoord':
+            elif opt == 'atomcoord':
                 return atom_list, natom_list, coord, p_z
+            elif opt == 'alist':
+                return atom_list, natom_list
+
+def get_iatoms_in_group(zmin, zmax, coord, loc):
+    ind=[]
+    for i, xyzs in enumerate(coord):
+        line_ele = xyzs.strip().split()
+        #print(f"{line_ele}")
+        if loc == 'in':
+            if zmin < float(line_ele[2]) and float(line_ele[2]) < zmax:
+                ind.append(i)
+        elif loc == 'out':
+            if float(line_ele[2]) < zmin or zmax < float(line_ele[2]):
+                ind.append(i)
+    return ind
+
+
+def obtain_atomlist0(zminmax, poscar, atom_species, loc):
+    '''
+    obtain_atomlist0: '0' denotes starting atom index
+    input
+        read poscar
+    return
+        atom list inbetween zmin & zmax: index from 0 ~
+        principal axes    
+    '''
+    if len(zminmax) == 2:
+        zmin, zmax = (zminmax[0], zminmax[1])
+    else:
+        print("z-coord error: {zminmax}, input two z-values with -z ")
+        return 1
+    atom_list, natom_list, coord, direct_z = parse_poscar('atomcoord', poscar)
+    ### in case direct coordinates in POSCAR, reduce cartisian by /direct_z
+    if direct_z != 1.0:
+        zmin /= direct_z
+        zmax /= direct_z
+        print(f"{whereami():>15}(): zmin, max = {zmin} {zmax} in direct coordinates in POSCAR: in {__name__}.py")
+    iatom=0
+    ind0_select=[]
+    print(f"{whereami():>15}(): POSCAR {atom_list} {natom_list} {len(coord)} coordinates: in {__name__}.py ")
+    for i, atom in enumerate(atom_list):
+        if atom in atom_species:
+            ind0_group = get_iatoms_in_group(zmin, zmax, coord[iatom:iatom+natom_list[i]], loc)
+            ind0_select.extend([x+iatom for x in ind0_group])
+        iatom += natom_list[i]
+
+    print(f"{whereami():>15}(): indices {ind0_select} total {len(ind0_select)}")
+    return ind0_select
 
      
 

@@ -35,7 +35,7 @@ def fileread(fname):
     return lineinfo, wordinfo
 
 
-def get_potcar(pot_type):
+def get_potcar(pot_type, hpp_list=None):
 
     error_check = 0
     if pot_type == 'lda':
@@ -66,14 +66,24 @@ def get_potcar(pot_type):
     element_refine = []
 
     for name in element:
-        if name in sv_list:
-            element_refine.append(name+'_sv')
-        elif name in pv_list:
-            element_refine.append(name+'_pv')
-        elif name in d_list:
-            element_refine.append(name+'_d')
-        else:
-            element_refine.append(name)
+        if name != 'H' or not hpp_list:
+            if name in sv_list:
+                element_refine.append(name+'_sv')
+            elif name in pv_list:
+                element_refine.append(name+'_pv')
+            elif name in d_list:
+                element_refine.append(name+'_d')
+            else:
+                element_refine.append(name)
+        elif name == 'H' and hpp_list:
+            hpp = hpp_list.pop(0)
+            if hpp[0] == '1':
+                hpp_dir = hpp[0] + '.' + hpp[1:]
+            else:
+                hpp_dir = '.' + hpp[:]
+            element_refine.append(name+hpp_dir)
+            print(f"find H directory {name+hpp_dir}")
+                
 
     # Generation VASP POTCAR
     cmd = 'cat'
@@ -91,9 +101,10 @@ def get_potcar(pot_type):
 def main():
     parser = argparse.ArgumentParser(description='make POTCAR with pp flavor')
     parser.add_argument('-pp', '--pseudop', choices=['lda', 'pbe', 'pw91'], help='select pseudo potential')
+    parser.add_argument('-hpp', '--pseudoH', nargs='*', help='pseudoH value')
     args = parser.parse_args()
 
-    get_potcar(args.pseudop)
+    get_potcar(args.pseudop, args.pseudoH)
 
     return 0
 

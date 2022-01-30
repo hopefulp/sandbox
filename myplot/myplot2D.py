@@ -7,7 +7,6 @@
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.ticker as ticker
-from cycler import cycler
 import sys
 import my_chem 
 import numpy as np
@@ -15,7 +14,7 @@ from common import *
 #plt.switch_backend('agg')
 size_title = 20
 size_label = 18
-size_tick = 15
+#size_tick = 15
 text_x = 0.75
 text_y = 0.8
 text_twinx_x = 0.8
@@ -47,20 +46,112 @@ def my_font(pack='amp'):
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
     return
-### choice between "import myplot_default"|call common_figure
-def common_figure():
-    fig = plt.figure(figsize=(15,10))
-    ax = plt.axes()
-    mpl.rcParams.update({'font.size':20})
-    ax.tick_params(axis='both', which='major', labelsize=25)
-    #ax.tick_params(axis='x', labelsize=30)
+### choice between "import myplot_default"|call common_figurea
 
-    #custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
-    custom_cycler = (cycler(color=['r','g']))                                          # Figure 8(b)
-    #custom_cycler = (cycler(color=['darkcyan','b']))                                   # Figure S16(a)
-    #custom_cycler = (cycler(color=['r','darkcyan']))                                    # Figure S16(b)
-    #custom_cycler = (cycler(color=['orange','m','g','b']))
-    ax.set_prop_cycle(custom_cycler)
+def lighten_color(color, ncolors):
+    """
+    Lightens the given color by multiplying (1-luminosity) by the given amount.
+    Input can be matplotlib color string, hex string, or RGB tuple.
+
+    Examples:
+    >> lighten_color('g', 0.3)
+    >> lighten_color('#F034A3', 0.6)
+    >> lighten_color((.3,.55,.1), 0.5)
+    """
+    import matplotlib.colors as mc
+    import colorsys
+    try:
+        c = mc.cnames[color]
+    except:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    print(f"h l s {c[0]} {c[1]} {c[2]}")
+    lmin = 0.2
+    lmax = c[1]*1.9
+    dl  = (lmax-lmin)/(ncolors-1)
+    print(f"min, max, dl {lmin} {lmax} {dl}")
+    color_rgb=[]
+    for i in range(ncolors):
+        print(f"lightness {lmin + dl*i}")
+        color_rgb.append(colorsys.hls_to_rgb(c[0], lmin + dl*i, c[2]))
+    amount=0.5 
+    lightness = c[1]*0.3 + amount * (1 - c[1])
+    print(f" lightness: {lightness }")
+    #return colorsys.hls_to_rgb(c[0], lightness, c[2])
+    return color_rgb
+    #return colorsys.hls_to_rgb(c[0], amount * (1 - c[1]), c[2])
+
+def lighten_2color(color, ncolors):
+    """
+    Lightens the given color by multiplying (1-luminosity) by the given amount.
+    Input can be matplotlib color string, hex string, or RGB tuple.
+
+    Examples:
+    >> lighten_color('g', 0.3)
+    >> lighten_color('#F034A3', 0.6)
+    >> lighten_color((.3,.55,.1), 0.5)
+    """
+    import matplotlib.colors as mc
+    import colorsys
+
+    color1=color[0]
+    color2=color[1]
+    nlight = int(ncolors/2)
+    ndark  = ncolors -nlight
+
+    c = colorsys.rgb_to_hls(*mc.to_rgb(color1))
+    print(f"h l s {c[0]} {c[1]} {c[2]}")
+    lmin = 0.25
+    lmax = 0.75
+    dl  = (lmax-lmin)/(ncolors-1)*2
+    print(f"min, max, dl {lmin} {lmax} {dl}")
+    color_rgb=[]
+    color_light=[0.5, 0.8]
+    for i in range(nlight):
+        print(f"lightness {lmin + dl*i}")
+        color_rgb.append(colorsys.hls_to_rgb(c[0], color_light[i], c[2]))
+    c = colorsys.rgb_to_hls(*mc.to_rgb(color2))
+    print(f"h l s {c[0]} {c[1]} {c[2]}")
+    color_light=[0.8, 0.6, 0.3]
+    for i in range(ndark):
+        print(f"darkness {lmax - dl*i}")
+        color_rgb.append(colorsys.hls_to_rgb(c[0], color_light[i], c[2]))
+    #amount=0.5 
+    #lightness = c[1]*0.3 + amount * (1 - c[1])
+    #print(f" lightness: {lightness }")
+    #return colorsys.hls_to_rgb(c[0], lightness, c[2])
+    return color_rgb
+    #return colorsys.hls_to_rgb(c[0], amount * (1 - c[1]), c[2])
+def common_figure(ctype='darken',ncolor=1):
+    '''
+    ctype   darken to change intensity
+            cycle to use designated color turns
+    '''
+    if ctype == 'darken':
+        import matplotlib.colors as ms
+        import colorsys
+    else:
+        from cycler import cycler
+
+    fig = plt.figure(figsize=(10,6))
+    ax = plt.axes()
+    mpl.rcParams.update({'font.size':12})
+    #ax.tick_params(axis='both', which='major', labelsize=25)
+    #ax.tick_params(axis='x', labelsize=30)
+    if ctype == 'darken':
+        pass   
+    else:
+        if ncolor == 2:
+            custom_cycler = (cycler(color=['r','g']))                                          # Figure 8(b)
+            custom_cycler = (cycler(color=['darkcyan','b']))                                   # Figure S16(a)
+            custom_cycler = (cycler(color=['r','darkcyan']))                                    # Figure S16(b)
+        elif ncolor == 4:
+            custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
+            custom_cycler = (cycler(color=['r','m','g','b']))
+        else:
+            custom_cycler = (cycler(color=['r','m','g','b']))
+            
+        ax.set_prop_cycle(custom_cycler)
     return fig, ax
 
 ### draw_dots_two was upgraded to twinx
@@ -321,36 +412,57 @@ def mplot_levels(x, ys, title=None, xlabel=None, ylabel=None, legend=None,Lsave=
     return 0
 
 
+def auto_nvector(x,y):
+    fig, ax = plt.subplots()
+    for i in range(len(y)):
+        plt.plot(x,y[i])
+    plt.show()
+    return 0
+### most1
 def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, Colors=None):
     '''
     call with x=[] and y=[ [...
     x:: [] or [size]
     y:: [size] or [[size],[size],...[size]]
+
+    if not Colors:
+        if len(legend):
+            fig, ax = common_figure(ncolor = len(legend))
+        else:
+            fig, ax = common_figure(ncolor=4)
+    else:
+        fig, ax = common_figure(ncolor=4)
     '''
     fig, ax = common_figure()
+    #if len(y):
+    #    camount= 1/len(y) *2
+    color_rgb = lighten_2color('rb', len(y))
+    print(f"size of y vector {len(y)}")
+    #plt.locator_params(axis='x', nbins=10)
     ys = np.array(y)
     if len(x) != 0:
         xsize = len(x)
     else:
         xsize = ys.shape[0]
         x=range(xsize)
-    print(f"x={len(x)} y={ys.shape}")
+    print(f"x={len(x)} y={ys.shape} in {whereami()}()")
     plt.title(title)
     if xlabel:
-        plt.xlabel(xlabel, fontsize=25)
-    plt.ylabel(ylabel, fontsize=25)
+        plt.xlabel(xlabel, fontsize=12)
+    plt.ylabel(ylabel, fontsize=12)
     if ys.ndim == 1:
-        plt.plot(x, y, 'bo-')
+        plt.plot(x, y, '-')
         #plt.scatter(x, y)
     elif ys.ndim == 2:
         for i in range(len(ys)):
-            plt.plot(x,ys[i,:], 'o-', label=legend[i] )
+            plt.plot(x,ys[i,:], color=color_rgb[i], label=legend[i] )
     else:
         print(f"Error:: obscure in y-dim {ys.ndim}")
     ### ADD LEGEND
-    plt.legend(loc=2)                # locate after plot
-    #ax.xaxis.set_major_locator(ticker.MultipleLocator(100))
-    #ax.yaxis.set_major_locator(ticker.MultipleLocator())
+    plt.legend(loc=1)                # locate after plot
+    #ax.set_xlim([-8, 6])
+    ax.xaxis.set_major_locator(ticker.AutoLocator())
+    ax.yaxis.set_major_locator(ticker.AutoLocator())
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)

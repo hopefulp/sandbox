@@ -26,6 +26,20 @@ def extract_one_line(fname, kw, nline=1, opt=1):
         print('error in %s' % __file__)
     return
 
+def extract_values(fname, key):
+    
+    values=[]
+    with open(fname, 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            if key in line:
+                ele = line.strip().split()
+                ind = ele.index(key)
+                values.append(ele[ind+2])
+
+    return values
+
+
 def extract_col_qchem(fname, kw):
     """
     extract column list for atom name

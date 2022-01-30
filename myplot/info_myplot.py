@@ -4,17 +4,18 @@ import argparse
 import os
 import re
 from common import dir_all, MyClass, dir_classify_n, whereami
+from comment_subj import vasp
 
 my_mpl  = MyClass('my_mpl')
 mplplot = MyClass('mplplot')
-musage  = MyClass('musage')
-amp     = MyClass('amp')
+usage   = MyClass('usage')
 table   = MyClass('table')
+test    = MyClass('test')
 
 my_mpl.ini = "initialize mpl in ~/.config/matplotlib/matplotlibrc \
-                \n\t\t:: check by ipython>>>matplotlib.matplotlib_fname()\
+                \n\t\t::usage.amp check by ipython>>>matplotlib.matplotlib_fname()\
                 "
-mplplot.mplot_1f="myplot.py -v|-f values|files -j job -t title\
+mplplot.mplot_f="myplot.py -v|-f values|files -j job -t title\
                 \n\t\t:: -v y1 y2 y3 ... | -f f1 f2 f3 ...\
                 \n\t\t:: -j for job qcmo|ai for xlabel, ylabel, title\
                 \n\t\t:: -t, -xt, -yt overwrites xlabel, ylabel, title\
@@ -24,7 +25,6 @@ mplplot.mplot_1f="myplot.py -v|-f values|files -j job -t title\
                 \n\te.g.:(qcmo) myplot.py -v -y -0.8058   -0.7866   -0.7860   -1.0080   -1.2482   -1.2539 -j qcmo -t \"CO2 charges\"\
                 \n\te.g.:(qcmo) myplot.py -f nbo-6f.dat -j qcmo -xt Model -ys -1 -yt \"Charge (e)\" -t \"CO2 charges\"\
                 "
-mplplot.mplot_f = mplplot.mplot_1f
 mplplot.mplot_pdnf =    "plot multiple files using pandas for ordering\
                         \n\t    any number of files\
                         \n\t    pandas is default\
@@ -36,10 +36,23 @@ mplplot.mplot_pdnf =    "plot multiple files using pandas for ordering\
                         \n\t    -pd is default to use pandas to ordering x-values\
                         \n\t\t-xs xspacing to reduce xticis by devide in the N list\
                         \n\t\t-xst ['evenly','numerically'(default)] in x-values\
-                        "
-mplplot.mplot_pd2f  =   "Draw 2d plot using pandas by reading file\
+                        \n\t(mplot_pdnf2) Draw 2d plot using pandas by reading file\
                         \n\t    will be deprecated to use mplot_pdnf.py\
                         \n\tUsage:: mplot_pd2f.py 1-2filenames options\
+                        "
+mplplot.myplot2D    =   "several kinds of 2d plot method\
+                        \n\tdef mplot_twinx:\
+                        \n\tdef mplot_nvector:\
+                        \n\t    called by:\
+                        \n\t\tmplot_f.py\
+                        \n\t\tmplot_table.py\
+                        \n\t\tplot_level.py\
+                        \n\t\trun_plot_qcmo.py\
+                        \n\tdef mplot_vector_one:\
+                        \n\tdef mplot_vector_two:\
+                        \n\tdef draw_histogram:\
+                        \n\tdef barplot2:\
+                        \n\tdef barplot_y:\
                         "
 table.mplot_table   =   "Plot table: CSV from MS Excel\
                         \n\t    import plot_level.mplot_level\
@@ -48,23 +61,36 @@ table.plot_level    =   "modules for table plot\
                         \n\t    imported in mplot_table\
                         \n\t    modified from mplot_f.py\
                         "
-
-
-musage.qcmo="(qcmo) myplot.py -v -y -0.8058   -0.7866   -0.7860   -1.0080   -1.2482   -1.2539 -j qcmo -t \"CO2 charges\"\
-            \n\t\t\t  myplot.py -f nbo-6f.dat -j qcmo -xt Model -ys -1 -yt \"Charge (e)\" -t \"CO2 charges\" "
-musage.eda="(eda) grep Polar *out | awk '{print $6}'\
-            \n\t\t\t grep \"CT = DEL\" *out | awk '{print $11}' | tr '\\n' ' '\
-            \n\t\t\t grep 'SCF Total' *out | awk '{print $11}' | tr '\\n' ' '\
-            \n\t\t\t myplot.py -v -y -0.8058   -0.7866   -0.7860  -j eda -t 'CT Energy' -yt 'E (kcal/mol)' \
-            \n\t\t\t myplot.py -f frozen_1.dat Polar.dat CTene.dat scf.dat -j eda -t EDA -yt 'E (kcal/mol)' -ys -1 -yl FRZ POL CT SCF-TOTAL\
-            \n\t\t\t myplot.py -f chg-nbo.dat CTene.dat -ys -1 j- -yl 'NAO Charge of CO2 (e$^-$)' 'CT (kcal/mol)' -tx\
-            \n\t\t\t myplot.py -f BE.dat scf.dat -ys -1 j- -t 'BE & SCF' -yt 'E (kcal/mol)' -yl BE SCF-TOTAL\
-            \n\t\t\t myplot.py -f chg-nbo.dat BE.dat -ys -1 j- -yl 'NAO Charge of CO2 (e$^-$)' 'BE (kcal/mol)' -tx -c r darkcyan\
-            \n\t\t\t myplot.py -f CTene.dat scf.dat -ys 'j-' 'j-' -yl 'CT (kcal/mol)' 'SCF (kcal/mol)' -tx -c red blue\
-            "
-amp.md = " myplot.py md.ene -x -t MD-Ethylene -yt \"E(eV)\" -xt \"time (10fs)\" "
+usage.qcmo      = "myplot.py -v -y -0.8058   -0.7866   -0.7860   -1.0080   -1.2482   -1.2539 -j qcmo -t 'CO2 charges'\
+                \n\t\t\t  myplot.py -f nbo-6f.dat -j qcmo -xt Model -ys -1 -yt 'Charge (e)' -t 'CO2 charges'\
+                "
+usage.eda       = "grep Polar *out | awk '{print $6}'\
+                \n\t\t\t grep \"CT = DEL\" *out | awk '{print $11}' | tr '\\n' ' '\
+                \n\t\t\t grep 'SCF Total' *out | awk '{print $11}' | tr '\\n' ' '\
+                \n\t\t\t myplot.py -v -y -0.8058   -0.7866   -0.7860  -j eda -t 'CT Energy' -yt 'E (kcal/mol)' \
+                \n\t\t\t myplot.py -f frozen_1.dat Polar.dat CTene.dat scf.dat -j eda -t EDA -yt 'E (kcal/mol)' -ys -1 -yl FRZ POL CT SCF-TOTAL\
+                \n\t\t\t myplot.py -f chg-nbo.dat CTene.dat -ys -1 j- -yl 'NAO Charge of CO2 (e$^-$)' 'CT (kcal/mol)' -tx\
+                \n\t\t\t myplot.py -f BE.dat scf.dat -ys -1 j- -t 'BE & SCF' -yt 'E (kcal/mol)' -yl BE SCF-TOTAL\
+                \n\t\t\t myplot.py -f chg-nbo.dat BE.dat -ys -1 j- -yl 'NAO Charge of CO2 (e$^-$)' 'BE (kcal/mol)' -tx -c r darkcyan\
+                \n\t\t\t myplot.py -f CTene.dat scf.dat -ys 'j-' 'j-' -yl 'CT (kcal/mol)' 'SCF (kcal/mol)' -tx -c red blue\
+                "
+usage.sno2      = "pyvasp/\
+                \n\tdoslm.py -z 3.69\
+                "
+usage.h2        = "H2 on Pt-C60-x\
+                \n\tf{vasp.scripts.zpe}\
+                "
+usage.amp       = " myplot.py md.ene -x -t MD-Ethylene -yt \"E(eV)\" -xt \"time (10fs)\" \
+                \n\t\t\tmplot_f.py -v 1 2 3 4\
+                "
+usage.test      = "\t(ascii file) Test for mpl plot\
+                \n\t    Usage:: mplot_f.py -v 1 2 3 4\
+                \n\t\t    mplot_f.py -f t.dat\
+                \n\t(csv file) Test for table plot\
+                \n\t    Usage:: mplot_table.py GC54Pt-abc.csv -l -t 'H2 diffusion on C60-x'\
+                "
 #classobj_dict={'MPL': my_mpl, 'MYPLOT': myplot, 'USAGE': musage}
-classobj_dict={'MPL': my_mpl, 'MYPLOT': mplplot, 'USAGE': musage}
+classobj_dict={'MPL': my_mpl, 'MYPLOT': mplplot, 'USAGE': usage}
 
 def classify(Lclassify, work, job):
 
@@ -133,7 +159,10 @@ def classify(Lclassify, work, job):
     for instance in MyClass.instances:
         print(f"{instance.name}", end=' ')
     print("\n\t    -w for detail")
-
+    if work == 'usage':
+        print("==== USAGE ====")
+        for key in usage.__dict__.keys():
+            print(f"{key.upper()}: {usage.__dict__[key]}")
     return 0
 
 def main():
@@ -142,7 +171,6 @@ def main():
     parser.add_argument('-w','--work', help="explain not-file-related work")
     parser.add_argument('-cn','--classname', help="present class details ")
     #parser.add_argument('-js','--specify', choices=['qcmo','nbo','eda'], help="present class details ")
-    parser.add_argument('-u','--usage', action='store_true', help="present main details")
     args = parser.parse_args()
 
     classify(args.classify, args.work, args.classname)
