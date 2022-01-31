@@ -157,7 +157,7 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     os.chdir(pwd)
     ##################################################
     ### run ? : first determin qx then qN
-    if not qx or not qN:
+    if get_hostname()=='pt' and (not qx or not qN):
         qx, qN = get_queue_pt(qx=qx)
     s = qsub_command(dirname,X=qx,nnode=qN,np=qn)
     print(f"{s}")

@@ -12,10 +12,8 @@ from envvasp import get_hostname
 from vas_qsub import get_queue_pt, qsub_command
 
 def run_vasp(dirname, qx, qN, np):
-    if not qx:
-        qx, qNN = get_queue_pt()
-    if not qN:
-        qN = qNN
+    if get_hostname()=='pt' and ( not qx or not qN):
+        qx, qN = get_queue_pt(qx=qx)
  
     s = qsub_command(dirname,X=qx,nnode=qN,np=np)
     print(s)
