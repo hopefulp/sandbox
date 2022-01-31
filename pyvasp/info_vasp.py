@@ -36,6 +36,7 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\t    -r  run qsub on any server\
                     \n\t    -o  qopt to use different qscript\
                     \n\t    -al stop questioning except -s poscar\
+                    \n\t    -hpp pseudo hydrogen in /TGM/Apps/VASP/POTCAR\
                     \n\tPOTCAR: \
                     \n\t    will be made by 'genpotcar.py -pp pbe' after cd and reading POSCAR\
                     \n\tKPOINTS:\
@@ -44,6 +45,8 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\t    need to be prepared in advance\
                     \n\te.g. (KISTI)\
                     \n\t    python $sbvas/vas_make_ini.py -r -o -al -s POSCAR.pdh2sidetop\
+                    \n\te.g. (platinum)\
+                    \n\t    vas_make_ini.py -s POSCAR.sc11sHHf -j sp -al -hpp .66 1.33\
                     "
 make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
                     \n\tvas_make_d2d.py old_dir new_dir job [options]\

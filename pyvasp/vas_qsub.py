@@ -1,9 +1,44 @@
+#!/home/joonho/anaconda3/bin/python
+
 from envvasp import get_hostname
 from server_env import nXn
 import sys
 import re
+import subprocess
 
 hostname = get_hostname()
+
+def get_queue_pt():
+    '''
+    obtain empty queue and nodes: convert linux function to python
+    '''
+    s = 'pestat'
+    popen = subprocess.Popen(s, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    #data = popen.read().strip()
+    (stdoutdata, stderrdata) = popen.communicate()
+    dataline = stdoutdata.decode('utf-8').split("\n")   # split is not working 
+    #sline = '\n'.join(dataline)
+    #print(f"{sline}") # nlen {len(dataline)}")
+    free_node={}
+    for line in dataline:
+        linestrip = line.strip()
+        if re.match('n', linestrip):
+        #    print (f"{line}")
+            ele = linestrip.split()
+            if ele[1][:2] not in free_node.keys():
+                free_node[ele[1][:2]] = 0
+            if ele[2] == 'idle':
+                print (f"{line}")
+                free_node[ele[1][:2]] += 1
+    print(f"{free_node}")
+    if free_node['X5'] >= 2:
+        return 5, free_node['X5'] 
+    elif free_node['X4'] >= 3:
+        return 4, free_node['X4']
+    elif free_node['X3'] >= 4:
+        return 3, free_node['X3']
+    else:
+        return free_node
 
 def qsub_command(ndir, X=3, nnode=4, np=40, nmpi=None):
     if hostname == 'mlet':
@@ -30,4 +65,6 @@ def qsub_command(ndir, X=3, nnode=4, np=40, nmpi=None):
         #sys.exit(1)
     return s        
 
+if __name__ == '__main__':
+    get_queue_pt()
 

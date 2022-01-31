@@ -77,26 +77,26 @@ def get_potcar(pot_type, hpp_list=None):
                 element_refine.append(name)
         elif name == 'H' and hpp_list:
             hpp = hpp_list.pop(0)
-            if hpp[0] == '1':
-                hpp_dir = hpp[0] + '.' + hpp[1:]
-            else:
-                hpp_dir = '.' + hpp[:]
-            element_refine.append(name+hpp_dir)
-            print(f"find H directory {name+hpp_dir}")
+            if hpp[0] == '0':
+                hpp.pop(0)
+            element_refine.append(name+hpp)
+            print(f"try H directory {name+hpp}")
                 
 
     # Generation VASP POTCAR
     cmd = 'cat'
     if error_check == 1:
-       print('Check what you are doing or to set a right POTCAR path')
+        print('Check what you are doing or to set a right POTCAR path')
     else:
-       os.system('rm -rf POTCAR')
-       for element in element_refine:
-           addcmd = ' ' + '%s/%s/POTCAR' % (pot_path, element)
-           cmd = cmd + addcmd 
-       cmd = cmd + ' > POTCAR'
-       os.system('%s' % cmd)
-       print('%s POTCAR is sucessfully generated' % pot_type)
+        os.system('rm -rf POTCAR')
+        for element in element_refine:
+            if os.path.isfile('%s/%s/POTCAR' % (pot_path, element)):
+                print("found %s/%s" % (pot_path, element))
+            addcmd = ' ' + '%s/%s/POTCAR' % (pot_path, element)
+            cmd = cmd + addcmd 
+        cmd = cmd + ' > POTCAR'
+        os.system('%s' % cmd)
+        print('%s POTCAR is sucessfully generated' % pot_type)
 
 def main():
     parser = argparse.ArgumentParser(description='make POTCAR with pp flavor')

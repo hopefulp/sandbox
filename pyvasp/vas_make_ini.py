@@ -11,7 +11,7 @@ import shutil
 import re
 from  envvasp import *
 from common import *
-from vas_qsub import qsub_command
+from vas_qsub import get_queue_pt, qsub_command
 from mod_poscar import get_poscar, pos2dirname
 
 home = os.environ['HOME']
@@ -157,6 +157,10 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     os.chdir(pwd)
     ##################################################
     ### run ?
+    if not qx:
+        qx, qNN = get_queue_pt()
+    if not qN:
+        qN = qNN
     s = qsub_command(dirname,X=qx,nnode=qN,np=qn)
     print(f"{s}")
     if Lrun or yes_or_no("Will you run ?"):
@@ -214,8 +218,8 @@ def main():
     parser.add_argument('-al', '--all', action='store_true', help="skip if not -s, -p, -k, -i")
     parser.add_argument('-r', '--run', action='store_true', help="submit job")
     g_queue = parser.add_argument_group(title='QUEUE')
-    g_queue.add_argument('-x', '--xpartition', default=5, type=int, help="partition in platinum")
-    g_queue.add_argument('-N', '--nnode', default=4, type=int, help="number of nodes, can be used to calculate total nproc")
+    g_queue.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
+    g_queue.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
     g_queue.add_argument('-np', '--nproc', default=24, type=int, help="number of nproc, total for pt, per node for kisti ")
     args = parser.parse_args()
 

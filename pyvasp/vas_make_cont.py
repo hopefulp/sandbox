@@ -9,10 +9,15 @@ from mod_incar import modify_incar
 from mod_poscar    import fixedMD_POSCAR, pos2dirname, get_poscar
 import sys
 from envvasp import get_hostname
-from vas_qsub import qsub_command
+from vas_qsub import get_queue_pt, qsub_command
 
-def run_vasp(ndir, np, x, nnode):
-    s = qsub_command(ndir, np=np, X=x, nnode=nnode)
+def run_vasp(dirname, qx, qN, np):
+    if not qx:
+        qx, qNN = get_queue_pt()
+    if not qN:
+        qN = qNN
+ 
+    s = qsub_command(dirname,X=qx,nnode=qN,np=np)
     print(s)
     if yes_or_no("Will you run"):
         os.system(s)
@@ -131,7 +136,7 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, kopt,incar_opt,incar_kws,inc
             print(f"CHGCAR is linked to {ndir}")
             os.chdir(pwd)
         ### qsub depends on server
-        run_vasp(ndir, np, xpart, nnode)
+        run_vasp(ndir, xpart, nnode, np)
     return 0
 
 
@@ -175,7 +180,7 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, incar_opt, Lrun,newdir,
         os.system(com)
 
         ### qsub depends on server
-        run_vasp(ndir, np, xpart, nnode)
+        run_vasp(ndir, xpart, nnode, np)
 
     return 0
 
@@ -225,7 +230,7 @@ def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun, np, xpart, nnode):
     os.system(com)
     ### only works for KISTI
     ### qsub depends on server
-    run_vasp(ndir, np, xpart, nnode)
+    run_vasp(ndir, xpart, nnode, np)
 
     return 0
 
@@ -248,8 +253,8 @@ def main():
     parser.add_argument('-s', '--poscar', help='incar POSCAR.name for job==ini')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
     parser.add_argument('-n', '--nproc', default=16, help='nprocess in qsub')
-    parser.add_argument('-x', '--partition', default=3, type=int, help='nprocess in qsub')
-    parser.add_argument('-N', '--nnode', default=4, type=int, help='nprocess in qsub')
+    parser.add_argument('-x', '--partition', help='partition number in qsub')
+    parser.add_argument('-N', '--nnode',     help='number of nodes in qsub')
     args = parser.parse_args()
 
 
