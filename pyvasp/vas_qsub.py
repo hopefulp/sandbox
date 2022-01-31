@@ -8,7 +8,7 @@ import subprocess
 
 hostname = get_hostname()
 
-def get_queue_pt():
+def get_queue_pt(qx=None):
     '''
     obtain empty queue and nodes: convert linux function to python
     '''
@@ -31,14 +31,20 @@ def get_queue_pt():
                 print (f"{line}")
                 free_node[ele[1][:2]] += 1
     print(f"{free_node}")
-    if free_node['X5'] >= 2:
-        return 5, free_node['X5'] 
-    elif free_node['X4'] >= 3:
-        return 4, free_node['X4']
-    elif free_node['X3'] >= 4:
-        return 3, free_node['X3']
+    if qx:
+        qname = 'X' + str(qx)
+        return qx, free_node[qname]
     else:
-        return free_node
+        if free_node['X5'] >= 2:
+            return 5, free_node['X5'] 
+        elif free_node['X4'] >= 3:
+            return 4, free_node['X4']
+        elif free_node['X3'] >= 4:
+            return 3, free_node['X3']
+        elif free_node['X2'] >= 20:
+            return 2, free_node['X2']
+        else:
+            return free_node
 
 def qsub_command(ndir, X=3, nnode=4, np=40, nmpi=None):
     if hostname == 'mlet':

@@ -156,11 +156,9 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
         os.system(s)
     os.chdir(pwd)
     ##################################################
-    ### run ?
-    if not qx:
-        qx, qNN = get_queue_pt()
-    if not qN:
-        qN = qNN
+    ### run ? : first determin qx then qN
+    if not qx or not qN:
+        qx, qN = get_queue_pt(qx=qx)
     s = qsub_command(dirname,X=qx,nnode=qN,np=qn)
     print(f"{s}")
     if Lrun or yes_or_no("Will you run ?"):
