@@ -13,7 +13,7 @@ def get_queue_pt(qx=None):
     obtain empty queue and nodes: convert linux function to python
     '''
     s = 'pestat'
-    popen = subprocess.Popen(s, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    popen = subprocess.Popen(s, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
     #data = popen.read().strip()
     (stdoutdata, stderrdata) = popen.communicate()
     dataline = stdoutdata.decode('utf-8').split("\n")   # split is not working 
