@@ -11,11 +11,11 @@ import sys
 from envvasp import get_hostname
 from vas_qsub import get_queue_pt, qsub_command
 
-def run_vasp(dirname, qx, qN, np):
+def run_vasp(dirname, qx, qN, np, hmem=None):
     if get_hostname()=='pt' and ( not qx or not qN):
         qx, qN = get_queue_pt(qx=qx)
  
-    s = qsub_command(dirname,X=qx,nnode=qN,np=np)
+    s = qsub_command(dirname,X=qx,nnode=qN,np=np, hmem=hmem)
     print(s)
     if yes_or_no("Will you run"):
         os.system(s)
@@ -62,7 +62,7 @@ def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
     return sp
 
 ### 1. for general job process
-def vasp_jobs( job, dirs, prefix, exclude, fixatom, kopt,incar_opt,incar_kws,incar_list,Lrun, newdir,np,xpart,nnode):
+def vasp_jobs( job, dirs, prefix, exclude, fixatom, kopt,incar_opt,incar_kws,incar_list,Lrun, newdir,np,xpart,nnode,hmem):
     #print(f"{exclude}")
     pwd = os.getcwd()
     if prefix:
@@ -134,12 +134,12 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, kopt,incar_opt,incar_kws,inc
             print(f"CHGCAR is linked to {ndir}")
             os.chdir(pwd)
         ### qsub depends on server
-        run_vasp(ndir, xpart, nnode, np)
+        run_vasp(ndir, xpart, nnode, np, hmem)
     return 0
 
 
 ### 2 only incar is changed for jobs: vdw, 
-def vasp_job_incar( job, dirs, prefix, exclude, fixatom, incar_opt, Lrun,newdir, incar_kws, incar_list,np,xpart,nnode):
+def vasp_job_incar( job, dirs, prefix, exclude, fixatom, incar_opt, Lrun,newdir, incar_kws, incar_list,np,xpart,nnode,hmem):
     '''
     in case only incar is changed
     job     vdw
@@ -178,12 +178,12 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, incar_opt, Lrun,newdir,
         os.system(com)
 
         ### qsub depends on server
-        run_vasp(ndir, xpart, nnode, np)
+        run_vasp(ndir, xpart, nnode, np, hmem)
 
     return 0
 
 ### 3:: only POSCAR or KPOINTS is changed for job ini & cont
-def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun, np, xpart, nnode):
+def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun, np, xpart, nnode, hmem):
     '''
     in case POSCAR or KPOINTS changes
     '''
@@ -228,7 +228,7 @@ def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun, np, xpart, nnode):
     os.system(com)
     ### only works for KISTI
     ### qsub depends on server
-    run_vasp(ndir, xpart, nnode, np)
+    run_vasp(ndir, xpart, nnode, np, hmem)
 
     return 0
 
@@ -250,9 +250,11 @@ def main():
     #parser.add_argument('-k', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
     parser.add_argument('-s', '--poscar', help='incar POSCAR.name for job==ini')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
-    parser.add_argument('-n', '--nproc', default=16, help='nprocess in qsub')
-    parser.add_argument('-x', '--partition', help='partition number in qsub')
-    parser.add_argument('-N', '--nnode',     help='number of nodes in qsub')
+    qsub = parser.add_argument_group(title='qsub')
+    qsub.add_argument('-x', '--partition',  help='partition number in qsub')
+    qsub.add_argument('-N', '--nnode',      help='number of nodes in qsub')
+    qsub.add_argument('-n', '--nproc',      help='nprocess in qsub')
+    qsub.add_argument('-m', '--hmem', action='store_true', help='in case large supercell, use half of memory')
     args = parser.parse_args()
 
 
@@ -271,11 +273,11 @@ def main():
     # dos:  INCAR + KPOINTS
 
     if args.job in incar_jobs:
-        vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option, args.run, args.newdir,args.incar_kws, args.incar_list,args.nproc,  args.partition, args.nnode)
+        vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option, args.run, args.newdir,args.incar_kws, args.incar_list,args.nproc,  args.partition, args.nnode, args.hmem)
     elif args.job in ini_jobs:
-        vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.kopt, args.run, args.nproc,  args.partition, args.nnode)
+        vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.kopt, args.run, args.nproc,  args.partition, args.nnode, args.hmem)
     else:
-        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.kopt,inc_option, args.incar_kws, args.incar_list, args.run,args.newdir,args.nproc,  args.partition, args.nnode)
+        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.kopt,inc_option, args.incar_kws, args.incar_list, args.run,args.newdir,args.partition, args.nnode, args.nproc, args.hmem )
     return 0
 
 if __name__ == '__main__':

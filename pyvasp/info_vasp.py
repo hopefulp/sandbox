@@ -156,7 +156,9 @@ doscar.doslm        =   "extact pdos then plot\
                         \n\t    -p store_true for plot\
                         \n\t\tcalls myplot2D.mplot_nvector\
                         "
-doscar.doslm_1l       =   "saved doslm.py for one atom list\
+doscar.pldos        =   "to plot pldos"
+doscar.pldos_nc     =   " given by Lee Y.-G. for siesta"
+doscar.doslm_1l     =   "saved doslm.py for one atom list\
                         \n\t\tupgrade to multiple atomlist sets in doslm.py\
                         "
 doscar.doscar_split =   "decompose DOSCAR for each atoms written by starmj"
