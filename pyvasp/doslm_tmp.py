@@ -19,39 +19,28 @@ from mod_poscar import obtain_atomlist0
 from common     import list2str, whereami
 from myplot2D   import mplot_nvector, auto_nvector
 from parsing    import convert_2lst_2Dlist
-from NanoCore import *
-def get_max(tdos, pdos):
-    if not tdos:
-        print(f"max TDOS {max(tdos)}")
-    elif not pdos:
-        print(f"max PDOS {max(pdos)}")
-    else:
-        print("Error: no dos")
-    return 1
-### Nanocore index starts from 1
-def extract_doscar_onelist1(doscar, ofile, alist1, idos, Ldoserr, eshift, l, m, bheadline, ngrid):
+
+def extract_doscar_onelist(doscar, ofile, alist0, idos, Ldoserr, eshift, l, m, bheadline, ngrid):
     '''
-    from NanoCore atom starts from 1
     works for one list
-    alist1      start from 1
+    alist0      start from 0
     arr_atom    start from 1
     list        [-1] for TDOS
     '''
 
-    arr_atom = np.array(alist1) # in case atom starts from 0: + 1
+    arr_atom = np.array(alist0) + 1
     if arr_atom[0] == 0:
         f_pre = 'TDOS'
     else:
-        f_pre = 'pdos'
+        f_pre = 'ldos'
 
-    ### make output file name
     if not ofile:
         if f_pre == 'TDOS':
             ofile = f_pre
             if eshift: f_tdos += eshift[0]
         else:
             alstr = str(arr_atom[0])
-            if 1 < len(alist1):
+            if 1 < len(alist0):
                 atom_imax = arr_atom.max()
                 atom_imin = arr_atom.min()
                 natom_in = arr_atom.size - 2
@@ -65,9 +54,9 @@ def extract_doscar_onelist1(doscar, ofile, alist1, idos, Ldoserr, eshift, l, m, 
             ofile = f_pre + 'a' + alstr
             if l: ofile += f'l{l}'
             if m: ofile += f'm{m}'
-            if eshift: ofile += eshift[0]
+            if eshift: ofile += eshift[:]
         ofile += '.dat'
-    #print(f"{whereami():>15}(): {idos+1}-th output file: {ofile}")
+    print(f"{whereami():>15}(): {idos+1}-th output file: {ofile}")
     ### 
     iatom       = -1    # 0 for TDOS and iatom counts from 1 to natom
     iatom_in    =  0
@@ -108,8 +97,8 @@ def extract_doscar_onelist1(doscar, ofile, alist1, idos, Ldoserr, eshift, l, m, 
                     ### for pdos:2D # check spin case
                     else:### initialize pdos2d at first
                         if 'pdos2d' not in locals():
-                            pdos2d = [ [ 0.0 for x in range(len(eles)-1) ] for y in range(int(ngrid)) ]  # pdos2d[ene][lm]
-                            #print(f"{whereami():>15}(): size of 2D pdos {len(pdos2d)} {len(pdos2d[0])}")
+                            pdos2d = [ [ 0.0 for x in range(len(eles)-1) ] for y in range(int(ngrid)) ]       # pdos2d[ene][lm]
+                            print(f"{whereami():>15}(): size of 2D pdos {len(pdos2d)} {len(pdos2d[0])}")
                         for i in range(len(eles)-1):
                             pdos2d[iene][i] += float(eles[i+1])
                     iene += 1
@@ -119,22 +108,22 @@ def extract_doscar_onelist1(doscar, ofile, alist1, idos, Ldoserr, eshift, l, m, 
     if eshift:
         ene_shift = float(eshift[1:])
         x_ene = list(np.array(x_ene)-ene_shift)
-    if f_pre == 'pdos':
+    if f_pre == 'ldos':
         ### pdos_sum
         dos = list(np.sum(np.array(pdos2d), axis=1))   # projected to atom with sum of all lm's
-        #print(f"{whereami():>15}(): size of pdos_sum {np.array(dos).shape}")
+        print(f"{whereami():>15}(): size of pdos_sum {np.array(dos).shape}")
     ### remove DOSCAR err at 1st ele
     if Ldoserr:
         del x_ene[0]
         del dos[0]
     
-    #print(f"{whereami():>15}(): maxdos {max(dos)} in revised DOSCAR")
+    print(f"{whereami():>15}(): maxdos {max(dos)} in revised DOSCAR")
     ### writing TDOS[].dat pdosa[].dat
-    #fout=open(ofile, 'w')
-    #for i in range(len(dos)):
-    #    fout.write(f"{x_ene[i]:10.3f}  {dos[i]:10.4f}\n")
-    #fout.close()
-    #print(f"{whereami():>15}(): write atoms {list(arr_atom)} to {ofile} ")
+    fout=open(ofile, 'w')
+    for i in range(len(dos)):
+        fout.write(f"{x_ene[i]:10.3f}  {dos[i]:10.4f}\n")
+    fout.close()
+    print(f"{whereami():>15}(): write atoms {list(arr_atom)} to {ofile} ")
     
     if f_pre == "TDOS":
         legend = f_pre
@@ -142,38 +131,14 @@ def extract_doscar_onelist1(doscar, ofile, alist1, idos, Ldoserr, eshift, l, m, 
         legend='a'+alstr
     return x_ene, dos, legend
 
-def get_list_z(poscar, dz):
-    at = io.read_poscar(poscar)
-    atoms = at._atoms
-    z_coords=[]; indices=[]
-
-    for atom in atoms:
-        if not atom[2] in z_coords: z_coords.append(atom[2])
-
-    zmax = max(z_coords)
-    zmin = min(z_coords)
-    print(f"z-coord min, max: {zmin} {zmax}")
-    zi = zmin - dz/2
-    zf = zmax + dz/2
-
-    z_coords.sort()
-    for z in z_coords:
-        temp = []
-        for atom in atoms:
-            if abs(z-atom[2]) < 0.01: temp.append(atom.get_serial())
-        indices.append(temp)
-    #print(f"{indices}")
-    print(f"{len(z_coords)} == {len(indices)}")
-    return z_coords, indices
-
-
-def pldos(doscar, poscar, dz, eshift, Lplot, xlabel, ylabel, title):
+def extract_doscar(doscar, ofile, job, alist02d, eshift, l, m, Lplot, xlabel, ylabel, title, colors):
     ### analyze DOSCAR headline: only one time event
-    natom, Emax, Emin, ngrid, Ef, bheadline, Ldoserr, Lspin = obtain_doscar_head(doscar)
-    
-    ### Use NanoCore
-    z_coords, indices = get_list_z(poscar, dz)
+    '''
+    alist02d    atom list index starts from 0
+    '''
 
+    natom, Emax, Emin, ngrid, Ef, bheadline, Ldoserr = obtain_doscar_head(doscar)
+    
     if eshift:
         if re.search('f', eshift, re.I):
             Eshift = 'E' + Ef
@@ -182,72 +147,79 @@ def pldos(doscar, poscar, dz, eshift, Lplot, xlabel, ylabel, title):
     else:
         Eshift = None
     
+    print(f"{alist02d}")
+    if Lplot:
+        ys      = []
+        legends = []
 
-
-    #if Lplot:
-    #    ys      = []
-    legends = []
-
-    ### loop depending on number of pdos file
+### loop depending on number of pdos file
     idos = 0
-    ### idos to get x, Ldoserr whether remove or not 1st energy
-    Z = []
-    for inds in indices:
-        #x, y          extract_doscar_onelist(doscar,ofile,[-1],idos,Ldoserr, Eshift,l, m, bheadline, ngrid)
-        E, dos, legend = extract_doscar_onelist1(doscar,None,inds,idos,Ldoserr, Eshift,0, 0, bheadline, ngrid)
+
+    if 't' in job:
+        ### atomlist: -1 for TDOS, idos to get x, Ldoserr whether remove or not 1st energy
+        x, y, legend = extract_doscar_onelist(doscar,ofile,[-1],idos,Ldoserr, Eshift,l, m, bheadline, ngrid)
         idos += 1
-        Z.append(dos)
-        legends.append(legend)
-
-    ### For DOS
-    #mplot_nvector(x, ys, xlabel=xlabel, ylabel=ylabel, title=title, legend=legends)
-    ### For PLDOS
-    absZ = np.abs(Z).T
-    print (len(E))
-    # convert to log10 values + minimum correction to avoid -INF
-    Z = np.log10(absZ + 10**-5)
-    E = np.array(E)
-    # generate meshgrid
-    #X, Y = np.meshgrid(np.array(z_coords), E-Ef)
-    X, Y = np.meshgrid(np.array(z_coords), E)
-
-    # customized figure 
-    import matplotlib.pyplot as plt
-    import pylab as plb
-    import matplotlib.ticker as ticker
-    fig  = plt.figure(figsize=(10,12))
-    ax   = plt.axes()
-    #plt.yticks(np.arange(-4,4,1))
-    levels = np.linspace(1.01*Z.min(), 0.99*Z.max(), 100)
-    cmap=plt.cm.get_cmap("jet")
-    cset = plb.contourf(X,Y,Z, levels, cmap=cmap)
-    plb.colorbar(cset,ticks=[-4,-3,-2,-1,0,1])
-    plt.xticks(np.array(z_coords))
-    #ax.xaxis.set_major_locator(ticker.AutoLocator())
-    ax.set_ylim(-1.5, 2)
-    minor_locator = ticker.AutoMinorLocator(5)
-    ax.yaxis.set_minor_locator(minor_locator)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    plt.show()
-    fig.savefig('pldos.png')
-
+        if Lplot:
+            ys.append(y)
+            legends.append(legend)
+    for i in range(len(alist02d)):
+        x, y, legend = extract_doscar_onelist(doscar,ofile,alist02d[i],idos,Ldoserr,Eshift,l,m,bheadline, ngrid)
+        if Lplot:
+            ys.append(y)
+            legends.append(legend)
+    ### plot here
+    if Lplot:
+        mplot_nvector(x, ys, xlabel=xlabel, ylabel=ylabel, title=title, legend=legends, colors=colors)
 
 def main():
     parser = argparse.ArgumentParser(description='To obtain PLDOS')
     parser.add_argument('doscar', nargs='?', default='DOSCAR', help='read DOSCAR')
     parser.add_argument('poscar', nargs='?', default="POSCAR", help="input POSCAR")
+    parser.add_argument('-of', '--ofile', help='output filename')
+    parser.add_argument('-j', '--job', default='l', help='l,p,t, LDOS, PDOS, LPDOS, TDOS')
+    ldos = parser.add_mutually_exclusive_group()
+    ldos.add_argument('-al','--atom_list0', nargs='*', help="list atoms with num and '-', index from 0 ")
+    #ldos.add_argument('-al2', '--atom0_2d', type=json.loads, help='list atoms as 2D list')
+    ldos.add_argument('-z', '--zintv', nargs='+', type=float, help='atoms between zmax * zmin')
+    parser.add_argument('-ash', '--atom_list0_sh', nargs='*', type=int, help='input shape of atom_list0')
     parser.add_argument('-dz', '--delta_z', default=0.1, type=float, help='use zmax or delta_z')
+    parser.add_argument('-loc', '--location', default='in', choices=['in', 'out'], help='outside or inside of zmin')
+    parser.add_argument('-as', '--atom_species', nargs='+', default=['O'], help='specify atom species')
     parser.add_argument('-e', '--energy_shift', help='[F|value], F for fermi E shift, V for VBM')
+    parser.add_argument('-l', '--ql', type=int, help='angular quantum number')
+    parser.add_argument('-m', '--qm', type=int, help='magnetic quantum number')
     parser.add_argument('-p', '--plot', action='store_true', help='plot pdos')
     plot = parser.add_argument_group(title='PLOT')
-    plot.add_argument('-xl', '--xlabel', default='z (A)', help='xlabel in z-coord')
-    plot.add_argument('-yl', '--ylabel', default='E (eV)', help='ylabel for Energy (eV)')
+    plot.add_argument('-xl', '--xlabel', default='E (eV)', help='xlabel for DOS (eV)')
+    plot.add_argument('-yl', '--ylabel', default='DOS', help='ylabel for DOS (eV)')
     plot.add_argument('-t', '--title', default='SnO2', help='title for plot')
+    plot.add_argument('-c', '--colors', nargs='*', default=['r','g','b','k'], help='colors')
 
     args = parser.parse_args()
     
-    pldos(args.doscar, args.poscar, args.delta_z, args.energy_shift,args.plot,args.xlabel,args.ylabel,args.title) 
+    ### obtain atom 2D list
+    if args.atom_list0:
+        if args.atom_list0_sh:
+            alist0 = convert_2lst_2Dlist(args.atom_list0, args.atom_list0_sh)
+        else:
+            ### convert 1D to 2D list
+            alist0=[]
+            alist0.append(list(map(int, args.atom_list0)))
+    else:
+        if not args.zintv:
+            print("Error: input z values for zmin and zmax (or dz y d0.01) ")
+            sys.exit(1)
+        else:
+            zaxis=[]
+            zaxis.append(args.zintv[0]-args.delta_z)
+            zaxis.append(args.zintv[-1]+args.delta_z)
+            if args.location == 'in':
+                print(f"{whereami():>15}(): use z-axis between {zaxis[0]} and {zaxis[1]}")
+            else:
+                print(f"{whereami():>15}(): use z-axis below {zaxis[0]} and upper {zaxis[1]}")
+            alist0 = obtain_atomlist0(zaxis, args.poscar, args.atom_species, args.location)
+    
+    extract_doscar(args.doscar, args.ofile, args.job, alist0, args.energy_shift,args.ql,args.qm,args.plot,args.xlabel,args.ylabel,args.title,args.colors) 
 
 if __name__ == '__main__':
     main()

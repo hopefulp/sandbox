@@ -26,6 +26,7 @@ vasp                = MyClass('vasp')
 vasp.server             = MyClass('vasp.server')
 vasp.scripts            = MyClass('vasp.scripts')
 vasp.postproc           = MyClass('vasp.postproc')
+sno2                = MyClass('sno2')
 water               = MyClass('water')
 
 amp.scripts.run  =  "\n    == Scripts ==\
@@ -413,6 +414,40 @@ vasp.postproc.vaspkit = "\n\t = VASP KIT\
                     "
 vasp.server         = "How to run VASP in each server\
                     \n\tUSE: showall.py -j server -k kisti"
+
+sno2.vasp           ="This is for VASP slab band structure\
+                    \n\t1. SnO2 slab and surface modification\
+                    \n\t2. get POSCAR, cif from material project\
+                    \n\t3. make surface using material studio\
+                    \n\t4. passivate bottom surface using pseudo hydrogen pp in $VASP_DIR/POTCAR\
+                    \n\t5. sort POSCAR with z-axis sort: seperate different H PP\
+                    \n\t6. run Opt -> sp (CHGCAR) -> band, dos\
+                    \n\t7. find bandgap in bulk\
+                    \n\t    in slab, find vbm of bulk using CBM and bandgap of bulk\
+                    \n\t    use pldos.py to find VBM\
+                    \n\t    obtain BAND.dat using FERMI_ENERGY.in with VBM to run vaspkit\
+                    \n\t8. DOSDIR:\
+                    \n\t    doslm.py atom_list atomlist_shape -e VBM -p\
+                    \n\t\tatomlist_shape makes group of atomlist\
+                    \n\t\t-e shift the reference energy of 0 to VBM\
+                    \n\t\t-p for plot\
+                    \n\t    plot doscar with data files using ../dos_sc43_nl.par format\
+                    \n\t    Usage::\
+                    \n\t\tsc43:\
+                    \n\t\tpristine:\
+                    \n\t\t    $ doslm.py -al 276-287 -ash 12 -e -1.169\
+                    \n\t\t    $ xmgrace ldosa277_N12_288V-1.169.dat -p ../dos_sc43.par\
+                    \n\t\tHOH:\
+                    \n\t\t    $ doslm.py -al 276-287 314-317 -ash 12 4 -p -e -1.169\
+                    \n\t\t    $ xmgrace ldosa277_N12_288V-1.169.dat ldosa315_N4_318V-1.169.dat -p ../dos_sc43.par\
+                    \n\t\tClHNH3:\
+                    \n\t\t    $ doslm.py -al 276-285 286 287 312 313 314-321 -ash 10 2 2 8 -e -0.844 -p\
+                    \n\t\t    $ xmgrace ldosa277_N10_286V-0.844.dat ldosa287_288V-0.844.dat ldosa313_314V-0.844.dat ldosa315_N8_322V-0.844.dat -p ../dos_sc43_l4_vert.par\
+                    \n\t\tHONH4:\
+                    \n\t\t    $ doslm.py -al 276-287 312-315 316-325 -ash 12 4 4 -e -0.789 -p\
+                    \n\t\t    $ xmgrace ldosa277_N12_288V-0.789.dat ldosa313_N4_316V-0.789.dat ldosa317_N10_326V-0.789.dat -p ../dos_sc43-3l.par\
+                    "
+
 
 qchem.server.mlet   = "=== Q-Chem ===\
                     \n    SERVER: \

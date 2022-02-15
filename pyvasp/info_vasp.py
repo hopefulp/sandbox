@@ -22,7 +22,7 @@ run     = MyClass('run')
 clean   = MyClass('clean')
 poscar  = MyClass('poscar')
 incar   = MyClass('incar')
-doscar  = MyClass('doscar')
+dosband = MyClass('dosband')
 procar  = MyClass('procar')
 ase     = MyClass('ase')
 charge  = MyClass('charge')
@@ -139,12 +139,8 @@ incar.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\t    incar_diff.py FPtb2H2 FPtb2H2hb\
                     \n\t    incar_diff.py -a -k ENCUT ISTART\
                     "
-doscar.dosall       =   "perl script to decompose lm-decomposded DOSCAR"
-doscar.doslm        =   "extact pdos then plot\
-                        \n\tUsage:\
-                        \n\t    doslm.py -z 3.69 -p\
-                        \n\t    doslm.py -z 3.69 -p -e f\
-                        \n\t    doslm.py -al 8 23 9 10 21 22 -als 2 4 -j l -p\
+dosband.dosall      =   "perl script to decompose lm-decomposded DOSCAR"
+dosband.doslm       =   "extact ldos then plot\
                         \n\tOptions:\
                         \n\t    (exclusive)\
                         \n\t\t-z zmin [zmax]  to include atoms inbetween zmin ~ zmax\
@@ -155,14 +151,35 @@ doscar.doslm        =   "extact pdos then plot\
                         \n\t    -e [f|float_value]: f for Fermi level, value for VBM shift\
                         \n\t    -p store_true for plot\
                         \n\t\tcalls myplot2D.mplot_nvector\
+                        \n\tUsage:\
+                        \n\t    doslm.py -z 3.69 -p\
+                        \n\t    doslm.py -z 3.69 -p -e f\
+                        \n\t    doslm.py -al 8 23 9 10 21 22 -als 2 4 -p\
+                        \n\t(3) to plot ldos of slab w.r.t. VBM: obtain VBM in slab (1)\
+                        \n\t    doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -e -1.169\
+                        \n\t\tmakes ldos files as much as ash(atom shape)\
+                        \n\t\txmgrace ldos_files -p ../dos_sc43.par\
                         "
-doscar.pldos        =   "to plot pldos"
-doscar.pldos_nc     =   " given by Lee Y.-G. for siesta"
-doscar.doslm_1l     =   "saved doslm.py for one atom list\
+dosband.pldos        =  "In dos directory\
+                        \n\t\tread DOSCAR & plot pldos\
+                        \n\t\t(slab 1) To obtain VBM of slab using bulk, run in dos-dir\
+                        \n\t\t    $ pldos.py\
+                        \n\t\t    To find out VBM\
+                        \n\t\t\tfind CBM, which is clean, in bulk area\
+                        \n\t\t\tuse bandgap in original bulk calculation\
+                        \n\t\t\tCBM - bandgap(bulk) = VBM in slab\
+                        \n\t\t(slab 2) To plot band structure of slab w.r.t. VBM\
+                        \n\t\t    $cd ~/band-dir: modify FERMI_ENERGY.in to VBM\
+                        \n\t\t\trun vaspkit again and use BAND.dat\
+                        \n\t\t\t    vaspkit/21/211\
+                        \n\t\t\t    xmgrace BAND.dat -p ../band_sc43.par\
+                        "
+dosband.pldos_nc     =   " given by Lee Y.-G. for siesta"
+dosband.doslm_1l     =   "saved doslm.py for one atom list\
                         \n\t\tupgrade to multiple atomlist sets in doslm.py\
                         "
-doscar.doscar_split =   "decompose DOSCAR for each atoms written by starmj"
-doscar.doscar_modi  =   "remove the first line of each energy loop for removing abnormal value\
+dosband.doscar_split =   "decompose DOSCAR for each atoms written by starmj"
+dosband.doscar_modi  =   "remove the first line of each energy loop for removing abnormal value\
                         \n\t\tdefault: read DOSCAR\
                         \n\t\tmove original DOSCAR to DOSCAR_o\
                         \n\t\tmake a new DOSCAR with 1 line less in each block, (natom+1) less line\

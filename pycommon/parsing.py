@@ -18,7 +18,7 @@ def convert_2lst_2Dlist(li, lshape):
     for i in range(len(lshape)):
         lst = []
         while len(lst) < lshape[i]:
-            print(f"{len(lst)} < {lshape[i]}")
+            #print(f"{len(lst)} < {lshape[i]} in module {__name__}")
             ### type of j: 1, 9, 11-15, 
             atom_0 = li.pop(0)
             if '-' in atom_0:
