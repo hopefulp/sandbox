@@ -11,16 +11,6 @@ import sys
 from envvasp import get_hostname
 from vas_qsub import run_vasp
 
-def run_vasp(dirname, qx, qN, np, hmem=None):
-    if get_hostname()=='pt' and ( not qx or not qN):
-        qx, qN = get_queue_pt(qx=qx)
- 
-    s = qsub_command(dirname,X=qx,nnode=qN,np=np, hmem=hmem)
-    print(s)
-    if yes_or_no("Will you run"):
-        os.system(s)
-    return 0
-
 def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
     ### if incar_opt='u..', just use it
     if incar_opt and re.match('u', incar_opt):
