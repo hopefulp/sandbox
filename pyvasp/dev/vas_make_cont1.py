@@ -9,7 +9,7 @@ from mod_incar import modify_incar
 from mod_poscar    import fixedMD_POSCAR, pos2dirname, get_poscar
 import sys
 from envvasp import get_hostname
-from vas_qsub import run_vasp
+from vas_qsub import get_queue_pt, qsub_command
 
 def run_vasp(dirname, qx, qN, np, hmem=None):
     if get_hostname()=='pt' and ( not qx or not qN):

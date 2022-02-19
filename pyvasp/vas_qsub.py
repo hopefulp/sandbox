@@ -4,9 +4,20 @@ from envvasp import get_hostname
 from server_env import nXn
 import sys
 import re
+import os
 import subprocess
-
+from common import yes_or_no
 hostname = get_hostname()
+
+def run_vasp(dirname, qx, qN, np, hmem=None):
+    if get_hostname()=='pt' and ( not qx or not qN):
+        qx, qN = get_queue_pt(qx=qx)
+
+    s = qsub_command(dirname,X=qx,nnode=qN,np=np, hmem=hmem)
+    print(s)
+    if yes_or_no("Will you run"):
+        os.system(s)
+    return 0
 
 def get_queue_pt(qx=None):
     '''
