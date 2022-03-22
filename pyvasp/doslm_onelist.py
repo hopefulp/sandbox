@@ -26,7 +26,7 @@ def get_filename(idos, f_pre, arr_atom, eshift, l, m):
         if eshift: f_tdos += eshift[0]
     else:
         alstr = str(arr_atom[0])
-        if 1 < arr_atom.size):
+        if 1 < arr_atom.size:
             atom_imax = arr_atom.max()
             atom_imin = arr_atom.min()
             natom_in = arr_atom.size - 2

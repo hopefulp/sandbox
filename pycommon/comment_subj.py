@@ -422,24 +422,31 @@ sno2.vasp           ="This is for VASP slab band structure\
                     \n\t4. passivate bottom surface using pseudo hydrogen pp in $VASP_DIR/POTCAR\
                     \n\t5. sort POSCAR with z-axis sort: seperate different H PP\
                     \n\t6. run Opt -> sp (CHGCAR) -> band, dos\
-                    \n\t7. find bandgap in bulk\
+                    \n\t7. Using VBM in bulk\
+                    \n\t7.1 In case the bottom layers fixed, bottom layers in LayerDOS will be similar\
+                    \n\t    LDOS for SnO2 4 layers with 48 O's\
+                    \n\t\tdoslm.py -al 96-287 -ash 48 48 48 48\
+                    \n\t\t    Including Sn would be same\
+                    \n\t\t\tdoslm.py -al 0-23 96-143 24-47 144-191 48-71 192-239 72-95 240-287 -ash 72 72 72 72\
+                    \n\t8.1 plot figures from top to bottom\
+                    \n\t    xmgrace ldosa241_N48_288.dat ldosa193_N48_240.dat ldosa145_N48_192.dat ldosa97_N48_144.dat -p ../xmpar/ldos4l.par\
+                    \n\t7.2 find bandgap in bulk\
                     \n\t    in slab, find vbm of bulk using CBM and bandgap of bulk\
                     \n\t    use pldos.py to find VBM\
                     \n\t    obtain BAND.dat using FERMI_ENERGY.in with VBM to run vaspkit\
-                    \n\t8. DOSDIR:\
+                    \n\t8.2 DOSDIR:\
                     \n\t    doslm.py atom_list atomlist_shape -e VBM -p\
                     \n\t\tatomlist_shape makes group of atomlist\
                     \n\t\t-e shift the reference energy of 0 to VBM\
                     \n\t\t-p for plot\
                     \n\t    plot doscar with data files using ../dos_sc43_nl.par format\
-                    \n\t    Usage::\
-                    \n\t\tsc43:\
+                    \n\t    Usage::For sc43\
                     \n\t\tpristine:\
                     \n\t\t    $ doslm.py -al 276-287 -ash 12 -e -1.169\
-                    \n\t\t    $ xmgrace ldosa277_N12_288V-1.169.dat -p ../dos_sc43.par\
+                    \n\t\t    $ xmgrace ldosa277_N12_288V-1.169.dat -p ../dos_1l_black.par\
                     \n\t\tHOH:\
-                    \n\t\t    $ doslm.py -al 276-287 314-317 -ash 12 4 -p -e -1.169\
-                    \n\t\t    $ xmgrace ldosa277_N12_288V-1.169.dat ldosa315_N4_318V-1.169.dat -p ../dos_sc43.par\
+                    \n\t\t    $ doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -p -e -1.169\
+                    \n\t\t    $ xmgrace ldosa277_N10_286V-1.169.dat ldosa287_288V-1.169.dat ldosa315_N4_318V-1.169.dat -p ../dos_3l_black.par\
                     \n\t\tClHNH3:\
                     \n\t\t    $ doslm.py -al 276-285 286 287 312 313 314-321 -ash 10 2 2 8 -e -0.844 -p\
                     \n\t\t    $ xmgrace ldosa277_N10_286V-0.844.dat ldosa287_288V-0.844.dat ldosa313_314V-0.844.dat ldosa315_N8_322V-0.844.dat -p ../dos_sc43_l4_vert.par\

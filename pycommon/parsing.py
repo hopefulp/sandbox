@@ -13,25 +13,39 @@ def find_letter(ch, lst):
 def find_letter2d(ch, lst2d):
     return any(ch in word for lst1d in lst2d for word in lst1d)
 
-def convert_2lst_2Dlist(li, lshape):
+def convert_2lst2D(li, lshape):
+    #print(f"{li} {lshape}")
     l2d = []
-    for i in range(len(lshape)):
+    tmplst = []
+    for shap in lshape:
         lst = []
-        while len(lst) < lshape[i]:
+        while len(lst) < shap:
             #print(f"{len(lst)} < {lshape[i]} in module {__name__}")
-            ### type of j: 1, 9, 11-15, 
-            atom_0 = li.pop(0)
-            if '-' in atom_0:
-                ele = list(map(int, re.split('-', atom_0)))
-                jlst = range(ele[0], ele[1]+1)
-                lst.extend(jlst)
+            ### type of j: 1, 9, 11-15,  sometimes 0-100
+            ### if not tmplost get from li
+            if not tmplst and li:
+                list_ele = li.pop(0)   # --> error when lack of li elements
+                if '-' in list_ele:
+                    ele = list(map(int, re.split('-', list_ele)))
+                    tmplst = list(range(ele[0], ele[1]+1))
+                elif list_ele.isdigit():
+                    tmplst.append(int(list_ele))
+                else:
+                    print("Error:: input type of atom list")
+            #print(f"a: tmplist {tmplst}")
+            ### tmplst exists
+            nreq = shap - len(lst)
+            if len(tmplst) <= nreq:
+                lst.extend(tmplst)
+                tmplst=[]
             else:
-                lst.append(int(atom_0))
+                lst.extend(tmplst[0:nreq])    # use slicing and del
+                del tmplst[:nreq]
+            #print(f"b: tmplist {tmplst}")
         l2d.append(lst)
     print(f"{whereami():>15}(): {l2d}")
     return l2d
     
-
 
 def is_int_el(s):
     try:

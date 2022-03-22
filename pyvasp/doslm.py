@@ -18,7 +18,7 @@ from mod_doscar import nheadline, obtain_doscar_head, change_Bheadline
 from mod_poscar import obtain_atomlist0
 from common     import list2str, whereami
 from myplot2D   import mplot_nvector, auto_nvector
-from parsing    import convert_2lst_2Dlist
+from parsing    import convert_2lst2D
 
 def get_filename(idos, f_pre, arr_atom, eshift, l, m):
     if f_pre == 'TDOS':
@@ -184,7 +184,7 @@ def main():
     ### obtain atom 2D list
     if args.atom_list0:
         if args.atom_list0_sh:
-            alist0 = convert_2lst_2Dlist(args.atom_list0, args.atom_list0_sh)
+            alist0 = convert_2lst2D(args.atom_list0, args.atom_list0_sh)
         else:
             ### convert 1D to 2D list
             alist0=[]

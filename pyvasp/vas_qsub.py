@@ -10,6 +10,7 @@ from common import yes_or_no
 hostname = get_hostname()
 
 def run_vasp(dirname, qx, qN, np, hmem=None):
+    #print(f'qx {qx} and qN {qN} in run_vasp()')
     if get_hostname()=='pt' and ( not qx or not qN):
         qx, qN = get_queue_pt(qx=qx)
 
