@@ -299,11 +299,13 @@ fname_root = f_root
 fname_ext  = f_ext
 
 def fname_decom(fname):
-    lname = fname.split('.')
-    if not len(lname) == 2:
-        print("Error: %s has more than 1 dot in file name" % fname)
+    fname_parts = fname.split('.')
+    if len(fname_parts) < 2:
+        print("Error: %s has not dot in file name" % fname)
         exit(1)
-    return lname[0], lname[1]        
+    suff = fname_parts.pop()
+    fn = '_'.join(fname_parts)
+    return fn, suff        
 
 fname_parsing = fname_decom
 

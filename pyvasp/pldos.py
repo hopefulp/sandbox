@@ -18,7 +18,7 @@ from mod_doscar import nheadline, obtain_doscar_head, change_Bheadline
 from mod_poscar import obtain_atomlist0
 from common     import list2str, whereami
 from myplot2D   import mplot_nvector, auto_nvector
-from parsing    import convert_2lst_2Dlist
+from parsing    import convert_2lst2D
 from NanoCore import *
 def get_max(tdos, pdos):
     if not tdos:
@@ -176,11 +176,14 @@ def pldos(doscar, poscar, dz, eshift, Lplot, xlabel, ylabel, title):
 
     if eshift:
         if re.search('f', eshift, re.I):
-            Eshift = 'E' + Ef
+            Eshift = 'E' + str(Ef)
+            Estr = 'F'
         else:
             Eshift = 'V' + eshift
+            Estr = f'V{eshift}'
     else:
         Eshift = None
+        Estr = ''
     
 
 
@@ -223,14 +226,15 @@ def pldos(doscar, poscar, dz, eshift, Lplot, xlabel, ylabel, title):
     cset = plb.contourf(X,Y,Z, levels, cmap=cmap)
     plb.colorbar(cset,ticks=[-4,-3,-2,-1,0,1])
     plt.xticks(np.array(z_coords))
-    #ax.xaxis.set_major_locator(ticker.AutoLocator())
-    ax.set_ylim(-1.5, 2)
+    ax.xaxis.set_major_locator(ticker.AutoLocator())
+    #ax.set_ylim(-1.5, 2)
+    ax.set_ylim(-0.5, 1.5)
     minor_locator = ticker.AutoMinorLocator(5)
     ax.yaxis.set_minor_locator(minor_locator)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     plt.show()
-    fig.savefig('pldos.png')
+    fig.savefig(f'pldos{Estr}.png')
 
 
 def main():

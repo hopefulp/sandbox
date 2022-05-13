@@ -1,5 +1,6 @@
 from common import MyClass_str as MyClass
 from parsing import str_decom as parse_str
+from info_common import filejob
 #from common import MyClass
 #import comment_sys as mod_sys
 
@@ -26,6 +27,8 @@ vasp                = MyClass('vasp')
 vasp.server             = MyClass('vasp.server')
 vasp.scripts            = MyClass('vasp.scripts')
 vasp.postproc           = MyClass('vasp.postproc')
+vasp.slab               = MyClass('vasp.slab')
+vasp.BE                 = MyClass('vasp.BE')
 sno2                = MyClass('sno2')
 water               = MyClass('water')
 
@@ -405,6 +408,13 @@ vasp.scripts.etc =  "\n\t ase_fconvert.py\
                     \n\t ase_vasp.py\
                     \n\t ase_zpe.py\
                     "
+vasp.BE         =   "\n    == VASP 1st work ==\
+                    \n\tmsi: Make structure from Material Studio\
+                    \n\tpos2msi.pl {atom series}\
+                    \n\t    in case no MD\
+                    \n\tpos2msi_mdnew.pl {atom series}\
+                    \n\t    in case md colume\
+                    "
 vasp.postproc.p4vasp = "\n    == VASP Post Processig ==\
                     \n\t = P4VASP + deactivate anaconda to use python2\
                     \n\t    p4v\
@@ -422,38 +432,36 @@ sno2.vasp           ="This is for VASP slab band structure\
                     \n\t4. passivate bottom surface using pseudo hydrogen pp in $VASP_DIR/POTCAR\
                     \n\t5. sort POSCAR with z-axis sort: seperate different H PP\
                     \n\t6. run Opt -> sp (CHGCAR) -> band, dos\
+                    \n\t    control sigma of ismear 0 for dos to be more sharp and separatable\
                     \n\t7. Using VBM in bulk\
-                    \n\t7.1 In case the bottom layers fixed, bottom layers in LayerDOS will be similar\
-                    \n\t    LDOS for SnO2 4 layers with 48 O's\
-                    \n\t\tdoslm.py -al 96-287 -ash 48 48 48 48\
-                    \n\t\t    Including Sn would be same\
-                    \n\t\t\tdoslm.py -al 0-23 96-143 24-47 144-191 48-71 192-239 72-95 240-287 -ash 72 72 72 72\
-                    \n\t8.1 plot figures from top to bottom\
-                    \n\t    xmgrace ldosa241_N48_288.dat ldosa193_N48_240.dat ldosa145_N48_192.dat ldosa97_N48_144.dat -p ../xmpar/ldos4l.par\
-                    \n\t7.2 find bandgap in bulk\
-                    \n\t    in slab, find vbm of bulk using CBM and bandgap of bulk\
-                    \n\t    use pldos.py to find VBM\
-                    \n\t    obtain BAND.dat using FERMI_ENERGY.in with VBM to run vaspkit\
-                    \n\t8.2 DOSDIR:\
-                    \n\t    doslm.py atom_list atomlist_shape -e VBM -p\
+                    \n\t7.1 Bottom layers passivated w. pseudo-H and 2 bottom layers will be fixed in MD\
+                    \n\t    First, plot bottom two layers and find VMB of bottom layers without energy shift\
+                    \n\t\tdoslm.py -al 0-23 96-143 24-47 144-191 -ash 72 72\
+                    \n\t\t    use l2ldosL2.agr to plot Layer4 & 3 to get absolute energy for band edge\
+                    \n\t7.2 Second, plot 4 layer by layer with energy shift\
+                    \n\t\tdoslm.py -al 0-23 96-143 24-47 144-191 48-71 192-239 72-95 240-287 -ash 72 72 72 72 -e -1.24\
+                    \n\t    cf. doslm.py atom_list atomlist_shape -e VBM -p\
                     \n\t\tatomlist_shape makes group of atomlist\
                     \n\t\t-e shift the reference energy of 0 to VBM\
                     \n\t\t-p for plot\
-                    \n\t    plot doscar with data files using ../dos_sc43_nl.par format\
+                    \n\t    Use l2ldos4Lv5_b3.agr for xmgrace format\
                     \n\t    Usage::For sc43\
-                    \n\t\tpristine:\
-                    \n\t\t    $ doslm.py -al 276-287 -ash 12 -e -1.169\
-                    \n\t\t    $ xmgrace ldosa277_N12_288V-1.169.dat -p ../dos_1l_black.par\
-                    \n\t\tHOH:\
-                    \n\t\t    $ doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -p -e -1.169\
-                    \n\t\t    $ xmgrace ldosa277_N10_286V-1.169.dat ldosa287_288V-1.169.dat ldosa315_N4_318V-1.169.dat -p ../dos_3l_black.par\
-                    \n\t\tClHNH3:\
-                    \n\t\t    $ doslm.py -al 276-285 286 287 312 313 314-321 -ash 10 2 2 8 -e -0.844 -p\
-                    \n\t\t    $ xmgrace ldosa277_N10_286V-0.844.dat ldosa287_288V-0.844.dat ldosa313_314V-0.844.dat ldosa315_N8_322V-0.844.dat -p ../dos_sc43_l4_vert.par\
-                    \n\t\tHONH4:\
-                    \n\t\t    $ doslm.py -al 276-287 312-315 316-325 -ash 12 4 4 -e -0.789 -p\
-                    \n\t\t    $ xmgrace ldosa277_N12_288V-0.789.dat ldosa313_N4_316V-0.789.dat ldosa317_N10_326V-0.789.dat -p ../dos_sc43-3l.par\
+                    \n\t\tTo find band edge\
+                    \n\t\t    $ doslm.py -al 0-23 96-143 24-47 144-191 -ash 72 72\
+                    \n\t\tTo draw doscar\
+                    \n\t\t    (pristine)\
+                    \n\t\t    $ doslm.py -al 0-23 96-143 24-47 144-191 48-71 192-239 72-95 240-287 -ash 72 72 72 72 -e -1.24\
+                    \n\t\t    (HOH:to separate OH_B)\
+                    \n\t\t    $ doslm.py -al 0-23 96-143 24-47 144-191 48-71 192-239 72-95 240-287 314-317 -ash 72 72 72 70 2 4 -e -1.10\
+                    \n\t\t    (ClHNH3:eshift: away -0.92, nearest -0.96, nestN -1.03)\
+                    \n\t\t    $ doslm.py -al 0-23 96-143 24-47 144-191 48-71 192-239 72-95 240-287 312-323 -ash 72 72 72 70 2 2 12 -e -0.92\
+                    \n\t\t    (HONH4)\
+                    \n\t\t    $ doslm.py -al 0-23 96-143 24-47 144-191 48-71 192-239 72-95 240-287 312-325 -ash 72 72 72 70 2 4 10 -e -0.942\
+                    \n\t8.3 advanced plot:\
+                    \n\t    In case DOS of conduction band is too small\
+                    \n\t\tthe DOS in conduction band can be multiplied by fmath.py\
                     "
+sno2.fmath          = "pycommon.fmath\n\t" + filejob.fmath 
 
 
 qchem.server.mlet   = "=== Q-Chem ===\

@@ -107,6 +107,7 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     files2copy.append('KPOINTS')
     ### 4. get INCAR :: use make_incar.py
     ### 4.1: use INCAR.job
+    incar_repo=f"{ini_dvasp}/INCAR.{job}"
     if opt_incar:
         if re.match('j', opt_incar):   # option in incar
             incar = 'INCAR.' + job
@@ -117,6 +118,8 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     elif allprepared:
         print(f"INCAR in cwd will be used")
         incar = 'INCAR'
+    elif os.path.isfile(incar_repo):
+        incar = incar_repo
     ### 4.4: make INCAR (not comlete)
     else:
         q = 'input incar-key file or use make_incar.py: '
@@ -124,7 +127,9 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
         if not keyfile:
             keyfile = iofile
         get_incar(keyfile)
-    os.system(f'cp {incar} INCAR')
+    print(incar)
+    if incar != 'INCAR':
+        os.system(f'cp {incar} INCAR')
     print(f'{incar} was copied to INCAR')
     files2copy.append('INCAR')
     ### 5. make work_dir
@@ -208,8 +213,8 @@ def main():
     parser.add_argument('-hpp', '--pseudoH', nargs='*', help='include pseudo H list ')
     parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz')
     parser.add_argument('-ks', '--kpsub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
-
-    parser.add_argument('-i', '--incar', default='j', help='j: use INCAR.job, dirname: use d/INCAR')
+    ### toggle default: unset in the bare dir, set to j when INCAR.job exists
+    parser.add_argument('-i', '--incar', help='j: use INCAR.job, dirname: use d/INCAR')
     parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
     parser.add_argument('-d', '--dname', help='get directory name')

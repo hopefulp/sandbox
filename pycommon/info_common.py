@@ -121,6 +121,26 @@ filejob.f_kw        =   "gather keywords to cut part of file\
                         \n\tQ-Chem outfile, also refer to ~/dev/\
                         \n\tBAND.dat from vaspkit to get part of bands\
                         "
+filejob.fmath           = "to selectively modify column values\
+                        \n\tUsage::\
+                        \n\t    $fmath.py fname.dat -m prod -v 10 -xgt 0.7 \
+                        \n\t\tmakes fname_new\{value\}.dat\
+                        \n\tOptions::\
+                        \n\t    -m:  [prod,add,div,sub]\
+                        \n\t    -v:  value to be operated, default=5\
+                        \n\t    -x: xcol to find region: default=0\
+                        \n\t    -y: ycol to be modified: default=1\
+                        \n\t    (Exclusive group)\
+                        \n\t    -xij: xi and xj (nargs=2)  with values(float) or index(int)\
+                        \n\t    -hlt: region x < 0.5\
+                        \n\t    -hgt: regipn 0.5 < x\
+                        \n\t    -xlt: value, region x < value\
+                        \n\t    -xgt: value, region 0.5 < x\
+                        \n\te.g.:\
+                        \n\t    $fmath.py 2ldosa25_N72_192V-0.92.dat -m prod -v 10 -xgt 0.7 \
+                        \n\t\tas for x values in col[0], if 0.7 < x, col[1]*3\
+                        "
+
 linejob.parsing     =   "line(string) parsing::\
                         \n\tdef is_int_el: \
                         \n\tdef is_int:\
