@@ -228,11 +228,11 @@ def main():
     parser = argparse.ArgumentParser(description='remove files except initial files')
     parser.add_argument('-j', '--job', choices=['sp','incar',"dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
     dgroup = parser.add_mutually_exclusive_group()
-    dgroup.add_argument('-d', '--dirs', nargs='+', help='specify directories')
+    dgroup.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
     dgroup.add_argument('-p', '--prefix', help='select directories using prefix')
 
     parser.add_argument('-ex', '--exclude', nargs='*', help='specify excluded dirs if already exist')
-    parser.add_argument('-nd', '--newdir', help='specify new dirname in case one job')
+    parser.add_argument('-dn', '--newdir', help='specify new dirname in case one job')
 
     parser.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
     parser.add_argument('-io', '--ioption', help='in the order: u:use INCAR.job,a:append,c:change,o:out,r:reverse')
