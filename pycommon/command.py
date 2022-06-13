@@ -363,8 +363,8 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(kisti.py)
         print("Pt(platinum:slurm): vasp")
         print(slurm.vas)
-        print("MLET(mlet): vasp")
-        print(mlet.vas)
+        #print("MLET(mlet): vasp")
+        #print(mlet.vas)
 
 
     else:
