@@ -61,15 +61,18 @@ zpe_out     = ['NPAR']
 ### MAGMOM
 #mag_active = {'ISPIN': 2}
 mag_change = {'ISPIN': 2}
-### KISTI
+### KISTI: param in follows param out to replace
 kisti_out = ['NPAR']
-kisti_active = {'NCORE': 20}
+kisti_in = {'NPAR': ['NCORE', 20]}
 
 
 def replace_line(dic, key, job=None):
     newline = f" {key} = {dic[key]}         ! in {job}"
     return newline
 
+def add_line(dic, key, job=None):
+    newline = f" {dic[key][0]} = {dic[key][1]}         ! in {job}\n"
+    return newline
 def comment_out_line(line, job):
     ''' if commented out already, return itself '''
     sline = line.strip()
@@ -100,7 +103,9 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
     ### in case uncomment: dict
     if f'{job}_active' in globals():
         paramin   = eval(f'{job}_active')
-    print(f"setting: paramch {paramch} add {dic}")
+    if f'{job}_in' in globals():
+        paramrep  = eval(f'{job}_in')
+    #print(f"setting: paramch {paramch} add {dic}")
     if dic:
         print(f"is this True {dic}")
         ### append params
@@ -130,7 +135,7 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
         lines = f.readlines()
     print(f"write to {outf}")
     ### open output file and write line by line of input INCAR
-    print(paramin.keys())
+    #print(paramin.keys())
     with open(outf, 'w') as f:    
         for line in lines:
             iline += 1
@@ -140,6 +145,7 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
                 continue
             else:
                 first_item = lst[0]
+            ### [1] check paramin
             ### param uncomment: when active and change: first activate and change
             if 'paramin' in locals() and paramin :
                 for key in paramin.keys():
@@ -158,7 +164,7 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
                 ### only apply once then remove key
                 #if tag_match == True:
                 #    del paramin[key]
-                            
+            ### [2]                
             ### param change
             if 'paramch' in locals() and paramch:
                 for key in paramch.keys():
@@ -170,17 +176,24 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
                 ### when remove a key, all the keys are not applied
                 #if tag_match == True:
                 #    del paramch[key]
+            ### [3]
             ### param comment out
+            tag_out = False
             if  'paramout' in locals() and paramout :
-                for param in paramout:
-                    tag_match = False
+                for param in paramout: # this is list
                     if param in line:
+                        print(f"param out:{param} i {i} {iline}")
+                        i += 1
                         line = comment_out_line(first_item, job)
-                        tag_match = True
+                        tag_out = True
                 #if tag_match == True:
                 #    paramout.remove(param)
                     
-            #print(f"{line}", end='')
+                        ### param rep comes together with param out
+                        if param in paramrep:
+                            addline = add_line( paramrep, param, job )
+                            f.write(addline)
+            print(f"{iline} line: {line}")
             f.write(line)
 
     return outf
@@ -190,7 +203,8 @@ def main():
     parser = argparse.ArgumentParser(description='test for INCAR change')
     parser.add_argument('inf', help='input incar file or directory')
     parser.add_argument('job', choices=["dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='job for VASP')
-    parser.add_argument('-suf', '--suffix', default='test', help='change the input filename')
+    #parser.add_argument('-suf', '--suffix', default='test', help='change the input filename')
+    parser.add_argument('-suf', '--suffix', help='change the input filename')
     args = parser.parse_args()
 
     if os.path.isfile(args.inf):
