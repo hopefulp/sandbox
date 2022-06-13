@@ -182,7 +182,7 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
             if  'paramout' in locals() and paramout :
                 for param in paramout: # this is list
                     if param in line:
-                        print(f"param out:{param} i {i} {iline}")
+                        #print(f"param out:{param} i {i} {iline}")
                         i += 1
                         line = comment_out_line(first_item, job)
                         tag_out = True
@@ -193,7 +193,7 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
                         if param in paramrep:
                             addline = add_line( paramrep, param, job )
                             f.write(addline)
-            print(f"{iline} line: {line}")
+            #print(f"{iline} line: {line}")
             f.write(line)
 
     return outf
