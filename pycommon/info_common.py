@@ -17,11 +17,10 @@ server  = MyClass('server')
 server.server_env   =   "=== Server-related ===\
                         \n\t\tobtain server hostname, home etc\
                         "
-server.pypath       =   "pypath.sh command\
-                        \n\t\ta.py args: Python command error\
-                        \n\t\t    due to the python path in #!/...home/anaconda/bin/python\
-                        \n\t\tpypath.sh $python_command\
-                        \n\t\t    python $(which pycommand) args\
+server.pypath       =   "pypath.sh $python_command\
+                        \n\t\tUsage::\
+                        \n\t\t    $pypath.sh $(which script.py) args\
+                        \n\t\tError::$script.py args -> bad interpreter: No such file due to shebang\
                         "
 server.git_push     =   "cli_dir.py gitpush was copied for only gitpush\
                         \n\t\t run in git directory\
