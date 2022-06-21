@@ -106,20 +106,25 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
         print("Use wdir KPOINTS")
     files2copy.append('KPOINTS')
     ### 4. get INCAR :: use make_incar.py
-    ### 4.1: use INCAR.job
     incar_repo=f"{ini_dvasp}/INCAR.{job}"
+    incar_job=f"INCAR.{job}"
+    ### 4.1 if incar was applied
     if opt_incar:
-        if re.match('j', opt_incar):   # option in incar
-            incar = 'INCAR.' + job
-        ### 4.2: use dirname/INCAR
-        elif os.path.isdir(opt_incar):
+        if os.path.isdir(opt_incar):
             incar = opt_incar + '/INCAR'
-    ### 4.3: use INCAR in wdir
+            print(f"use {opt_incar}/INCAR")
+        elif os.path.isfile(opt_incar):
+            print(f"use {opt_incar}")
+            incar = opt_incar
+    ### 4.2 use incar.job
+    elif os.path.isfile(incar_job):
+        incar = incar_job
+    elif os.path.isfile(incar_repo):
+        incar =ncar_repo 
+    ### 4.3: INCAR in wdir
     elif allprepared:
         print(f"INCAR in cwd will be used")
         incar = 'INCAR'
-    elif os.path.isfile(incar_repo):
-        incar = incar_repo
     ### 4.4: make INCAR (not comlete)
     else:
         q = 'input incar-key file or use make_incar.py: '
