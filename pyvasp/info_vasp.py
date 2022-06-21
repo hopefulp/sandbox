@@ -112,6 +112,9 @@ poscar.mod_poscar    ="module for POSCAR modification\
                     \n\t    : poscar is modified\
                     \n\t    : all the atoms except atom will be fixed for ZPE\
                     "
+poscar.pos2cif      ="convert vasp format(POSCAR, CONTCAR) to cif to be read in MS\
+                    \n\tMS: save to msi to be converted using msi2pos.pl\
+                    "
 run.amp_env_run     ="amp_run.py in (envs) anaconda\
                     \n\t\t   when envs is not (base), detect envs and import proper module\
                     "
@@ -129,6 +132,7 @@ poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
                     \n\t    -z  True for z-sort in the atom group\
                     \n\tNB: when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
                     "
+
 incar.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\tOptions:\
                     \n\t    one dir : show INCAR\
@@ -146,6 +150,10 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\t\t-z zmin [zmax]  to include atoms inbetween zmin ~ zmax\
                         \n\t\t    if only zmin, zmin-=dz, zmax+=dz\
                         \n\t\t-al atom list index start from 0 from ase gui\
+                        \n\t\t-ash atom list shape\
+                        \n\t\t    len(atomlist) == sum(atomlist_shape)\
+                        \n\t\t-ash atom list shape\
+                        \n\t\t    len(atomlist) == sum(atomlist_shape)\
                         \n\t\t-ash atom list shape\
                         \n\t\t    len(atomlist) == sum(atomlist_shape)\
                         \n\t    -e [f|float_value]: f for Fermi level, value for VBM shift\
