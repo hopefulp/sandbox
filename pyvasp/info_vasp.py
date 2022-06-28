@@ -26,6 +26,7 @@ dosband = MyClass('dosband')
 procar  = MyClass('procar')
 ase     = MyClass('ase')
 charge  = MyClass('charge')
+convert = MyClass('convert')
 
 make.vas_make_ini   ="==================== Start VASP =======================================\
                     \n\t===== Make VASP initial directory ====\
@@ -112,8 +113,19 @@ poscar.mod_poscar    ="module for POSCAR modification\
                     \n\t    : poscar is modified\
                     \n\t    : all the atoms except atom will be fixed for ZPE\
                     "
-poscar.pos2cif      ="convert vasp format(POSCAR, CONTCAR) to cif to be read in MS\
+convert.pos2cif      ="vstsscripts/[.pl] convert vasp format(POSCAR, CONTCAR) to cif to be read in MS\
+                    \n\tUsage::\
+                    \n\t    pos2cif.pl inputfile [outputfile]\
+                    \n\t\tinputfile: POSCAR|CONTCAR\
+                    \n\t\toutputfile (default): a/CONTCAR -> aCONTCAR.cif\
                     \n\tMS: save to msi to be converted using msi2pos.pl\
+                    "
+convert.vas2cif     ="[.pl] link to \"pos2cif.pl\""
+convert.msi2pos     ="vscripts/[.pl] convert MS(msi) format to POSCAR\
+                    \n\tMany diverse forms in /vscripts\
+                    \n\tUsage::\
+                    \n\t    msi2pos.pl a.ami\
+                    \n\t\treturns POSCAR.a\
                     "
 run.amp_env_run     ="amp_run.py in (envs) anaconda\
                     \n\t\t   when envs is not (base), detect envs and import proper module\
