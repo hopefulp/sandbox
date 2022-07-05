@@ -232,7 +232,7 @@ def main():
     dgroup.add_argument('-p', '--prefix', help='select directories using prefix')
 
     parser.add_argument('-ex', '--exclude', nargs='*', help='specify excluded dirs if already exist')
-    parser.add_argument('-dn', '--newdir', help='specify new dirname in case one job')
+    parser.add_argument('-dn', '-nd', '--newdir', help='specify new dirname in case one job')
 
     parser.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
     parser.add_argument('-io', '--ioption', help='in the order: u:use INCAR.job,a:append,c:change,o:out,r:reverse')
