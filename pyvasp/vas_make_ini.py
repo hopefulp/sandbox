@@ -81,7 +81,13 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     q = 'will you make KPOINTS?'
     kpointjob = 'KPOINTS.' + job
     q2 = f'will you use {kpointjob}?'
-    if allprepared:
+    if kpoints:
+        if kpoints == [0,0,0]:
+            method = "gamma"
+        else:
+            method = "MH"
+        make_kpoints(kpoints, method)
+    elif allprepared:
         print(f"KPOINTS in cwd will be copied to {dirname}")
     elif os.path.isfile(kpointjob) and yes_or_no(q2):
         os.system(f'cp {kpointjob} KPOINTS')
@@ -120,7 +126,7 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     elif os.path.isfile(incar_job):
         incar = incar_job
     elif os.path.isfile(incar_repo):
-        incar =ncar_repo 
+        incar = incar_repo 
     ### 4.3: INCAR in wdir
     elif allprepared:
         print(f"INCAR in cwd will be used")
@@ -148,6 +154,13 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
             com1 = "mkdir " + dirname
             print(com1)
             os.system(com1)
+        else:
+            q = f"{dirname} exists: want to overwrite?"
+            if yes_or_no(q):
+                pass
+            else:
+                print("Stop proceeding")
+                sys.exit(1)
         
     for f in files2copy:
         com2 = f"cp {f} " + dirname
