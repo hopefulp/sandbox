@@ -124,7 +124,8 @@ convert.vas2cif     ="[.pl] link to \"pos2cif.pl\""
 convert.msi2pos     ="vscripts/[.pl] convert MS(msi) format to POSCAR\
                     \n\tMany diverse forms in /vscripts\
                     \n\tUsage::\
-                    \n\t    msi2pos.pl a.ami\
+                    \n\t    msi2pos.pl a.msi atom_list\
+                    \n\t    msi2pos.pl a.msi Pb Br C N H\
                     \n\t\treturns POSCAR.a\
                     "
 run.amp_env_run     ="amp_run.py in (envs) anaconda\
