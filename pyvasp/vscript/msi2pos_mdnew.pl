@@ -37,7 +37,7 @@ for($i=0;$i<=$nspecies;$i++){
 }
 
 ### T or False
-$dyn = 'F';
+$dyn = 'T';
 
 $atom_kinds = join("   ",@atom_kinds);
 print "   ",$atom_kinds,"\n";

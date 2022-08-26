@@ -18,131 +18,46 @@ from mod_doscar import nheadline, obtain_doscar_head, change_Bheadline
 from mod_poscar import obtain_atomlist0
 from common     import list2str, whereami
 from myplot2D   import mplot_nvector, auto_nvector
-from parsing    import convert_2lst_2Dlist
-def get_max(tdos, pdos):
-    if not tdos:
-        print(f"max TDOS {max(tdos)}")
-    elif not pdos:
-        print(f"max PDOS {max(pdos)}")
-    else:
-        print("Error: no dos")
-    return 1
+from parsing    import convert_2lst2D
 
-def extract_doscar_onelist(doscar, ofile, alist0, idos, Ldoserr, eshift, l, m, bheadline, ngrid):
+def get_filename(idos, f_pre, arr_atom, eshift, l, m):
+    if f_pre == 'TDOS':
+        ofile = f_pre
+        if eshift: f_tdos += eshift[0]
+    else:
+        alstr = str(arr_atom[0])
+        if 1 < arr_atom.size:
+            atom_imax = arr_atom.max()
+            atom_imin = arr_atom.min()
+            natom_in = arr_atom.size - 2
+            if natom_in == 0:
+                alstr = alstr + '_' + str(arr_atom[-1])
+            else:
+                if arr_atom.size == atom_imax - atom_imax:
+                    alstr = alstr + '-' + str(atom_imax)
+                else:
+                    alstr = alstr + '_N' + str(arr_atom.size) + '_' + str(atom_imax)
+        ofile = f_pre + 'a' + alstr
+        if l: ofile += f'l{l}'
+        if m: ofile += f'm{m}'
+        if eshift: ofile += eshift[:]
+    ofile += '.dat'
+    print(f"{whereami():>15}(): {idos+1}-th output file: {ofile}")
+    return ofile, alstr
+
+def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel, title, colors):
     '''
     works for one list
     alist0      start from 0
-    arr_atom    start from 1
+    arr_atoms   start from 1
     list        [-1] for TDOS
     '''
-
-    arr_atom = np.array(alist0) + 1
-    if arr_atom[0] == 0:
-        f_pre = 'TDOS'
-    else:
-        f_pre = 'pdos'
-
-    if not ofile:
-        if f_pre == 'TDOS':
-            ofile = f_pre
-            if eshift: f_tdos += eshift[0]
-        else:
-            alstr = str(arr_atom[0])
-            if 1 < len(alist0):
-                atom_imax = arr_atom.max()
-                atom_imin = arr_atom.min()
-                natom_in = arr_atom.size - 2
-                if natom_in == 0:
-                    alstr = alstr + '_' + str(arr_atom[-1])
-                else:
-                    if arr_atom.size == atom_imax - atom_imax:
-                        alstr = alstr + '-' + str(atom_imax)
-                    else:
-                        alstr = alstr + '_N' + str(arr_atom.size) + '_' + str(atom_imax)
-            ofile = f_pre + 'a' + alstr
-            if l: ofile += f'l{l}'
-            if m: ofile += f'm{m}'
-            if eshift: ofile += eshift[0]
-        ofile += '.dat'
-    print(f"{whereami():>15}(): {idos+1}-th output file: {ofile}")
-    ### 
-    iatom       = -1    # 0 for TDOS and iatom counts from 1 to natom
-    iatom_in    =  0
-    x_ene       = []    # x needs always to write to pdosa___.dat
-    dos         = []    # for TDOS and pdos_sum
-    with open(doscar, 'r') as f:
-        for i, line in enumerate(f):
-            if i < nheadline:
-                pass
-            ### start new block: headline
-            elif line == bheadline:
-                iatom += 1                  # 0 for TDOS and iatom counts from 1 to natom
-                iene = 0                    # index in energy block
-                ### escape after getting all the atoms in arr_atomlist
-                if iatom_in == len(arr_atom):
-                    break
-                ### decide atom box is in or not
-                if iatom in arr_atom:
-                    Lcheck_atom = True
-                    iatom_in += 1
-                else:
-                    Lcheck_atom = False
-                if 0 < iatom and f_pre == 'TDOS': # stop if TDOS
-                    break
-                #print(f"iatom {iatom} and job {job} in {whereami()}()")
-                #if iatom==0:
-            ### loop in block: ngrid
-            else:
-                ### save dos (TDOS or PDOS)
-                if Lcheck_atom == True:
-                    eles = line.strip().split()
-                    ### save x for the first atom in atomlist_array
-                    if iatom_in == 1:
-                        x_ene.append(float(eles[0]))
-                    ### if TDOS  # check spin case
-                    if iatom ==0:
-                        dos.append(float(eles[1]))
-                    ### for pdos:2D # check spin case
-                    else:### initialize pdos2d at first
-                        if 'pdos2d' not in locals():
-                            pdos2d = [ [ 0.0 for x in range(len(eles)-1) ] for y in range(int(ngrid)) ]       # pdos2d[ene][lm]
-                            print(f"{whereami():>15}(): size of 2D pdos {len(pdos2d)} {len(pdos2d[0])}")
-                        for i in range(len(eles)-1):
-                            pdos2d[iene][i] += float(eles[i+1])
-                    iene += 1
-                else:
-                    continue
-    ### energy shift for x_ene: eshift==Evalue|Vvalue
-    if eshift:
-        ene_shift = float(eshift[1:])
-        x_ene = list(np.array(x_ene)-ene_shift)
-    if f_pre == 'pdos':
-        ### pdos_sum
-        dos = list(np.sum(np.array(pdos2d), axis=1))   # projected to atom with sum of all lm's
-        print(f"{whereami():>15}(): size of pdos_sum {np.array(dos).shape}")
-    ### remove DOSCAR err at 1st ele
-    if Ldoserr:
-        del x_ene[0]
-        del dos[0]
+    natom, Emax, Emin, nene, Ef, bheadline, Ldoserr, Lspin = obtain_doscar_head(doscar)
     
-    print(f"{whereami():>15}(): maxdos {max(dos)} in revised DOSCAR")
-    ### writing TDOS[].dat pdosa[].dat
-    fout=open(ofile, 'w')
-    for i in range(len(dos)):
-        fout.write(f"{x_ene[i]:10.3f}  {dos[i]:10.4f}\n")
-    fout.close()
-    print(f"{whereami():>15}(): write atoms {list(arr_atom)} to {ofile} ")
-    
-    if f_pre == "TDOS":
-        legend = f_pre
-    else:
-        legend='a'+alstr
-    return x_ene, dos, legend
+    if Lplot:
+        ys      = []
+        legends = []
 
-def extract_doscar(doscar, ofile, job, alist02d, eshift, l, m, Lplot, xlabel, ylabel, title):
-    ### analyze DOSCAR headline: only one time event
-    natom, Emax, Emin, ngrid, Ef, bheadline, Ldoserr = obtain_doscar_head(doscar)
-    
     if eshift:
         if re.search('f', eshift, re.I):
             Eshift = 'E' + Ef
@@ -150,35 +65,102 @@ def extract_doscar(doscar, ofile, job, alist02d, eshift, l, m, Lplot, xlabel, yl
             Eshift = 'V' + eshift
     else:
         Eshift = None
-    
-    print(f"{alist02d}")
-    if Lplot:
-        ys      = []
-        legends = []
-
-### loop depending on number of pdos file
+    ### loop for 2d list
     idos = 0
-
-    if 't' in job:
-        ### atomlist: -1 for TDOS, idos to get x, Ldoserr whether remove or not 1st energy
-        x, y, legend = extract_doscar_onelist(doscar,ofile,[-1],idos,Ldoserr, Eshift,l, m, bheadline, ngrid)
-        idos += 1
-        ys.append(y)
-        legends.append(legend)
-    for i in range(len(alist02d)):
-        x, y, legend = extract_doscar_onelist(doscar,ofile,alist02d[i],idos,Ldoserr,Eshift,l,m,bheadline, ngrid)
-        ys.append(y)
-        legends.append(legend)
+    x_ene   = []    # x needs always to write to ldosa___.dat
+    iatom   = 0     # index for total atom count for x_ene=[]
+    if Lspin:
+        nlm = 18
+    else:
+        nlm = 9
+    with open(doscar, 'r') as f:
+        # nlines = 5 + (1 + nene) * (natom+1) 
+        lines = f.readlines()
+        for alist0 in alist02d:
+            ### change atom index which start from 0
+            arr_atoms = np.array(alist0) + 1
+            ### Make filename: prefix 
+            if arr_atoms[0] == 0:
+                f_pre = 'TDOS'
+            else:
+                f_pre = 'ldos'
+            ### make filename
+            if not ofile:
+                fname, alstr = get_filename(idos, f_pre, arr_atoms, Eshift, l, m)
+            else:
+                fname = ofile[idos]
+                alstr = fname
+            pdos2d  = []
+            for ind_atom in arr_atoms: # ind_atom is atom index in total system
+                istart = nheadline + (1 + nene) * ind_atom
+                #print(f"istart {istart} nene {nene} ind_atom {ind_atom} in total lines {len(lines)}")
+                iene = 0 # loop index: energy block
+                for i in range(istart, istart+1+nene):
+                    if lines[i] == bheadline:
+                        continue
+                    eles = lines[i].strip().split()
+                    ### save x for for 1st atom
+                    if iatom == 0:
+                        x_ene.append(float(eles[0]))
+                    ### if TDOS  # update for spin case
+                    if ind_atom == 0:
+                        dos.append(float(eles[1]))
+                    ### for pdos:2D # update spin case
+                    else:### initialize pdos2d at first
+                        if not pdos2d:
+                            pdos2d = [ [ 0.0 for x in range(len(eles)-1) ] for y in range(int(nene)) ]       # pdos2d[ene][lm]
+                            print(f"{whereami():>15}(): size of 2D pdos {len(pdos2d)} {len(pdos2d[0])}")
+                        for i in range(len(eles)-1):
+                            pdos2d[iene][i] += float(eles[i+1])
+                    iene += 1
+                iatom += 1
+            ### one atom list is done, plot dos
+            if f_pre == 'ldos':
+                ### pdos_sum
+                dos = list(np.sum(np.array(pdos2d), axis=1))   # projected to atom with sum of all lm's
+                print(f"{whereami():>15}(): size of pdos_sum {np.array(dos).shape}")
+            if idos == 0:
+                if eshift:
+                    ene_shift = float(Eshift[1:])
+                    x_ene = list(np.array(x_ene)-ene_shift)
+            ### remove DOSCAR err at 1st ele
+            if Ldoserr:
+                if idos == 0:
+                    del x_ene[0]
+                del dos[0]
+            print(f"dimensions x, dos: {len(x_ene)} {len(dos)}")
+            ### writing TDOS[].dat pdosa[].dat in the one atom list
+            fout=open(fname, 'w')
+            for i in range(len(dos)):
+                fout.write(f"{x_ene[i]:10.3f}  {dos[i]:10.4f}\n")
+            fout.close()
+            print(f"{whereami():>15}(): write atoms {list(arr_atoms)} to {fname} ")
+            ### energy shift for x_ene: eshift==Evalue|Vvalue
+            idos += 1   # the same as ialist
+            print(f"{whereami():>15}(): maxdos {max(dos)} in revised DOSCAR")
+            print(f"{idos}th-dos was done")
+            ### save var for plot in each dos
+            if Lplot:
+                ys.append(dos)
+                if f_pre == "TDOS":
+                    legend = f_pre
+                else:
+                    legend='a'+alstr
+                legends.append(legend)
     ### plot here
     if Lplot:
-        mplot_nvector(x, ys, xlabel=xlabel, ylabel=ylabel, title=title, legend=legends)
+        mplot_nvector(x_ene, ys, xlabel=xlabel, ylabel=ylabel, title=title, legend=legends, colors=colors, Lsave=True)
+    return 0
+
+
+    
+    
 
 def main():
     parser = argparse.ArgumentParser(description='To obtain PLDOS')
     parser.add_argument('doscar', nargs='?', default='DOSCAR', help='read DOSCAR')
     parser.add_argument('poscar', nargs='?', default="POSCAR", help="input POSCAR")
     parser.add_argument('-of', '--ofile', help='output filename')
-    parser.add_argument('-j', '--job', default='t', help='l,p,t, LDOS, PDOS, LPDOS, TDOS')
     ldos = parser.add_mutually_exclusive_group()
     ldos.add_argument('-al','--atom_list0', nargs='*', help="list atoms with num and '-', index from 0 ")
     #ldos.add_argument('-al2', '--atom0_2d', type=json.loads, help='list atoms as 2D list')
@@ -195,13 +177,14 @@ def main():
     plot.add_argument('-xl', '--xlabel', default='E (eV)', help='xlabel for DOS (eV)')
     plot.add_argument('-yl', '--ylabel', default='DOS', help='ylabel for DOS (eV)')
     plot.add_argument('-t', '--title', default='SnO2', help='title for plot')
+    plot.add_argument('-c', '--colors', nargs='*', default=['r','g','b','k'], help='colors')
 
     args = parser.parse_args()
     
     ### obtain atom 2D list
     if args.atom_list0:
         if args.atom_list0_sh:
-            alist0 = convert_2lst_2Dlist(args.atom_list0, args.atom_list0_sh)
+            alist0 = convert_2lst2D(args.atom_list0, args.atom_list0_sh)
         else:
             ### convert 1D to 2D list
             alist0=[]
@@ -220,7 +203,7 @@ def main():
                 print(f"{whereami():>15}(): use z-axis below {zaxis[0]} and upper {zaxis[1]}")
             alist0 = obtain_atomlist0(zaxis, args.poscar, args.atom_species, args.location)
     
-    extract_doscar(args.doscar, args.ofile, args.job, alist0, args.energy_shift,args.ql,args.qm,args.plot,args.xlabel,args.ylabel,args.title) 
+    extract_doscar(args.doscar, args.ofile, alist0, args.energy_shift,args.ql,args.qm,args.plot,args.xlabel,args.ylabel,args.title,args.colors) 
 
 if __name__ == '__main__':
     main()

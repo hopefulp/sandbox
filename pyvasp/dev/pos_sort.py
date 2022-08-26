@@ -105,6 +105,8 @@ def expand_atoms(atom_list, natom):
     atoms = atom_list * int(times)
     return atoms
 
+### Below: used in poscar_sort()
+
 def cal_num_atoms_orig(alist, nalist):
     ''' return
             dict of dict[atoms_species]=natom for original poscar
@@ -118,6 +120,21 @@ def cal_num_atoms_orig(alist, nalist):
             mydic[atom] = natom
     return mydic            
 
+### calculate sum of atom-kinds
+def obtain_sort_natom_list(line, katom_orig, atom_klist):
+    natom_orig = list(map(int, line.strip().split()))
+    number_dic = cal_num_atoms_orig(katom_orig, natom_orig)
+    print(number_dic)
+    s=''
+    sort_natom_list=[]
+    for atom in atom_klist:
+        s += f"  {number_dic[atom]} "
+        sort_natom_list.append(number_dic[atom])
+    ntatom = sum(sort_natom_list)
+    s += "\n"
+    return s, ntatom, natom_orig
+
+
 def get_atomlist(line):
     alist_all = line.strip().split()
     atoms = []
@@ -127,7 +144,8 @@ def get_atomlist(line):
     return atoms, alist_all  
 
 ### Just read poscar and rearrange: atom_list, natom || atom_file [ftype]
-def poscar_rearrange(pos, atom_klist, natom, atom_file, ftype, suff, rename, sort_z):
+### POSCAR sort for the same atoms
+def poscar_sort(pos, atom_klist, natom, atom_file, ftype, suff, rename, sort_z):
     ### atom list is given repetively --> atom kinds list
     ### rearrange poscar
     ofile = pos+suff
@@ -150,28 +168,29 @@ def poscar_rearrange(pos, atom_klist, natom, atom_file, ftype, suff, rename, sor
             ### copy cell parameters
             elif i < 5:
                 outf.write(line)
+
             ### filter unique atom species in the order in POSCAR
-            elif i == 5 and not any(s.isdigit() for s in line) :
-                ### keep atom list with index
-                atom_sort, katom_orig = get_atomlist(line)
-                if not atom_klist:
-                    atom_klist = atom_sort
-                s = "  " + "  ".join(atom_klist) + "\n"
-                print(s)
-                outf.write(s)
-            ### calculate sum of atom-kinds
-            elif i == 6 and any(d.isdigit() for d in line): # line includes space
-                natom_orig = list(map(int, line.strip().split()))
-                number_dic = cal_num_atoms_orig(katom_orig, natom_orig)
-                print(number_dic)
-                s=''
-                sort_natom_list=[]
-                for atom in atom_klist:
-                    s += f"  {number_dic[atom]} "
-                    sort_natom_list.append(number_dic[atom])
-                ntatom = sum(sort_natom_list)
-                s += "\n"
-                outf.write(s)
+            ### there might be atom species or not
+            elif i == 5:
+                ### if atom symbols line exists
+                if not any(s.isdigit() for s in line):
+                    ### keep atom list with index
+                    atom_sort, katom_orig = get_atomlist(line)
+                    if not atom_klist:
+                        atom_klist = atom_sort
+                    s = "  " + "  ".join(atom_klist) + "\n"
+                    print(s)
+                    outf.write(s)
+                    tag_atomsort = False
+                ### if not, calculate natoms list
+                else:
+                    s, ntatom, natom_orig = obtain_sort_natom_list(line, katom_orig, atom_klist)
+                    outf.write(s)
+                    tag_atomsort = True
+            ### in case: at i==6, natoms exist
+            elif not tag_atomsort:
+                s, ntatom, natom_orig = obtain_sort_natom_list(line, katom_orig, atom_klist)
+                tag_atomsort = True
             ### write cartesian or direct if not digit
             elif re.match('[SDC]', line, re.I):     # write and skip if Selective|Direct|Cartesion
                 print(f"line: {line} in {whereami()}")
@@ -207,7 +226,7 @@ def main():
     parser.add_argument('-z', '--sortz', action='store_true', help='increasing order in z-axis')
     args = parser.parse_args()
 
-    poscar_rearrange(args.poscar, args.atom_klist, args.natom, args.atom_file, args.file_type, args.suffix, args.rename, args.sortz)
+    poscar_sort(args.poscar, args.atom_klist, args.natom, args.atom_file, args.file_type, args.suffix, args.rename, args.sortz)
 
 if __name__ == "__main__":
     main()

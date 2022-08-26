@@ -11,17 +11,17 @@ import re
 from  envvasp import *
 from common import *
 from mod_poscar import get_poscar
+from vas_qsub import run_vasp
 
-def make_vas_d2d(odir, ndir, job, poscar, kpoints, potcar, incar):
+
+def make_vas_d2d(odir, ndir, job, poscar, kpoints, potcar, incar, files, np,xpart,nnode,hmem):
 
     pwd = os.getcwd()
     if potcar and potcar=='lda':
         pp = 'lda'
     else:
         pp = 'gga'
-    files=[]
 
-    ### Extra files for Continous Job: CHGCAR, WAVECAR
 
     if os.path.isdir(ndir):
         print(f"overwrite {ndir}")
@@ -31,10 +31,21 @@ def make_vas_d2d(odir, ndir, job, poscar, kpoints, potcar, incar):
         print(f"directory {ndir} was made")
    
     ### 1. POSCAR
-    get_poscar(poscar, job='new', sub=1)    #1 for CONTCAR
-    s = f"cp POSCAR {ndir}"
+    #get_poscar(poscar, job='new', sub=1)    #1 for CONTCAR
+    if poscar == 'p':
+        pos = f"{odir}/POSCAR"
+    elif poscar == 'c':
+        pos = f"{odir}/CONTCAR"
+    elif poscar == 'w':
+        pos = f"{pwd}/POSCAR"
+    else:
+        if os.path.isfile(poscar):
+            pos = poscar
+        else:
+            print("there is no poscar")
+    s = f"cp {pos} {ndir}/POSCAR"
     os.system(s)
-    print(f"POSCAR  from {'wdir':>15} to {ndir}")
+    print(f"POSCAR  from {pos:>15} to {ndir}")
     ### 2. KPOINTS    
     if not kpoints:
         s = f"cp {odir:>15}/KPOINTS {ndir}"
@@ -52,14 +63,23 @@ def make_vas_d2d(odir, ndir, job, poscar, kpoints, potcar, incar):
         os.chdir(pwd)
         print(f"POTCAR was generated in {ndir} with {pp}")
     ### INCAR :: copy INCAR or incar.key
-    ### INCAR is normally different job so read on the work directory
     if incar:
-        print("Use vas_make_cont.py")
-        sys.exit(1)
+        inc = incar
     else:
-        s = f"cp {odir}/INCAR {ndir}"
-        os.system(s)
-        print(f"INCAR   from {odir:>15} to {ndir}")
+        inc = f"{odir}/INCAR"
+    s = f"cp {inc} {ndir}/INCAR"
+    os.system(s)
+    print(f"INCAR   from {inc:>15} to {ndir}")
+    
+    ### Extra files for Continous Job: CHGCAR, WAVECAR
+    if files:
+        for f in files:
+            s = f"cp -P {odir}/{f} {ndir}"
+            os.system(s)
+            print(f"{odir}/{f} was copied to {ndir}")
+    ### run?
+    run_vasp(ndir, xpart, nnode, np, hmem)
+
     return 0        
             
                 
@@ -69,12 +89,18 @@ def main():
     parser.add_argument('odir', help='copy from old dir')
     parser.add_argument('ndir', help='mkdir and cp')
     parser.add_argument('-j', '--job', choices=['lda',"hybrid","md","mol"], help='inquire for each file')
-    parser.add_argument('-s', '--poscar', help='copy odir/CONTCAR or input')
+    parser.add_argument('-s', '--poscar', default='p', help='p[POSCAR],c[CONTCAR],w[wdir/POSCAR],input poscar')
     parser.add_argument('-p', '--potcar', help='copy odir/potcaruse or make POTCAR')
     parser.add_argument('-i', '--incar',  help='use the same INCAR in d2d')
     parser.add_argument('-k', '--kpoints', help='copy odir/KPOINTS or make')
-    
+    parser.add_argument('-f', '--files', nargs='*', help='copy more files')
+    qsub = parser.add_argument_group(title='qsub')
+    qsub.add_argument('-x', '--partition',  help='partition number in qsub')
+    qsub.add_argument('-N', '--nnode',      help='number of nodes in qsub')
+    qsub.add_argument('-n', '--nproc',      help='nprocess in qsub')
+    qsub.add_argument('-m', '--hmem', action='store_true', help='in case large supercell, use half of memory')
+      
     args = parser.parse_args()
-    make_vas_d2d(args.odir, args.ndir, args.job, args.poscar, args.kpoints, args.potcar, args.incar)
+    make_vas_d2d(args.odir, args.ndir, args.job, args.poscar, args.kpoints, args.potcar, args.incar, args.files, args.partition, args.nnode, args.nproc, args.hmem)
 if __name__ == '__main__':
     main()

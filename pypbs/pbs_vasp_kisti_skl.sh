@@ -21,11 +21,10 @@ echo "NPROC = $NPROC" >> $log_file
 echo start >> $log_file
 date >> $log_file
 
-#EXEC="/home01/g129a89/vasp.5.4.4/bin/vasp"
 if [ $exe ]; then
-    EXEC="/home01/x2232a02/bin/vasp.5.4.4.pl2.O2.NORMAL.std.x"
+    EXEC="$HOME/bin/vasp_gam"
 else
-    EXEC="/home01/x2232a02/bin/vasp_5.4.4_GRP7_NORMAL_20170903.x"
+    EXEC="$HOME/bin/vasp_std"
 fi
 
 cd $log_dir/$wdir

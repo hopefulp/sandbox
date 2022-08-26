@@ -19,8 +19,16 @@ qsleep  = MyClass('qsleep')
 process = MyClass('process')
 slurm   = MyClass('slurm')
 kisti   = MyClass('kisti')
-
+sftp    = MyClass('sftp')
 # if not use input variables, define here
+
+sftp.sftp_loop  ="== SFTP ==\
+                \n\tTo transmit from server target to destination inbetween\
+                \n\tif there is a file in target  sftp to inter-serer\
+                "
+sftp.sftps_inter="\tif there is a file sftp from inter-server to destination\
+                "
+
 sge.usage="$qstat -f    # see all nodes(/used/total) and my job\
             \n\t\t$qstatf      # aliast qstat -f ...\
             \n\t\t$qfree       # free nodes\

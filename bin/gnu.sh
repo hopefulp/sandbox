@@ -15,13 +15,12 @@ TITLE=$dirname
 #term='postscript' 
 #eps
 #extens='png'
-RANGE='[-15:10] [:]'
 #STYLE1=" u ((\$1-$asymp)*$hkj)  w lp lt 1 lw 3 "
 STYLE1=" u (\$1):(\$2)  w lp lt 1 lw 3 "
 STYLE2=" u 1 w lp lt 29 lw 3 "
 gnuplot -persist << EOF
-set xlabel 'E(eV)'
-set ylabel 'DOS'
+set xlabel 'a(A)'
+set ylabel 'E(eV)'
 set title "$TITLE"
 plot $RANGE "$infile"  $STYLE1
 EOF

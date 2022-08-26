@@ -155,4 +155,4 @@ for($j=0;$j<=$#atoms;$j++){
 close(IN); 
 close(OUTvasp);
 close(OUTlxyz);
-
+print "write to $fvasp\n";

@@ -371,7 +371,7 @@ def make_double(x, y):
     return xnew, np.array(ynew), line_pairs
 
 
-def mplot_levels(x, ys, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, Colors=None):
+def mplot_levels(x, ys, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, colors=None):
     '''
     plot table 
     x   from 1st column
@@ -387,10 +387,10 @@ def mplot_levels(x, ys, title=None, xlabel=None, ylabel=None, legend=None,Lsave=
         plt.xlabel(xlabel, fontsize=35)
     plt.ylabel(ylabel, fontsize=35)
     
-    if not Colors:
+    if not colors:
         colors = ["blue", "red", "green", "orange", "purple"]
     else:
-        colors = Colors
+        colors = colors
     ### make levels: x=list, ys=array
     for i, y in enumerate(ys):
         xd, yd, linepair = make_double(x, y)
@@ -419,13 +419,13 @@ def auto_nvector(x,y):
     plt.show()
     return 0
 ### most1
-def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, Colors=None):
+def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, colors=None):
     '''
     call with x=[] and y=[ [...
     x:: [] or [size]
     y:: [size] or [[size],[size],...[size]]
 
-    if not Colors:
+    if not colors:
         if len(legend):
             fig, ax = common_figure(ncolor = len(legend))
         else:
@@ -436,7 +436,7 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     fig, ax = common_figure()
     #if len(y):
     #    camount= 1/len(y) *2
-    color_rgb = lighten_2color('rb', len(y))
+    #color_rgb = lighten_2color('rb', len(y))
     print(f"size of y vector {len(y)}")
     #plt.locator_params(axis='x', nbins=10)
     ys = np.array(y)
@@ -455,7 +455,8 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
         #plt.scatter(x, y)
     elif ys.ndim == 2:
         for i in range(len(ys)):
-            plt.plot(x,ys[i,:], color=color_rgb[i], label=legend[i] )
+            #plt.plot(x,ys[i,:], color=color_rgb[i], label=legend[i] )
+            plt.plot(x,ys[i,:], color=colors[i], label=legend[i] )
     else:
         print(f"Error:: obscure in y-dim {ys.ndim}")
     ### ADD LEGEND
@@ -465,7 +466,7 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     ax.yaxis.set_major_locator(ticker.AutoLocator())
     plt.show()
     if Lsave:
-        plt.savefig(figname, dpi=150)
+        fig.savefig("dos.png", dpi=150)
     return 0
 
 

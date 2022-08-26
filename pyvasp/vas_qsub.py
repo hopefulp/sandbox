@@ -4,16 +4,28 @@ from envvasp import get_hostname
 from server_env import nXn
 import sys
 import re
+import os
 import subprocess
-
+from common import yes_or_no
 hostname = get_hostname()
+
+def run_vasp(dirname, qx, qN, np, hmem=None):
+    #print(f'qx {qx} and qN {qN} in run_vasp()')
+    if get_hostname()=='pt' and ( not qx or not qN):
+        qx, qN = get_queue_pt(qx=qx)
+
+    s = qsub_command(dirname,X=qx,nnode=qN,np=np, hmem=hmem)
+    print(s)
+    if yes_or_no("Will you run"):
+        os.system(s)
+    return 0
 
 def get_queue_pt(qx=None):
     '''
     obtain empty queue and nodes: convert linux function to python
     '''
     s = 'pestat'
-    popen = subprocess.Popen(s, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
+    popen = subprocess.Popen(s, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     #data = popen.read().strip()
     (stdoutdata, stderrdata) = popen.communicate()
     dataline = stdoutdata.decode('utf-8').split("\n")   # split is not working 
@@ -30,7 +42,7 @@ def get_queue_pt(qx=None):
             if ele[2] == 'idle':
                 print (f"{line}")
                 free_node[ele[1][:2]] += 1
-    print(f"{free_node}")
+    print(f"Idle nodes: {free_node}")
     if qx:
         qname = 'X' + str(qx)
         return qx, free_node[qname]
@@ -46,25 +58,27 @@ def get_queue_pt(qx=None):
         else:
             return free_node
 
-def qsub_command(ndir, X=3, nnode=4, np=40, nmpi=None):
+def qsub_command(ndir, X=3, nnode=4, np=40, hmem=None):
     if hostname == 'mlet':
         s = f"qsub -N {ndir} -pe numa {np} -v np={np} -v dir={ndir} -v vas=gam $SB/pypbs/sge_vasp_exe.csh"
     elif hostname == 'kisti':
         nnode=20
         np=40
-        if not nmpi:
-            if re.search('bd', ndir) or re.search('band', ndir):
-                nmpi = int(np/2)
-            else:
-                nmpi = np
-        if np == nmpi:
-            s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_skl.sh"
-        ### due to memory prob for band calculation of large sc, use nmpi = np/2
+        if not hmem and ( re.search('bd', ndir) or re.search('band', ndir)):
+                print("Use -m for half nproc for memory problem")
+        if hmem:
+            hproc = int(np/2)
+            ### due to memory prob for band calculation of large sc, use hmem = np/2
+            s = f"qsub -N {ndir} -l select={nnode}:ncpus={np}:mpiprocs={hproc}:ompthreads=1  $SB/pypbs/pbs_vasp_kisti_skl.sh"
         else:
-            s = f"qsub -N {ndir} -l select={nnode}:ncpus={np}:mpiprocs={nmpi}:ompthreads=1  $SB/pypbs/pbs_vasp_kisti_skl.sh"
+            s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_skl.sh"
     elif hostname == 'pt':
         nproc = nnode * nXn[X]
-        s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+        if hmem:
+            hproc = int(nXn[X]/2)
+            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -c {hproc} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+        else:
+            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     else:
         print(f"No qsub command for {hostname}")
         s=''

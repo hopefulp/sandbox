@@ -1,5 +1,7 @@
 ### analysis of DOSCAR
 from common import whereami
+import sys
+
 nheadline = 5
 dos_err = 100
 
@@ -28,7 +30,9 @@ def obtain_doscar_head(fname):
                 Ef      = float(info[3])
             ### check whether DOS at first energy has error
             elif i == nheadline +1:
-                dos1    = float(line.strip().split()[1])
+                elist   = line.strip().split()
+                dos1    = float(elist[1])
+                ncol_tdos = len(elist)
             elif i == nheadline + 2:
                 dos2    = float(line.strip().split()[1])
                 break
@@ -36,8 +40,15 @@ def obtain_doscar_head(fname):
         Ldos_err = True
     else:
         Ldos_err = False
+    if ncol_tdos == 3:
+        Lspin = False
+    elif ncol_tdos == 5:
+        Lspin = True
+    else:
+        print(f"DOSCAR parsing error: ncol of tdos {ncol_tdos}")
+        sys.exit(100)
     print(f"{whereami():>15}(): DOS err {Ldos_err} at 1st energy {dos1} then {dos2} in {__name__}.py")
-    return natom, Emax, Emin, ngrid, Ef, bheadline, Ldos_err
+    return natom, Emax, Emin, ngrid, Ef, bheadline, Ldos_err, Lspin
 
 def change_Bheadline(old, Emin, Erep, ngrid, new_ngrid):
     print(f"{old}")

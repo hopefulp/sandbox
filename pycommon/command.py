@@ -140,8 +140,11 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         kw1 = keyvalues[0]
     ###### make command line in advance
     ### KISTI
-    kisti.vas = f"\t(VASP)$ qsub -N {qname} -v exe=1 $SB/pypbs/pbs_vasp.sh for different vasp exe file"
-    kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas = f"\t(VASP) for (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)"
+    kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
+    kisti.vas += f"\n\t      for (gamma, ncl)"
+    kisti.vas += f"\n\t      $ qsub -N {qname} -v exe=gamma $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t      (run half process to save memory usage)"
     kisti.vas += f"\n\t      $ qsub -N {qname} -l select=20:ncpus=40:mpiprocs=20:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t      $ qsub -N {qname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
@@ -363,8 +366,8 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(kisti.py)
         print("Pt(platinum:slurm): vasp")
         print(slurm.vas)
-        print("MLET(mlet): vasp")
-        print(mlet.vas)
+        #print("MLET(mlet): vasp")
+        #print(mlet.vas)
 
 
     else:
@@ -375,7 +378,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', choices=['slurm','sge','kisti','amp','qchem','ga','gpu','vasp'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('job', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-j', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")

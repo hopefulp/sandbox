@@ -1,3 +1,4 @@
+#!/home/joonho/anaconda3/bin/python
 ### module for INCAR modification
 '''
 job zpe
@@ -44,7 +45,7 @@ vdw_active  = {'IVDW': 12}
 noD_out     = ['IVDW']
 ### OPT
 opt_change  = {'NSW': 1000}
-opt_active  = {'ISIF': 2, 'IBRION': 2, 'POTIM': 0.3}
+opt_active  = {'ISIF': 2, 'IBRION': 2, 'POTIM': 0.3, 'NSW': 1000, 'EDIFFG': -0.01}
 ### chg, sp
 chg_out     = ['ISIF', 'IBRION', 'EDIFFG', 'POTIM']
 chg_change  = {'LCHARG': '.T.'}
@@ -60,15 +61,18 @@ zpe_out     = ['NPAR']
 ### MAGMOM
 #mag_active = {'ISPIN': 2}
 mag_change = {'ISPIN': 2}
-### KISTI
+### KISTI: param in follows param out to replace
 kisti_out = ['NPAR']
-kisti_active = {'NCORE': 20}
+kisti_in = {'NPAR': ['NCORE', 20]}
 
 
 def replace_line(dic, key, job=None):
     newline = f" {key} = {dic[key]}         ! in {job}"
     return newline
 
+def add_line(dic, key, job=None):
+    newline = f" {dic[key][0]} = {dic[key][1]}         ! in {job}\n"
+    return newline
 def comment_out_line(line, job):
     ''' if commented out already, return itself '''
     sline = line.strip()
@@ -99,7 +103,9 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
     ### in case uncomment: dict
     if f'{job}_active' in globals():
         paramin   = eval(f'{job}_active')
-    print(f"setting: paramch {paramch} add {dic}")
+    if f'{job}_in' in globals():
+        paramrep  = eval(f'{job}_in')
+    #print(f"setting: paramch {paramch} add {dic}")
     if dic:
         print(f"is this True {dic}")
         ### append params
@@ -123,52 +129,71 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
                 paramout = dic
     #print(f"param active {paramin} param change {paramch}")
     # print(f"param comment out {paramout}")
+    i=0
+    iline=0
     with open(incar) as f:
         lines = f.readlines()
     print(f"write to {outf}")
     ### open output file and write line by line of input INCAR
+    #print(paramin.keys())
     with open(outf, 'w') as f:    
         for line in lines:
-            mline = line.strip()
+            iline += 1
+            lst = line.strip().split()
+            if len(lst) == 0:
+                f.write(line)
+                continue
+            else:
+                first_item = lst[0]
+            ### [1] check paramin
             ### param uncomment: when active and change: first activate and change
             if 'paramin' in locals() and paramin :
                 for key in paramin.keys():
                     tag_match = False
-                    if key in mline:
-                        #print(f"mline:{mline}")
-                        if mline[0] == '#':
-                            line = mline[1:] +'\n'
-                            #print(f"paramin:{line}")
+                    if key in first_item:
+                        if first_item == f'#{key}':
+                            newline = line[1:]
+                            print(f"paramin:{newline} i {i} {iline}")
+                            i += 1
                         ### if option == 'ac', in activation, replace at the same time
                         if opt and 'c' in opt:
                             line = replace_line(paramin, key, job) + "\n"
-                        tag_match = True
+                        tag_match = True    # used in change
+                        ### as for 1 key appearance, just apply once
+                        #continue
                 ### only apply once then remove key
                 #if tag_match == True:
                 #    del paramin[key]
-                            
+            ### [2]                
             ### param change
             if 'paramch' in locals() and paramch:
                 for key in paramch.keys():
                     tag_match = False
                     ### replace finds only the first letter is active
-                    if re.match(key, mline):
+                    if re.match(key, first_item):
                         line = replace_line(paramch, key, job) + "\n"
                         tag_match == True
                 ### when remove a key, all the keys are not applied
                 #if tag_match == True:
                 #    del paramch[key]
+            ### [3]
             ### param comment out
+            tag_out = False
             if  'paramout' in locals() and paramout :
-                for param in paramout:
-                    tag_match = False
+                for param in paramout: # this is list
                     if param in line:
-                        line = comment_out_line(mline, job)
-                        tag_match = True
+                        #print(f"param out:{param} i {i} {iline}")
+                        i += 1
+                        line = comment_out_line(first_item, job)
+                        tag_out = True
                 #if tag_match == True:
                 #    paramout.remove(param)
                     
-            #print(f"{line}", end='')
+                        ### param rep comes together with param out
+                        if param in paramrep:
+                            addline = add_line( paramrep, param, job )
+                            f.write(addline)
+            #print(f"{iline} line: {line}")
             f.write(line)
 
     return outf
@@ -178,7 +203,8 @@ def main():
     parser = argparse.ArgumentParser(description='test for INCAR change')
     parser.add_argument('inf', help='input incar file or directory')
     parser.add_argument('job', choices=["dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='job for VASP')
-    parser.add_argument('-suf', '--suffix', default='test', help='change the input filename')
+    #parser.add_argument('-suf', '--suffix', default='test', help='change the input filename')
+    parser.add_argument('-suf', '--suffix', help='change the input filename')
     args = parser.parse_args()
 
     if os.path.isfile(args.inf):

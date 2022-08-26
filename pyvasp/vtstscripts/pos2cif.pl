@@ -33,10 +33,18 @@ if($filetype eq "vasp") {
     if(@args >= 2) {
         $outputfilename = $args[1];
     } else {
-        $outputfilename = $inputfilename.".cif";
+        if ($inputfilename =~ /\// ){
+            @inpfile = split(/\//, $inputfilename);
+            if (2 <= scalar(@inpfile) ){
+                $outputfilename = $inpfile[0].$inpfile[1].".cif";
+            }
+        }
+        else {
+            $outputfilename = $inputfilename.".cif";
+        }
     }
-
     open (OUT,">$outputfilename");
+    print "write to $outputfilename\n";
     $description =~ s/^\s+//;
     @atom_types = split(/\s+/,$description);
     $description =~ s/ //g;

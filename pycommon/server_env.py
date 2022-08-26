@@ -5,6 +5,7 @@ import subprocess
 ###### KHKIM's lab
 ### partition and number of process per node
 nXn = { 1: 8, 2: 12, 3: 20, 4:24, 5:32 }
+#print(f'nproc is {nXn[4]} in {__name__}')
 
 ###### KISTI
 _HOSTname = subprocess.check_output('hostname', shell=True)

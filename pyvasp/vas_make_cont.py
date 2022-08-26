@@ -3,23 +3,14 @@
 import argparse
 import os
 import re
+import sys
 import json
 from common import get_dirs_prefix, yes_or_no, list2dict
 from mod_incar import modify_incar
 from mod_poscar    import fixedMD_POSCAR, pos2dirname, get_poscar
 import sys
 from envvasp import get_hostname
-from vas_qsub import get_queue_pt, qsub_command
-
-def run_vasp(dirname, qx, qN, np):
-    if get_hostname()=='pt' and ( not qx or not qN):
-        qx, qN = get_queue_pt(qx=qx)
- 
-    s = qsub_command(dirname,X=qx,nnode=qN,np=np)
-    print(s)
-    if yes_or_no("Will you run"):
-        os.system(s)
-    return 0
+from vas_qsub import run_vasp
 
 def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
     ### if incar_opt='u..', just use it
@@ -62,11 +53,9 @@ def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
     return sp
 
 ### 1. for general job process
-def vasp_jobs( job, dirs, prefix, exclude, fixatom, kopt,incar_opt,incar_kws,incar_list,Lrun, newdir,np,xpart,nnode):
-    #print(f"{exclude}")
+###            1     2        3     4      5           6       7         8    9      10    11    12     13
+def vasp_jobs( job, dirs, fixatom, kopt,incar_opt,incar_kws,incar_list,Lrun, newdir, np, xpart, nnode, hmem):
     pwd = os.getcwd()
-    if prefix:
-        dirs = get_dirs_prefix(pwd, prefix, excludes=exclude)
 
     for odir in dirs:
         if not newdir:
@@ -118,9 +107,13 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, kopt,incar_opt,incar_kws,inc
         ### 4: INCAR
         #if (not incar_opt or incar_opt== 'm') and os.path.isfile(f"{odir}/INCAR"):
         #    incar = modify_incar(f"{odir}/INCAR", job)
-        #elif incar_opt == 'u' and os.path.isfile('INCAR.'+job):
-        st = change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list)
-        com.append(st)
+        if incar_opt == 'u' and os.path.isfile('INCAR.'+job):
+            incar = f"INCAR.{job}"
+            com.append(f'cp {incar} {ndir}/INCAR')
+            print(f'{incar} is used')
+        else:
+            st = change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list)
+            com.append(st)
 
         ### make directory and copy
         for st in com:
@@ -134,12 +127,12 @@ def vasp_jobs( job, dirs, prefix, exclude, fixatom, kopt,incar_opt,incar_kws,inc
             print(f"CHGCAR is linked to {ndir}")
             os.chdir(pwd)
         ### qsub depends on server
-        run_vasp(ndir, xpart, nnode, np)
+        run_vasp(ndir, xpart, nnode, np, hmem)
     return 0
 
 
 ### 2 only incar is changed for jobs: vdw, 
-def vasp_job_incar( job, dirs, prefix, exclude, fixatom, incar_opt, Lrun,newdir, incar_kws, incar_list,np,xpart,nnode):
+def vasp_job_incar( job, dirs, fixatom, incar_opt, Lrun,newdir, incar_kws, incar_list,np,xpart,nnode,hmem):
     '''
     in case only incar is changed
     job     vdw
@@ -147,8 +140,6 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, incar_opt, Lrun,newdir,
         chg
     '''
     pwd = os.getcwd()
-    if prefix:
-        dirs = get_dirs_prefix(pwd, prefix, excludes=exclude)
 
     for odir in dirs:
         if newdir:
@@ -178,12 +169,12 @@ def vasp_job_incar( job, dirs, prefix, exclude, fixatom, incar_opt, Lrun,newdir,
         os.system(com)
 
         ### qsub depends on server
-        run_vasp(ndir, xpart, nnode, np)
+        run_vasp(ndir, xpart, nnode, np, hmem)
 
     return 0
 
 ### 3:: only POSCAR or KPOINTS is changed for job ini & cont
-def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun, np, xpart, nnode):
+def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun, np, xpart, nnode, hmem):
     '''
     in case POSCAR or KPOINTS changes
     '''
@@ -228,7 +219,7 @@ def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun, np, xpart, nnode):
     os.system(com)
     ### only works for KISTI
     ### qsub depends on server
-    run_vasp(ndir, xpart, nnode, np)
+    run_vasp(ndir, xpart, nnode, np, hmem)
 
     return 0
 
@@ -236,10 +227,13 @@ def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun, np, xpart, nnode):
 def main():
     parser = argparse.ArgumentParser(description='remove files except initial files')
     parser.add_argument('-j', '--job', choices=['sp','incar',"dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
-    parser.add_argument('-d', '--dirs', nargs='+', help='select directories')
-    parser.add_argument('-nd', '--newdir', help='select directories')
-    parser.add_argument('-p', '--prefix', help='select directories using prefix')
-    parser.add_argument('-ex', '--exclude', nargs='*', help='exclude if already exist')
+    dgroup = parser.add_mutually_exclusive_group()
+    dgroup.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
+    dgroup.add_argument('-p', '--prefix', help='select directories using prefix')
+
+    parser.add_argument('-ex', '--exclude', nargs='*', help='specify excluded dirs if already exist')
+    parser.add_argument('-dn', '-nd', '--newdir', help='specify new dirname in case one job')
+
     parser.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
     parser.add_argument('-io', '--ioption', help='in the order: u:use INCAR.job,a:append,c:change,o:out,r:reverse')
     #parser.add_argument('-id', '--incar_dict', type=json.loads, help='input dict from command line')
@@ -250,9 +244,11 @@ def main():
     #parser.add_argument('-k', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
     parser.add_argument('-s', '--poscar', help='incar POSCAR.name for job==ini')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
-    parser.add_argument('-n', '--nproc', default=16, help='nprocess in qsub')
-    parser.add_argument('-x', '--partition', help='partition number in qsub')
-    parser.add_argument('-N', '--nnode',     help='number of nodes in qsub')
+    qsub = parser.add_argument_group(title='qsub')
+    qsub.add_argument('-x', '--partition', type=int,  help='partition number in qsub')
+    qsub.add_argument('-N', '--nnode',     type=int,  help='number of nodes in qsub')
+    qsub.add_argument('-n', '--nproc',      help='nprocess in qsub')
+    qsub.add_argument('-m', '--hmem', action='store_true', help='in case large supercell, use half of memory')
     args = parser.parse_args()
 
 
@@ -269,13 +265,22 @@ def main():
     ### others
     # band: INCAR + KPOINTS
     # dos:  INCAR + KPOINTS
+    ### obtain job directories
+    pwd = os.getcwd()
+    if args.dirs:
+        dirs = args.dirs
+    elif args.prefix:
+        dirs = get_dirs_prefix(pwd, args.prefix, excludes=args.exclude)
+    else:
+        print("Usage:: input old job dirs: -d ")
+        sys.exit(1)
 
     if args.job in incar_jobs:
-        vasp_job_incar(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, inc_option, args.run, args.newdir,args.incar_kws, args.incar_list,args.nproc,  args.partition, args.nnode)
+        vasp_job_incar(args.job, dirs, args.fixed_atom, inc_option, args.run, args.newdir,args.incar_kws, args.incar_list,args.nproc,  args.partition, args.nnode, args.hmem)
     elif args.job in ini_jobs:
-        vasp_job_ini( args.job, args.dirs, args.poscar, args.newdir, args.kopt, args.run, args.nproc,  args.partition, args.nnode)
+        vasp_job_ini( args.job, dirs, args.poscar, args.newdir, args.kopt, args.run, args.nproc,  args.partition, args.nnode, args.hmem)
     else:
-        vasp_jobs(args.job, args.dirs, args.prefix, args.exclude, args.fixed_atom, args.kopt,inc_option, args.incar_kws, args.incar_list, args.run,args.newdir,args.nproc,  args.partition, args.nnode)
+        vasp_jobs(args.job, dirs, args.fixed_atom, args.kopt,inc_option, args.incar_kws, args.incar_list, args.run,args.newdir, args.nproc, args.partition, args.nnode, args.hmem )
     return 0
 
 if __name__ == '__main__':
