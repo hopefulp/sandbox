@@ -88,9 +88,10 @@ dirjob.diramp       =   "Run multiple job in amp by scanning a value in bash\
                         \n\t\t\tamp_wrapper.py -js qsub -qn \$dirname -k \$n & \
                         \n\t\t    te: run amp_wrapper.py -js qsub -j te\
                         "
-dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp\
+dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp, chmod\
                         \n\t\tOptions::\
                         \n\t\t    -[p|s|m] for matching type\
+                        \n\t\t    -v  inverse the matching\
                         \n\t\t    -rp for replacement of matching part\
                         \n\t\t    -id to include dir in scanning dir\
                         \n\t\t    -e exception list\
@@ -115,6 +116,7 @@ filejob.fline_part =    "extract a part from files: type=molden|band\
                         \n\t    fline_part.py BAND.dat -i 24\
                         \n\t\tto extract certain band from BAND.dat into 'BAND.idb01' only one band\
                         "                        
+filejob.fline_shebang   =   "Change shebang to make .py executable"
 filejob._extract_line   = "to extract a certain part in a file"
 filejob.f_kw        =   "gather keywords to cut part of file\
                         \n\tQ-Chem outfile, also refer to ~/dev/\

@@ -194,13 +194,13 @@ def get_answers(question):
     return reply
 
 
-def get_files_pattern(m_type, pattern,dirname, Ldir=False):
+def get_files_pattern(m_type, pattern,dirname, Ldir=False, Linverse=False):
     #print(m_type)
     Lshow = False
     if m_type == 'p':
         f_list = get_files_prefix(pattern, dirname, Lshow, Ldir=Ldir)
     elif m_type == 's':
-        f_list = get_files_suffix(pattern, dirname, Lshow, Ldir=Ldir)
+        f_list = get_files_suffix(pattern, dirname, Lshow, Ldir=Ldir, Linverse=Linverse)
     elif m_type == 'm':
         f_list = get_files_match(pattern, dirname, Lshow, Ldir=Ldir)
     else:
@@ -339,7 +339,7 @@ def get_files_suffix_list(suffixes, flist, Lshow=False, Ldir=False):
     matched_files.extend(dirs)                
     return matched_files    
 
-def get_files_suffix(suffixes, dname, Lshow=False, Ldir=False):
+def get_files_suffix(suffixes, dname, Lshow=False, Ldir=False, Linverse=False):
     """
         receive list of suffixes & directory
         suffixes : list of suffix
@@ -347,8 +347,14 @@ def get_files_suffix(suffixes, dname, Lshow=False, Ldir=False):
     matched_files=[]
     for suff in suffixes:
         for fname in os.listdir(dname):
+            ### if matched
             if fname.endswith(suff):
-                if Ldir or not os.path.isdir(fname):
+                ### if Ldir, include dir || if not dir, include
+                if not Linverse:
+                    if Ldir or not os.path.isdir(fname):
+                        matched_files.append(fname)
+            elif Linverse:
+                if not os.path.isdir(fname):
                     matched_files.append(fname)
     return matched_files                
 

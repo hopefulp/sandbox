@@ -114,7 +114,7 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     ### 4. get INCAR :: use make_incar.py
     incar_repo=f"{ini_dvasp}/INCAR.{job}"
     incar_job=f"INCAR.{job}"
-    ### 4.1 if incar was applied
+    ### 4.1 if use incar in dir
     if opt_incar:
         if os.path.isdir(opt_incar):
             incar = opt_incar + '/INCAR'
@@ -122,15 +122,15 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
         elif os.path.isfile(opt_incar):
             print(f"use {opt_incar}")
             incar = opt_incar
-    ### 4.2 use incar.job
+    ### 4.2: if INCAR is prepared in wdir
+    elif allprepared:
+        print(f"INCAR in cwd will be used")
+        incar = 'INCAR'
+    ### 4.3 use incar.job
     elif os.path.isfile(incar_job):
         incar = incar_job
     elif os.path.isfile(incar_repo):
         incar = incar_repo 
-    ### 4.3: INCAR in wdir
-    elif allprepared:
-        print(f"INCAR in cwd will be used")
-        incar = 'INCAR'
     ### 4.4: make INCAR (not comlete)
     else:
         q = 'input incar-key file or use make_incar.py: '
@@ -236,7 +236,7 @@ def main():
     parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
     parser.add_argument('-d', '--dname', help='get directory name')
-    parser.add_argument('-al', '--all', action='store_true', help="skip if not -s, -p, -k, -i")
+    parser.add_argument('-al', '--all', action='store_true', help="prepared in job dir if not -s, -p, -k, -i")
     parser.add_argument('-r', '--run', action='store_true', help="submit job")
     g_queue = parser.add_argument_group(title='QUEUE')
     g_queue.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
