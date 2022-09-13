@@ -55,7 +55,7 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepared, kpsub, dirname, iofile, atoms, Lrun,qx,qN,qn):
+def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepared, dirname, iofile, atoms, Lrun,qx,qN,qn):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -82,10 +82,11 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     kpointjob = 'KPOINTS.' + job
     q2 = f'will you use {kpointjob}?'
     if kpoints:
-        if kpoints == [0,0,0]:
-            method = "gamma"
-        else:
+        if len(kpoints) == 3: 
             method = "MH"
+        elif len(kpoints) == 1 and kpoints[0] == 'g':
+            kpoints = "1  1  1"
+            method = "gamma"
         make_kpoints(kpoints, method)
     elif allprepared:
         print(f"KPOINTS in cwd will be copied to {dirname}")
@@ -229,8 +230,7 @@ def main():
     parser.add_argument('-s', '--poscar', help='poscar is required')
     parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
     parser.add_argument('-hpp', '--pseudoH', nargs='*', help='include pseudo H list ')
-    parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz')
-    parser.add_argument('-ks', '--kpsub', default='monk', choices=['monk','gamma','dos','band'], help='diverse k-point sampling')
+    parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz, or g for gamma')
     ### toggle default: unset in the bare dir, set to j when INCAR.job exists
     parser.add_argument('-i', '--incar', help='j: use INCAR.job, dirname: use d/INCAR')
     parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
@@ -241,10 +241,10 @@ def main():
     g_queue = parser.add_argument_group(title='QUEUE')
     g_queue.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
     g_queue.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
-    g_queue.add_argument('-np', '--nproc', default=24, type=int, help="number of nproc, total for pt, per node for kisti ")
+    g_queue.add_argument('-n', '-np', '--nproc', default=24, type=int, help="number of nproc, total for pt, per node for kisti ")
     args = parser.parse_args()
 
-    make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, args.incar, args.all, args.kpsub, args.dname, args.iofile, args.atoms, args.run, args.xpartition, args.nnode, args.nproc)
+    make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, args.incar, args.all, args.dname, args.iofile, args.atoms, args.run, args.xpartition, args.nnode, args.nproc)
     return 0
 
 if __name__ == '__main__':
