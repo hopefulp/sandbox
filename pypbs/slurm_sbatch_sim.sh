@@ -28,7 +28,7 @@ cd $wdir
 ###### Modify INCAR
 ### change NPAR = NNode * npar_in_partition
 
-mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/OLD_BIN/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
 
 date >> $logfile
 
