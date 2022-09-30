@@ -241,7 +241,7 @@ def main():
     g_queue = parser.add_argument_group(title='QUEUE')
     g_queue.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
     g_queue.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
-    g_queue.add_argument('-n', '-np', '--nproc', default=24, type=int, help="number of nproc, total for pt, per node for kisti ")
+    g_queue.add_argument('-n', '-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
     args = parser.parse_args()
 
     make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, args.incar, args.all, args.dname, args.iofile, args.atoms, args.run, args.xpartition, args.nnode, args.nproc)
