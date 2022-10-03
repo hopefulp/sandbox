@@ -120,70 +120,57 @@ def compare_incar(files, key, Ldiff=False):
 
     return 0
    
-def show_incars(ftype, kws):
+def show_incars(f, Lall, kws, ftype):
     ### change kws into UPPERCASE
     kws = [ el.upper() for el in kws ]
     pwd = os.getcwd()
-    files=[]
-    if ftype == 'a' or ftype == 'd':
-        allfiles = os.listdir(pwd)
-        dirs = [ f for f in allfiles if os.path.isdir(pwd+'/'+f) ]
+    if Lall:
+        dirs = os.listdir(pwd)
         dirs.sort()
-        #print(f"{dirs}")
-        for d in dirs:
+    else:
+        dirs = f
+    #print(f"{dirs}")
+    i = 0
+    value_ini=[]
+    for d in dirs:
+        if os.path.isdir(d):
             incar = pwd + '/'+d+'/INCAR'
             if os.path.isfile(incar):
-                files.append(incar)
-    if ftype == 'a' or ftype == 'f':
-        allfiles = os.listdir(pwd)
-        incars = [ f for f in allfiles if re.match('INCAR', f) ]
-        incars.sort()
-        files.extend(incars)
-    print(f"{files}")
-    i = 0
-    #value_ini=[]
-    for f in files:
-        i += 1
-        dic = get_incar_dict(f)
-        #print(f"{dic} in {f}")
-        if re.search('/', f):
-            fs = re.split('/', f)
-            print(f"{fs[-2]:20}:",end='')
-        else:
-            print(f"{f:20}:",end='')
-        ### kws loop
-        for j, kw in enumerate(kws):
-            #if i == 1 :
-                ### this makes error if dic[kw] does not exist
-            #    value_ini.append(dic[kw])
-            if kw in dic.keys():
-                #if value_ini[j] == dic[kw]:
-                print(f" {kw:10} {dic[kw]:>5} {'':10}", end='')
-                #else:
-                #    print(f" {kw:10} {dic[kw]:>5} {'diff':<10}", end='')
-            else:
-                print(f" {kw:10} {'None':>5}", end='')
-        print("")
+                i += 1
+                dic = get_incar_dict(incar)
+                #print(f"{dic} in {d}")
+                print(f"{d:20}:",end='')
+                ### kws loop
+                for j, kw in enumerate(kws):
+                    if i == 1 :
+                        value_ini.append(dic[kw])
+                    if kw in dic.keys():
+                        if value_ini[j] == dic[kw]:
+                            print(f" {kw:10} {dic[kw]:>5} {'':10}", end='')
+                        else:
+                            print(f" {kw:10} {dic[kw]:>5} {'diff':<10}", end='')
+                    else:
+                        print(f" {kw:10} {'None':>5}", end='')
+                print("")
     return 0            
 
 def main():
 
     parser = argparse.ArgumentParser(description="Compare two INCAR")
-    parser.add_argument('-t', '--type', default='diff', choices=['diff','kw'], help="show INCAR difference or show keywords")
-    targets = parser.add_mutually_exclusive_group()
-    targets.add_argument('-f', '--files', nargs='+',  help="compare several INCAR files w. type=diff")
-    targets.add_argument('-ft', '--ftype', default='d', choices=['d','f','a'], help="scan all INCAR for kw")
+    parser.add_argument('files', nargs='*', help="one or two INCAR file ")
     parser.add_argument('-k', '--kws', nargs='*',  help="check the key and values ")
     parser.add_argument('-d', '--Ldiffer', action='store_true',  help="show only differences")
     parser.add_argument('-s', '--Lshow', action='store_true',  help="just show")
+    parser.add_argument('-a', '--all', action='store_true',  help="all the directories and files")
+    parser.add_argument('-f', '--ftype', default='d', choices=['d','f','a'], help="INCAR in dir and/or pwd")
     args = parser.parse_args()
 
     #if not args.files:
     #    files=['INCAR']
     #print(f"{args.kws}")
-    if args.type == 'kw':
-        show_incars(args.ftype, args.kws) 
-    elif args.type == 'diff':
+    if args.all:
+        show_incars(args.files ,args.all, args.kws, args.ftype) 
+    else:
         compare_incar(args.files, args.kws, args.Ldiffer)
 
 if __name__ == "__main__":
