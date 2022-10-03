@@ -148,13 +148,14 @@ poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
 
 incar.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\tOptions:\
-                    \n\t    one dir : show INCAR\
-                    \n\t    two dirs: compare two INCAR\
-                    \n\t    -k  keys: to check whether the keys exist\
-                    \n\t    -a  : search all directories as for -k keys\
+                    \n\t    -t : 'kw' for showing kw for many files, 'diff' for difference between a few files\
+                    \n\t    -ft, -f: -ft [d,f,a] for dir, INCARs, all, -f for a few files w '-t diff'\
+                    \n\t    -k  : for keywords for '-t kw'\
                     \n\tUsage:\
-                    \n\t    incar_diff.py FPtb2H2 FPtb2H2hb\
-                    \n\t    incar_diff.py -a -k ENCUT ISTART\
+                    \n\t    incar_diff.py -t kw -ft f -k ivdw\
+                    \n\t    incar_diff.py -t kw -ft d -k ivdw\
+                    \n\t    incar_diff.py FPtb2H2 FPtb2H2hb --- old style\
+                    \n\t    incar_diff.py -a -k ENCUT ISTART --- old style\
                     "
 dosband.dosall      =   "perl script to decompose lm-decomposded DOSCAR"
 dosband.doslm       =   "extact ldos then plot\
