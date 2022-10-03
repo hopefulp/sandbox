@@ -6,19 +6,7 @@ import os
 import sys
 from common import *
 
-def make_newfname(fname, pattern, style, new_word):
-    if style == 'ap':
-        if re.search('\.',fname):
-            fn = re.split('\.',fname)
-            newf = fn[0] + new_word + '.' + fn[1]
-        else:
-            newf = fname + new_word
-    elif style == 'rp':
-        newf = fname.replace(pattern, new_word)
-    return newf
-
-
-def ch_fname(job, m_tag, pattern, Linverse, style, new_word, L_dir, exceptions,ex_opt, dir_out,run):
+def cmd(job, m_tag, pattern, Linverse, new_pattern, L_dir, exceptions,ex_opt, dir_out,mode,run):
     pwd = os.getcwd()
     # pattern should have 1 element
     print(pattern)
@@ -61,9 +49,7 @@ def ch_fname(job, m_tag, pattern, Linverse, style, new_word, L_dir, exceptions,e
         #    exit(10)
         #else:
         for fname in l_file:
-            ### 
-            new_name = make_newfname(fname, pattern[0], style, new_word)
-            #new_name = fname.replace(patt, new_patt)
+            new_name = fname.replace(pattern[0], new_pattern)
             ### rename file with extension
             '''
             if re.search('\.', fname):
@@ -76,7 +62,6 @@ def ch_fname(job, m_tag, pattern, Linverse, style, new_word, L_dir, exceptions,e
             comm  = "mv  " + fname + " " + new_name
             commands.append(comm)
     else:
-        ### rewrite mode
         for f in l_file:
             if job == 'rm':
                 com = job + " " + f
@@ -109,18 +94,16 @@ def main():
     group.add_argument( '-m', '--match', nargs='*', help='find matching string')
     group.add_argument( '-i', '--infiles', nargs='*', help='input file list')
     parser.add_argument( '-v', '--inverse', action='store_true', help='after find matching, inverse the selection')
-    parser.add_argument('-st', '--style', choices=['ap', 'rp', 'mo'], help='fname changing style: append, replace, mode')
-    parser.add_argument( '-rw', '--replace_word', help='string for replacement')
-    #change.add_argument('-a', '--append', help="add suffix by -a to the original filename without extension")
-    #change.add_argument('-mo', '--mode', default='755', choices=['755','644'], help="input chmod")
+    parser.add_argument( '-rp', '--replace', help='string for replacement')
     parser.add_argument( '-id', '--include_dir', action='store_true', help='include dirname to filename')
     parser.add_argument( '-e', '--excluded', nargs='*', help='filename to be excluded')
     parser.add_argument( '-eo', '--excluded_opt', default='m',help='excluded fname option: matching or fullname')
     parser.add_argument( '-d', '--directory', type=str, default='tmppy', help='target directory to move files')
+    parser.add_argument('-a', '--append', help="add suffix by -a to the original filename without extension")
+    parser.add_argument('-mo', '--mode', default='755', choices=['755','644'], help="input chmod")
     parser.add_argument( '-r', '--run', action='store_true', help='run or not-False')
     args = parser.parse_args()
 
-    ### select matching style
     if args.prefix:
         matching=args.prefix
         m_tag = 'p'
@@ -142,7 +125,7 @@ def main():
     #        new_name = args.append
     #        rn_type = 'a'   # for append except extension
     #cmd(args.job, m_tag, matching, args.excluded, args.directory,args.rename,rn_type,new_name,args.run)
-    ch_fname(args.job, m_tag, matching, args.inverse, args.style, args.replace_word, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.run)
+    cmd(args.job, m_tag, matching, args.inverse, args.replace, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.mode,args.run)
 
 if __name__ == "__main__":
     main()

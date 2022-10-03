@@ -92,12 +92,14 @@ dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp, chmod\
                         \n\t\tOptions::\
                         \n\t\t    -[p|s|m] for matching type\
                         \n\t\t    -v  inverse the matching\
-                        \n\t\t    -rp for replacement of matching part\
+                        \n\t\t    -st style=[ap:append, rp:replace, mo: mode\
+                        \n\t\t    -rw replacement word\
                         \n\t\t    -id to include dir in scanning dir\
                         \n\t\t    -e exception list\
                         \n\t\t    -eo default=m exception by matching or fullname\
                         \n\t\tUsage::\
-                        \n\t\t    dir_fname.py rename -p G4 -rp G2 -id              ! to rename directories\
+                        \n\t\t    dir_fname.py rename -p G4 -st rp -rw G2 -id         ! rename with full replacement\
+                        \n\t\t    dir_fname.py rename -p G4 -st ap -rw vdw -id        ! append new word after dir and fname\
                         \n\t\t    dir_fname.py rename -m sc34c -rp sc34 -id -e sc34ch ! rename dir & file with exception\
                         \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'      ! to remove pbs files \
                         "

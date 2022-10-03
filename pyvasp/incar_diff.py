@@ -121,6 +121,8 @@ def compare_incar(files, key, Ldiff=False):
     return 0
    
 def show_incars(f, Lall, kws):
+    ### change kws into UPPERCASE
+    kws = [ el.upper() for el in kws ]
     pwd = os.getcwd()
     if Lall:
         dirs = os.listdir(pwd)
@@ -136,7 +138,7 @@ def show_incars(f, Lall, kws):
             if os.path.isfile(incar):
                 i += 1
                 dic = get_incar_dict(incar)
-                #print(f"{dic}")
+                #print(f"{dic} in {d}")
                 print(f"{d:20}:",end='')
                 ### kws loop
                 for j, kw in enumerate(kws):
