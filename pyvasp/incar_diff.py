@@ -69,7 +69,7 @@ def print_key(dic, params):
             print(f"{p.upper()} does not exist")
     return 0
 
-def compare_incar(files, key, Ldiff=False):
+def compare_incars(files, key, Ldiff=False):
     tup = get_incar_dicts(files)
     if len(tup) == 1:
         if key:
