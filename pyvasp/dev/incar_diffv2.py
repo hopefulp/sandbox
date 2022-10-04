@@ -182,7 +182,7 @@ def main():
             if not args.kws:
                 print(f"for -j kw -f [d,f,a] includes -kw kws")
             else:
-                check_kw(args.files[0], args.kws) 
+                check_kw(args.files, args.kws) 
         else:
             print(f"for -j kw select {file_choice}")
     elif args.job == 'diff':

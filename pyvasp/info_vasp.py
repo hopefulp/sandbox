@@ -148,12 +148,12 @@ poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
 
 incar.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\tOptions:\
-                    \n\t    -t : 'kw' for showing kw for many files, 'diff' for difference between a few files\
-                    \n\t    -ft, -f: -ft [d,f,a] for dir, INCARs, all, -f for a few files w '-t diff'\
-                    \n\t    -k  : for keywords for '-t kw'\
+                    \n\t    -j: ['kw','diff'] kw-many files to check kw, diff- compare a few files\
+                    \n\t    -f: files/dirs for '-j diff' or [d,f,a] for '-j kw'\
+                    \n\t    -k: for keywords for '-j kw'\
                     \n\tUsage:\
-                    \n\t    incar_diff.py -t kw -ft f -k ivdw\
-                    \n\t    incar_diff.py -t kw -ft d -k ivdw\
+                    \n\t    incar_diff.py -j kw -f f -k ivdw\
+                    \n\t    incar_diff.py -j kw -f d -k ivdw\
                     \n\t    incar_diff.py FPtb2H2 FPtb2H2hb --- old style\
                     \n\t    incar_diff.py -a -k ENCUT ISTART --- old style\
                     "
