@@ -73,6 +73,9 @@ def ch_fname(job, m_tag, pattern, Linverse, style, new_word, L_dir, exceptions,e
             else:
                 new_file=fname+new_name
             '''
+            if os.path.isfile(new_name):
+                print(f"{new_name} will be overwritten. Stop!")
+                sys.exit(1)
             comm  = "mv  " + fname + " " + new_name
             commands.append(comm)
     else:
