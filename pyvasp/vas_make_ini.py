@@ -55,7 +55,7 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepared, dirname, iofile, atoms, Lrun,qx,qN,qn):
+def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepared, dirname, iofile, atoms, Lrun,Lmkdir,qx,qN,qn):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -139,14 +139,14 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
         if not keyfile:
             keyfile = iofile
         get_incar(keyfile)
-    print(incar)
+    #print(incar)
     if incar != 'INCAR':
         os.system(f'cp {incar} INCAR')
     print(f'{incar} was copied to INCAR')
     files2copy.append('INCAR')
     ### 5. make work_dir
     q = 'will you make dir? '
-    if yes_or_no(q):
+    if Lmkdir or yes_or_no(q):
         print(f"dirname {dirname}")
         if not "dirname" in locals():
             q = 'input dirname: '
@@ -187,42 +187,6 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     print(f"{s}")
     if Lrun or yes_or_no("Will you run ?"):
         os.system(s)
-    ### Running without question
-    '''
-    else:
-        ### 1. get POSCAR
-        dirname = 'tmp_vasp'
-        if aposcar:
-            get_poscar(aposcar)
-        else:
-            get_poscar("")
-
-        ### 2. get POTCAR
-        if apotcar:
-            if not atoms:
-                q = 'input atoms in the order of poscar: '
-                atoms = get_answers(q).split()
-                get_potcar(apotcar, atoms)
-            else:            
-                get_potcar(apotcar, atoms)
-        else:
-            if not atoms:
-                print("Use -a atom list as minimum requirement")
-            else:
-                get_potcar('new', atoms) 
-            
-        ### 3. get KPOINTS
-        if kpoints:
-            make_kpoints(kpoints, kpsub)
-        else:
-            print("KPOINTS will be made from gamma")
-            make_kpoints("", 'gamma')
-        ### 4. get INCAR :: use make_incar.py        
-        if iofile:
-            print("Used 'incar.key'")
-            get_incar("incar.key")
-    '''            
-
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
@@ -238,13 +202,14 @@ def main():
     parser.add_argument('-d', '--dname', help='get directory name')
     parser.add_argument('-al', '--all', action='store_true', help="prepared in job dir if not -s, -p, -k, -i")
     parser.add_argument('-r', '--run', action='store_true', help="submit job")
+    parser.add_argument('-rd', '--mkdir', action='store_true', help="submit job")
     g_queue = parser.add_argument_group(title='QUEUE')
     g_queue.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
     g_queue.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
     g_queue.add_argument('-n', '-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
     args = parser.parse_args()
 
-    make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, args.incar, args.all, args.dname, args.iofile, args.atoms, args.run, args.xpartition, args.nnode, args.nproc)
+    make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, args.incar, args.all, args.dname, args.iofile, args.atoms, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc)
     return 0
 
 if __name__ == '__main__':

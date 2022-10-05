@@ -155,8 +155,11 @@ def classify_dirs(lsorted, classobj_dict_key,classobj_dict):
             print(f"    {d}")
     return luse
 
-def whereami():
-    return inspect.stack()[1][3]
+def whereami(rank=1):
+    '''
+    rank can be [0,1]
+    '''
+    return inspect.stack()[rank][3]
 
 def yes_or_no(question):
     reply = str(input(question+' (y/n): ')).lower().strip()     # raw_input is renamed in v3.6

@@ -134,7 +134,7 @@ def get_poscar(poscar, job='new', sub=0):
             dname = pos2dirname(poscar)
         comm = 'cp %s POSCAR' % nposcar
         os.system(comm)
-        print(f'POSCAR was made from {nposcar}')
+        print(f'{__name__}:{whereami()}:: POSCAR was made from {nposcar}')
     # confirm POSCAR is made        
     if not os.access('POSCAR', os.F_OK):
         print('POSCAR is not here')

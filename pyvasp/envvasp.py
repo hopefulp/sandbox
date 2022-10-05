@@ -60,7 +60,7 @@ def get_vasp_repository():
     else:
         ini_dvasp = '/home/joonho/sandbox/pyvasp/ini'
 
-    print("vasp repository is ", ini_dvasp, ' in system ', hostname)
+    print(f"{__name__}:{whereami()}:: vasp repository is {ini_dvasp} in system {hostname}")
     if not os.access(ini_dvasp, os.F_OK):
         print("Error:: the directory cannot be found\n stop")
         exit(1)
@@ -108,7 +108,7 @@ def make_kpoints(kp, method):
         if method == 'gamma':
             kfile = ini_dvasp + '/kp.gamma'
             s = 'cp %s KPOINTS' % kfile
-            print('KPOINTS was copied from %s' % kfile)
+            print(f"{__name__}:{whereami()}::KPOINTS was copied from {kfile}")
             os.system(s)
             return 0
         else:
