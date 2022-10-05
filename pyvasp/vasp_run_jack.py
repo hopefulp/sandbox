@@ -31,8 +31,6 @@ def main():
 	vasp_jobs(args.dir)
 	return
 
-
-
 if __name__=='__main__':
 	main()	
 
