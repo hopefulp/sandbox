@@ -7,6 +7,7 @@
 
 ##### default kpoints
 series=( 1Li 1LiP 2Li 2LiP 3Li 3LiP 4Li 4LiP )
+#series=( 1Li )     # for loop test
 #echo ${series[*]}
 fpre=MXNBs22L1P
 dseries=${@:-${series[@]}}
@@ -24,5 +25,5 @@ for x in ${dseries[@]}; do
     #echo "python $(which vas_make_cont.py) -j opt -d ${dirname} "
     #python $(which vas_make_cont.py) -j opt -d ${dirname}
     #echo "python $(which vas_make_ini.py) -s $poscar -al -r"
-    python $(which vas_make_ini.py) -s $poscar -al -r -rd
+    python $(which vas_make_ini.py) -s POSCAR.$poscar -al -r -rd 
     done

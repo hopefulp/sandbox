@@ -70,6 +70,7 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
             poscar = get_answers(q)
     else:
         ### cp input poscar to 'POSCAR'
+        #print(f"{__name__}::{poscar}")
         get_poscar(poscar)
         if not dirname:
             dirname = pos2dirname(poscar)
