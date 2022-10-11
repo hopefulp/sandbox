@@ -25,10 +25,12 @@ echo "$partname  $jobname $SLURM_NTASKS " >> $logfile
 echo "NODELIST: $nodelist"
 cd $wdir
 
-###### Modify INCAR
-### change NPAR = NNode * npar_in_partition
+###### Do nothing in INCAR
+vasp_dir="/TGM/Apps/VASP/OLD_BIN/5.4.4/O2/NORMAL"
+vasp_ndir="/TGM/Apps/VASP/5.4.4.pl2"
+vasp_dirv6="/TGM/Apps/VASP/bin/6.3.1"
 
-mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/OLD_BIN/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+mpirun -np $SLURM_NTASKS  ${vasp_dir}/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
 
 date >> $logfile
 

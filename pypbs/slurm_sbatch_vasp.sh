@@ -50,8 +50,6 @@ echo "ncpu per node: $SLURM_CPUS_PER_NODE in $partname" >> $logfile
 echo "NODELIST: $nodelist"
 cd $wdir
 
-
-
 echo "npar = $npar" >> $logfile
 sed -i "s/.*NPAR.*/NPAR = $npar/" INCAR
 if [ $hmem ]; then

@@ -39,7 +39,7 @@ for dir in  $@
 	    cd $dir
 	    	chgsum.pl AECCAR0 AECCAR2
 		    bader CHGCAR -ref CHGCAR_sum
-            pcharge_bader.py
+            charge_bader.py
 		cd ..
 	    ;;
 	"${job_list[1]}")
