@@ -105,7 +105,7 @@ def ch_fname(job, m_tag, pattern, Linverse, style, new_word, L_dir, exceptions,e
 
 def main():
     parser = argparse.ArgumentParser(description='Command Line Interface to deal with directory')
-    parser.add_argument( 'job', choices=['ls', 'mvdir', 'rm', 'rename', 'cp', 'chmod'],  help='shell command')
+    parser.add_argument( 'job', choices=['ls', 'mvdir', 'rm', 'rename', 'cp', 'chmod', 'mv'],  help='shell command')
     group = parser.add_mutually_exclusive_group()
     group.add_argument( '-p', '--prefix', nargs='*', help='prefix of filename')
     group.add_argument( '-s', '--suffix', nargs='*', help='list several suffixes')
@@ -133,8 +133,8 @@ def main():
     elif args.match:
         matching=args.match
         m_tag = 'm'
-    elif args.ifile:
-        matching=args.files
+    elif args.infile:
+        matching=args.infiles
         m_tag = 'f'
     else:
         print("matching should be given")

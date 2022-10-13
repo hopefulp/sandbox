@@ -114,6 +114,8 @@ poscar.mod_poscar    ="module for POSCAR modification\
                     \n\t    : poscar is modified\
                     \n\t    : all the atoms except atom will be fixed for ZPE\
                     "
+#poscar.posd2c       = convert.posd2c                    
+poscar.posd2c       =".pl: convert direct coord to cartesian coord in POSCAR"                    
 convert.pos2cif      ="vstsscripts/[.pl] convert vasp format(POSCAR, CONTCAR) to cif to be read in MS\
                     \n\tUsage::\
                     \n\t    pos2cif.pl inputfile [outputfile]\
@@ -180,7 +182,7 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\tUsage:\
                         \n\t    doslm.py -z 3.69 -p\
                         \n\t    doslm.py -z 3.69 -p -e f\
-                        \n\t    doslm.py -al 8 23 9 10 21 22 -als 2 4 -p\
+                        \n\t    doslm.py -al 8 23 9 10 21 22 -ash 2 4 -p\
                         \n\t(3) to plot ldos of slab w.r.t. VBM: obtain VBM in slab (1)\
                         \n\t    doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -e -1.169\
                         \n\t\tmakes ldos files as much as ash(atom shape)\
@@ -210,6 +212,8 @@ dosband.doscar_modi  =   "remove the first line of each energy loop for removing
                         \n\t\tmove original DOSCAR to DOSCAR_o\
                         \n\t\tmake a new DOSCAR with 1 line less in each block, (natom+1) less line\
                         "
+dosband.vasp_anal_dos=  "get pdos for every atoms"
+
 procar.procar       =   "To extract and draw band\
                         \n\tload PROCAR can make a memory problem\
                         "

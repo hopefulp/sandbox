@@ -12,7 +12,6 @@ import sys
 from envvasp import get_hostname
 from vas_qsub import run_vasp
 
-
 def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
     ### if incar_opt='u..', just use it
     if incar_opt and re.match('u', incar_opt):
@@ -67,83 +66,6 @@ def make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_list):
     else:
         incar = change_incar(odir, job, ikw_opt, incar_kws, incar_list)
     return incar
-
-### O: Use this to comtain all the jobs
-###                 1     2      3       4     5      6       7            8        9      10    11    12     13   14
-def vasp_jobs(job, vgroup, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_list, Lrun, newdir, np, xpart, nnode, hmem):
-    pwd = os.getcwd()
-
-    for odir in dirs:
-        if not newdir:
-            ndir = odir + job
-        else:
-            ndir = newdir
-        com=[]
-        if os.path.isdir(ndir):
-            print(f"{ndir} for {odir} exists")
-            continue
-        ### 0: make a new dir
-        com.append(f'mkdir {ndir}')
-        ### 1: POSCAR
-        ### zpe: modify POSCAR
-        if job == 'zpe':
-            fixedMD_POSCAR(f"{odir}/CONTCAR", fixatom)
-            print(f"{odir}/CONTCAR was modified to POSCAR")
-            poscar = 'POSCAR'
-        ### else: just copy CONTCAR
-        else:
-            poscar = odir + '/CONTCAR'
-            print(f"{odir}/CONTCAR will be copied")
-        com.append(f'cp {poscar} {ndir}/POSCAR')
-        ### 2: POTCAR
-        potcar = odir + '/POTCAR'
-        com.append(f'cp {potcar} {ndir}/POTCAR')
-        print(f"{potcar} was copied")
-        ### 3: KPOINTS
-        if vgroup == 1 or vgroup == 2:
-            if kopt:
-                ### if kpoints file
-                kfname = kopt
-                kfsuff = f'KPOINTS.{kopt}'
-                if os.path.isfile(kfname):
-                    kpoints = kfname
-                ### if kpoints suffix
-                elif os.path.isfile(kfsuff):
-                    kpoints = kfsuff
-        ### use -j job
-        elif vgroup == 3:
-            if job == 'zpe' or job == 'wav':
-                kpoints = odir + '/KPOINTS'
-            elif os.path.isfile(f'KPOINTS.{job}'):
-                kpoints = 'KPOINTS.'+job
-            elif os.path.isfile('KPOINTS'):
-                kpoints = 'KPOINTS'
-            else:
-                kpoints = odir + "/KPOINTS"
-        com.append(f'cp {kpoints} {ndir}/KPOINTS')
-        print(f"{kpoints} was used")
-        ### 4: INCAR
-        #if (not ikw_opt or ikw_opt== 'm') and os.path.isfile(f"{odir}/INCAR"):
-        #    incar = modify_incar(f"{odir}/INCAR", job)
-        incar = make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_list)
-        st = f"cp {incar} {ndir}/INCAR"
-        com.append(st)
-
-        ### make directory and copy
-        for st in com:
-            print(f"{st}")
-            os.system(st)
-
-        ### 5: More Extra files
-        if job == 'band' or job == 'dos':
-            os.chdir(ndir)
-            s = f"ln -s ../{odir}/CHGCAR ."
-            os.system(s)
-            print(f"CHGCAR is linked to {ndir}")
-            os.chdir(pwd)
-        ### qsub depends on server
-        run_vasp(ndir, xpart, nnode, np, hmem)
-    return 0
 
 ### 1. INCAR and more files need to be modified
 ###                 1     2      3       4     5      6       7            8        9      10    11    12     13   14
@@ -349,15 +271,14 @@ def main():
         ikw_option = 'ac'
     else:
         ikw_option = args.ioption
-
+    ### only INCAR changes in no-vdw -> vdw, sp -> opt, opt->sp
+    incar_jobs = ['vdw','noD', 'opt','copt','mag', 'kisti','incar','sp','chg']
     ### copy initial job: POSCAR or CONTCAR
     ### cont + ok to change KPOINTS
-    ### vgroup1
-    vgroup1 = ini_jobs = ['ini', 'cont']
-    ### vgroup2: only INCAR changes in no-vdw -> vdw, sp -> opt, opt->sp
-    vgroup2 = incar_jobs = ['vdw','noD', 'opt','copt','mag', 'kisti','incar','sp','chg']
-    ### copy more files ['CHGCAR', 'WAVECAR'] and change KPOINTS
-    vgroup3 = ['dos','band']
+    ini_jobs = ['ini', 'cont']
+    ### others
+    # band: INCAR + KPOINTS
+    # dos:  INCAR + KPOINTS
     ### obtain job directories
     pwd = os.getcwd()
     if args.dirs:
@@ -368,18 +289,12 @@ def main():
         print("Usage:: input old job dirs: -d ")
         sys.exit(1)
 
-    if args.job in vgroup1:
-        vgroup=1
-        vasp_job_ini( args.job, dirs, args.poscar, args.newdir, args.kopt, args.run, args.nproc,  args.partition, args.nnode, args.hmem)
-    elif args.job in vgroup2:
-        vgroup=2
+    if args.job in incar_jobs:
         vasp_job_incar(args.job, dirs, args.fixed_atom, args.incar, ikw_option, args.run, args.newdir,args.incar_kws, args.incar_list,args.nproc,  args.partition, args.nnode, args.hmem)
+    elif args.job in ini_jobs:
+        vasp_job_ini( args.job, dirs, args.poscar, args.newdir, args.kopt, args.run, args.nproc,  args.partition, args.nnode, args.hmem)
     else:
-        vgroup=3
-        #vasp_jobs_more(args.job, dirs, args.fixed_atom, args.kopt, args.incar, ikw_option, args.incar_kws, args.incar_list, args.run,args.newdir, args.nproc, args.partition, args.nnode, args.hmem )
-        vasp_jobs(args.job, vgroup, dirs, args.fixed_atom, args.kopt, args.incar, ikw_option, args.incar_kws, args.incar_list, args.run,args.newdir, args.nproc, args.partition, args.nnode, args.hmem )
-    return 0
-
+        vasp_jobs_more(args.job, dirs, args.fixed_atom, args.kopt, args.incar, ikw_option, args.incar_kws, args.incar_list, args.run,args.newdir, args.nproc, args.partition, args.nnode, args.hmem )
     return 0
 
 if __name__ == '__main__':

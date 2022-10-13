@@ -60,7 +60,7 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel,
 
     if eshift:
         if re.search('f', eshift, re.I):
-            Eshift = 'E' + Ef
+            Eshift = 'E' + f"{Ef:5.3f}"
         else:
             Eshift = 'V' + eshift
     else:
