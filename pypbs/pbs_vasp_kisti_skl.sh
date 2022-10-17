@@ -41,7 +41,7 @@ fail="error"
 i=1
 grep -q "$fail" $log_dir/$jobname.out
 while [ $? -eq 0 ]; do
-    for f in $sfiles[@]; do
+    for f in $sfiles{[@]}; do
         cp $f ${i}${f}
         done
     cp CONTCAR POSCAR
