@@ -83,12 +83,13 @@ mv $outfile $pdir/$jobname.out
 
 sfiles=( POSCAR XDATCAR OUTCAR INCAR )
 fail="error"
-grep -q "$fail" $pdir/$jobname.out
 i=1
+grep -q "$fail" $pdir/$jobname.out
 while [ $? -eq 0 ]; do
-    for f in $sfiles; do
+    for f in ${sfiles[@]}; do
         cp $f ${i}${f}
         done
+    cp CONTCAR POSCAR
     if grep 'ISTART = 0' INCAR ; then
         sed -i 's/ISTART = 0/ISTART = 1/' INCAR
     fi
