@@ -139,6 +139,8 @@ def vasp_jobs(job, vgroup, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_
             os.chdir(ndir)
             s = f"ln -s ../{odir}/CHGCAR ."
             os.system(s)
+            #s = f"ln -s ../{odir}/WAVECAR ."
+            #os.system(s)
             print(f"CHGCAR is linked to {ndir}")
             os.chdir(pwd)
         ### qsub depends on server

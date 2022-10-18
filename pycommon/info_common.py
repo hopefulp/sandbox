@@ -95,13 +95,16 @@ dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp, chmod\
                         \n\t\t    -st style=[ap:append, rp:replace, mo: mode\
                         \n\t\t    -rw replacement word\
                         \n\t\t    -id to include dir in scanning dir\
+                        \n\t\t    -d  dirname for mv\
+                        \n\t\t    -ip include_parents directory for matching is 'suffix'\
                         \n\t\t    -e exception list\
                         \n\t\t    -eo default=m exception by matching or fullname\
                         \n\t\tUsage::\
                         \n\t\t    dir_fname.py rename -p G4 -st rp -rw G2 -id         ! rename with full replacement\
                         \n\t\t    dir_fname.py rename -p G4 -st ap -rw vdw -id        ! append new word after dir and fname\
                         \n\t\t    dir_fname.py rename -m sc34c -rp sc34 -id -e sc34ch ! rename dir & file with exception\
-                        \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'      ! to remove pbs files \
+                        \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'        ! to remove pbs files \
+                        \n\t\t    dir_fname.py mv -s .cont -id -d tmpcont -ip         ! to move include rootname dir\
                         "
 filejob.fline_edit  =   "Job to treat file:\
                         \n\tfind a line and substitute\

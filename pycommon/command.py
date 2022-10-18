@@ -142,6 +142,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     ### KISTI
     kisti.vas = f"\t(VASP) for (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)"
     kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
+    kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh "
     kisti.vas += f"\n\t      for (gamma, ncl)"
     kisti.vas += f"\n\t      $ qsub -N {qname} -v exe=gamma $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t      (run half process to save memory usage)"

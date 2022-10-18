@@ -49,17 +49,13 @@ def ch_fname(job, m_tag, pattern, Linverse, style, new_word, L_dir, exceptions,e
     if job == "ls":
         if l_file:
             print(("\n".join(l_file)))
-    ### mvdir?            
-    #elif job in "mvdir" :
-    elif job == "mv" :
-        ### secure dir_out directory exists not to delete files
+    elif job in "mvdir" :
         if not os.path.isdir(dir_out):
             comm = "mkdir " + dir_out
             os.system(comm)
         for f in l_file:
-            comm = f'{job} {f} {dir_out}'
+            comm = f'{job} {f} {dir_out}")'
             print(comm)
-            commands.append(comm)
     elif job == 'rename':
         #if not new_name: 
         #    print("add new name with -a or ")
@@ -112,7 +108,7 @@ def ch_fname(job, m_tag, pattern, Linverse, style, new_word, L_dir, exceptions,e
 
 def main():
     parser = argparse.ArgumentParser(description='Command Line Interface to deal with directory')
-    parser.add_argument( 'job', choices=['ls', 'mv', 'rm', 'rename', 'cp', 'chmod'],  help='shell command: ?mvdir')
+    parser.add_argument( 'job', choices=['ls', 'mvdir', 'rm', 'rename', 'cp', 'chmod', 'mv'],  help='shell command')
     group = parser.add_mutually_exclusive_group()
     group.add_argument( '-p', '--prefix', nargs='*', help='prefix of filename')
     group.add_argument( '-s', '--suffix', nargs='*', help='list several suffixes')
