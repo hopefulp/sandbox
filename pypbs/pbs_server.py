@@ -101,7 +101,7 @@ def job_description(fname, ndata, software, qjobname, sub_job, np, mem, node, sc
     return 0        
 
 def main():
-    parser = argparse.ArgumentParser(description="how to use qsub:\n Usage:: qsub_server.py sge qchem -j qjobname(dirname) -i file.in -n np")
+    parser = argparse.ArgumentParser(description="how to use qsub:\n Usage:: pbs_server.py sge qchem -j qjobname(dirname) -i file.in -n np")
     parser.add_argument('software', nargs='?', default='amp', choices=['qchem', 'grmx', 'vasp','sleep','amp'], help='kind of software')
     parser.add_argument('-nd','--data_total', help='cut data region ')
     parser.add_argument('-qj', '--qjobname', help='qjob name for qsub|directory name')
