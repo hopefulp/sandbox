@@ -81,3 +81,29 @@ date >> $logfile
 
 mv $outfile $pdir/$jobname.out
 
+sfiles=( POSCAR XDATCAR OUTCAR INCAR )
+fail="error"
+i=1
+grep -q "$fail" $pdir/$jobname.out
+while [ $? -eq 0 ]; do
+    for f in ${sfiles[@]}; do
+        cp $f ${i}${f}
+        done
+    cp CONTCAR POSCAR
+    if grep 'ISTART = 0' INCAR ; then
+        sed -i 's/ISTART = 0/ISTART = 1/' INCAR
+    fi
+    if grep 'ICHARG = 2' INCAR ; then
+        sed -i 's/ICHARG = 2/ICHARG = 0/' INCAR
+    fi
+    cp $pdir/$jobname.out ${i}$jobname.out
+    export i=`expr $i + 1`
+    echo start >> $logfile
+    date >> $logfile
+    mpirun -np $SLURM_NTASKS  ${vasp_dir}/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+    mv $outfile $pdir/$jobname.out
+    echo end >> $logfile
+    date >> $logfile
+    grep -q "$fail" $pdir/$jobname.out
+    done
+
