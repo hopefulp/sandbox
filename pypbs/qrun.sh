@@ -97,7 +97,7 @@ if [[ $hname != 'chi' &&  $software == 'amp' ]]; then
     echo "Usage:: $0 tr|te [pa] sub_dir qname  f_input nproc memory[nG] hidden_layer Energy_limit Force_limit Data_region"
     echo "HL = $hl"
     if [[ $qsub =~ 'qsub' ]]; then
-        st="qsub_server.py amp -qj $qjobname -i $fin -nt $ndata -n $np -hl '$hl' -el $el -fl $fl -dt $dtype -dl '$dlist' -m $mem -j $ampjob"
+        st="pbs_server.py amp -qj $qjobname -i $fin -nt $ndata -n $np -hl '$hl' -el $el -fl $fl -dt $dtype -dl '$dlist' -m $mem -j $ampjob"
         read -p "$st | Will you run? [enter/no]" var
         if [ -z $var ]; then
             $st

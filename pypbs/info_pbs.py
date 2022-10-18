@@ -9,7 +9,7 @@ from common import dir_all, dir_classify_n, whereami, MyClass
 
 ### thest are globals() not locals()|vars()
 sge     = MyClass('sge')
-qsub    = MyClass('qsub')
+pbs    = MyClass('pbs')
 ssh     = MyClass('ssh')
 grmx    = MyClass('grmx')
 usage   = MyClass('usage')
@@ -39,13 +39,13 @@ sge.usage="$qstat -f    # see all nodes(/used/total) and my job\
 sge.sge_dir_run     = "\n\tsge_dir_run.py\
                     \n\t    run in a directory w/wo qsub\
                     "
-qsub.qsub_server     = f"QSUB JOB\
+pbs.pbs_server     = f"QSUB JOB\
                     \n\tautodetection of server ['login','chi']\
                     \n\tWorks: ['qchem','amp','vasp','sleep']\
                     \n\t    Q-Chem:\
                     \n\t\tOne Job::\
-                    \n\t\t    qsub_server.py qchem -qj Nimono -i CO2M06(.in) -n 16 -m 5(G)\
-                    \n\t\t    qsub_server.py qchem -qj CC6 -i 6-CC-NiFe.in -n 6 -m 6 -no skylake@node14\
+                    \n\t\t    pbs_server.py qchem -qj Nimono -i CO2M06(.in) -n 16 -m 5(G)\
+                    \n\t\t    pbs_server.py qchem -qj CC6 -i 6-CC-NiFe.in -n 6 -m 6 -no skylake@node14\
                     \n\t\tN.B.::\
                     \n\t\t    showall.py -s -j qchem\
                     \n\t\t    job downs in opt&slet -> specify -no skylake@node??\
@@ -58,13 +58,14 @@ qsub.qsub_server     = f"QSUB JOB\
                     \n\t\t-n --np  nproc\
                     \n\t\t-no --node specify node\
                     "
-qsub.usage          ="qsub -N jobname -v var=a_variable /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh\
+pbs.usage          ="qsub -N jobname -v var=a_variable /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh\
                     \n\t\t$var can be used as variable in the script\
                     \n\t\tscript name should be full name\
                     "
-qsub.qdel           ="qdel (from) job-ID (to) job-ID\
+pbs.qdel           ="qdel (from) job-ID (to) job-ID\
                     \n\tto kill process in master node: rt. process.prockill\
                     "
+                    
 process.prockill    ="kill (from) PID (to) PID\
                     "
 ssh.ssh_node_byproc = "\n\tssh_node_byproc.sh node index_proc num_proc[default=16]\
@@ -104,18 +105,23 @@ amp.amp_scan="amp_scan.sh\
             \n\t\tdirect run at node with scan\
             "
 # kisti  = " " makes error: 149: gkey==instance.name if not instance
-kisti.pbs_vasp_kisti_skl = "Usage:: python $sbvas/vasp_script.py args\
-                            \n\t\tSkylake for VASP\
-                            \n\t\tsetting: nnode=20, nproc=40 in 40\
+kisti.pbs_vasp_kisti_skl = "Usage:: (direct) qsub -N job(dir)name $SB/pbs_vasp_kisti_skl.sh\
+                            \n\t\t\t\t(vasp)python $(which vas_make_...py) args(-j, -d, -nd)\
+                            \n\t\t\t\t    Skylake for VASP\
+                            \n\t\t\t\t    setting: nnode=20, nproc=40 in 40\
                             " 
-kisti.pbs_vasp_kisti_skl2 = "setting: nnode=20, nproc=20 in 40 for memory overflow\
+kisti.pbs_vasp_kisti_sklopt = "Usage:: the same as pbs_vasp_kisti_skl.sh\
+                            \n\t\t\t\topt can be repeated in case it fails with error in convergence\
+                            "
+kisti.pbs_vasp_kisti_skl_2 = "Usage:: the same as pbs_vasp_kisti_skl.sh\
+                            \n\t\t\t\tsetting: nnode=20, nproc=20 in 40 for memory overflow\
                             "  
 
 kisti.pbs_vasp_kisti_knl = "setting: nnode=10, nproc=68 in 68\
-                            \n\t\tKnight for parallel process such as LAMMPS\
+                            \n\t\t\t\tKnight for parallel process such as LAMMPS\
                             "  
-kisti.pbs_vasp_kisti_knl2 = "setting: nnode=10, nproc=64 in 68\
-                            \n\t\tfor fast calculation?\
+kisti.pbs_vasp_kisti_knl_2 = "setting: nnode=10, nproc=64 in 68\
+                            \n\t\t\t\tfor fast calculation?\
                             "  
 
 
@@ -130,7 +136,7 @@ slurm.slurm_sbatch_py   ="to run python in node\
                         \n\tUse: command.py slurm -sj mldyn\
                         "
 
-classobj_dict={'SGE': sge, 'GRMX': grmx, 'AMP':amp, 'USAGE': usage, 'Qsub': qsub, 'QChem': qchem, 'Qsleep': qsleep}
+classobj_dict={'SGE': sge, 'GRMX': grmx, 'AMP':amp, 'USAGE': usage, 'PBS': pbs, 'QChem': qchem, 'Qsleep': qsleep}
 lclass_var=['QChem', 'AMP', 'Qsleep']
 #print(classobj_dict['SGE'].usage)
 
