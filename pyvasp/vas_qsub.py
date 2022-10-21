@@ -56,12 +56,10 @@ def get_queue_pt(qx=None):
         elif free_node['X2'] >= 20:
             return 2, free_node['X2']
         else:
-            return free_node
+            return 1, free_node
 
-def qsub_command(ndir, X=3, nnode=4, np=40, hmem=None):
-    if hostname == 'mlet':
-        s = f"qsub -N {ndir} -pe numa {np} -v np={np} -v dir={ndir} -v vas=gam $SB/pypbs/sge_vasp_exe.csh"
-    elif hostname == 'kisti':
+def qsub_command(ndir, X=3, nnode=4, np=None, hmem=None):
+    if hostname == 'kisti':
         nnode=20
         np=40
         if not hmem and ( re.search('bd', ndir) or re.search('band', ndir)):
@@ -73,7 +71,10 @@ def qsub_command(ndir, X=3, nnode=4, np=40, hmem=None):
         else:
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_skl.sh"
     elif hostname == 'pt':
-        nproc = nnode * nXn[X]
+        if np:
+            nproc = np
+        else:
+            nproc = nnode * nXn[X]
         if hmem:
             hproc = int(nXn[X]/2)
             s = f"sbatch -J {ndir} -p X{X} -N {nnode} -c {hproc} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"

@@ -8,10 +8,9 @@ import re
 import sys
 from common import *
 from amp_ini import ampdb
+from mod_vasp import vasf_ini, vasf_default
 
 q_list=[]
-vas_default=['CHG','CHGCAR','CONTCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR','XDATCAR']
-vas_ini=['POSCAR','KPOINTS','INCAR','POTCAR']
 
 def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, Ldefault):
 
@@ -35,13 +34,13 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
         elif work == 'qchem':
             pass
         elif work == 'vasp' or work =='nc':
-            fkeep = vas_ini[:]
+            fkeep = vasf_ini[:]
             f_list=os.listdir(pwd)
             print(f"total: {f_list}")
-            if Ldefault:    # remove only files in vas_default
+            if Ldefault:    # remove only files in vasf_default
                 matches = []
                 for f in f_list:
-                    if f in vas_default:
+                    if f in vasf_default:
                         matches.append(f)
             else:
                 if work == 'nc':

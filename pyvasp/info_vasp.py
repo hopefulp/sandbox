@@ -22,6 +22,7 @@ run     = MyClass('run')
 clean   = MyClass('clean')
 poscar  = MyClass('poscar')
 incar   = MyClass('incar')
+potcar  = MyClass('potcar')
 dosband = MyClass('dosband')
 procar  = MyClass('procar')
 ase     = MyClass('ase')
@@ -113,6 +114,8 @@ poscar.mod_poscar    ="module for POSCAR modification\
                     \n\t    : poscar is modified\
                     \n\t    : all the atoms except atom will be fixed for ZPE\
                     "
+#poscar.posd2c       = convert.posd2c                    
+poscar.posd2c       =".pl: convert direct coord to cartesian coord in POSCAR"                    
 convert.pos2cif      ="vstsscripts/[.pl] convert vasp format(POSCAR, CONTCAR) to cif to be read in MS\
                     \n\tUsage::\
                     \n\t    pos2cif.pl inputfile [outputfile]\
@@ -145,16 +148,20 @@ poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
                     \n\t    -z  True for z-sort in the atom group\
                     \n\tNB: when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
                     "
+potcar.genpotcar =  "genpotcar.py -pp pseudop\
+                    \n\tread POSCAR make POTCAR inside VASP dir\
+                    "
 
 incar.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\tOptions:\
-                    \n\t    one dir : show INCAR\
-                    \n\t    two dirs: compare two INCAR\
-                    \n\t    -k  keys: to check whether the keys exist\
-                    \n\t    -a  : search all directories as for -k keys\
+                    \n\t    -j: ['kw','diff'] kw-many files to check kw, diff- compare a few files\
+                    \n\t    -f: files/dirs for '-j diff' or [d,f,a] for '-j kw'\
+                    \n\t    -k: for keywords for '-j kw'\
                     \n\tUsage:\
-                    \n\t    incar_diff.py FPtb2H2 FPtb2H2hb\
-                    \n\t    incar_diff.py -a -k ENCUT ISTART\
+                    \n\t    incar_diff.py -j kw -f f -k ivdw\
+                    \n\t    incar_diff.py -j kw -f d -k ivdw\
+                    \n\t    incar_diff.py FPtb2H2 FPtb2H2hb --- old style\
+                    \n\t    incar_diff.py -a -k ENCUT ISTART --- old style\
                     "
 dosband.dosall      =   "perl script to decompose lm-decomposded DOSCAR"
 dosband.doslm       =   "extact ldos then plot\
@@ -175,7 +182,7 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\tUsage:\
                         \n\t    doslm.py -z 3.69 -p\
                         \n\t    doslm.py -z 3.69 -p -e f\
-                        \n\t    doslm.py -al 8 23 9 10 21 22 -als 2 4 -p\
+                        \n\t    doslm.py -al 8 23 9 10 21 22 -ash 2 4 -p\
                         \n\t(3) to plot ldos of slab w.r.t. VBM: obtain VBM in slab (1)\
                         \n\t    doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -e -1.169\
                         \n\t\tmakes ldos files as much as ash(atom shape)\
@@ -205,6 +212,8 @@ dosband.doscar_modi  =   "remove the first line of each energy loop for removing
                         \n\t\tmove original DOSCAR to DOSCAR_o\
                         \n\t\tmake a new DOSCAR with 1 line less in each block, (natom+1) less line\
                         "
+dosband.vasp_anal_dos=  "get pdos for every atoms"
+
 procar.procar       =   "To extract and draw band\
                         \n\tload PROCAR can make a memory problem\
                         "
@@ -213,13 +222,15 @@ procar.procar_byline=   "the same as procar.py\
                         "
 charge.vasp_anal    =   "(.sh) Charge analysis of Bader\
                         \n\tjobs: bader bader2(spin) convasp dos bchg end\
-                        \n\tUsage: Run out of directory\
+                        \n\tUsage: Run just above vasp directory\
                         \n\t    vasp_anal.sh bader dirname\
                         "
-charge.bader_charge =   "included in vasp_anal.sh\
+charge.charge_bader =   "included in vasp_anal.sh\
                         \n\tRead POTCAR for ZVAL\
                         \n\tRead POSCAR for atom list\
-                        \n\toutput: Bader charge in 'pcharge_bader.dat'\
+                        \n\toutput: Bader charge in 'bader_pcharge.dat'\
+                        \n\tto compare two configurations w. the same atom index\
+                        \n\t    paste adir/bader_pcharge.dat bdir/bader_pcharge.dat | awk '{print $1, $6-$3}'\
                         "
 
 ase.ase_fconvert    =""

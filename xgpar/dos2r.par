@@ -1,7 +1,7 @@
 # Grace project file
 #
 version 50125
-page size 612, 792
+page size 792, 612
 page scroll 5%
 page inout 5%
 link page off
@@ -63,7 +63,7 @@ timestamp color 1
 timestamp rot 0
 timestamp font 0
 timestamp char size 1.000000
-timestamp def "Sat Feb 19 20:05:21 2022"
+timestamp def "Tue Oct 11 21:14:39 2022"
 r0 off
 link r0 to g0
 r0 type above
@@ -110,15 +110,15 @@ g0 fixedpoint xy 0.000000, 0.000000
 g0 fixedpoint format general general
 g0 fixedpoint prec 6, 6
 with g0
-    world -7e-17, -0.5, 500, 1.5
+    world -3, 0, 1, 300
     stack world 0, 0, 0, 0
     znorm 1
-    view 0.150000, 0.295307, 0.336462, 0.992780
-    title ""
+    view 0.150000, 0.531818, 1.144118, 0.850000
+    title "LDOS: SnO2- 110 surface"
     title font 0
     title size 1.500000
     title color 1
-    subtitle ""
+    subtitle "Pristine surface"
     subtitle font 0
     subtitle size 1.000000
     subtitle color 1
@@ -133,7 +133,7 @@ with g0
     xaxis  bar color 1
     xaxis  bar linestyle 1
     xaxis  bar linewidth 1.0
-    xaxis  label ""
+    xaxis  label "E (eV)"
     xaxis  label layout para
     xaxis  label place auto
     xaxis  label char size 1.000000
@@ -141,17 +141,17 @@ with g0
     xaxis  label color 1
     xaxis  label place normal
     xaxis  tick on
-    xaxis  tick major 100
+    xaxis  tick major 1
     xaxis  tick minor ticks 1
     xaxis  tick default 6
     xaxis  tick place rounded true
     xaxis  tick in
     xaxis  tick major size 1.000000
-    xaxis  tick major color 0
+    xaxis  tick major color 1
     xaxis  tick major linewidth 1.0
     xaxis  tick major linestyle 1
     xaxis  tick major grid off
-    xaxis  tick minor color 0
+    xaxis  tick minor color 1
     xaxis  tick minor linewidth 1.0
     xaxis  tick minor linestyle 1
     xaxis  tick minor grid off
@@ -175,7 +175,7 @@ with g0
     xaxis  ticklabel char size 1.000000
     xaxis  ticklabel font 0
     xaxis  ticklabel color 1
-    xaxis  tick place normal
+    xaxis  tick place both
     xaxis  tick spec type none
     yaxis  on
     yaxis  type zero false
@@ -184,7 +184,7 @@ with g0
     yaxis  bar color 1
     yaxis  bar linestyle 1
     yaxis  bar linewidth 1.0
-    yaxis  label ""
+    yaxis  label "DOS"
     yaxis  label layout para
     yaxis  label place auto
     yaxis  label char size 1.000000
@@ -192,7 +192,7 @@ with g0
     yaxis  label color 1
     yaxis  label place normal
     yaxis  tick on
-    yaxis  tick major 0.5
+    yaxis  tick major 100
     yaxis  tick minor ticks 1
     yaxis  tick default 6
     yaxis  tick place rounded true
@@ -200,9 +200,9 @@ with g0
     yaxis  tick major size 1.000000
     yaxis  tick major color 1
     yaxis  tick major linewidth 1.0
-    yaxis  tick major linestyle 0
+    yaxis  tick major linestyle 1
     yaxis  tick major grid off
-    yaxis  tick minor color 0
+    yaxis  tick minor color 1
     yaxis  tick minor linewidth 1.0
     yaxis  tick minor linestyle 1
     yaxis  tick minor grid off
@@ -226,23 +226,23 @@ with g0
     yaxis  ticklabel char size 1.000000
     yaxis  ticklabel font 0
     yaxis  ticklabel color 1
-    yaxis  tick place normal
+    yaxis  tick place both
     yaxis  tick spec type none
     altxaxis  off
     altyaxis  off
     legend on
     legend loctype view
-    legend 0.18, 0.97
-    legend box color 0
+    legend 0.85, 0.8
+    legend box color 1
     legend box pattern 1
     legend box linewidth 1.0
     legend box linestyle 1
     legend box fill color 0
-    legend box fill pattern 0
+    legend box fill pattern 1
     legend font 0
-    legend char size 0.980000
+    legend char size 1.000000
     legend color 1
-    legend length 7
+    legend length 4
     legend vgap 1
     legend hgap 1
     legend invert false
@@ -253,150 +253,3 @@ with g0
     frame pattern 1
     frame background color 0
     frame background pattern 0
-    s0 hidden false
-    s0 type xy
-    s0 symbol 0
-    s0 symbol size 1.000000
-    s0 symbol color 1
-    s0 symbol pattern 1
-    s0 symbol fill color 1
-    s0 symbol fill pattern 0
-    s0 symbol linewidth 1.0
-    s0 symbol linestyle 1
-    s0 symbol char 65
-    s0 symbol char font 0
-    s0 symbol skip 0
-    s0 line type 1
-    s0 line linestyle 1
-    s0 line linewidth 1.0
-    s0 line color 1
-    s0 line pattern 1
-    s0 baseline type 0
-    s0 baseline off
-    s0 dropline off
-    s0 fill type 0
-    s0 fill rule 0
-    s0 fill color 1
-    s0 fill pattern 9
-    s0 avalue off
-    s0 avalue type 2
-    s0 avalue char size 1.000000
-    s0 avalue font 0
-    s0 avalue color 1
-    s0 avalue rot 0
-    s0 avalue format general
-    s0 avalue prec 3
-    s0 avalue prepend ""
-    s0 avalue append ""
-    s0 avalue offset 0.000000 , 0.000000
-    s0 errorbar on
-    s0 errorbar place both
-    s0 errorbar color 1
-    s0 errorbar pattern 1
-    s0 errorbar size 1.000000
-    s0 errorbar linewidth 1.0
-    s0 errorbar linestyle 1
-    s0 errorbar riser linewidth 1.0
-    s0 errorbar riser linestyle 1
-    s0 errorbar riser clip off
-    s0 errorbar riser clip length 0.100000
-    s0 comment "pdosa139_N6_144.dat"
-    s0 legend  "O\sB"
-    s1 hidden false
-    s1 type xy
-    s1 symbol 0
-    s1 symbol size 1.000000
-    s1 symbol color 11
-    s1 symbol pattern 1
-    s1 symbol fill color 11
-    s1 symbol fill pattern 0
-    s1 symbol linewidth 1.0
-    s1 symbol linestyle 1
-    s1 symbol char 65
-    s1 symbol char font 0
-    s1 symbol skip 0
-    s1 line type 1
-    s1 line linestyle 1
-    s1 line linewidth 1.0
-    s1 line color 11
-    s1 line pattern 1
-    s1 baseline type 0
-    s1 baseline off
-    s1 dropline off
-    s1 fill type 0
-    s1 fill rule 0
-    s1 fill color 1
-    s1 fill pattern 1
-    s1 avalue off
-    s1 avalue type 2
-    s1 avalue char size 1.000000
-    s1 avalue font 0
-    s1 avalue color 1
-    s1 avalue rot 0
-    s1 avalue format general
-    s1 avalue prec 3
-    s1 avalue prepend ""
-    s1 avalue append ""
-    s1 avalue offset 0.000000 , 0.000000
-    s1 errorbar on
-    s1 errorbar place both
-    s1 errorbar color 11
-    s1 errorbar pattern 1
-    s1 errorbar size 1.000000
-    s1 errorbar linewidth 1.0
-    s1 errorbar linestyle 1
-    s1 errorbar riser linewidth 1.0
-    s1 errorbar riser linestyle 1
-    s1 errorbar riser clip off
-    s1 errorbar riser clip length 0.100000
-    s1 comment "ldosa315_N4_318V-1.169.dat"
-    s1 legend  "OH\sB"
-    s2 hidden false
-    s2 type xy
-    s2 symbol 0
-    s2 symbol size 1.000000
-    s2 symbol color 2
-    s2 symbol pattern 1
-    s2 symbol fill color 2
-    s2 symbol fill pattern 0
-    s2 symbol linewidth 1.0
-    s2 symbol linestyle 1
-    s2 symbol char 65
-    s2 symbol char font 0
-    s2 symbol skip 0
-    s2 line type 1
-    s2 line linestyle 1
-    s2 line linewidth 1.0
-    s2 line color 2
-    s2 line pattern 1
-    s2 baseline type 0
-    s2 baseline off
-    s2 dropline off
-    s2 fill type 0
-    s2 fill rule 0
-    s2 fill color 1
-    s2 fill pattern 1
-    s2 avalue off
-    s2 avalue type 2
-    s2 avalue char size 1.000000
-    s2 avalue font 0
-    s2 avalue color 1
-    s2 avalue rot 0
-    s2 avalue format general
-    s2 avalue prec 3
-    s2 avalue prepend ""
-    s2 avalue append ""
-    s2 avalue offset 0.000000 , 0.000000
-    s2 errorbar on
-    s2 errorbar place both
-    s2 errorbar color 2
-    s2 errorbar pattern 1
-    s2 errorbar size 1.000000
-    s2 errorbar linewidth 1.0
-    s2 errorbar linestyle 1
-    s2 errorbar riser linewidth 1.0
-    s2 errorbar riser linestyle 1
-    s2 errorbar riser clip off
-    s2 errorbar riser clip length 0.100000
-    s2 comment "ldosa315_N4_318V-1.169.dat"
-    s2 legend  "OH\sT"

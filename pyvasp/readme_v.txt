@@ -284,7 +284,7 @@ ldos_int_2fermi.pl cpo27_1co2_V_dos.extg/Ldos_a25-51.dat 1.e-5 V [ads|des]
 	: makes POSCAR(c)
   con22pos.pl POSCAR(c)
 	: makes CONTCAR(d)
-    cf. direct2cart.pl
+    cf. posd2c.pl
 
 2. Extract molecule from POSCAR or CONTCAR
 2.1 based on atom index (from 0)
@@ -305,7 +305,7 @@ extract_anchor.pl poscar metal_index atom_series
 2. ./pos2cart.pl CONTCAR.6co2.dirt
         : in poscar change direct to cartesian with the same cell
         : make "CONTCAR.cart"
-        : it was "direct2cart.pl"
+        : it was "posd2c.pl"
 3. ./shift_6co2_poscart.pl CONTCAR.cart  1.5
         : $cell_expansion = 1.5 while atoms are fixed in that position in
 Cartesian format

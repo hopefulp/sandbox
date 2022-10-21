@@ -155,8 +155,11 @@ def classify_dirs(lsorted, classobj_dict_key,classobj_dict):
             print(f"    {d}")
     return luse
 
-def whereami():
-    return inspect.stack()[1][3]
+def whereami(rank=1):
+    '''
+    rank can be [0,1]
+    '''
+    return inspect.stack()[rank][3]
 
 def yes_or_no(question):
     reply = str(input(question+' (y/n): ')).lower().strip()     # raw_input is renamed in v3.6
@@ -194,19 +197,67 @@ def get_answers(question):
     return reply
 
 
-def get_files_pattern(m_type, pattern,dirname, Ldir=False):
+def get_files_pattern(m_type, pattern,dirname, Ldir=False, Linverse=False, Lparents=None):
     #print(m_type)
     Lshow = False
     if m_type == 'p':
-        f_list = get_files_prefix(pattern, dirname, Lshow, Ldir=Ldir)
+        f_list = get_files_prefix(pattern, dirname, Lshow, Ldir=Ldir, Lparents=Lparents)
     elif m_type == 's':
-        f_list = get_files_suffix(pattern, dirname, Lshow, Ldir=Ldir)
+        f_list = get_files_suffix(pattern, dirname, Lshow, Ldir=Ldir, Linverse=Linverse, Lparents=Lparents)
     elif m_type == 'm':
-        f_list = get_files_match(pattern, dirname, Lshow, Ldir=Ldir)
+        f_list = get_files_match(pattern, dirname, Lshow, Ldir=Ldir, Lparents=Lparents)
     else:
         print("No matching for file extraction")
     return f_list
 
+
+def get_files_patterns(m_type, pattern, wdir, Ldir=False, Linverse=False, Lparents=None):
+    """
+    receive list of prefix & directory
+    prefixes: list of prefix
+    Lshow   to check list inside function
+    """
+    Lshow = False
+    matched_files=[]
+    ### Codes for prefix
+    dir_files = os.listdir(wdir)
+    i=0
+    for fname in dir_files:
+        for patt in pattern:
+            if m_type == 'p':
+                if re.match(patt, fname):
+                    if Ldir or not os.path.isdir(fname):
+                        matched_files.append(fname)
+                    #print (patt, fname)
+            ### for suffix
+            elif m_type == 's':
+                if fname.endswith(patt):
+                    #if not Linverse:
+                    if Ldir or not os.path.isdir(fname):
+                        matched_files.append(fname)
+                    ### included parents and directories
+                    if Lparents:
+                        #relative_files = get_relatives_suff(fname, dir_files)
+                        fnlist = re.split('\.', fname)
+                        if os.path.isdir(fnlist[0]):
+                            rel_dir = fnlist[0]
+                            print(f"{i:02d}: relative files {rel_dir}")
+                            matched_files.append(rel_dir)
+                            i += 1
+            ### for search
+            elif m_type == 'm':
+                if re.search(patt, fname):
+                ### if it is dir skip
+                    if Ldir or not os.path.isdir(fname):
+                        matched_files.append(fname)
+            if Lshow:
+                print(f"detect {fname}") # in {match} {matches}")
+                
+            #elif Linverse:
+            #    if not os.path.isdir(fname):
+            #        matched_files.append(fname)
+    return matched_files
+                
 def get_files_type(ftype, dirname):
     matched_files=[]
     print(ftype)
@@ -339,7 +390,7 @@ def get_files_suffix_list(suffixes, flist, Lshow=False, Ldir=False):
     matched_files.extend(dirs)                
     return matched_files    
 
-def get_files_suffix(suffixes, dname, Lshow=False, Ldir=False):
+def get_files_suffix(suffixes, dname, Lshow=False, Ldir=False, Linverse=False, Lparents=False):
     """
         receive list of suffixes & directory
         suffixes : list of suffix
@@ -347,8 +398,14 @@ def get_files_suffix(suffixes, dname, Lshow=False, Ldir=False):
     matched_files=[]
     for suff in suffixes:
         for fname in os.listdir(dname):
+            ### if matched
             if fname.endswith(suff):
-                if Ldir or not os.path.isdir(fname):
+                ### if Ldir, include dir || if not dir, include
+                if not Linverse:
+                    if Ldir or not os.path.isdir(fname):
+                        matched_files.append(fname)
+            elif Linverse:
+                if not os.path.isdir(fname):
                     matched_files.append(fname)
     return matched_files                
 
