@@ -1,17 +1,26 @@
 #!/home/joonho/anaconda3/bin/python
+### written by David Park Sep. 2022
+
 import pandas as pd
 import argparse
 import re
-import os
-import matplotlib as mpl
+#import os
+#import matplotlib as mpl
 import matplotlib.pyplot as plt
-import csv
+#import csv
 import sys
 import numpy as np
+'''
+    This reads only csv format
+'''
 
-
-def plot_gibbs(fname):
-
+def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors):
+    ### check input file whether it is csv format
+    l_fname = re.split('\.', fname)
+    if l_fname[1] != 'csv':
+        print("Please input csv format")
+        sys.exit(1)
+    ### use pandas dataframe
     df = pd.read_csv(fname)
     total_rows=len(df.axes[0])#number of row
     total_cols=len(df.axes[1])#number of column
@@ -86,9 +95,16 @@ def plot_gibbs(fname):
 def main():
     parser = argparse.ArgumentParser(description='To get rid of abnormal DOS at start energy')
     parser.add_argument('inf')
+    parser.add_argument('-yi','--y_columns', default=0, type=int, narg='+', help='select y column index')
+    parser.add_argument('-xl', '--xlable', help='input x-label')
+    parser.add_argument('-yl', '--ylable', default='G [eV]', help='input x-label')
+    parser.add_argument('-l', '--legend', help='input x-label')
+    parser.add_argument('-t', '--title', help='input x-label')
+    parser.add_argument('-c', '--color', help='input x-label')
+
     args = parser.parse_args()
     
-    plot_gibbs(args.inf) 
+    plot_gibbs(args.inf, args.y_columns, args.xlabel, args.ylabel, args.legend, args.title, args.color) 
 
 if __name__ == '__main__':
     main()
