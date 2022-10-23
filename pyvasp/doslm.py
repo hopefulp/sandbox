@@ -60,7 +60,7 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel,
 
     if eshift:
         if re.search('f', eshift, re.I):
-            Eshift = 'E' + Ef
+            Eshift = 'E' + f"{Ef:5.3f}"
         else:
             Eshift = 'V' + eshift
     else:
@@ -162,7 +162,7 @@ def main():
     parser.add_argument('poscar', nargs='?', default="POSCAR", help="input POSCAR")
     parser.add_argument('-of', '--ofile', help='output filename')
     ldos = parser.add_mutually_exclusive_group()
-    ldos.add_argument('-al','--atom_list0', nargs='*', help="list atoms with num and '-', index from 0 ")
+    ldos.add_argument('-al','--atom_list0', nargs='+', default=":", help="list atoms with num and '-', index from 0 ")
     #ldos.add_argument('-al2', '--atom0_2d', type=json.loads, help='list atoms as 2D list')
     ldos.add_argument('-z', '--zintv', nargs='+', type=float, help='atoms between zmax * zmin')
     parser.add_argument('-ash', '--atom_list0_sh', nargs='*', type=int, help='input shape of atom_list0')
@@ -186,8 +186,13 @@ def main():
         if args.atom_list0_sh:
             alist0 = convert_2lst2D(args.atom_list0, args.atom_list0_sh)
         else:
-            ### convert 1D to 2D list
             alist0=[]
+            ### get atom list from DOSCAR
+            #if args.atom_list == ":":
+            #    alist0 = 
+
+            #else:
+            ### convert 1D to 2D list
             alist0.append(list(map(int, args.atom_list0)))
     else:
         if not args.zintv:

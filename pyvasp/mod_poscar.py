@@ -123,6 +123,7 @@ def get_poscar(poscar, job='new', sub=0):
         print("POSCAR will be used")
     ### if poscar is dir
     else:
+        #print(f"{__name__}: {poscar}")
         if os.path.isdir(poscar):
             if sub == 0:
                 nposcar = f'{poscar}/POSCAR'
@@ -133,8 +134,9 @@ def get_poscar(poscar, job='new', sub=0):
             nposcar = poscar
             dname = pos2dirname(poscar)
         comm = 'cp %s POSCAR' % nposcar
+        print(f"{__name__}:{whereami()}:: {comm}")
         os.system(comm)
-        print(f'POSCAR was made from {nposcar}')
+        print(f'{__name__}:{whereami()}:: POSCAR was made from {nposcar}')
     # confirm POSCAR is made        
     if not os.access('POSCAR', os.F_OK):
         print('POSCAR is not here')

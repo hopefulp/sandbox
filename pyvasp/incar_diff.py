@@ -69,7 +69,7 @@ def print_key(dic, params):
             print(f"{p.upper()} does not exist")
     return 0
 
-def compare_incar(files, key, Ldiff=False):
+def compare_incars(files, key, Ldiff=False):
     tup = get_incar_dicts(files)
     if len(tup) == 1:
         if key:
@@ -120,55 +120,73 @@ def compare_incar(files, key, Ldiff=False):
 
     return 0
    
-def show_incars(f, Lall, kws):
+def check_kw(ftype, kws):
+    ### change kws into UPPERCASE
+    kws = [ el.upper() for el in kws ]
     pwd = os.getcwd()
-    if Lall:
-        dirs = os.listdir(pwd)
+    files=[]
+    if ftype == 'a' or ftype == 'd':
+        allfiles = os.listdir(pwd)
+        dirs = [ f for f in allfiles if os.path.isdir(pwd+'/'+f) ]
         dirs.sort()
-    else:
-        dirs = f
-    #print(f"{dirs}")
-    i = 0
-    value_ini=[]
-    for d in dirs:
-        if os.path.isdir(d):
+        #print(f"{dirs}")
+        for d in dirs:
             incar = pwd + '/'+d+'/INCAR'
             if os.path.isfile(incar):
-                i += 1
-                dic = get_incar_dict(incar)
-                #print(f"{dic}")
-                print(f"{d:20}:",end='')
-                ### kws loop
-                for j, kw in enumerate(kws):
-                    if i == 1 :
-                        value_ini.append(dic[kw])
-                    if kw in dic.keys():
-                        if value_ini[j] == dic[kw]:
-                            print(f" {kw:10} {dic[kw]:>5} {'':10}", end='')
-                        else:
-                            print(f" {kw:10} {dic[kw]:>5} {'diff':<10}", end='')
-                    else:
-                        print(f" {kw:10} {'None':>5}", end='')
-                print("")
+                files.append(incar)
+    if ftype == 'a' or ftype == 'f':
+        allfiles = os.listdir(pwd)
+        incars = [ f for f in allfiles if re.match('INCAR', f) ]
+        incars.sort()
+        files.extend(incars)
+    print(f"{files}")
+    i = 0
+    #value_ini=[]
+    for f in files:
+        i += 1
+        dic = get_incar_dict(f)
+        #print(f"{dic} in {f}")
+        if re.search('/', f):
+            fs = re.split('/', f)
+            print(f"{fs[-2]:20}:",end='')
+        else:
+            print(f"{f:20}:",end='')
+        ### kws loop
+        for j, kw in enumerate(kws):
+            #if i == 1 :
+                ### this makes error if dic[kw] does not exist
+            #    value_ini.append(dic[kw])
+            if kw in dic.keys():
+                #if value_ini[j] == dic[kw]:
+                print(f" {kw:10} {dic[kw]:>5} {'':10}", end='')
+                #else:
+                #    print(f" {kw:10} {dic[kw]:>5} {'diff':<10}", end='')
+            else:
+                print(f" {kw:10} {'None':>5}", end='')
+        print("")
     return 0            
 
 def main():
 
     parser = argparse.ArgumentParser(description="Compare two INCAR")
-    parser.add_argument('files', nargs='*', help="one or two INCAR file ")
+    parser.add_argument('-j', '--job', default='diff', choices=['diff','kw'], help="show INCAR difference or show keywords")
+    parser.add_argument('-f', '--files', nargs='+',  help="fnames or symbol ['d','f','a']")
     parser.add_argument('-k', '--kws', nargs='*',  help="check the key and values ")
     parser.add_argument('-d', '--Ldiffer', action='store_true',  help="show only differences")
     parser.add_argument('-s', '--Lshow', action='store_true',  help="just show")
-    parser.add_argument('-a', '--all', action='store_true',  help="all the directories")
     args = parser.parse_args()
 
-    #if not args.files:
-    #    files=['INCAR']
-    #print(f"{args.kws}")
-    if args.all:
-        show_incars(args.files ,args.all, args.kws) 
-    else:
-        compare_incar(args.files, args.kws, args.Ldiffer)
+    file_choice=['d','f','a']
+    if args.job == 'kw':
+        if len(args.files) == 1 and args.files[0] in file_choice:
+            if not args.kws:
+                print(f"for -j kw -f [d,f,a] includes -kw kws")
+            else:
+                check_kw(args.files[0], args.kws) 
+        else:
+            print(f"for -j kw select {file_choice}")
+    elif args.job == 'diff':
+        compare_incars(args.files, args.kws, args.Ldiffer)
 
 if __name__ == "__main__":
     main()

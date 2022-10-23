@@ -88,7 +88,7 @@ def main():
     parser = argparse.ArgumentParser(description='make directory from other directory ')
     parser.add_argument('odir', help='copy from old dir')
     parser.add_argument('ndir', help='mkdir and cp')
-    parser.add_argument('-j', '--job', choices=['lda',"hybrid","md","mol"], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=['lda','hybrid','md','mol','kp'], help='inquire for each file')
     parser.add_argument('-s', '--poscar', default='p', help='p[POSCAR],c[CONTCAR],w[wdir/POSCAR],input poscar')
     parser.add_argument('-p', '--potcar', help='copy odir/potcaruse or make POTCAR')
     parser.add_argument('-i', '--incar',  help='use the same INCAR in d2d')

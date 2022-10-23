@@ -88,17 +88,23 @@ dirjob.diramp       =   "Run multiple job in amp by scanning a value in bash\
                         \n\t\t\tamp_wrapper.py -js qsub -qn \$dirname -k \$n & \
                         \n\t\t    te: run amp_wrapper.py -js qsub -j te\
                         "
-dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp\
+dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp, chmod\
                         \n\t\tOptions::\
                         \n\t\t    -[p|s|m] for matching type\
-                        \n\t\t    -rp for replacement of matching part\
+                        \n\t\t    -v  inverse the matching\
+                        \n\t\t    -st style=[ap:append, rp:replace, mo: mode\
+                        \n\t\t    -rw replacement word\
                         \n\t\t    -id to include dir in scanning dir\
+                        \n\t\t    -d  dirname for mv\
+                        \n\t\t    -ip include_parents directory for matching is 'suffix'\
                         \n\t\t    -e exception list\
                         \n\t\t    -eo default=m exception by matching or fullname\
                         \n\t\tUsage::\
-                        \n\t\t    dir_fname.py rename -p G4 -rp G2 -id              ! to rename directories\
+                        \n\t\t    dir_fname.py rename -p G4 -st rp -rw G2 -id         ! rename with full replacement\
+                        \n\t\t    dir_fname.py rename -p G4 -st ap -rw vdw -id        ! append new word after dir and fname\
                         \n\t\t    dir_fname.py rename -m sc34c -rp sc34 -id -e sc34ch ! rename dir & file with exception\
-                        \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'      ! to remove pbs files \
+                        \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'        ! to remove pbs files \
+                        \n\t\t    dir_fname.py mv -s .cont -id -d tmpcont -ip         ! to move include rootname dir\
                         "
 filejob.fline_edit  =   "Job to treat file:\
                         \n\tfind a line and substitute\
@@ -115,6 +121,7 @@ filejob.fline_part =    "extract a part from files: type=molden|band\
                         \n\t    fline_part.py BAND.dat -i 24\
                         \n\t\tto extract certain band from BAND.dat into 'BAND.idb01' only one band\
                         "                        
+filejob.fline_shebang   =   "Change shebang to make .py executable"
 filejob._extract_line   = "to extract a certain part in a file"
 filejob.f_kw        =   "gather keywords to cut part of file\
                         \n\tQ-Chem outfile, also refer to ~/dev/\

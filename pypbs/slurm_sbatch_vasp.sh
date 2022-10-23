@@ -50,8 +50,6 @@ echo "ncpu per node: $SLURM_CPUS_PER_NODE in $partname" >> $logfile
 echo "NODELIST: $nodelist"
 cd $wdir
 
-
-
 echo "npar = $npar" >> $logfile
 sed -i "s/.*NPAR.*/NPAR = $npar/" INCAR
 if [ $hmem ]; then
@@ -70,16 +68,16 @@ if [ $ucorr -eq 1 ]; then
     sed -i "s/.*LDAUJ.*/$ldauj/" INCAR
 fi
 
-if [ $partname == 'X1' ]; then
-    #mpirun -genv I_MPI_FABRICS "shm:ofa" -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
-    mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/OLD_BIN/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+vasp_dir="/TGM/Apps/VASP/OLD_BIN/5.4.4/O2/NORMAL"
+vasp_ndir="/TGM/Apps/VASP/5.4.4.pl2"
+vasp_dirv6="/TGM/Apps/VASP/bin/6.3.1"
+
+if [ $hmem ]; then
+    mpirun -np $mpiproc  ${vasp_dir}/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
 else
-    if [ $hmem ]; then
-        mpirun -np $mpiproc  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
-    else
-        mpirun -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/O2/NORMAL/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
-    fi
+    mpirun -np $SLURM_NTASKS  ${vasp_dir}/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
 fi
 date >> $logfile
 
 mv $outfile $pdir/$jobname.out
+

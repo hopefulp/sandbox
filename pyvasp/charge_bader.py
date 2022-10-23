@@ -24,7 +24,7 @@ def cal_pcharge(fname, atoms, natoms, zvals):
         atoms = tatom_list
         natoms = tnatom_list
     print(f"atoms {atoms} natoms {natoms}")
-    ofname = "pcharge_bader.dat"
+    ofname = "bader_pcharge.dat"
     
     fout=open(ofname, 'w')
     with open(fname, 'r') as f:
