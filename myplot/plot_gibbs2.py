@@ -95,16 +95,17 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors):
 def main():
     parser = argparse.ArgumentParser(description='To get rid of abnormal DOS at start energy')
     parser.add_argument('inf')
-    parser.add_argument('-yi','--y_columns', default=0, type=int, narg='+', help='select y column index')
-    parser.add_argument('-xl', '--xlable', help='input x-label')
-    parser.add_argument('-yl', '--ylable', default='G [eV]', help='input x-label')
-    parser.add_argument('-l', '--legend', help='input x-label')
-    parser.add_argument('-t', '--title', help='input x-label')
-    parser.add_argument('-c', '--color', help='input x-label')
+    gplot = parser.add_argument_group(title='plot')
+    gplot.add_argument('-yi','--y_columns', default=0, type=int, nargs='+', help='select y column index')
+    gplot.add_argument('-xl', '--xlabel', help='input x-label')
+    gplot.add_argument('-yl', '--ylabel', default='G [eV]', help='input x-label')
+    gplot.add_argument('-l', '--legends', help='input x-label')
+    gplot.add_argument('-t', '--title', help='input x-label')
+    gplot.add_argument('-c', '--color', help='input x-label')
 
     args = parser.parse_args()
     
-    plot_gibbs(args.inf, args.y_columns, args.xlabel, args.ylabel, args.legend, args.title, args.color) 
+    plot_gibbs(args.inf, args.y_columns, args.xlabel, args.ylabel, args.legends, args.title, args.color) 
 
 if __name__ == '__main__':
     main()
