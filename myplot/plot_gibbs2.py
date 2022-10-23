@@ -54,24 +54,20 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors):
             ene.append()
     '''
 
-
     ### matplotlib 
     fig = plt.figure()
     ax = fig.add_subplot()
-
-    plt.ylabel('E (eV)',rotation=0, labelpad=18)
+    if ylabel:
+        plt.ylabel(ylabel,rotation=90, labelpad=18)
+    else:
+        plt.ylabel('G [eV]' ,rotation=90, labelpad=18)
     varnum=total_rows
 
-
-
-
-
-
-#data line
+    #data line
     for i in range(varnum):
         for j in range((total_cols-1)*i,(total_cols-1)*i+(total_cols-1)):
             plt.plot([i*2 ,i*2+1], [colindexes[j],colindexes[j]],color='k')
-#connection line
+    #connection line
     for i in range(varnum-1):#0~9
         for j in range(total_cols-1):#4
             plt.plot([i*2+1,i*2+2],[colindexes[(total_cols-1)*i+j],colindexes[((total_cols-1)*(i+1))+j]],color='k',linestyle='--',linewidth=0.5)
@@ -84,11 +80,6 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors):
     ax.set_xticks(xx)
     ax.set_xticklabels(rowindexes, fontsize=8)
         
-        
-
-
-
-
     plt.show()
     return 0
 
