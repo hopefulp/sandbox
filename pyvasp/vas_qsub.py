@@ -9,12 +9,12 @@ import subprocess
 from common import yes_or_no
 hostname = get_hostname()
 
-def run_vasp(dirname, qx, qN, np, hmem=None):
+def run_vasp(dirname, qx, qN, np, issue=None):
     #print(f'qx {qx} and qN {qN} in run_vasp()')
     if get_hostname()=='pt' and ( not qx or not qN):
         qx, qN = get_queue_pt(qx=qx)
 
-    s = qsub_command(dirname,X=qx,nnode=qN,np=np, hmem=hmem)
+    s = qsub_command(dirname,X=qx,nnode=qN,np=np, issue=issue)
     print(s)
     if yes_or_no("Will you run"):
         os.system(s)
@@ -58,16 +58,18 @@ def get_queue_pt(qx=None):
         else:
             return 1, free_node
 
-def qsub_command(ndir, X=3, nnode=4, np=None, hmem=None):
+def qsub_command(ndir, X=3, nnode=4, np=None, issue=None):
     if hostname == 'kisti':
         nnode=20
         np=40
-        if not hmem and ( re.search('bd', ndir) or re.search('band', ndir)):
-                print("Use -m for half nproc for memory problem")
-        if hmem:
+        if issue != 'mem' and ( re.search('bd', ndir) or re.search('band', ndir)):
+            print("Use -m for half nproc for memory problem")
+        if issue == 'mem':
             hproc = int(np/2)
             ### due to memory prob for band calculation of large sc, use hmem = np/2
             s = f"qsub -N {ndir} -l select={nnode}:ncpus={np}:mpiprocs={hproc}:ompthreads=1  $SB/pypbs/pbs_vasp_kisti_skl.sh"
+        elif issue == 'opt':
+            s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
         else:
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_skl.sh"
     elif hostname == 'pt':
@@ -75,7 +77,7 @@ def qsub_command(ndir, X=3, nnode=4, np=None, hmem=None):
             nproc = np
         else:
             nproc = nnode * nXn[X]
-        if hmem:
+        if issue == 'mem':
             hproc = int(nXn[X]/2)
             s = f"sbatch -J {ndir} -p X{X} -N {nnode} -c {hproc} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
         else:

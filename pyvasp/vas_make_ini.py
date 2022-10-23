@@ -55,7 +55,7 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepared, dirname, iofile, atoms, Lrun,Lmkdir,qx,qN,qn):
+def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepared, dirname, iofile, atoms, issue, Lrun,Lmkdir,qx,qN,qn):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -184,7 +184,7 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     ### run ? : first determin qx then qN
     if get_hostname()=='pt' and (not qx or not qN):
         qx, qN = get_queue_pt(qx=qx)
-    s = qsub_command(dirname,X=qx,nnode=qN,np=qn)
+    s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue)
     print(f"{s}")
     if Lrun or yes_or_no("Will you run ?"):
         os.system(s)
@@ -204,13 +204,14 @@ def main():
     parser.add_argument('-al', '--all', action='store_true', help="prepared in job dir if not -s, -p, -k, -i")
     parser.add_argument('-r', '--run', action='store_true', help="submit job")
     parser.add_argument('-rd', '--mkdir', action='store_true', help="submit job")
+    parser.add_argument('-err', '--error', choices=['opt','mem'], help="vasp error: converge, memory issue")
     g_queue = parser.add_argument_group(title='QUEUE')
     g_queue.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
     g_queue.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
     g_queue.add_argument('-n', '-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
     args = parser.parse_args()
 
-    make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, args.incar, args.all, args.dname, args.iofile, args.atoms, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc)
+    make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc)
     return 0
 
 if __name__ == '__main__':
