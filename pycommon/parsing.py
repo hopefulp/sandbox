@@ -25,7 +25,10 @@ def convert_2lst2D(li, lshape):
             ### if not tmplost get from li
             if not tmplst and li:
                 list_ele = li.pop(0)   # --> error when lack of li elements
-                if '-' in list_ele:
+                ### if -1, save -1 for Tdos: modified for '-1' of Tdos
+                if list_ele == '-1':
+                    tmplst=[-1]
+                elif '-' in list_ele:
                     ele = list(map(int, re.split('-', list_ele)))
                     tmplst = list(range(ele[0], ele[1]+1))
                 elif list_ele.isdigit():

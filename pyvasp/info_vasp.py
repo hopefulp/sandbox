@@ -170,10 +170,7 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\t\t-z zmin [zmax]  to include atoms inbetween zmin ~ zmax\
                         \n\t\t    if only zmin, zmin-=dz, zmax+=dz\
                         \n\t\t-al atom list index start from 0 from ase gui\
-                        \n\t\t-ash atom list shape\
-                        \n\t\t    len(atomlist) == sum(atomlist_shape)\
-                        \n\t\t-ash atom list shape\
-                        \n\t\t    len(atomlist) == sum(atomlist_shape)\
+                        \n\t\t    -1 for Tdos, such as -1, 0, 3-9 w. -ash 1 4 4\
                         \n\t\t-ash atom list shape\
                         \n\t\t    len(atomlist) == sum(atomlist_shape)\
                         \n\t    -e [f|float_value]: f for Fermi level, value for VBM shift\
@@ -181,8 +178,9 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\t\tcalls myplot2D.mplot_nvector\
                         \n\tUsage:\
                         \n\t    doslm.py -z 3.69 -p\
-                        \n\t    doslm.py -z 3.69 -p -e f\
+                        \n\t    doslm.py -z 3.69 -p -eV-2.33 for VBM\
                         \n\t    doslm.py -al 8 23 9 10 21 22 -ash 2 4 -p\
+                        \n\t    doslm.py -al -1 10-19 -ash 1 10 -eF\
                         \n\t(3) to plot ldos of slab w.r.t. VBM: obtain VBM in slab (1)\
                         \n\t    doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -e -1.169\
                         \n\t\tmakes ldos files as much as ash(atom shape)\
