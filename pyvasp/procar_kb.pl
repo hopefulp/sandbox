@@ -3,28 +3,30 @@
 # energy overlap between $atom1 $atom1l orbital and $atom2 $atom2l orbital
 # energy is given by center and delta E or Emin and Emax
 
-use lib '/qcfs/joonho/modules';
+use lib '/home/joonho/sandbox/perl_mod';
 use VaspDos;
 
-if($#ARGV<0){
-    print "Usage :: $0 d=[dir] [e=]-2.5[:E_max] \"atom list 3 9 etc\" \n";
+if($#ARGV<0 || $ARGV[0] eq "h"){
+    print "Usage :: $0 [d=dir] [e=]-2.5[:E_max] \"atom list 3 9 etc\" \n";
+    print "Note: atom list starts from 1\n";
+    print "Use energy without Fermi energy correction\n";
     exit(0);
 }
 
-$chg_crit=0.015;
+$chg_crit=0.001;
 $switch_density="ldos";		# ldos for atom, pdos for angular momentum
 $fin="PROCAR";
 
-### analyze the second argument of energy for scanning energy region
+### if there is "d=", it is directory
 if($ARGV[0] =~ /^d/){
     $dir=$ARGV[0];
     shift @ARGV;
     @d=split(/=/,$dir);
     $fin="$d[1]/PROCAR";
 }
-
 print "fin = $fin\n";
 
+### obtain energy interval by "e="
 $str_energy=$ARGV[0];
 if($str_energy =~ /=/ ){
     @e=split(/=/,$str_energy);
@@ -73,13 +75,13 @@ if( 0 <= $#atoms ){
 #####                   for partial density of atom, less than 0.01
 #@density=qw(0. 0. 0. 0. 0. 0. 0. 0. 0.01 0. 0. 0. 0.01  ); 	# 0.02 0.02 ; 0.002 0.002 ;	0.003 0.003 
 ###########  1    2    3    4    5    6    7    8    9   10   11   12     49
-@density=qw(0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0 0.0  0.0 0.015    0.015  ); 	# 0.02 0.02 ; 0.002 0.002 ;	0.003 0.003 
+#@density=qw(0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0 0.0  0.0 0.015    0.015  ); 	# 0.02 0.02 ; 0.002 0.002 ;	0.003 0.003 
 
 #@density=qw(0.01 0.01 ); 	# 0.02 0.02 ; 0.002 0.002 ;	0.003 0.003 
 $density_ldos=0.01;    # check 1
 $density_pdos=0.01;
 $density_limit=$density_ldos;
-if(! defined(@density)){
+if(! @density){
     @density=();
     for($i=0;$i<=$#atoms;$i++){
 	push(@density, $density_limit);
@@ -200,70 +202,74 @@ while($line=<IN>){
 #	}
 #   }
 #   next;
-
+    ### In KB-loop, if atom index == selected atom
     for($j=0;$j<=$#atoms;$j++){
     	if($line[0] == $atoms[$j]){
-##   	    if(defined(@atoms_l) and $ncheck_energy==1){	($nc,$nd)=&VaspDos::lm_quantum($atoms_l[$j]);}
+##   	    if(@atoms_l and $ncheck_energy==1){	($nc,$nd)=&VaspDos::lm_quantum($atoms_l[$j]);}
 	    # make column list for add as for each atom
 	    @column_list=();
-   	    if(defined(@atoms_l)){	@column_list=&VaspDos::lm_quantum($atoms_l[$j],$m,1); }
+   	    if(@atoms_l){	@column_list=&VaspDos::lm_quantum($atoms_l[$j],$m,1); }
 	    else{push(@column_list,9);} # this include only orbitals by "shift(@list); in sub sum()"
 	    $nc=$column_list[0]; $nd=$column_list[$#column_list]; # column list should be consecutive
 	    #print "$j\t$atoms_l[$j]\t$nc\t$nd\n";
 	    if($switch_density eq "ldos"){
 	        $ldos[$j]=$line[10];	# last (11-th) column is sum of all the other columns 
-	 	$dos[$j]=$ldos[$j];
+	 	    $dos[$j]=$ldos[$j];
 	    }else{
 	    	$pdos[$j]=&sum($nc,$nd,@line);
-		$dos[$j]=$pdos[$j];
+		    $dos[$j]=$pdos[$j];
 	    }
 	    #print join("  ",@column_list),"\n";
 	    #print "index: ",$nc,"\t",$nd,"\n";
+        ### to check ldos
+        #$iatom = $j+1;
+        #print "$band: $iatom atom: ldos $ldos[$j]\n";
     	}
     }
     #### Have read one (k,band) set of atoms
     if($line[0] == $tot_atoms){
 #    	print  $energy,"\t", $kpoint,"\t",$band,"\t",join("  ",@pdos),"\t", join("  ",@ldos),"\n";
-	$tag_density="ON";
-	for($j=0;$j<=$#atoms;$j++){
-	    if($dos[$j] < $density[$j]){ $tag_density="OFF"; last;}
-	}
-	if($tag_density eq "ON"){
-    	    print  "$energy\t$kpoint\t$band\t";
-	    for($j=0;$j<=$#atoms;$j++){ print "$dos[$j]\t"; 	}
-	    print "\n";
-	    push @{ $kb_dos[$n_kb]}, @dos; 
-	    $n_kb++;
-	}
+	    $tag_density="ON";
+        for($j=0;$j<=$#atoms;$j++){
+            if($dos[$j] < $density[$j]){ $tag_density="OFF"; last;}
+        }
+        if($tag_density eq "ON"){
+            ### print one line for k,b set with dos of each atom
+            print  "$energy\t$kpoint\t$band\t";
+            for($j=0;$j<=$#atoms;$j++){ print "$dos[$j]\t"; 	}
+                print "\n";
+                push @{ $kb_dos[$n_kb]}, @dos; 
+                $n_kb++;
+        }
     }
   
 } continue {
     $i++;
     ### whenever $tag turns ON $iatom is increased
     if($tag eq "ON"){
-	$iatom++;
+	    $iatom++;
     }
     ### increase the number of skip
     if($skip_tag eq "ON"){
-	$nskip++;
-	### skip is over : turn off $skip_tag
-	if($nskip >= $max_skip){
-	    $skip_tag="OFF";
-	}
+	    $nskip++;
+        ### skip is over : turn off $skip_tag
+        if($nskip >= $max_skip){
+            $skip_tag="OFF";
+        }
     }
 }
 close(IN);
 
-### output summation
+### print sum of all the dos for atom == sum of ldos of the atom
 @kbsum_dos=();
 for($i=0;$i<$n_kb;$i++){
 #    print join("  ",@{ $kb_dos[$i]} ),"\n";
     for($j=0;$j<=$#atoms;$j++){
-	$kbsum_dos[$j]+=$kb_dos[$i][$j];
+	    $kbsum_dos[$j]+=$kb_dos[$i][$j];
     }
 }
 
-print "\t\t\t     ";
+print "Sum\t\t\t     ";
 for($i=0;$i<=$#atoms;$i++){
     printf "%8.3f",$kbsum_dos[$i]*$weight;
 }

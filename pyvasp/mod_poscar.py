@@ -10,6 +10,7 @@ def get_ntatom(st):
     ntotal = sum(natom_list)
     return ntotal, natom_list
 
+### read_poscar was changed into parse_poscar
 def parse_poscar(pos, opt):
     '''
     extract lattice vectors, pre-part, atom_list, coordinates

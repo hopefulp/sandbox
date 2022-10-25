@@ -1,6 +1,7 @@
 #!/home/joonho/anaconda3/bin/python
 '''
     made by J. Park 2022.01.03 runs for POSCAR, KPOINTS, PROCAR
+    To get PLDOS?
 '''
 import argparse
 import os
@@ -8,7 +9,7 @@ import re
 import sys
 import numpy as np
 from common         import dir_files
-from mod_poscar     import read_poscar, obtain_atomlist
+from mod_poscar     import parse_poscar, obtain_atomlist0
 from mod_kpoints    import read_kpoints
 '''
 def get_iatoms_in_group(zmin, zmax, coord, job):
@@ -77,8 +78,8 @@ def cal_kspacing(paxes2d):
 
 def analyze_procar(atom_list, poscar, kpoints, procar):
 
-    ### make kpoints distance
-    p_axes = read_poscar('paxes', poscar)
+    ### make kpoints distance, get principle axies
+    p_axes = parse_poscar(poscar, 'paxes')
     ##  For the given paths: S - X - G - Y - S: y-dir, x-dir, y-dir, x-dir
     npoints, nkline, spacing = cal_kspacing(p_axes)
     print(f"npoints {npoints}, nkline {nkline}, spacing {spacing}") # check cal_kspacing
@@ -128,7 +129,7 @@ def analyze_procar(atom_list, poscar, kpoints, procar):
 
 def main():
 
-    parser = argparse.ArgumentParser(description="display Usage for /mymplot  ")
+    parser = argparse.ArgumentParser(description="to plot PLDOS?  ")
     parser.add_argument('procar', nargs='?', default="PROCAR", help="input PROCAR")
     parser.add_argument('poscar', nargs='?', default="POSCAR", help="input POSCAR")
     parser.add_argument('kpoints', nargs='?', default="KPOINTS", help="input KPOINTS file for band")

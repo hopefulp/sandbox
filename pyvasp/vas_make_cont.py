@@ -10,8 +10,13 @@ from mod_incar import modify_incar
 from mod_poscar    import fixedMD_POSCAR, pos2dirname, get_poscar
 import sys
 from envvasp import get_hostname
-from vas_qsub import run_vasp
+from vas_qsub import qsub_command
 
+chg_poscar=['ini','cont']
+chg_kpoints=['dos','band']
+chg_incar=['sp','opt','copt','vdw','chg','chgw','dos','pchg','band','kisti']
+chg_potcar=['lda','gga']
+chg_link=['dos','band','pchg']
 
 def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
     ### if incar_opt='u..', just use it
@@ -70,7 +75,7 @@ def make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_list):
 
 ### O: Use this to comtain all the jobs
 ###                 1     2      3       4     5      6       7            8        9      10    11    12     13   14
-def vasp_jobs(job, vgroup, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_list, Lrun, newdir, np, xpart, nnode, hmem):
+def vasp_jobs(job, vgroup, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_list, Lrun, newdir, issue, np, xpart, nnode):
     pwd = os.getcwd()
 
     for odir in dirs:
@@ -79,28 +84,35 @@ def vasp_jobs(job, vgroup, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_
         else:
             ndir = newdir
         com=[]
-        if os.path.isdir(ndir):
-            print(f"{ndir} for {odir} exists")
-            continue
         ### 0: make a new dir
-        com.append(f'mkdir {ndir}')
+        if os.path.isdir(ndir):
+            print(f"{ndir} for {odir} exists: exits")
+            sys.exit(1)
+        else:
+            os.system(f'mkdir {ndir}')
         ### 1: POSCAR
         ### zpe: modify POSCAR
         if job == 'zpe':
             fixedMD_POSCAR(f"{odir}/CONTCAR", fixatom)
             print(f"{odir}/CONTCAR was modified to POSCAR")
             poscar = 'POSCAR'
-        ### else: just copy CONTCAR
+        ### else: just copy CONTCAR for continuous job
         else:
             poscar = odir + '/CONTCAR'
-            print(f"{odir}/CONTCAR will be copied")
-        com.append(f'cp {poscar} {ndir}/POSCAR')
+            if os.path.isfile(poscar):
+                print(f"{odir}/CONTCAR will be copied")
+            else:
+                print(f"{poscar} does not exists: exit")
+        os.system(f'cp {poscar} {ndir}/POSCAR')
         ### 2: POTCAR
         potcar = odir + '/POTCAR'
-        com.append(f'cp {potcar} {ndir}/POTCAR')
+        os.system(f'cp {potcar} {ndir}/POTCAR')
         print(f"{potcar} was copied")
         ### 3: KPOINTS
-        if vgroup == 1 or vgroup == 2:
+        if not job in chg_kpoints:
+            kpoints = f'{odir}/KPOINTS'
+        else:
+        #if vgroup == 1 or vgroup == 2:
             if kopt:
                 ### if kpoints file
                 kfname = kopt
@@ -111,8 +123,8 @@ def vasp_jobs(job, vgroup, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_
                 elif os.path.isfile(kfsuff):
                     kpoints = kfsuff
         ### use -j job
-        elif vgroup == 3:
-            if job == 'zpe' or job == 'wav':
+        #elif vgroup == 3:
+            elif job == 'zpe' or job == 'wav':
                 kpoints = odir + '/KPOINTS'
             elif os.path.isfile(f'KPOINTS.{job}'):
                 kpoints = 'KPOINTS.'+job
@@ -120,31 +132,47 @@ def vasp_jobs(job, vgroup, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_
                 kpoints = 'KPOINTS'
             else:
                 kpoints = odir + "/KPOINTS"
-        com.append(f'cp {kpoints} {ndir}/KPOINTS')
+        os.system(f'cp {kpoints} {ndir}/KPOINTS')
         print(f"{kpoints} was used")
         ### 4: INCAR
         #if (not ikw_opt or ikw_opt== 'm') and os.path.isfile(f"{odir}/INCAR"):
         #    incar = modify_incar(f"{odir}/INCAR", job)
-        incar = make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_list)
-        st = f"cp {incar} {ndir}/INCAR"
-        com.append(st)
+        incarjob = f"INCAR.{job}"
+        if os.path.isfile(incarjob):
+            st = f"cp {incarjob} {ndir}/INCAR"
+            print(f'{incarjob} was copied to {ndir}')
+        else:
+            incar = make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_list)
+            st = f"cp {incar} {ndir}/INCAR"
+        os.system(st)
+
+        ### make link for CHGCAR, WAVECAR
+        if job in chg_link:
+            os.chdir(ndir)
+            if os.path.isfile(f'../{odir}/CHGCAR'):
+                s = f"ln -s ../{odir}/CHGCAR ."
+                os.system(s)
+                print(f"CHGCAR is linked to {ndir}")
+            else:
+                print(f"there is no {ochgcar} for {job}")
+                sys.exit(5) # exit number is file index 5 for CHGCAR, 6 for WAVECAR
+            if job == 'pchg':
+                if os.path.isfile(f'../{odir}/WAVECAR'):
+                    s = f"ln -s ../{odir}/WAVECAR ."
+                    os.system(s)
+                    print(f"WAVECAR is linked to {ndir}")
+                else:
+                    print(f"there is no {owavecar} for {job}")
+                    sys.exit(6)
+            os.chdir(pwd)
 
         ### make directory and copy
         for st in com:
             print(f"{st}")
             os.system(st)
 
-        ### 5: More Extra files
-        if job == 'band' or job == 'dos':
-            os.chdir(ndir)
-            s = f"ln -s ../{odir}/CHGCAR ."
-            os.system(s)
-            #s = f"ln -s ../{odir}/WAVECAR ."
-            #os.system(s)
-            print(f"CHGCAR is linked to {ndir}")
-            os.chdir(pwd)
         ### qsub depends on server
-        run_vasp(ndir, xpart, nnode, np, hmem)
+        qsub_command(ndir, X=xpart, nnode=nnode, np=np, issue=issue)
     return 0
 
 ### 1. INCAR and more files need to be modified
@@ -320,7 +348,7 @@ def vasp_job_ini(job, dirs, poscar, newdir, Loptkp, Lrun, np, xpart, nnode, hmem
 
 def main():
     parser = argparse.ArgumentParser(description='remove files except initial files')
-    parser.add_argument('-j', '--job', choices=['sp','incar',"dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
+    parser.add_argument('-j', '--job', choices=['sp','incar',"dos","band","pchg","chg","chgw","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
     dgroup = parser.add_mutually_exclusive_group()
     dgroup.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
     dgroup.add_argument('-p', '--prefix', help='select directories using prefix')
@@ -338,11 +366,11 @@ def main():
     #parser.add_argument('-k', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
     parser.add_argument('-s', '--poscar', help='incar POSCAR.name for job==ini')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
+    parser.add_argument('-err', '--error', choices=['opt','mem','sim'], help="vasp error: converge, memory issue, sim for not to change INCAR")
     qsub = parser.add_argument_group(title='qsub')
     qsub.add_argument('-x', '--partition', type=int,  help='partition number in qsub')
     qsub.add_argument('-N', '--nnode',     type=int,  help='number of nodes in qsub')
     qsub.add_argument('-n', '--nproc',      help='nprocess in qsub')
-    qsub.add_argument('-m', '--hmem', action='store_true', help='in case large supercell, use half of memory')
     args = parser.parse_args()
 
 
@@ -370,17 +398,17 @@ def main():
         print("Usage:: input old job dirs: -d ")
         sys.exit(1)
 
+    ### now other functions are being deprecated
     if args.job in vgroup1:
         vgroup=1
-        vasp_job_ini( args.job, dirs, args.poscar, args.newdir, args.kopt, args.run, args.nproc,  args.partition, args.nnode, args.hmem)
+        #vasp_job_ini( args.job, dirs, args.poscar, args.newdir, args.kopt, args.run, args.nproc,  args.partition, args.nnode, args.hmem)
     elif args.job in vgroup2:
         vgroup=2
-        vasp_job_incar(args.job, dirs, args.fixed_atom, args.incar, ikw_option, args.run, args.newdir,args.incar_kws, args.incar_list,args.nproc,  args.partition, args.nnode, args.hmem)
+        #vasp_job_incar(args.job, dirs, args.fixed_atom, args.incar, ikw_option, args.run, args.newdir,args.incar_kws, args.incar_list,args.nproc,  args.partition, args.nnode, args.hmem)
     else:
         vgroup=3
         #vasp_jobs_more(args.job, dirs, args.fixed_atom, args.kopt, args.incar, ikw_option, args.incar_kws, args.incar_list, args.run,args.newdir, args.nproc, args.partition, args.nnode, args.hmem )
-        vasp_jobs(args.job, vgroup, dirs, args.fixed_atom, args.kopt, args.incar, ikw_option, args.incar_kws, args.incar_list, args.run,args.newdir, args.nproc, args.partition, args.nnode, args.hmem )
-    return 0
+    vasp_jobs(args.job, vgroup, dirs, args.fixed_atom, args.kopt, args.incar, ikw_option, args.incar_kws, args.incar_list, args.run,args.newdir,args.error, args.nproc, args.partition, args.nnode)
 
     return 0
 

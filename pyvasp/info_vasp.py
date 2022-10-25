@@ -114,7 +114,9 @@ poscar.mod_poscar    ="module for POSCAR modification\
                     \n\t    : poscar is modified\
                     \n\t    : all the atoms except atom will be fixed for ZPE\
                     "
-#poscar.posd2c       = convert.posd2c                    
+poscar.pos_lattice  ="[.pl] input POSCAR\
+                    \n\t\treturns lattice volume, constants, angles\
+                    "
 poscar.posd2c       =".pl: convert direct coord to cartesian coord in POSCAR"                    
 convert.pos2cif      ="vstsscripts/[.pl] convert vasp format(POSCAR, CONTCAR) to cif to be read in MS\
                     \n\tUsage::\
@@ -212,11 +214,28 @@ dosband.doscar_modi  =   "remove the first line of each energy loop for removing
                         "
 dosband.vasp_anal_dos=  "get pdos for every atoms"
 
+procar.procar_kb    =   "[procar_kb.pl] renamed from 'get_Procar.pl'\
+                        \n\t\tTo extract k,b sets for the related peak in dos plot\
+                        \n\t\tcontrol inside script:\
+                        \n\t\t    ldos or pdos\
+                        \n\t\t    dos amplitude criteria for each dos and pldos\
+                        \n\t\tinput: energy range <- find energy in LDOS of the atom\
+                        \n\t\tUsage:\
+                        \n\t\t    procar_kb.pl [d=dirname] [e=]E1[:Emax] \"atom indices\"\
+                        \n\t\t\td=dirname: optional\
+                        \n\t\t\tE1: center of DOS\
+                        \n\t\t\tEmin:Emax for energy range\
+                        \n\t\t\t\'indices': atom index which starts from 1\
+                        \n\t\tE.g.:\
+                        \n\t\t    get_Procar.pl e=-6:-5 '3 58'\
+                        "
+procar.get_procar   =   "[.pl] similar to procar_kb.pl"
+procar.get_procar_kband = "[.pl] similar to get_procar.pl"
 procar.procar       =   "To extract and draw band\
-                        \n\tload PROCAR can make a memory problem\
+                        \n\t\t'to load PROCAR' can make a memory problem\
                         "
 procar.procar_byline=   "the same as procar.py\
-                        \n\tread by line and calculate to save memory\
+                        \n\t\tread by line and calculate to save memory for what?\
                         "
 charge.vasp_anal    =   "(.sh) Charge analysis of Bader\
                         \n\tjobs: bader bader2(spin) convasp dos bchg end\
