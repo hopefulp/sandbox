@@ -5,6 +5,8 @@ import os
 import re
 import sys
 import json
+import subprocess
+from subprocess import Popen, PIPE, STDOUT
 from common import get_dirs_prefix, yes_or_no, list2dict
 from mod_incar import modify_incar
 from mod_poscar    import fixedMD_POSCAR, pos2dirname, get_poscar
@@ -12,11 +14,11 @@ import sys
 from envvasp import get_hostname
 from vas_qsub import qsub_command
 
-chg_poscar=['ini','cont']
-chg_kpoints=['dos','band']
-chg_incar=['sp','opt','copt','vdw','chg','chgw','dos','pchg','band','kisti']
-chg_potcar=['lda','gga']
-chg_link=['dos','band','pchg']
+jg_poscar=['ini', 'zpe']      # ini uses, zpe modifies, others use CONTCAR
+jg_kpoints=['dos','band']
+jg_incar=['sp','opt','copt','vdw','chg','chgw','dos','pchg','band','kisti']
+jg_potcar=['lda','gga']
+jg_link=['dos','band','pchg']
 
 def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
     ### if incar_opt='u..', just use it
@@ -85,31 +87,44 @@ def vasp_jobs(job, vgroup, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_
             ndir = newdir
         com=[]
         ### 0: make a new dir
-        if os.path.isdir(ndir):
-            print(f"{ndir} for {odir} exists: exits")
+        #if os.path.isdir(ndir):
+        #    print(f"{ndir} for {odir} exists: exits")
+        #    sys.exit(1)
+        #else:
+        #    os.system(f'mkdir {ndir}')
+        try: 
+            subprocess.call(['mkdir', f'{ndir}'])     # str f'mkdir {ndir}' is not wokring
+            print(f'{ndir} was made')
+        except:
+            print(f"can't make {ndir}")
             sys.exit(1)
-        else:
-            os.system(f'mkdir {ndir}')
         ### 1: POSCAR
-        ### zpe: modify POSCAR
-        if job == 'zpe':
-            fixedMD_POSCAR(f"{odir}/CONTCAR", fixatom)
-            print(f"{odir}/CONTCAR was modified to POSCAR")
-            poscar = 'POSCAR'
-        ### else: just copy CONTCAR for continuous job
+        if job in jg_poscar:
+            ### zpe: modify POSCAR
+            if job == 'zpe':
+                fixedMD_POSCAR(f"{odir}/CONTCAR", fixatom)
+                print(f"{odir}/CONTCAR was modified to POSCAR")
+                poscar = f'{pwd}/POSCAR'
+            ### job == 'ini'
+            else: 
+                poscar = f'{odir}/POSCAR'
+        ### other job uses CONTCAR
         else:
-            poscar = odir + '/CONTCAR'
-            if os.path.isfile(poscar):
-                print(f"{odir}/CONTCAR will be copied")
-            else:
-                print(f"{poscar} does not exists: exit")
+            poscar = f'{odir}/CONTCAR'
         os.system(f'cp {poscar} {ndir}/POSCAR')
+        print(f"{poscar} was copied to {ndir}/POSCAR")
+
         ### 2: POTCAR
-        potcar = odir + '/POTCAR'
-        os.system(f'cp {potcar} {ndir}/POTCAR')
-        print(f"{potcar} was copied")
+        if not job in jg_potcar:
+            potcar = f'{odir}/POTCAR'
+        else:
+            # under construction
+            pass
+        os.system(f'cp {potcar} {ndir}')
+        print(f"{potcar} was copied to {ndir}")
+
         ### 3: KPOINTS
-        if not job in chg_kpoints:
+        if not job in jg_kpoints:
             kpoints = f'{odir}/KPOINTS'
         else:
         #if vgroup == 1 or vgroup == 2:
@@ -133,21 +148,23 @@ def vasp_jobs(job, vgroup, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_
             else:
                 kpoints = odir + "/KPOINTS"
         os.system(f'cp {kpoints} {ndir}/KPOINTS')
-        print(f"{kpoints} was used")
+        print(f"{kpoints} was copied to {ndir}/KPOINTS")
+
         ### 4: INCAR
         #if (not ikw_opt or ikw_opt== 'm') and os.path.isfile(f"{odir}/INCAR"):
         #    incar = modify_incar(f"{odir}/INCAR", job)
-        incarjob = f"INCAR.{job}"
-        if os.path.isfile(incarjob):
-            st = f"cp {incarjob} {ndir}/INCAR"
-            print(f'{incarjob} was copied to {ndir}')
+        if not job in jg_incar:
+            incar = f"{odir}/INCAR"
         else:
-            incar = make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_list)
-            st = f"cp {incar} {ndir}/INCAR"
-        os.system(st)
+            if os.path.isfile(f"INCAR.{job}"):
+                incar = f"INCAR.{job}"
+            else:
+                incar = make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_list)
+        os.system(f"cp {incar} {ndir}/INCAR")
+        print(f"{incar} was copied to {ndir}/INCAR")
 
-        ### make link for CHGCAR, WAVECAR
-        if job in chg_link:
+        ### 5: Link: 5: Link: 5: Link: 5: Link: 5: Link: make link for CHGCAR, WAVECAR
+        if job in jg_link:
             os.chdir(ndir)
             if os.path.isfile(f'../{odir}/CHGCAR'):
                 s = f"ln -s ../{odir}/CHGCAR ."
@@ -166,12 +183,7 @@ def vasp_jobs(job, vgroup, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_
                     sys.exit(6)
             os.chdir(pwd)
 
-        ### make directory and copy
-        for st in com:
-            print(f"{st}")
-            os.system(st)
-
-        ### qsub depends on server
+        ### 6: Job submit: qsub
         qsub_command(ndir, X=xpart, nnode=nnode, np=np, issue=issue)
     return 0
 

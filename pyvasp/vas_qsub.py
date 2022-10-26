@@ -89,13 +89,13 @@ def qsub_command(ndir, X=3, nnode=4, np=None, issue=None):
             s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
         else:
             s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
-        print(s)
-        if yes_or_no("Will you run"):
-            os.system(s)
     else:
         print(f"No qsub command for {hostname}")
         s=''
-        #sys.exit(1)
+        sys.exit(10)
+    print(s)
+    if yes_or_no("Will you run"):
+        os.system(s)
     return s        
 
 if __name__ == '__main__':

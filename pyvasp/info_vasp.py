@@ -28,7 +28,7 @@ procar  = MyClass('procar')
 ase     = MyClass('ase')
 charge  = MyClass('charge')
 convert = MyClass('convert')
-
+analysis = MyClass('analysis')
 make.vas_make_ini   ="==================== Start VASP =======================================\
                     \n\t===== Make VASP initial directory ====\
                     \n\t===== Prepare POSCAR, POTCAR, KPOINTS, INCAR\
@@ -212,7 +212,7 @@ dosband.doscar_modi  =   "remove the first line of each energy loop for removing
                         \n\t\tmove original DOSCAR to DOSCAR_o\
                         \n\t\tmake a new DOSCAR with 1 line less in each block, (natom+1) less line\
                         "
-dosband.vasp_anal_dos=  "get pdos for every atoms"
+analysis.vas_anal_dos=  "get pdos for every atoms"
 
 procar.procar_kb    =   "[procar_kb.pl] renamed from 'get_Procar.pl'\
                         \n\t\tTo extract k,b sets for the related peak in dos plot\
@@ -237,18 +237,19 @@ procar.procar       =   "To extract and draw band\
 procar.procar_byline=   "the same as procar.py\
                         \n\t\tread by line and calculate to save memory for what?\
                         "
-charge.vasp_anal    =   "(.sh) Charge analysis of Bader\
+analysis.vas_anal    =   "(.sh) Charge analysis of Bader\
                         \n\tjobs: bader bader2(spin) convasp dos bchg end\
                         \n\tUsage: Run just above vasp directory\
-                        \n\t    vasp_anal.sh bader dirname\
+                        \n\t    vas_anal.sh bader dirname\
                         "
-charge.charge_bader =   "included in vasp_anal.sh\
+charge.charge_bader =   "included in vas_anal.sh\
                         \n\tRead POTCAR for ZVAL\
                         \n\tRead POSCAR for atom list\
                         \n\toutput: Bader charge in 'bader_pcharge.dat'\
                         \n\tto compare two configurations w. the same atom index\
                         \n\t    paste adir/bader_pcharge.dat bdir/bader_pcharge.dat | awk '{print $1, $6-$3}'\
                         "
+charge.vas_anal     =   analysis.vas_anal
 
 ase.ase_fconvert    =""
 ase.ase_vasp        =""
