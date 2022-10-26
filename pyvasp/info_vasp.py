@@ -183,6 +183,7 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\t    doslm.py -z 3.69 -p -eV-2.33 for VBM\
                         \n\t    doslm.py -al 8 23 9 10 21 22 -ash 2 4 -p\
                         \n\t    doslm.py -al -1 10-19 -ash 1 10 -eF\
+                        \n\t    (Pt-C60-x): doslm.py -al -1 2 54 55 -ash 1 1 1 1\
                         \n\t(3) to plot ldos of slab w.r.t. VBM: obtain VBM in slab (1)\
                         \n\t    doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -e -1.169\
                         \n\t\tmakes ldos files as much as ash(atom shape)\

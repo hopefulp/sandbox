@@ -23,13 +23,23 @@ from parsing    import convert_2lst2D
 def get_filename(idos, f_pre, arr_atom, eshift, l, m):
     if f_pre == 'TDOS':
         ofile = f_pre
+        alstr=None
     else:
         ### atom list string for filename
-        ### make atom list string: atom index Amin_max_Nnum
-        ofile = f'{f_pre}A{str(arr_atom[0])}'
-        if arr_atom.size != 1:
-            ofile += f'_{str(arr_atom[-1])}'
-        ofile += f'_N{arr_atom.size}'
+        alstr = str(arr_atom[0])
+        if 1 < arr_atom.size:
+            atom_imax = arr_atom.max()
+            atom_imin = arr_atom.min()
+            natom_in = arr_atom.size - 2
+            ### make atom list string: atom index Amin_max_Nnum
+            if natom_in == 0:
+                alstr = alstr + '_' + str(arr_atom[-1])
+            else:
+                if arr_atom.size == atom_imax - atom_imax:
+                    alstr = alstr + '-' + str(atom_imax)
+                else:
+                    alstr = alstr + '_N' + str(arr_atom.size) + '_' + str(atom_imax)
+        ofile = f_pre + 'A' + alstr
         if l: ofile += f'l{l}'
         if m: ofile += f'm{m}'
     if eshift:
@@ -39,18 +49,7 @@ def get_filename(idos, f_pre, arr_atom, eshift, l, m):
             ofile += eshift[:]
     ofile += '.dat'
     print(f"{whereami():>15}(): {idos+1}-th output file: {ofile}")
-    return ofile
-
-def make_vert_line(fname, Ene, maxdos=10):
-    f0 = open(fname, 'w')
-    dE = 0.001
-    EL = float(Ene-dE)
-    ER = float(Ene+dE)
-    f0.write(f"{EL:10.3f}\t{0.00:10.3f}\n")
-    f0.write(f"{Ene:10.3f}\t{maxdos:10.3f}\n")
-    f0.write(f"{ER:10.3f}\t{0.00:10.3f}\n")
-    f0.close()
-    return 0
+    return ofile, alstr
 
 def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel, title, colors):
     '''
@@ -68,17 +67,12 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel,
     if eshift:
         if re.search('f', eshift, re.I):
             Eshift = f"F{Ef:5.3f}"
-            ### make F0 vertical line at E=0.00
-            make_vert_line("E0.dat", 0.00)      # kw maxdos=10 default
         elif re.search('v', eshift, re.I):
             Eshift = f"V{eshift:5.3f}"
         else:
             Eshift = f"E{eshift:5.3f}"
     else:
         Eshift = None
-        ### make F0 vertical line at E=F0
-        make_vert_line("EF0.dat", Ef)   # kw maxdos=10 default
-
     ### loop for 2d list
     idos = 0
     x_ene   = []    # x needs always to write to ldosa___.dat
@@ -101,9 +95,10 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel,
                 f_pre = 'ldos'
             ### make filename
             if not ofile:
-                fname = get_filename(idos, f_pre, arr_atoms, Eshift, l, m)
+                fname, alstr = get_filename(idos, f_pre, arr_atoms, Eshift, l, m)
             else:
                 fname = ofile[idos]
+                alstr = fname
             pdos2d  = []
             for ind_atom in arr_atoms: # ind_atom is atom index in total system
                 istart = nheadline + (1 + nene) * ind_atom
@@ -159,12 +154,16 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel,
                 if f_pre == "TDOS":
                     legend = f_pre
                 else:
-                    legend=re.split('\.',fname)[0]
+                    legend='a'+alstr
                 legends.append(legend)
     ### plot here
     if Lplot:
         mplot_nvector(x_ene, ys, xlabel=xlabel, ylabel=ylabel, title=title, legend=legends, colors=colors, Lsave=True)
     return 0
+
+
+    
+    
 
 def main():
     parser = argparse.ArgumentParser(description='To obtain PLDOS')
