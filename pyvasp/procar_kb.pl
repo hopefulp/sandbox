@@ -13,7 +13,7 @@ if($#ARGV<0 || $ARGV[0] eq "h"){
     exit(0);
 }
 
-$chg_crit=0.001;
+$density_crit=0.005;
 $switch_density="ldos";		# ldos for atom, pdos for angular momentum
 $fin="PROCAR";
 
@@ -78,8 +78,8 @@ if( 0 <= $#atoms ){
 #@density=qw(0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0 0.0  0.0 0.015    0.015  ); 	# 0.02 0.02 ; 0.002 0.002 ;	0.003 0.003 
 
 #@density=qw(0.01 0.01 ); 	# 0.02 0.02 ; 0.002 0.002 ;	0.003 0.003 
-$density_ldos=0.01;    # check 1
-$density_pdos=0.01;
+$density_ldos=$density_crit;    # check 1
+$density_pdos=$density_crit;
 $density_limit=$density_ldos;
 if(! @density){
     @density=();

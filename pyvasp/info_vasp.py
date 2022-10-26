@@ -228,7 +228,7 @@ procar.procar_kb    =   "[procar_kb.pl] renamed from 'get_Procar.pl'\
                         \n\t\t\tEmin:Emax for energy range\
                         \n\t\t\t\'indices': atom index which starts from 1\
                         \n\t\tE.g.:\
-                        \n\t\t    get_Procar.pl e=-6:-5 '3 58'\
+                        \n\t\t    procar_kb.pl e=-6:-5 '3 58'\
                         "
 procar.get_procar   =   "[.pl] similar to procar_kb.pl"
 procar.get_procar_kband = "[.pl] similar to get_procar.pl"
