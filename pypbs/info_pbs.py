@@ -128,12 +128,18 @@ kisti.pbs_vasp_kisti_knl_2 = "setting: nnode=10, nproc=64 in 68\
 qchem.usage=""
 qsleep.usage=""
 
-slurm.slurm_sbatch      ="link file to slurm_sbatch_vasp.sh"
+slurm.slurm_sbatch      ="\tlink file to slurm_sbatch_vasp.sh"
 slurm.slurm_sbatch_vasp ="to run vasp in slurm\
-                        \n\tUse: command.py slurm -sj vasp\
+                        \n\t\t\t\t    NPAR is changed accorinding to Xpartition\
+                        \n\t\t\t\t    Use: command.py slurm -sj vasp\
+                        "
+slurm.slurm_sbatch_vaspopt ="in case opt stops due to opt error, it will rerun\
+                            "
+slurm.slurm_sbatch_sim  ="simple run vasp\
+                        \n\t\t\t\t    Do not change anything in INCAR\
                         "
 slurm.slurm_sbatch_py   ="to run python in node\
-                        \n\tUse: command.py slurm -sj mldyn\
+                        \n\t\t\t\t    Use: command.py slurm -sj mldyn\
                         "
 
 classobj_dict={'SGE': sge, 'GRMX': grmx, 'AMP':amp, 'USAGE': usage, 'PBS': pbs, 'QChem': qchem, 'Qsleep': qsleep}
