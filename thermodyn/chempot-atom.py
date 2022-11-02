@@ -17,99 +17,14 @@ See details in the referece below
 
 import os
 import matplotlib.pyplot as plt
+from thermo_env import data_target, data_refer, targets
 
-############    Functions    #########################################
-
-def file_read(filename):
-    lineinfo = []; wordinfo = []
-    
-    with open(filename) as f:
-        for i, l in enumerate(f):
-            line = l; word = line.split()
-            lineinfo.append(line); wordinfo.append(word)
-
-    return lineinfo, wordinfo
-
-def get_info(filepath):
-    """ 
-    This function will automatically search
-      1) VASP total energy from OUTCAR 
-      2) Atom(s) information from CONTCAR (ver.5 format)
-    """
-    current_path = os.popen('pwd').read()
-    path = filepath
-    
-    E = []; atom = []
-  
-    os.chdir(path)
-    if os.path.isfile('OUTCAR'):
-        lineinfo, wordinfo = file_read('OUTCAR')
-        for i in range(len(lineinfo)):
-            if 'y  w' in lineinfo[i]:
-                TE = float(wordinfo[i][-1])
-                E.append(TE)
-            else:
-                pass
-    else:
-        print("No OUTCAR in", path)
-    
-    # (Caution) CONTCAR file must be VASP ver.5 format
-    # line 6th : atomic element
-    # line 7th : # of atoms for each element
-    
-    if os.path.isfile('CONTCAR'):
-        lineinfo, wordinfo = file_read('CONTCAR')
-        atom_element = wordinfo[5]; atom_number = wordinfo[6]
-        for j in range(len(atom_element)):
-            info = {atom_element[j] : int(atom_number[j])}
-            atom.append(info)
-    else:
-        print("No CONTCAR in", path)
-    
-    os.chdir(current_path.strip())
-    optE = float(E[-1])
-    
-    return optE, atom
-
-def format_data(legend, paths):
-    data = []
-    if len(legend) == len(paths):
-        for i in range(len(legend)):
-            optE, atom = get_info(paths[i])
-            data.append([legend[i], optE, atom])
-    else:
-        print("number of legend and path are not matched")
-
-    return data
+############    Functions  -> rf. thermo_env   #########################################
 
 ############    Example: lowest O-termination in MoS2 nanoribbon #####
 
 
-# Step 1: set the VASP output paths after geometry optimization calculation
-
-""" 
-You must modify this variables to calculate your own simulation
-"""
-
-legend_target = ["O-000", "O-050", "O-100", "S-100"]
-legend_refer  = ["a-MoO3", "bcc-Mo", "alpha-S", "mol-O2"]
-
-path_target = [
-             "/home2/starnmj/TASK/35.MoS2-oxidation/thermodynamic-tutorial/01.target_MoS2_nanoribbon/01.O-000",
-             "/home2/starnmj/TASK/35.MoS2-oxidation/thermodynamic-tutorial/01.target_MoS2_nanoribbon/02.O-050",
-             "/home2/starnmj/TASK/35.MoS2-oxidation/thermodynamic-tutorial/01.target_MoS2_nanoribbon/03.O-100",
-             "/home2/starnmj/TASK/35.MoS2-oxidation/thermodynamic-tutorial/01.target_MoS2_nanoribbon/04.S-100"
-              ]
-
-path_refer = [
-             "/home2/starnmj/TASK/35.MoS2-oxidation/thermodynamic-tutorial/02.reference/bulk/01.alpha-MoO3",
-             "/home2/starnmj/TASK/35.MoS2-oxidation/thermodynamic-tutorial/02.reference/bulk/02.bcc-Mo",
-             "/home2/starnmj/TASK/35.MoS2-oxidation/thermodynamic-tutorial/02.reference/bulk/03.alpha-S",
-             "/home2/starnmj/TASK/35.MoS2-oxidation/thermodynamic-tutorial/02.reference/mol/01.mol-O2",
-             ]
-
-data_target = format_data(legend_target, path_target)
-data_refer = format_data(legend_refer, path_refer) 
+# Step 1: set the VASP output paths after geometry optimization calculation -> rf. thermo_env
 
 # Step 2: get oxygen poor limit (0.5 delta_H) (cf. oxygen rich limit = 1/2E_O2)
 
@@ -166,7 +81,7 @@ for i in range(len(data_target)):
     poor_point.append(G_poor_norm)
 
 for i in range(len(rich_point)):
-    print(legend_target[i], rich_point[i], poor_point[i])
+    print(targets[i], rich_point[i], poor_point[i])
 
 # Step 4: visualization with matplotlib
 
@@ -174,8 +89,10 @@ X_shift_max = mu_O_rich - 0.5*E_molO2
 X_shift_min = mu_O_poor - 0.5*E_molO2
 
 plt.figure(figsize=(7,5))
-for i in range(len(legend_target)):
-    line = plt.plot([X_shift_max, X_shift_min], [rich_point[i], poor_point[i]], label='%s' % legend_target[i])
+print(f"num legend target: {len(targets)}")
+print(f"{targets}")
+for i in range(len(targets)):
+    line = plt.plot([X_shift_max, X_shift_min], [rich_point[i], poor_point[i]], label='%s' % targets[i])
 
 plt.axis([X_shift_min, X_shift_max, min(rich_point), max(poor_point)])
 plt.vlines(X_shift_min+0.5, min(rich_point), max(poor_point), color='red', linestyle=':')

@@ -16,7 +16,7 @@ from vas_qsub import qsub_command
 
 jg_poscar=['ini', 'zpe']      # ini uses, zpe modifies, others use CONTCAR
 jg_kpoints=['dos','band']
-jg_incar=['sp','opt','copt','vdw','chg','chgw','dos','pchg','band','kisti']
+jg_incar=['sp','opt','copt','vdw','chg','chgw','dos','pchg','band','mag','kisti']
 jg_potcar=['lda','gga']
 jg_link=['dos','band','pchg']
 
