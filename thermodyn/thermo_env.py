@@ -23,7 +23,7 @@ def get_info(filepath):
     """ 
     This function will automatically search
       1) VASP total energy from OUTCAR 
-      2) Atom(s) information from CONTCAR (ver.5 format)
+      2) dict{atom species: natom} from CONTCAR
     """
     current_path = os.popen('pwd').read()
     path = filepath
@@ -64,6 +64,10 @@ def get_info(filepath):
 
 
 def format_data(legend, paths):
+    '''
+    return data
+        list of legend, opt_energy, atom_format=dict{atom species:natoms}
+    '''
     data = []
     if len(legend) == len(paths):
         for i in range(len(legend)):
