@@ -15,7 +15,6 @@ lammps.start            = MyClass('lammps.start')
 lammps.lamphet          = MyClass('lammps.lamphet')
 lammps.kim              = MyClass('lammps.kim')
 myplot              = MyClass('myplot')
-nico2               = MyClass('nico2')
 packmol             = MyClass('packmol')
 qcmo                = MyClass('qcmo')
 qchem               = MyClass('qchem')
@@ -29,8 +28,10 @@ vasp.scripts            = MyClass('vasp.scripts')
 vasp.postproc           = MyClass('vasp.postproc')
 vasp.slab               = MyClass('vasp.slab')
 vasp.BE                 = MyClass('vasp.BE')
+nico2               = MyClass('nico2')
 sno2                = MyClass('sno2')
 water               = MyClass('water')
+mxene               = MyClass('mxene')
 
 amp.scripts.run  =  "\n    == Scripts ==\
                     \n\t== AMP direct Run Test\
@@ -582,6 +583,10 @@ nico2.eda       =   "\n    EDA: Plot gragh\
                     \n\t$ mplot_f.py -f mol5_BE-tzD.dat mol5_4scf_total.dat -x Ni5 -ys -1 j- -t 'BE & SCF' -yl 'E (kcal/mol)' -yls BE SCF_TOTAL  \
                     \n\t$ mplot_f.py -f mol5_nbo.dat mol5_BE-tzD.dat -ys -1 -yl 'NAO Charge of CO2 (e$^-$)' -yl2 'BE (kcal/mol)' -tx -t 'BE & NAO' -x Ni5  -yls NAO BE\
                     "
+mxene.postjob   =   "treat series job\
+                    "
+
+
 def print_obj(job):
     print("Instances:: ", end='')
     if job == None:
