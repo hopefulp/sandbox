@@ -42,9 +42,14 @@ fold_molO2 = 1; E_molO2 = molO2[1]/fold_molO2
 
 # Total reaction : delta_H = a-MoO3 - (1 * bcc-Mo + 3 * (1/2) * O2)
 delta_H = E_aMoO3 - (1*E_bccMo + 3*0.5*E_molO2)
+import os, sys
+rich_limit = float(sys.argv[1])
+poor_limit = float(sys.argv[2])
 
-mu_O_rich = 0.5*E_molO2+0.5 # O rich limit
-mu_O_poor = 0.5*E_molO2+0.5*delta_H-0.5 # O poor limit
+mu_O_rich = 0.5*E_molO2+rich_limit # O rich limit
+mu_O_poor = 0.5*E_molO2+0.5*delta_H-poor_limit # O poor limit
+#mu_O_rich = 0.5*E_molO2 # O rich limit
+#mu_O_poor = 0.5*E_molO2+0.5*delta_H # O poor limit
 
 
 # Step 3: get edge free energy (see PRB 67, 085410, 2003) & gradient
@@ -93,7 +98,7 @@ print(f"num legend target: {len(targets)}")
 print(f"{targets}")
 for i in range(len(targets)):
     line = plt.plot([X_shift_max, X_shift_min], [rich_point[i], poor_point[i]], label='%s' % targets[i])
-
+plt.title(f'%s %s' %(rich_limit, poor_limit)) 
 plt.axis([X_shift_min, X_shift_max, min(rich_point), max(poor_point)])
 plt.vlines(X_shift_min+0.5, min(rich_point), max(poor_point), color='red', linestyle=':')
 plt.vlines(X_shift_max-0.5, min(rich_point), max(poor_point), color='red', linestyle=':')
