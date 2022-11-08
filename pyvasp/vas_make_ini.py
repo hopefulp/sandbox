@@ -185,13 +185,14 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     if get_hostname()=='pt' and (not qx or not qN):
         qx, qN = get_queue_pt(qx=qx)
     s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue)
-    print(f"{s}")
-    if Lrun or yes_or_no("Will you run ?"):
-        os.system(s)
+    ### qsub runs inside module vas_qsub.qsub_command
+    #print(f"{s}")
+    #if Lrun or yes_or_no("Will you run ?"):
+    #    os.system(s)
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', default="opt", choices=["pchg","chg","md","ini","zpe","mol","wav","opt","sp", 'noD'], help='inquire for each file')
+    parser.add_argument('-j', '--job', default="opt", choices=["pchg","chg","md","ini","zpe","mol","wav","opt","copt","sp", 'noD'], help='inquire for each file')
     parser.add_argument('-s', '--poscar', help='poscar is required')
     parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
     parser.add_argument('-hpp', '--pseudoH', nargs='*', help='include pseudo H list ')
