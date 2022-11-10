@@ -1,10 +1,10 @@
 #!/home/joonho/anaconda3/bin/python
 import argparse
-import envvasp 
+import vas_env
 
 def main():
     '''
-    magnetism details are written in envvasp
+    magnetism details are written in vas_env
     '''
     
     global ini_dvasp, pwd
@@ -33,7 +33,7 @@ def main():
     arg_dic = vars(args) 
     #print arg_dic
     
-    envvasp.make_incar(arg_dic, args.iofile)
+    vas_env.make_incar(arg_dic, args.iofile)
 
 
 if __name__ == '__main__':

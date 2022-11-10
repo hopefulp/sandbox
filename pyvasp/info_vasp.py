@@ -139,7 +139,11 @@ run.amp_env_run     ="amp_run.py in (envs) anaconda\
 run.vas_qsub        = " run vasp in queue\
                     \n\t called by vas_make_cont.py\
                     "
-run.envvasp         = " imported from vasp run, make\
+run.vas_env         = " imported from vasp run, make scripts such as\
+                    \n\tvas_make_ini.py\
+                    \n\tvas_make_cont.py\
+                    \n\tvas_make_d2d.py\
+                    \n\tvas_make_incar.py\
                     "
 clean.clean         =" "
 poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\

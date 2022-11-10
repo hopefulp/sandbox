@@ -7,18 +7,11 @@ import sys
 import json
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
-from common import get_dirs_prefix, yes_or_no, list2dict
-from mod_incar import modify_incar
+from common     import get_dirs_prefix, yes_or_no, list2dict
+from mod_incar  import modify_incar
 from mod_poscar    import fixedMD_POSCAR, pos2dirname, get_poscar
-import sys
-from envvasp import get_hostname
-from vas_qsub import qsub_command
-
-jg_poscar=['ini', 'zpe']      # ini uses, zpe modifies, others use CONTCAR
-jg_kpoints=['dos','band']
-jg_incar=['sp','opt','copt','vdw','chg','chgw','dos','pchg','band','mag','kisti']
-jg_potcar=['lda','gga']
-jg_link=['dos','band','pchg']
+from vas_env    import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_link
+from vas_qsub   import qsub_command
 
 def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
     ### if incar_opt='u..', just use it

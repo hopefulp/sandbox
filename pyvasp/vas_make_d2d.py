@@ -8,10 +8,10 @@ import argparse
 import os
 import shutil
 import re
-from  envvasp import *
 from common import *
 from mod_poscar import get_poscar
 from vas_qsub import run_vasp
+from vas_env  import *
 
 
 def make_vas_d2d(odir, ndir, job, poscar, kpoints, potcar, incar, files, np,xpart,nnode,hmem):
