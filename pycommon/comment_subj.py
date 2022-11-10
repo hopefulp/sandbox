@@ -583,7 +583,15 @@ nico2.eda       =   "\n    EDA: Plot gragh\
                     \n\t$ mplot_f.py -f mol5_BE-tzD.dat mol5_4scf_total.dat -x Ni5 -ys -1 j- -t 'BE & SCF' -yl 'E (kcal/mol)' -yls BE SCF_TOTAL  \
                     \n\t$ mplot_f.py -f mol5_nbo.dat mol5_BE-tzD.dat -ys -1 -yl 'NAO Charge of CO2 (e$^-$)' -yl2 'BE (kcal/mol)' -tx -t 'BE & NAO' -x Ni5  -yls NAO BE\
                     "
-mxene.postjob   =   "treat series job\
+mxene.postjob   =   "Treat series job\
+                    \n\tReadme::\
+                    \n\t    Functions are kept in alias.sh\
+                    \n\t    mv not opt file to a.cont not to be detected\
+                    \n\t$ greftail MXNBs22L1*out\
+                    \n\t    filename & last energy\
+                    \n\t    check filename not to include other files\
+                    \n\t$ grefopt MXNBs22L1*out\
+                    \n\t    just energy to get energy values\
                     "
 
 
