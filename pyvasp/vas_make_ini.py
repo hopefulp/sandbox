@@ -9,7 +9,7 @@ import argparse
 import os
 import shutil
 import re
-from  envvasp import *
+from  vas_env import *
 from common import *
 from vas_qsub import get_queue_pt, qsub_command
 from mod_poscar import get_poscar, pos2dirname
@@ -116,30 +116,36 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
     ### 4. get INCAR :: use make_incar.py
     incar_repo=f"{ini_dvasp}/INCAR.{job}"
     incar_job=f"INCAR.{job}"
-    ### 4.1 if use incar in dir
-    if opt_incar:
-        if os.path.isdir(opt_incar):
-            incar = opt_incar + '/INCAR'
-            print(f"use {opt_incar}/INCAR")
-        elif os.path.isfile(opt_incar):
-            print(f"use {opt_incar}")
-            incar = opt_incar
-    ### 4.2: if INCAR is prepared in wdir
-    elif allprepared:
-        print(f"INCAR in cwd will be used")
-        incar = 'INCAR'
-    ### 4.3 use incar.job
-    elif os.path.isfile(incar_job):
-        incar = incar_job
-    elif os.path.isfile(incar_repo):
-        incar = incar_repo 
-    ### 4.4: make INCAR (not comlete)
-    else:
-        q = 'input incar-key file or use make_incar.py: '
-        keyfile = get_answers(q)
-        if not keyfile:
-            keyfile = iofile
-        get_incar(keyfile)
+    tag_incar = 0   # if incar file is defined, change to 1
+    ### 4.1 use incar.job
+    if job:
+        if os.path.isfile(incar_job):
+            incar = incar_job
+            tag_incar = 1
+        else:
+            print(f"There is no {incar_job} in wdir")
+    if not tag_incar:
+        ### 4.2: if INCAR is prepared in wdir
+        if allprepared:
+            print(f"INCAR in cwd will be used")
+            incar = 'INCAR'
+        ### 4.3 if use incar in dir
+        if opt_incar:
+            if os.path.isdir(opt_incar):
+                incar = opt_incar + '/INCAR'
+                print(f"use {opt_incar}/INCAR")
+            elif os.path.isfile(opt_incar):
+                print(f"use {opt_incar}")
+                incar = opt_incar
+        elif os.path.isfile(incar_repo):
+            incar = incar_repo 
+        ### 4.4: make INCAR (not comlete)
+        else:
+            q = 'input incar-key file or use make_incar.py: '
+            keyfile = get_answers(q)
+            if not keyfile:
+                keyfile = iofile
+            get_incar(keyfile)
     #print(incar)
     if incar != 'INCAR':
         os.system(f'cp {incar} INCAR')
@@ -192,7 +198,7 @@ def make_vasp_dir(job, poscar, apotcar, hpp_list, kpoints, opt_incar, allprepare
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', default="opt", choices=["pchg","chg","md","ini","zpe","mol","wav","opt","copt","sp", 'noD'], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=["pchg","chg","md","ini","zpe","mol","wav","opt","copt","sp", 'noD'], help='inquire for each file')
     parser.add_argument('-s', '--poscar', help='poscar is required')
     parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
     parser.add_argument('-hpp', '--pseudoH', nargs='*', help='include pseudo H list ')

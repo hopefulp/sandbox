@@ -17,6 +17,18 @@ from common import whereami
 
 """
 
+### VASP ini & outfiles
+vasf_default=['CHG','CHGCAR','CONTCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR',  'XDATCAR']
+vasf_ini=['POSCAR','KPOINTS','INCAR','POTCAR']
+
+### VASP jobs group with file to be modified
+jg_poscar=['ini', 'zpe']      # ini uses, zpe modifies, others use CONTCAR
+jg_kpoints=['dos','band']
+jg_incar=['sp','opt','copt','vdw','chg','chgw','dos','pchg','band','mag','kisti']
+jg_potcar=['lda','gga']
+jg_link=['dos','band','pchg']
+
+
 eps_H2O = 78.3
 ini_dvasp = '/tmp'
 
