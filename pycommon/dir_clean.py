@@ -6,9 +6,9 @@ import argparse
 import os
 import re
 import sys
-from common import *
-from amp_ini import ampdb
-from mod_vasp import vasf_ini, vasf_default
+from common     import *
+from amp_ini    import ampdb
+from mod_vas    import vasf_ini, vasf_default
 
 q_list=[]
 
