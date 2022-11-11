@@ -11,7 +11,7 @@ import re
 from common import *
 from mod_poscar import get_poscar
 from vas_qsub import run_vasp
-from vas_env  import *
+from mod_vas  import *
 
 
 def make_vas_d2d(odir, ndir, job, poscar, kpoints, potcar, incar, files, np,xpart,nnode,hmem):
