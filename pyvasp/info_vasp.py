@@ -261,7 +261,8 @@ ase.ase_vasp        =""
 ase.ase_zpe         =""
 classobj_dict={'MAKE': make, 'RUN': run, 'CLEAN': clean} 
 
-def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
+#def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
+def classify(Lclassify, work, class_name, job):
     
     mdir = os.path.dirname(__file__)
     print(f"List directory of {mdir} ")
@@ -336,7 +337,7 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
     if job == 'amp':
         print("For AMP::")
         file_conversion()
-        run_amp(fname,HL, elimit, nc, Lgraph)
+        #run_amp(fname,HL, elimit, nc, Lgraph)
     ### print dictionary here
     if job in classobj_dict.keys():
         name_class = classobj_dict[job]
@@ -356,16 +357,17 @@ def main():
     parser = argparse.ArgumentParser(description="display Usage for ~/py_ai")
     parser.add_argument('-c', '--classify', action="store_false", help="classify files ")
     parser.add_argument('-w','--work',  help="several explanation option ")
-    parser.add_argument('-j','--job',  help="[val,train,test] ")
     parser.add_argument('-cn', '--cname', help="detail for each class ")
-    parser.add_argument('-f','--file',  help="input energy data file ")
-    parser.add_argument('-hl','--hidden_layer',nargs='*', default=['4','4','4'], help="list of number of Hidden Layer")
-    parser.add_argument('-el','--energy_limit',default=0.001, type=float,  help="energy_limit for training")
-    parser.add_argument('-nc','--ncore',  help="number of parallel process")
-    parser.add_argument('-g','--graph', action='store_true',  help="draw graph or not")
+    parser.add_argument('-j','--job',  help="[val,train,test] ")
+    #parser.add_argument('-f','--file',  help="input energy data file ")
+    #parser.add_argument('-hl','--hidden_layer',nargs='*', default=['4','4','4'], help="list of number of Hidden Layer")
+    #parser.add_argument('-el','--energy_limit',default=0.001, type=float,  help="energy_limit for training")
+    #parser.add_argument('-nc','--ncore',  help="number of parallel process")
+    #parser.add_argument('-g','--graph', action='store_true',  help="draw graph or not")
     args = parser.parse_args()
 
-    classify(args.classify, args.work, args.cname, args.job,args.file, args.hidden_layer, args.energy_limit,args.ncore, args.graph )
+    #classify(args.classify, args.work, args.cname, args.job, args.file, args.hidden_layer, args.energy_limit,args.ncore, args.graph )
+    classify(args.classify, args.work, args.cname, args.job)
 
 if __name__ == "__main__":
     main()
