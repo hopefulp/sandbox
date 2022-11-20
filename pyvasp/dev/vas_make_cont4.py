@@ -8,12 +8,12 @@ import json
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 from common     import get_dirs_prefix, yes_or_no, list2dict
-from mod_incar  import modify_incar, smodify_incar
+from mod_incar  import modify_incar
 from mod_poscar import fixedMD_POSCAR, pos2dirname, get_poscar
 from mod_vas    import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_link
 from vas_qsub   import qsub_command
 
-def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_remove):
+def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_list):
     ### if incar_opt='u..', just use it
     if incar_opt and re.match('u', incar_opt):
         incar = 'INCAR.' + job
@@ -34,8 +34,8 @@ def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_remove):
             kws = list2dict(incar_kws)
             dic.update(kws)
 
-        elif incar_remove:
-            dic = incar_remove
+        elif incar_list:
+            dic = incar_list
             ### in case LDA: change POTCAR
             print(f"incar list {dic} and incar option {inc_option}")
             if 'GGA' in dic and 'o' in inc_option:
@@ -52,7 +52,7 @@ def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_remove):
         print(f"{incaro} was modified and {incar} was used")
     return incar
 
-def make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_remove):
+def make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_list):
     print(f"{iopt}")
     if iopt:
         if iopt == 'job':
@@ -65,14 +65,12 @@ def make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_remove):
         else:
             print(f"Note: iopt was defined but not 'job'")
     else:
-        incar = change_incar(odir, job, ikw_opt, incar_kws, incar_remove)
+        incar = change_incar(odir, job, ikw_opt, incar_kws, incar_list)
     return incar
 
-     
-
 ### O: Use this to comtain all the jobs
-###            1     2      3       4     5      6           7         8        9      10    11    12   13
-def vasp_jobs(job, dirs, fixatom, kopt, iopt, incar_kws, incar_remove, Lrun, newdir, issue, np, xpart, nnode):
+###                 1     2      3       4     5      6       7            8        9      10    11    12     13   14
+def vasp_jobs(job, dirs, fixatom, kopt, iopt, ikw_opt, incar_kws, incar_list, Lrun, newdir, issue, np, xpart, nnode):
     pwd = os.getcwd()
 
     for odir in dirs:
@@ -80,7 +78,7 @@ def vasp_jobs(job, dirs, fixatom, kopt, iopt, incar_kws, incar_remove, Lrun, new
             ndir = odir + job
         else:
             ndir = newdir
-        #com=[]
+        com=[]
         ### 0: make a new dir
         #if os.path.isdir(ndir):
         #    print(f"{ndir} for {odir} exists: exits")
@@ -148,29 +146,13 @@ def vasp_jobs(job, dirs, fixatom, kopt, iopt, incar_kws, incar_remove, Lrun, new
         ### 4: INCAR
         #if (not ikw_opt or ikw_opt== 'm') and os.path.isfile(f"{odir}/INCAR"):
         #    incar = modify_incar(f"{odir}/INCAR", job)
-        ### iopt if incar was designated as 'INCAR' or dir with INCAR
-        if iopt:
-            if os.path.isfile(f"{iopt}"):
-                incar = iopt
-            elif os.path.isdir(f"{iopt}") and os.path.isfile(f"{iopt}/INCAR"):
-                incar = f"{iopt}/INCAR"
-        ### jg_incar for INCAR modify
-        elif not job in jg_incar:
+        if not job in jg_incar:
             incar = f"{odir}/INCAR"
         else:
             if os.path.isfile(f"INCAR.{job}"):
                 incar = f"INCAR.{job}"
             else:
-                pass
-                ### iopt, ikw_opt is deprecated
-                #incar = make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_remove)
-        ### if incar needs to be modified: kw for active, remove for comment out
-        if incar_kws or incar_remove:
-            ### make incar.new
-            incar_o = incar
-            incar = smodify_incar(incar_o, incar_kws, incar_remove)
-            print(f"{incar_o} was modified to {incar}")
-
+                incar = make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_list)
         os.system(f"cp {incar} {ndir}/INCAR")
         print(f"{incar} was copied to {ndir}/INCAR")
 
@@ -209,12 +191,10 @@ def main():
     parser.add_argument('-dn', '-nd', '--newdir', help='specify new dirname in case one job')
 
     parser.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
-    parser.add_argument('-i', '--incar', help='specify incar file or dir')
-    #parser.add_argument('-io', '--ioption', help='in the order: u:use INCAR.job,a:append,c:change,o:out,r:reverse')
-    #parser.add_argument('-ikw', '--incar_kws', nargs='*', help='input key-value pairs in the list from command line')
-    ### depricate original io and io is replaced by ikw
-    parser.add_argument('-io', '--incar_kws', nargs='*', help='input key-value pairs in the list from command line')
-    parser.add_argument('-ir', '--incar_remove', nargs='*', help='input list for comment out')
+    parser.add_argument('-i', '--incar', default='job', help='incar option:')
+    parser.add_argument('-io', '--ioption', help='in the order: u:use INCAR.job,a:append,c:change,o:out,r:reverse')
+    parser.add_argument('-ikw', '--incar_kws', nargs='*', help='input key-value pairs in the list from command line')
+    parser.add_argument('-il', '--incar_list', nargs='*', help='input list for comment out')
     #kgroup = parser.add_mutually_exclusive_group('input kpoint option')
     parser.add_argument('-k', '--kopt', help='k option: fname, extension name, 3 values')
     #parser.add_argument('-k', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
@@ -228,11 +208,11 @@ def main():
     args = parser.parse_args()
 
 
-    ### incar option: deprecated
-    #if not args.ioption and 'opt' in args.job:
-    #    ikw_option = 'ac'
-    #else:
-    #    ikw_option = args.ioption
+    ### incar option
+    if not args.ioption and 'opt' in args.job:
+        ikw_option = 'ac'
+    else:
+        ikw_option = args.ioption
 
     ### copy initial job: POSCAR or CONTCAR
     ### cont + ok to change KPOINTS
@@ -246,9 +226,7 @@ def main():
         print("Usage:: input old job dirs: -d ")
         sys.exit(1)
 
-    #vasp_jobs(args.job, dirs, args.fixed_atom, args.kopt, args.incar, ikw_option, args.incar_kws, args.incar_remove, args.run,args.newdir,args.error, args.nproc, args.partition, args.nnode)
-###            1         2            3           4            5            6           7                   8           9           10        11           12           13    
-    vasp_jobs(args.job, dirs, args.fixed_atom, args.kopt, args.incar, args.incar_kws, args.incar_remove, args.run, args.newdir, args.error, args.nproc, args.partition, args.nnode)
+    vasp_jobs(args.job, dirs, args.fixed_atom, args.kopt, args.incar, ikw_option, args.incar_kws, args.incar_list, args.run,args.newdir,args.error, args.nproc, args.partition, args.nnode)
 
     return 0
 

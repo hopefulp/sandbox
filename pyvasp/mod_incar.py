@@ -1,6 +1,8 @@
 #!/home/joonho/anaconda3/bin/python
 ### module for INCAR modification
 '''
+    modify_incar
+    smodify_incar   new simple version to modify INCAR
 job zpe
     with CHGCAR: 0 1, without: 0 2
     NSW = 1 : not compatable with ICHRGE 11
@@ -19,10 +21,11 @@ job vdw
 '''
 
 import argparse
-import fileinput
 import re
 import os
 import sys
+from common import list2dict, whereami
+
 
 ### INCAR ORDER for display
 ordered_incar=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','NSIM','LPLANE','ISTART','ICHARG','ISPIN','ENCUT','NELMIN','NELM','EDIFF','ISYM','ADDGRID','LREAL','LASPH','LMAXMIX','NELECT','MAGMOM','ISMEAR','SIGMA','AMIX','BMIX','AMIN','IWAVPRE','ISIF','IBRION','NSW','POTIM','EDIFFG','NWRITE','LPETIM','LWAVE','LCHARG','LAECHG','LVTOT','LVHAR','LORBIT','NEDOS','EMIN','EMAX','LPARD','NBMOD','EINT','LSEPB','LSEPK','NFREE','LEPSILON','LMONO','IDIPOL','LDIPOL','GGA_COMPAT','LSORBIT','IVDW','LVDWSCS','LDAU','LDAUTYPE','LDAUL','LDAUU','LDAUJ','LDAUPRINT']
@@ -87,13 +90,66 @@ def dict_update(param, dic):
         paramch   = eval(f'{job}_change')
     return paramch
 '''
+### simple modification using incar_kw and incar_remove
+def smodify_incar(incar, ickw, icout, outf='INCAR.mod'):
+    '''
+    read incar
+    active ickw
+    deactivate icout
+    return lines
+    '''
+    if ickw:
+        if len(ickw) % 2 != 0:
+            print("not perfect kw options: put in even numbers for keyword options")
+            sys.exit(11)
+        else:
+            keyup = [ kv.upper()  if kv.isalpha() else kv for kv in ickw]
+            kws = list2dict(keyup)
+            print(f"{kws} in {whereami()} at {__file__}")
+    iline=0
+    with open(incar) as f:
+        lines = f.readlines()
+    ### save to lines and return
+    newline=[]
+    for line in lines:
+        iline += 1
+        lst = line.strip().split()
+        ### if no word, continue
+        if len(lst) == 0:
+            newline.append(line)
+            continue
+        else:
+            line_key = lst[0]
+        ### if not activated --> activate
+        if ickw:
+            if '#' in line_key:
+                line_key = line_key.replace('#', '')
+            #print(f"{line_key}: {kws.keys()}")
+            if line_key.upper() in kws.keys():
+                line = f" {line_key}  =  {kws[line_key]}   ! change in smodify_incar\n"
+        ### if activated and in the list of delete
+        elif icout and line_key in icout:
+            line = f" #{line.rstrip()}    ! change in smodify_incar\n"
+        else:
+            pass
+        newline.append(line)
+    
+    with open(outf, 'w') as f:
+        for line in newline:
+            #print(line)
+            f.write(line)
+
+    return outf           
+
+
 def modify_incar(incar, job, dic=None, opt='ac', suff=None):
     #os.system(f"cp {INCAR} INCAR")
     #line_change_dict('INCAR', vasp_job.zpe)
+    print(f"running in {whereami()}:{__file__}")
     if suff:
         outf = f"INCAR.{suff}"
     else:
-        outf  = "INCARnew."+job
+        outf  = f"INCARnew.{job}"
     ### common dict for modification
     if f'{job}_change' in globals():
         paramch   = eval(f'{job}_change')
