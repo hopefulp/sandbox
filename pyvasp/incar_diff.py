@@ -39,8 +39,8 @@ def get_incar_dict(f):
 def get_incar_dicts(files):
     dic_list = []
     for fname in files:
-        if fname != 'INCAR' and os.path.isdir(fname):
-            fname = fname + '/INCAR'
+        if os.path.isdir(fname) and os.path.isfile(f"{fname}/INCAR"):
+            fname = f"{fname}/INCAR"
         if os.path.isfile(fname):
             dic = get_incar_dict(fname)
             dic_list.append(dic)                            
