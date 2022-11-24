@@ -71,22 +71,19 @@ def make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_remove):
      
 
 ### O: Use this to comtain all the jobs
-###            1     2      3       4     5      6           7         8        9      10    11    12   13
-def vasp_jobs(job, dirs, fixatom, kopt, iopt, incar_kws, incar_remove, Lrun, newdir, issue, np, xpart, nnode):
+###            1     2      3       4     5      6           7         8        9      10    11    12   13    14
+def vasp_jobs(job, dirs, fixatom, kopt, iopt, incar_kws, incar_remove, Lrun, newdir, suff, issue, np, xpart, nnode):
     pwd = os.getcwd()
 
     for odir in dirs:
-        if not newdir:
-            ndir = odir + job
-        else:
+        if newdir:
             ndir = newdir
+        elif suff:
+            ndir = odir + suff
+        else:
+            ndir = odir + job
         #com=[]
         ### 0: make a new dir
-        #if os.path.isdir(ndir):
-        #    print(f"{ndir} for {odir} exists: exits")
-        #    sys.exit(1)
-        #else:
-        #    os.system(f'mkdir {ndir}')
         try: 
             subprocess.call(['mkdir', f'{ndir}'])     # str f'mkdir {ndir}' is not wokring
             print(f'{ndir} was made')
@@ -201,14 +198,14 @@ def vasp_jobs(job, dirs, fixatom, kopt, iopt, incar_kws, incar_remove, Lrun, new
 def main():
     parser = argparse.ArgumentParser(description='remove files except initial files')
     parser.add_argument('-j', '--job', choices=['sp','incar',"dos","band","pchg","chg","chgw","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
-    dgroup = parser.add_mutually_exclusive_group()
-    dgroup.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
-    dgroup.add_argument('-p', '--prefix', help='select directories using prefix')
-
+    gdirectory = parser.add_mutually_exclusive_group()
+    gdirectory.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
+    gdirectory.add_argument('-p', '--prefix', help='select directories using prefix')
     parser.add_argument('-ex', '--exclude', nargs='*', help='specify excluded dirs if already exist')
     parser.add_argument('-dn', '-nd', '--newdir', help='specify new dirname in case one job')
-
-    parser.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
+    goutput = parser.add_mutually_exclusive_group()
+    goutput.add_argument('-suf', '--suffix', help='specify suffix of new directory')
+    goutput.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
     parser.add_argument('-i', '--incar', help='specify incar file or dir')
     #parser.add_argument('-io', '--ioption', help='in the order: u:use INCAR.job,a:append,c:change,o:out,r:reverse')
     #parser.add_argument('-ikw', '--incar_kws', nargs='*', help='input key-value pairs in the list from command line')
@@ -227,16 +224,6 @@ def main():
     qsub.add_argument('-n', '--nproc',      help='nprocess in qsub')
     args = parser.parse_args()
 
-
-    ### incar option: deprecated
-    #if not args.ioption and 'opt' in args.job:
-    #    ikw_option = 'ac'
-    #else:
-    #    ikw_option = args.ioption
-
-    ### copy initial job: POSCAR or CONTCAR
-    ### cont + ok to change KPOINTS
-    ### obtain job directories
     pwd = os.getcwd()
     if args.dirs:
         dirs = args.dirs
@@ -246,9 +233,8 @@ def main():
         print("Usage:: input old job dirs: -d ")
         sys.exit(1)
 
-    #vasp_jobs(args.job, dirs, args.fixed_atom, args.kopt, args.incar, ikw_option, args.incar_kws, args.incar_remove, args.run,args.newdir,args.error, args.nproc, args.partition, args.nnode)
-###            1         2            3           4            5            6           7                   8           9           10        11           12           13    
-    vasp_jobs(args.job, dirs, args.fixed_atom, args.kopt, args.incar, args.incar_kws, args.incar_remove, args.run, args.newdir, args.error, args.nproc, args.partition, args.nnode)
+###            1         2            3           4            5            6           7                   8           9           10        11           12           13           14
+    vasp_jobs(args.job, dirs, args.fixed_atom, args.kopt, args.incar, args.incar_kws, args.incar_remove, args.run, args.newdir, args.suffix,  args.error, args.nproc, args.partition, args.nnode)
 
     return 0
 
