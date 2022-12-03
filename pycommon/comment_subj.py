@@ -1,6 +1,7 @@
 from common import MyClass_str as MyClass
 from parsing import str_decom as parse_str
 from info_common import filejob
+from info_myplot import table
 #from common import MyClass
 #import comment_sys as mod_sys
 
@@ -593,6 +594,11 @@ mxene.postjob   =   "Treat series job\
                     \n\t$ grefopt MXNBs22L1*out\
                     \n\t    just energy to get energy values\
                     "
+mxene.plot      = "Gibbs plot using mplot_gibbs.py"
+mxene.myplot    = "\t" + table.mplot_gibbs
+mxene.plot2     =  "\tmplot_gibbs.py MXNB-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.37)' 'G($U_{Eq}$=2.73)' 'G($U_{Ch}$=3.42)' -c k b g r\
+                   mplot_gibbs.py MX-MXNB-Ueq.csv -l 'MXene' 'MX-NB' -c b r -t 'U$_{Eq}$'\
+                   "
 
 
 def print_obj(job):

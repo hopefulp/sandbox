@@ -54,10 +54,12 @@ mplplot.myplot2D    =   "several kinds of 2d plot method\
                         \n\tdef barplot2:\
                         \n\tdef barplot_y:\
                         "
-table.mplot_gibbs   =   "Convert Excel to SCV: written by David Park\
-                        \n    mplot_gibbs.py MX-LAB-1L.csv -l 'G(U=0)' 'G(\$U_{Dc}$=0.95)' 'G(\$U_{Eq}$=2.79)' 'G(\$U_{Ch}$=4.79)' -c k b g r\
+table.mplot_gibbs   =   "plot csv: written by David Park\
+                        \n\tsave excel sheet to csv format\
+                        \n\t$mplot_gibbs.py MXene-4level.csv -l 'G(U=0)' 'G(\$U_{Dc}$=1.03)' 'G(\$U_{Eq}$=2.79)' 'G(\$U_{Ch}$=4.79)' -c k b g r\
+                        \n\t$mplot_gibbs.py MXene-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.03)' 'G($U_{Eq}$=2.79)' 'G($U_{Ch}$=4.79)' -xl 'O$_2$ Reduction step' -c k b g r\
                         \n\tText\
-                        \n\t    hypertext: $_{}$ $^{}$ or \\$_{}$ \\$^{}$\
+                        \n\t    hypertext: $_{}$ $^{}$ (in chi) or \\$_{}$ \\$^{}$ (in Pt)\
                         "
 ### this should follow the definition of table.mplot_gibbs
 mplplot.mplot_gibbs = table.mplot_gibbs                        

@@ -82,8 +82,8 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors, ymax, y
     ###matplotlib###
     fig = plt.figure()
     ax = fig.add_subplot()
-    plt.ylabel(ylabel,rotation=90, labelpad=18)
-    plt.xlabel(xlabel)
+    plt.ylabel(ylabel,rotation=90, labelpad=18, fontsize=15)
+    plt.xlabel(xlabel, fontsize=15)
     plt.title(title)
 
 
@@ -137,13 +137,13 @@ def main():
     parser.add_argument('inf')
     gplot = parser.add_argument_group(title='plot')
     gplot.add_argument('-yi','--y_columns',required=False, default=[], type=int, nargs='+', help='select y column index')
-    gplot.add_argument('-xl', '--xlabel', default='', type=str, help='input x-label')
+    gplot.add_argument('-xl', '--xlabel', default='O$_2$ Reduction Step', help='input x-label')
     gplot.add_argument('-yl', '--ylabel', required=False, default='G [eV]', help='input y-label')
     gplot.add_argument('-l', '--legends', required=False, type=str, default=[], nargs='+', help='input legends')
     gplot.add_argument('-t', '--title', required=False, type=str, default='', help='input title')
     gplot.add_argument('-c', '--color', required=False, type=str, default=[], nargs='+', help='input color')
-    gplot.add_argument('-ymax', '--ymax', required=False, type=float, default=0, help='input maximum of y')
-    gplot.add_argument('-ymin', '--ymin', required=False, type=float, default=0, help='input minimum of y')
+    gplot.add_argument('-ymax', '--ymax', required=False, type=float, help='input maximum of y')
+    gplot.add_argument('-ymin', '--ymin', required=False, type=float, help='input minimum of y')
     args = parser.parse_args()
     
     plot_gibbs(args.inf, args.y_columns, args.xlabel, args.ylabel, args.legends, args.title, args.color, args.ymax, args.ymin) 
