@@ -21,8 +21,6 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors, ymax, y
         print("Please input csv format")
         sys.exit(1)
 
-    print(ymax, ymin)
-
     ###necessary lists###
     rowindexes=[]
     colindexes=[]
@@ -105,18 +103,16 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors, ymax, y
         for j in range(0,total_cols):
             plt.plot([i*2+1,i*2+2],[twodarray[j][i],twodarray[j][i+1]],color=colorselect[j],linestyle='--',linewidth=0.5)
 
-    print(type(ymax))
-
-
 
     if legends==[]:
         pass
     else:
         plt.legend()
 
-    if ymax+ymin == 0:
-        pass
-    elif ymax+ymin != 0:
+    #if ymax+ymin == 0:
+    #    pass
+    #elif ymax+ymin != 0:
+    if ymin:
         ax.set_ylim([ymin, ymax])
     
 

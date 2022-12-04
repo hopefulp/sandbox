@@ -596,7 +596,7 @@ mxene.postjob   =   "Treat series job\
                     "
 mxene.plot      = "Gibbs plot using mplot_gibbs.py"
 mxene.myplot    = "\t" + table.mplot_gibbs
-mxene.plot2     =  "\tmplot_gibbs.py MXNB-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.37)' 'G($U_{Eq}$=2.73)' 'G($U_{Ch}$=3.42)' -c k b g r\
+mxene.plot2     =  "\tmplot_gibbs.py MXNB-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.37)' 'G($U_{Eq}$=2.73)' 'G($U_{Ch}$=3.42)' -c k b g r -ymin -11 -ymax 24\
                    mplot_gibbs.py MX-MXNB-Ueq.csv -l 'MXene' 'MX-NB' -c b r -t 'U$_{Eq}$'\
                    "
 
