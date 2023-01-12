@@ -15,6 +15,7 @@ nc      =   MyClass('nc')
 dac     =   MyClass('dac')
 slurm   =   MyClass('slurm')
 kisti   =   MyClass('kisti')
+mlet     =   MyClass('mlet')
 
 ### modify input-detail here
 ### AMP-NODE job
@@ -37,6 +38,7 @@ amp_qsub_data_type={'interval':  "-v nt=4000 -v ntr=100 -v dtype=int -v dlist='1
 amp_qsub_gaussian_param={'log': "-v des=gs -v pf=log10 -v pmod=del -v pmm='0.05 200.0' -v pn=10",
                         'pow': "-v des=gs -v pf=powNN -v pn=5"
                         }
+amp_qsub_str_suff=" /home/joonho/sandboxg/pypbs/sge_amp.csh"                        
 
 ### AMP-GET-QSUB job
 amp_getqsub_str = { 'noforce': ' -j tr -hl 4 -el 0.001 -fl -0.1', 'force': ' -j tr -hl 4 -el 0.001 -fl 0.1 0.04 -nc 10'}
@@ -173,6 +175,10 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     slurm.vas += f"\n\t    --ntasks-per-node {nXn[partition]/2} in case doesnot know ncpu/node"
     if nproc != nnode * nXn[partition]:
         print("Warning!! Not using all the processes in the node")
+    ### SGE(mlet)
+    mlet.vas  = f"\t(VASP)   $ qsub -N {qname} -pe numa {nproc} -v np={nproc} -v dir={qname} $SB/pypbs/sge_vasp.csh"
+    mlet.vas += f"\n\t(VASP)   $ qsub -N {qname} -pe numa {nproc} -v np={nproc} -v dir={qname} -v vas=gam $SB/pypbs/sge_vasp_exe.csh"
+    mlet.vas += f"\n\thow to run with multiple nodes?"
 
     ###### JOB start 
     if job == 'amp':
@@ -223,6 +229,8 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print("\t    : queue submit job HL44tr-HL44te consecutively")
 
             print(amp.ga)
+        elif job_submit == 'getqsub':
+            print(f"sge_amp.py -qj {qname} -m 3G", amp_getqsub_str[settings['force']], amp_getqsub_datatype[settings['dtype']], amp_getqsub_symmfuncttype[settings['gs']]) 
         ### this part is for common
         print(amp.clean)
         print(amp.statistics)
@@ -337,6 +345,17 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print("\tpef    to get free nodes")
         print("\tpestat to see all nodes")
         print("\tqstat -u joonho     to check my job")
+    elif job == 'sge':
+        if subjob == 'vasp':
+            print(comment_subj.vasp.run)
+            print(comment_sys.server.mlet.vasp)
+        print(comment_sys.server.mlet.system)
+        print(comment_sys.server.mlet.sgescripts)
+        print(comment_sys.server.mlet.sleep)
+        print(comment_sys.server.mlet.sge)
+
+        print(mlet.vas)
+        print(comment_sys.server.mlet.qstat)
     elif job == 'kisti':
         if subjob == 'vasp':
             print(comment_subj.vasp.run)
@@ -349,6 +368,9 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(kisti.py)
         print("Pt(platinum:slurm): vasp")
         print(slurm.vas)
+        #print("MLET(mlet): vasp")
+        #print(mlet.vas)
+
 
     else:
         print("build more jobs")
