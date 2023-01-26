@@ -271,21 +271,19 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(f"Usage for {job}")
         print(f"\t {os.path.basename(__file__)} {job} -sj vasp -qn dirname -p {partition} -N {nnode} -n {nproc}")
         print("Run in slurm")
-        if nhl:
-            hlstr1 = list2str(nhl, delimit=" ")
-            hl2str = list2str(nhl)
-            if not qname:
-                qname = 'hl'+hl2str
-        if not qname:
-            qname = 'amptest'
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_vasp.sh")
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_py.sh")
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} slurm_sbatch_NanoCore.sh")
         if not subjob:
             print("use -sj subjob [vasp|mldyn|nc]")
 
         elif subjob == 'amp':
+            if nhl:
+                hlstr1 = list2str(nhl, delimit=" ")
+                hl2str = list2str(nhl)
+                if not qname:
+                    qname = 'hl'+hl2str
+            if not qname:
+                qname = 'amptest'
+            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_vasp.sh")
+            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_py.sh")
             print(slurm.amp)
             print(f"\t1. amp_jobs.sh fp {inf} {partition} {idata} {ndata} | sh")
             print(f"\t1.9 amp_jobs.sh db {inf} 2 60 | sh")
@@ -325,6 +323,15 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print(ga.dyn)
         elif subjob == 'nc':
             print("SBATCH:")
+            if keyvalues:
+                kv  = keyvalues[0]
+            else:
+                kv  =   'ORR'
+            
+            if not qname:
+                qname=f'{keyvalues}_test'
+            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
+            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=job='{kv}' slurm_sbatch_nc.sh")
             print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=main={inf} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
             print("\nNonoCore Package Development:")
             print(nc.build)
@@ -361,7 +368,7 @@ def main():
     parser.add_argument('job', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-j', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
-    parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")
+    parser.add_argument('-qn', '-q', '--qname', help="queue name for qsub shown by qstat")
     parser.add_argument('-kv', '--keyvalues', nargs='*', help='change a keyword in print')
     parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
     ### flowing slurm option

@@ -7,6 +7,7 @@ import re
 #import os
 #import matplotlib as mpl
 import matplotlib.pyplot as plt
+#import matplotlib.ticker as ticker
 #import csv
 import sys
 import numpy as np
@@ -14,13 +15,13 @@ import numpy as np
     This reads only csv format
 '''
 
-def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors, ymax, ymin):
+def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors, ymax, ymin, yinterval):
     ### check input file whether it is csv format
     l_fname = re.split('\.', fname)
     if l_fname[1] != 'csv':
         print("Please input csv format")
         sys.exit(1)
-
+        
     ###necessary lists###
     rowindexes=[]
     colindexes=[]
@@ -30,7 +31,7 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors, ymax, y
     datanames=[]
 
     ###use pandas dataframe
-    df = pd.read_csv(fname)
+    df = pd.read_csv(fname, delim_whitespace=True)
 
     ###making list of data selection
     if y_columns == []:
@@ -55,7 +56,8 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors, ymax, y
     ###data names for legends label
     for i in (legends):
         datanames.append(i)
-
+    
+    
 
     ###making list of color selection###
     colorselect=[]
@@ -71,7 +73,6 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors, ymax, y
     onedarray=np.asarray(colindexes)
     twodarray=onedarray.reshape((total_cols,total_rows))
     
-
     ###error if number of color and data mismatches
     if len(colorselect)!=total_cols:
         print('Error: Please match the number of data and color')
@@ -80,8 +81,8 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors, ymax, y
     ###matplotlib###
     fig = plt.figure()
     ax = fig.add_subplot()
-    plt.ylabel(ylabel,rotation=90, labelpad=18, fontsize=15)
-    plt.xlabel(xlabel, fontsize=15)
+    plt.ylabel(ylabel,rotation=90, labelpad=18)
+    plt.xlabel(xlabel)
     plt.title(title)
 
 
@@ -90,42 +91,51 @@ def plot_gibbs(fname, y_columns, xlabel, ylabel, legends, title, colors, ymax, y
         for i in range(0,total_rows):
             for j in range(0,total_cols):
                 if i == 0:
-                    plt.plot([i*2 ,i*2+1], [twodarray[j][i],twodarray[j][i]],color=colorselect[j],label='{0}'.format(datanames[j]))
+                    plt.plot([i*2 ,i*2+1], [twodarray[j][i],twodarray[j][i]],color=colorselect[j],label='{0}'.format(datanames[j]),linewidth=3)
                 else:
-                    plt.plot([i*2 ,i*2+1], [twodarray[j][i],twodarray[j][i]],color=colorselect[j])
+                    plt.plot([i*2 ,i*2+1], [twodarray[j][i],twodarray[j][i]],color=colorselect[j],linewidth=3)
     if len(datanames) == 0:
         for i in range(0,total_rows):
             for j in range(0,total_cols):
-                plt.plot([i*2 ,i*2+1], [twodarray[j][i],twodarray[j][i]],color=colorselect[j])
+                plt.plot([i*2 ,i*2+1], [twodarray[j][i],twodarray[j][i]],color=colorselect[j],linewidth=3)
 
     ###connection line draw###
     for i in range(0,total_rows-1):
         for j in range(0,total_cols):
-            plt.plot([i*2+1,i*2+2],[twodarray[j][i],twodarray[j][i+1]],color=colorselect[j],linestyle='--',linewidth=0.5)
+            plt.plot([i*2+1,i*2+2],[twodarray[j][i],twodarray[j][i+1]],color=colorselect[j],linestyle='--',dashes=(6,3.5),linewidth=1)
+
 
 
     if legends==[]:
         pass
     else:
         plt.legend()
-
-    #if ymax+ymin == 0:
-    #    pass
-    #elif ymax+ymin != 0:
-    if ymin:
-        ax.set_ylim([ymin, ymax])
     
+
+    if ymax+ymin == 0:
+        pass
+    if ymax+ymin != 0:
+        if yinterval == 0:
+            plt.yticks(np.arange(ymin, ymax+1))
+        else:
+            plt.ylim([ymin,ymax])
+            plt.yticks(np.arange(ymin, ymax+1, yinterval))
+
 
 
     ax.plot()
     
-    ###xticks setting(x axis data names)
+    ###ticks setting(x axis data names)
     xx=list(np.arange(0.5,total_rows*2,2))
     ax.set_xticks(xx)
-    ax.set_xticklabels(rowindexes, fontsize=8)
-    
+    ax.set_xticklabels(rowindexes, fontsize=8,)
+    ax.tick_params(axis="y",direction="in",length=8)
+    ax.tick_params(axis="x",direction="in",length=0)
+
+    plt.savefig('plotresult.png', dpi=300)    
 
     plt.show()
+
     return 0
 
 def main():
@@ -133,16 +143,17 @@ def main():
     parser.add_argument('inf')
     gplot = parser.add_argument_group(title='plot')
     gplot.add_argument('-yi','--y_columns',required=False, default=[], type=int, nargs='+', help='select y column index')
-    gplot.add_argument('-xl', '--xlabel', default='O$_2$ Reduction Step', help='input x-label')
+    gplot.add_argument('-xl', '--xlabel', default='', type=str, help='input x-label')
     gplot.add_argument('-yl', '--ylabel', required=False, default='G [eV]', help='input y-label')
     gplot.add_argument('-l', '--legends', required=False, type=str, default=[], nargs='+', help='input legends')
     gplot.add_argument('-t', '--title', required=False, type=str, default='', help='input title')
     gplot.add_argument('-c', '--color', required=False, type=str, default=[], nargs='+', help='input color')
-    gplot.add_argument('-ymax', '--ymax', required=False, type=float, help='input maximum of y')
-    gplot.add_argument('-ymin', '--ymin', required=False, type=float, help='input minimum of y')
+    gplot.add_argument('-ymax', '--ymax', required=False, type=float, default=0, help='input maximum of y')
+    gplot.add_argument('-ymin', '--ymin', required=False, type=float, default=0, help='input minimum of y')
+    gplot.add_argument('-yint','--yinterval', required=False, type=float, default=0, help='input y ticks interval')
     args = parser.parse_args()
     
-    plot_gibbs(args.inf, args.y_columns, args.xlabel, args.ylabel, args.legends, args.title, args.color, args.ymax, args.ymin) 
+    plot_gibbs(args.inf, args.y_columns, args.xlabel, args.ylabel, args.legends, args.title, args.color, args.ymax, args.ymin, args.yinterval) 
 
 if __name__ == '__main__':
     main()

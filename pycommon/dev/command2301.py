@@ -368,9 +368,10 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(kisti.py)
         print("Pt(platinum:slurm): vasp")
         print(slurm.vas)
-        #print("MLET(mlet): vasp")
-        #print(mlet.vas)
 
+    elif job == 'nc':
+        print("NanoCore: vasp")
+        print(nc.build)
 
     else:
         print("build more jobs")
@@ -380,7 +381,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('job', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp','nc'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-j', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")
