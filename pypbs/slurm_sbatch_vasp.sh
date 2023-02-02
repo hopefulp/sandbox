@@ -71,12 +71,19 @@ fi
 vasp_dir="/TGM/Apps/VASP/OLD_BIN/5.4.4/O2/NORMAL"
 vasp_ndir="/TGM/Apps/VASP/5.4.4.pl2"
 vasp_dirv6="/TGM/Apps/VASP/bin/6.3.1"
-evasp="gam" # gam std, ncl
+
+if [ $exe ]; then
+    EXEC="vasp.5.4.4.pl2.O2.NORMAL.${exe}.x"
+else
+    EXEC="vasp.5.4.4.pl2.O2.NORMAL.std.x"
+fi
+
+echo "${vasp_dir}/${EXEC}" >> $logfile
 
 if [ $hmem ]; then
-    mpirun -np $mpiproc  ${vasp_dir}/vasp.5.4.4.pl2.O2.NORMAL.${evasp}.x > $outfile
+    mpirun -np $mpiproc  ${vasp_dir}/${EXEC} > $outfile
 else
-    mpirun -np $SLURM_NTASKS  ${vasp_dir}/vasp.5.4.4.pl2.O2.NORMAL.${evasp}.x > $outfile
+    mpirun -np $SLURM_NTASKS  ${vasp_dir}/${EXEC}.x > $outfile
 fi
 date >> $logfile
 
