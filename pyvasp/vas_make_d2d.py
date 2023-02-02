@@ -32,7 +32,7 @@ def make_vas_d2d(odir, ndir, job, poscar, kpoints, potcar, incar, files, np,xpar
    
     ### 1. POSCAR
     #get_poscar(poscar, job='new', sub=1)    #1 for CONTCAR
-    if poscar == 'p':
+    if job == 'ini' or poscar == 'p':
         pos = f"{odir}/POSCAR"
     elif poscar == 'c':
         pos = f"{odir}/CONTCAR"
@@ -44,18 +44,18 @@ def make_vas_d2d(odir, ndir, job, poscar, kpoints, potcar, incar, files, np,xpar
         else:
             print("there is no poscar")
     s = f"cp {pos} {ndir}/POSCAR"
+    print(f"{s}")
     os.system(s)
-    print(f"POSCAR  from {pos:>15} to {ndir}")
     ### 2. KPOINTS    
-    if not kpoints:
-        s = f"cp {odir:>15}/KPOINTS {ndir}"
+    if job == 'ini' or not kpoints:
+        s = f"cp {odir}/KPOINTS {ndir}"
+    print(f"{s}")
     os.system(s)
-    print(f"KPOINTS from {odir:>15} to {ndir}")
     ### 3. POTCAR
-    if not potcar:
+    if job == 'ini' or not potcar:
         s = f"cp {odir}/POTCAR {ndir}"
         os.system(s)
-        print(f"POTCAR  from {odir:>15} to {ndir}")
+        print(f"{s}")
     else:
         s = f"genpotcar.py -pp {pp}"
         os.chdir(ndir)
@@ -63,13 +63,13 @@ def make_vas_d2d(odir, ndir, job, poscar, kpoints, potcar, incar, files, np,xpar
         os.chdir(pwd)
         print(f"POTCAR was generated in {ndir} with {pp}")
     ### INCAR :: copy INCAR or incar.key
-    if incar:
-        inc = incar
-    else:
+    if job == 'ini' or not incar:
         inc = f"{odir}/INCAR"
+    else:
+        inc = incar
     s = f"cp {inc} {ndir}/INCAR"
+    print(f"{s}")
     os.system(s)
-    print(f"INCAR   from {inc:>15} to {ndir}")
     
     ### Extra files for Continous Job: CHGCAR, WAVECAR
     if files:
@@ -88,7 +88,7 @@ def main():
     parser = argparse.ArgumentParser(description='make directory from other directory ')
     parser.add_argument('odir', help='copy from old dir')
     parser.add_argument('ndir', help='mkdir and cp')
-    parser.add_argument('-j', '--job', choices=['lda','hybrid','md','mol','kp'], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=['lda','hybrid','md','mol','kp','ini'], help='inquire for each file')
     parser.add_argument('-s', '--poscar', default='p', help='p[POSCAR],c[CONTCAR],w[wdir/POSCAR],input poscar')
     parser.add_argument('-p', '--potcar', help='copy odir/potcaruse or make POTCAR')
     parser.add_argument('-i', '--incar',  help='use the same INCAR in d2d')
