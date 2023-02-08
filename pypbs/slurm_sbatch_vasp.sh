@@ -78,12 +78,12 @@ else
     EXEC="vasp.5.4.4.pl2.O2.NORMAL.std.x"
 fi
 
-echo "${vasp_dir}/${EXEC}" >> $logfile
-
 if [ $hmem ]; then
+    echo "mpirun -np $mpiproc  ${vasp_dir}/${EXEC}" >> $logfile
     mpirun -np $mpiproc  ${vasp_dir}/${EXEC} > $outfile
 else
-    mpirun -np $SLURM_NTASKS  ${vasp_dir}/${EXEC}.x > $outfile
+    echo "mpirun -np $SLURM_NTASKS  ${vasp_dir}/${EXEC}" >> $logfile
+    mpirun -np $SLURM_NTASKS  ${vasp_dir}/${EXEC} > $outfile
 fi
 date >> $logfile
 
