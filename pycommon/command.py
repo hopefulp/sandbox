@@ -160,6 +160,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     ncpu =  int(nXn[partition]/2)
     slurm.vas = " === Job submission"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
     slurm.vas +=  "\n        For memory issue"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -c {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
