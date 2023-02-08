@@ -37,7 +37,7 @@ def get_yv_scale(yscale):
     return values
 
 def get_title(name):
-    title = fname_pre(name)
+    title = f_root(name)
     return title.upper()
 
 def fwhite2table(f):
