@@ -4,16 +4,22 @@ import argparse
 import re
 import os
 import subprocess
+from myplot2D import mplot_nvector as mplot
+import numpy as np
 
-def anal_oszicar(fname, outf):
-    if os.path.isdir(fname):
-        f = fname + '/OSZICAR'
-    else:
-        f = fname
-    st = f"grep T= {f} > mdlog.dat"
-    subprocess.check_output(st, shell = True)
+def anal_oszicar(files, outf, ys):
+    os.system('rm mdlog.dat')
+    for fname in files:
+        if os.path.isdir(fname):
+            f = fname + '/OSZICAR'
+        else:
+            f = fname
+        st = f"grep T= {f} >> mdlog.dat"
+        os.system(st)
+        #subprocess.check_output(st, shell = True)
 
     t = []
+    tstep = []
     T = []
     Etot = []
     F = []
@@ -21,11 +27,14 @@ def anal_oszicar(fname, outf):
     Ekin = []
     ther_pot = []
     ther_kin = []
+
+
     with open("mdlog.dat", 'r') as f:
-        for line in f: 
+        for i, line in enumerate(f): 
             #print(line)
             li = line.strip().split()
             t.append(int(li[0]))
+            tstep.append(i+1) 
             T.append(int(float(li[2])))
             Etot.append(float(li[4]))
             F.append(float(li[6]))
@@ -43,15 +52,34 @@ def anal_oszicar(fname, outf):
         print(f"Etot {Etot[i]:12.5f} EF {F[i]:12.5f}  Epot+Ekin {Epot[i]+Ekin[i]:12.5f} Eall {Epot[i]+Ekin[i]+ther_pot[i]+ther_kin[i]:12.5f}")
     fout.close()
 
+    osz = {'T':T, 'Etot': Etot, 'F':F, 'Epot':Epot, 'Ekin':Ekin, 'Spot':ther_pot, 'Skin':ther_kin}
+    yplots =[]
+    ylegends =[]
+    for y in ys:
+        print(f"key: {y}")
+        for key in osz.keys():
+            if y.casefold() == key.casefold():
+                yplots.append(osz[key])
+                ylegends.append(key)
+
+    etotnu = np.array(Epot) + np.array(Ekin)
+    ther = np.array(ther_pot) + np.array(ther_kin)
+    esum = etotnu + ther 
+    #mplot(tstep, yplots, legend=ylegends)
+    mplot(tstep, [Etot,etotnu, esum], legend=['Etot','Etotptl','Esum'] )
+    ### ys.dim = 1
+    #mplot(tstep, T)
+
     return 0
 
 def main():
     parser = argparse.ArgumentParser(description='read vasp logfile')
-    parser.add_argument('file', help='read logfile or OSZICAR')
+    parser.add_argument('file', nargs='+', help='read logfile or OSZICAR')
     parser.add_argument('-of', '--outf', default='md.dat', help='save md data')
+    parser.add_argument('-y', '--ys', nargs='+', default='F', help='y plots')
     args = parser.parse_args()
     
-    anal_oszicar(args.file, args.outf) 
+    anal_oszicar(args.file, args.outf, args.ys) 
 
 if __name__ == '__main__':
     main()
