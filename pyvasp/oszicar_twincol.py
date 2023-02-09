@@ -4,9 +4,11 @@ import argparse
 import re
 import os
 import subprocess
+from myplot2D import mplot_nvector as mplot
+from myplot2D import mplot_twinx as mplot2y
 import numpy as np
 
-def anal_oszicar(files, outf, ys, iy2s):
+def anal_oszicar(files, outf, ys, ys2):
     os.system('rm mdlog.dat')
     for fname in files:
         if os.path.isdir(fname):
@@ -55,7 +57,7 @@ def anal_oszicar(files, outf, ys, iy2s):
     yplots =[]
     ylegends =[]
     for y in ys:
-        print(f"key: {y}, len {len(y.split())}")
+        print(f"key left: {y}, len {len(y.split())}")
         if len(y.split()) == 1:
             for key in osz.keys():
                 if y.casefold() == key.casefold():
@@ -76,16 +78,41 @@ def anal_oszicar(files, outf, ys, iy2s):
             yarr1d = np.array(ysum).T.sum(axis=1)
             yplots.append(yarr1d)
             ylegends.append(leg)
+    if ys2:
+        yplots2 =[]
+        ylegends2 =[]
+        for y in ys2:
+            print(f"key right: {y}, len {len(y.split())}")
+            if len(y.split()) == 1:
+                for key in osz.keys():
+                    if y.casefold() == key.casefold():
+                        yplots2.append(osz[key])
+                        ylegends2.append(key)
+            ### sum several terms
+            else:
+                ysum=[]
+                leg=""
+                inp_keys = y.split()
+                for inp_key in inp_keys:
+                    for key in osz.keys():
+                        if inp_key.casefold() == key.casefold():
+                            print(f"add {key} to ys")
+                            ysum.append(osz[key])
+                            leg+=f"{key}+"
+                ### sum 2d array
+                yarr1d = np.array(ysum).T.sum(axis=1)
+                yplots2.append(yarr1d)
+                ylegends2.append(leg)
+        
             
     #etotnu = np.array(Epot) + np.array(Ekin)
     #ther = np.array(ther_pot) + np.array(ther_kin)
     #esum = etotnu + ther
-    if not iy2s:
-        from myplot2D import mplot_nvector as mplot
+    if not ys2:
         mplot(tstep, yplots, legend=ylegends)
     else:
-        from myplot2D import mplot_twinx as mplot
-        mplot(tstep, yplots, iy2s, legend=ylegends)
+        leg = [ylegends, ylegends2]
+        mplot2y(tstep, yplots, yplots2, legend=leg)
     #mplot(tstep, [Etot,etotnu, esum], legend=['Etot','Etotptl','Esum'] )
     ### ys.dim = 1
     #mplot(tstep, T)
@@ -97,10 +124,10 @@ def main():
     parser.add_argument('file', nargs='+', help='read logfile or OSZICAR')
     parser.add_argument('-of', '--outf', default='md.dat', help='save md data')
     parser.add_argument('-y', '--ys', nargs='+', default='F', help='y plots')
-    parser.add_argument('-iy2', '--iy2s', nargs='*', type=int, help='y2 column as index')
+    parser.add_argument('-y2', '--ys2', nargs='*', help='y plots')
     args = parser.parse_args()
     
-    anal_oszicar(args.file, args.outf, args.ys, args.iy2s) 
+    anal_oszicar(args.file, args.outf, args.ys, args.ys2) 
 
 if __name__ == '__main__':
     main()
