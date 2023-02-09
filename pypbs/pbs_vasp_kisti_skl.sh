@@ -29,6 +29,8 @@ fi
 
 cd $log_dir/$wdir
 
+echo "mpirun $EXEC" >> $log_file
+
 mpirun $EXEC > $log_dir/$jobname.log
 
 mv $log_dir/$jobname.log $log_dir/$jobname.out 
