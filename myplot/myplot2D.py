@@ -11,6 +11,7 @@ import sys
 import my_chem 
 import numpy as np
 from common import *
+
 #plt.switch_backend('agg')
 size_title = 20
 size_label = 18
@@ -296,7 +297,7 @@ def xtitle_font(tit):
 
 ### used for md.ene, normal data file
 #def mplot_twinx(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None):
-def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=None, Lsave=False, Colors=None):
+def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel='E [eV]', legend=None, Lsave=False, Colors=None):
     '''
     called from "amp_plot_stat.py"
     call with x=[] and y=[ [...
@@ -304,7 +305,8 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     y:: [size] or [[size],[size],...[size]]
     len(ylabel) == 2
     '''
-    fig, ax = common_figure()
+    #fig, ax = common_figure(ncolor = len(y))
+    fig, ax = plt.subplots(figsize=(12,8))
     ys = np.array(y)
     if len(x) != 0:
         xsize = len(x)
@@ -324,16 +326,16 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     #ax.xaxis.set_major_locator(plt.NullLocator())
     #print(f"x, y shape:: {np.array(x).shape} {np.array(y).shape} and ylabel {ylabel} in {whereami()}")
     ax2=ax.twinx()
-    ax2.set_ylabel(ylabel2, color='g')
+    ax2.set_ylabel(ylabel2, fontsize=25, color='g')
     #ax2.set_ylim(0,0.2)
     pls=[]
-    print(iy_right, len(ys))
+    print(f"{iy_right} {len(ys)} {whereami()}")
     for i in range(len(ys)):
         if i in iy_right: 
             #if Colors:  color = Colors.pop(i)       #'tab:' + Colors.pop(0)
             #else:       color='tab:green'
             plt.yticks(color='g')
-            p2, = ax2.plot(x, ys[i,:], 'x-', color='g', label=legend[i])
+            p2, = ax2.plot(x, ys[i,:], '-', color='g', label=legend[i])
             pls.append(p2)
         else:
             #ax2.tick_params(axis='y')
@@ -341,17 +343,17 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
             #else:       color = 'tab:red'
             #print(f"shape of x, ys[i] = {np.array(x).shape} {ys[i,:].shape}")
             plt.yticks(color='r')
-            p1, = ax.plot(x, ys[i,:], 'o-', color='r',  label=legend[i])
+            p1, = ax.plot(x, ys[i,:], '-', color='r',  label=legend[i])
             pls.append(p1)
     #plt.legend(pls, Ylabels, loc=2)
-    #ax.legend(loc=3)            # 2
-    #ax2.legend(loc=4)           # 1
-    #plt.legend()
+    ax.legend(loc=2)            # 2
+    ax2.legend(loc=4)           # 1
+    plt.legend()
     #common_figure_after()
     #x_ticks = ['PP', 'PPP', 'PNP', 'PNP-bridged']
     #plt.xticks(x_ticks)
     #ax.set_xticklabels(x_ticks)
-    plt.locator_params(axis='x', nbins=10)
+    #plt.locator_params(axis='x', nbins=10)
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)
@@ -424,7 +426,7 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     call with x=[] and y=[ [...
     x:: [] or [size]
     y:: [size] or [[size],[size],...[size]]
-
+    '''
     if not colors:
         if len(legend):
             fig, ax = common_figure(ncolor = len(legend))
@@ -432,8 +434,7 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
             fig, ax = common_figure(ncolor=4)
     else:
         fig, ax = common_figure(ncolor=4)
-    '''
-    fig, ax = common_figure()
+    #fig, ax = common_figure()
     #if len(y):
     #    camount= 1/len(y) *2
     #color_rgb = lighten_2color('rb', len(y))
@@ -456,7 +457,9 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     elif ys.ndim == 2:
         for i in range(len(ys)):
             #plt.plot(x,ys[i,:], color=color_rgb[i], label=legend[i] )
-            plt.plot(x,ys[i,:], color=colors[i], label=legend[i] )
+            #plt.plot(x,ys[i,:], color=colors[i], label=legend[i] )
+            ### common_figure uses color_cycler
+            plt.plot(x,ys[i,:],  label=legend[i] )
     else:
         print(f"Error:: obscure in y-dim {ys.ndim}")
     ### ADD LEGEND
