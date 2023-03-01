@@ -123,8 +123,7 @@ def lighten_2color(color, ncolors):
     #return colorsys.hls_to_rgb(c[0], lightness, c[2])
     return color_rgb
     #return colorsys.hls_to_rgb(c[0], amount * (1 - c[1]), c[2])
-
-def common_figure(ctype='darken', ncolor=4, Ltwinx=False):
+def common_figure(ctype='darken',ncolor=1):
     '''
     ctype   darken to change intensity
             cycle to use designated color turns
@@ -143,31 +142,19 @@ def common_figure(ctype='darken', ncolor=4, Ltwinx=False):
     if ctype == 'darken':
         pass   
     else:
-        if Ltwinx:
-            print(f"make twinx axis")
-            ax2 = ax.twinx()
-            custom_cycler = (cycler(color=['r','m', 'orange']))
-            custom_cycler2 = (cycler(color=['b', 'g']))
-            ax.set_prop_cycle(custom_cycler)
-            ax2.set_prop_cycle(custom_cycler2)
-            return fig, ax, ax2
+        if ncolor == 2:
+            custom_cycler = (cycler(color=['r','g']))                                          # Figure 8(b)
+            custom_cycler = (cycler(color=['darkcyan','b']))                                   # Figure S16(a)
+            custom_cycler = (cycler(color=['r','darkcyan']))                                    # Figure S16(b)
+        elif ncolor == 4:
+            custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
+            custom_cycler = (cycler(color=['r','m','g','b']))
         else:
-            if ncolor == 2:
-                custom_cycler = (cycler(color=['r','g']))                                          # Figure 8(b)
-                custom_cycler = (cycler(color=['darkcyan','b']))                                   # Figure S16(a)
-                custom_cycler = (cycler(color=['r','darkcyan']))                                    # Figure S16(b)
-            elif ncolor == 3:
-                custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
-                custom_cycler = (cycler(color=['r','m','g','b']))
-            elif ncolor == 4:
-                custom_cycler = (cycler(color=['orange','m','g','b'])+ cycler(lw=[1,1,1,2]))       # Figure 8(a)
-                custom_cycler = (cycler(color=['r','m','g','b']))
-            else:
-                custom_cycler = (cycler(color=['r','m','g','b']))
-            ax.set_prop_cycle(custom_cycler)
-            return fig, ax
+            custom_cycler = (cycler(color=['r','m','g','b']))
+            
+        ax.set_prop_cycle(custom_cycler)
     return fig, ax
-    
+
 ### draw_dots_two was upgraded to twinx
 def draw_2subdots(y, h, title, suptitle, Ltwinx=None, escale=1.0,Colors=['r','b','o'], Ldiff=True):
     '''
@@ -308,7 +295,8 @@ def xtitle_font(tit):
     return st
 
 
-### twinx1: used for md.ene, normal data file
+### used for md.ene, normal data file
+#def mplot_twinx(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None):
 def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel='E [eV]', legend=None, Lsave=False, Colors=None):
     '''
     called from "amp_plot_stat.py"
@@ -317,11 +305,8 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel='E [eV]', legend
     y:: [size] or [[size],[size],...[size]]
     len(ylabel) == 2
     '''
-    if iy_right:
-        fig, ax, ax2 = common_figure(ctype='cycle', ncolor = len(y), Ltwinx=True)
-    else:
-        fig, ax = common_figure(ctype='cycle', ncolor = len(y))
-    #fig, ax = plt.subplots(figsize=(12,8))
+    #fig, ax = common_figure(ncolor = len(y))
+    fig, ax = plt.subplots(figsize=(12,8))
     ys = np.array(y)
     if len(x) != 0:
         xsize = len(x)
@@ -336,35 +321,29 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel='E [eV]', legend
     elif isinstance(ylabel, list):
         ylabel1 = ylabel[0]
         ylabel2 = ylabel[1]
-    ### try autocolor
-    #plt.ylabel(ylabel1, fontsize=25, color='r')
-    plt.ylabel(ylabel1, fontsize=25)
-    #ax.tick_params(axis='y', colors='r')
-    ax.tick_params(axis='y')
-    #ax.set_ylim(-2,2)
+    plt.ylabel(ylabel1, fontsize=25, color='r')
+    ax.tick_params(axis='y', colors='r')
     #ax.xaxis.set_major_locator(plt.NullLocator())
     #print(f"x, y shape:: {np.array(x).shape} {np.array(y).shape} and ylabel {ylabel} in {whereami()}")
-    #ax2.set_ylabel(ylabel2, fontsize=25, color='g')
-    ax2.set_ylabel(ylabel2, fontsize=25)
-    ax2.set_ylim(-2,2)
+    ax2=ax.twinx()
+    ax2.set_ylabel(ylabel2, fontsize=25, color='g')
+    #ax2.set_ylim(0,0.2)
     pls=[]
     print(f"{iy_right} {len(ys)} {whereami()}")
     for i in range(len(ys)):
         if i in iy_right: 
             #if Colors:  color = Colors.pop(i)       #'tab:' + Colors.pop(0)
             #else:       color='tab:green'
-            #plt.yticks(color='g')
-            #p2, = ax2.plot(x, ys[i,:], '-', color='g', label=legend[i])
-            p2, = ax2.plot(x, ys[i,:], '-', label=legend[i])
+            plt.yticks(color='g')
+            p2, = ax2.plot(x, ys[i,:], '-', color='g', label=legend[i])
             pls.append(p2)
         else:
             #ax2.tick_params(axis='y')
             #if Colors:  color = Colors.pop(i)       #color = 'tab:' + Colors.pop(0)
             #else:       color = 'tab:red'
             #print(f"shape of x, ys[i] = {np.array(x).shape} {ys[i,:].shape}")
-            #plt.yticks(color='r')
-            #p1, = ax.plot(x, ys[i,:], '-', color='r',  label=legend[i])
-            p1, = ax.plot(x, ys[i,:], '-', label=legend[i])
+            plt.yticks(color='r')
+            p1, = ax.plot(x, ys[i,:], '-', color='r',  label=legend[i])
             pls.append(p1)
     #plt.legend(pls, Ylabels, loc=2)
     ax.legend(loc=2)            # 2
@@ -448,14 +427,13 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     x:: [] or [size]
     y:: [size] or [[size],[size],...[size]]
     '''
-    print(f"{legend} {len(legend)}")
-    nlegend = len(legend)
     if not colors:
-        fig, ax = common_figure(ncolor = nlegend)
-        #else:
-        #    fig, ax = common_figure(ncolor=4)
-    #else:
-    #    fig, ax = common_figure(ncolor=4)
+        if len(legend):
+            fig, ax = common_figure(ncolor = len(legend))
+        else:
+            fig, ax = common_figure(ncolor=4)
+    else:
+        fig, ax = common_figure(ncolor=4)
     #fig, ax = common_figure()
     #if len(y):
     #    camount= 1/len(y) *2
@@ -473,14 +451,6 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     if xlabel:
         plt.xlabel(xlabel, fontsize=12)
     plt.ylabel(ylabel, fontsize=12)
-    ### test value of Spot
-    test = 0
-    if test == 1:
-        ndata = 100
-        pivot = len(x) - ndata
-        for i in range(ndata):
-            print(f"x {x[pivot+i]} y {y[0][pivot+i]}")
-
     if ys.ndim == 1:
         plt.plot(x, y, '-')
         #plt.scatter(x, y)
