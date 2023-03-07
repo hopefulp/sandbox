@@ -55,7 +55,7 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,opt_incar, allprepared, dirname, iofile, atoms, issue, Lrun,Lmkdir,qx,qN,qn):
+def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, opt_incar, allprepared, dirname, iofile, atoms, issue, Lrun,Lmkdir,qx,qN,qn):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -151,10 +151,8 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,opt_incar, al
         print(f'{incar} will be copied to INCAR')
         files2copy.append(f"{incar}")
         ### 5. make work_dir
-        q = f'will you make dir? {dirname}...'
+        q = 'will you make dir? '
         if Lmkdir or yes_or_no(q):
-            if Lktest:
-                dirname += 'k' + list2str(kpoints)
             print(f"dirname {dirname}")
             if not "dirname" in locals():
                 q = 'input dirname: '
@@ -203,9 +201,6 @@ def main():
     parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
     parser.add_argument('-hpp', '--pseudoH', nargs='*', help='include pseudo H list ')
     parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz, or g for gamma')
-    g_ktest = parser.add_argument_group(title='KP tests')
-    g_ktest.add_argument('-kdim', '--kdim', default=3, type=int, choices=[1,2,3], help='input series of k-points [kx, ky, kz]*3')
-    g_ktest.add_argument('-kps', '--kp_test', nargs='*', type=int, help='input series of k-points [kx, ky, kz]*3')
     ### toggle default: unset in the bare dir, set to j when INCAR.job exists
     parser.add_argument('-i', '--incar', help='j: use INCAR.job, dirname: use d/INCAR')
     parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
@@ -221,22 +216,7 @@ def main():
     g_queue.add_argument('-n', '-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
     args = parser.parse_args()
 
-    ### for kpoints-scan
-    if args.kp_test:
-        kparray = np.array(args.kp_test)
-        kps = kparray.reshape([-1,args.kdim])
-        for kp in kps:
-            if kp.size == 1:
-                kp_in=[kp[0], kp[0], kp[0]]
-            elif kp.size == 2:
-                kp_in=[kp[0], kp[0], kp[1]]
-            elif kp.size == 3:
-                kp_in = list(kp)
-            print(kp_in)
-            kp_str = list(map(str, kp_in))
-            make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc)
-    else:
-        make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc)
+    make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc)
     return 0
 
 if __name__ == '__main__':

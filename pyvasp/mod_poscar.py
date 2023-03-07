@@ -167,14 +167,15 @@ def get_poscar0(poscar):
     return 0
 
 def pos2dirname(poscar):
-   ### obtain dirname from POSCAR.dir
-   if re.match("POSCAR", poscar):
-       dirname = poscar[7:]
-   else:
-       dirname = poscar
-   return dirname
-
-
+    ### obtain dirname from POSCAR.dir
+    if re.match("POSCAR", poscar):
+        if len(poscar) == 6:
+            dirname='pos'
+        else:
+            dirname = poscar[7:]
+    else:
+        dirname = poscar
+    return dirname
 
 def fixedMD_POSCAR(poscar, atom, atoms=None):
     '''

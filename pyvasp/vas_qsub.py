@@ -75,7 +75,7 @@ def qsub_command(ndir, X=3, nnode=4, np=None, issue=None):
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_skl.sh"
     elif hostname == 'pt':
         if not X or not nnode:
-            qx, qN = get_queue_pt(qx=qx)
+            qx, qN = get_queue_pt(qx=X)
         if np:
             nproc = np
         else:
