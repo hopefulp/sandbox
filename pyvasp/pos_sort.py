@@ -59,7 +59,7 @@ def contract_atom_numbers(numbers, atomlist):
     print(num_atom_kinds)
     return num_atom_kinds, atom_kinds
 
-def sortz_atom_coord(lines):
+def sortz_atom_coord(lines, atom):
     ''' for a same atom group '''
     line2d=[]
     for line in lines:
@@ -71,8 +71,10 @@ def sortz_atom_coord(lines):
     s=[]
     for line_ele in new_coord2d:
         ### use join to make a string regardless of number of data
-        space = "  "
-        st = space.join(line_ele) + "\n"
+        ### sorted POSCAR format
+        space = "     "
+        icoord = list(map(float, line_ele))
+        st = f"  {icoord[0]:10.5f} {icoord[1]:10.5f} {icoord[2]:10.5f}   {atom}\n"
         s.append(st)
     return s
 
@@ -90,7 +92,7 @@ def rearrange_coord_lines(lines, atom_klist, atom_names_orig, natom_orig, sort_z
     for atom in atom_klist:
         if sort_z:
             print(f"z sort in {whereami()}")
-            lines = sortz_atom_coord(coord_dict[atom])
+            lines = sortz_atom_coord(coord_dict[atom], atom=atom)
         else:
             lines = coord_dict[atom]
         for line in lines:

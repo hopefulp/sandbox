@@ -35,20 +35,26 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\tOPTIONS:\
                     \n\t    -s  poscar\
                     \n\t\tPOSCAR.dirname <- convention\
+                    \n\t\tPOSCAR for k-sampling\
                     \n\t    -r  run qsub on any server\
                     \n\t    -o  qopt to use different qscript\
                     \n\t    -al stop questioning except -s poscar\
                     \n\t    -hpp pseudo hydrogen in /TGM/Apps/VASP/POTCAR\
+                    \n\t    Group k-sampling\
+                    \n\t\t-kdim [1,2,3], 1 for bulk: k[0]*3, 2 for slab: k[0]*2 k[1], 3 for default\
+                    \n\t\t-kps 4 4 6 4 8 4 10 4 for -kdim 2\
                     \n\tPOTCAR: \
                     \n\t    will be made by 'genpotcar.py -pp pbe' after cd and reading POSCAR\
                     \n\tKPOINTS:\
-                    \n\t    constructed by raw\
+                    \n\t    constructed by raw: if fail M, try G\
                     \n\tINCAR:\
                     \n\t    need to be prepared in advance\
                     \n\te.g. (KISTI)\
                     \n\t    python $sbvas/vas_make_ini.py -r -o -al -s POSCAR.pdh2sidetop\
                     \n\te.g. (platinum)\
                     \n\t    vas_make_ini.py -s POSCAR.sc11sHHf -j sp -al -hpp .66 1.33\
+                    \n\t    (kpoint sampling)\
+                    \n\t    vas_make_ini.py -s POSCAR -kdim 2 -kps 4 4 6 4 8 4 -x 2 -N 1 -n 4\
                     "
 make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
                     \n\tvas_make_d2d.py old_dir new_dir job [options]\
@@ -154,8 +160,19 @@ poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
                     \n\t    -z  True for z-sort in the atom group\
                     \n\tNB: when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
                     "
-potcar.genpotcar =  "genpotcar.py -pp pseudop\
+potcar.potcar_gen   =  "potcar_gen.py -pp pseudop\
                     \n\tread POSCAR make POTCAR inside VASP dir\
+                    "
+potcar.genpotcar    = "linked to potcar_gen.py\
+                    "
+potcar.potcar_kw    = "extract k-w\
+                    \n\tpotcar_kw.py POTCAR[dir] -kw KW\
+                    \n\tOptions:\
+                    \n\t    POTCAR or if dir, dir/POTCAR\
+                    \n\t    -kw:\
+                    \n\t\tENMAX -> get 130% of ENMAX\
+                    \n\te.g.:\
+                    \n\t    potcar_kw.py k774 [-kw ENMAX]\
                     "
 
 incar.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
