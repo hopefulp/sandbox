@@ -59,8 +59,15 @@ def get_queue_pt(qx=None):
         else:
             return 1, free_node
 
-def qsub_command(ndir, X=3, nnode=4, np=None, issue=None):
+def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None):
     if hostname == 'kisti':
+        if vasp_exe:
+            if vasp_exe == 'gamma':
+                str_vasp = "-v exe=gamma"
+            elif vasp_exe == 'xyrelax':
+                str_vasp = "-v crelax=xy"
+        else:
+            str_vasp = ""
         nnode=20
         np=40
         if issue != 'mem' and ( re.search('bd', ndir) or re.search('band', ndir)):
@@ -72,7 +79,7 @@ def qsub_command(ndir, X=3, nnode=4, np=None, issue=None):
         elif issue == 'opt':
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
         else:
-            s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_skl.sh"
+            s = f"qsub -N {ndir} {str_vasp} $SB/pypbs/pbs_vasp_kisti_skl.sh"
     elif hostname == 'pt':
         if not X or not nnode:
             qx, qN = get_queue_pt(qx=X)

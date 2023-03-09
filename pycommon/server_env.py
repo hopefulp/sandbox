@@ -15,7 +15,7 @@ else:
     host = _HOSTname
 
 if host == 'kisti':    
-    home = "/home01/x2232a02"
+    home = "/home01/x2462a02"
 
 '''
 PPNs={'chi':1, 'login':4, 'iron':''}

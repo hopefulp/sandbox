@@ -7,4 +7,4 @@
 
 cd $PBS_O_WORKDIR
 
-mpirun /home01/x2232a02/bin/vasp_5.4.4_GRP7_NORMAL_20170903.x > stdout.txt
+mpirun /home01/x2462a02/bin/vasp_5.4.4_GRP7_NORMAL_20170903.x > stdout.txt
