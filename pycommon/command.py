@@ -139,14 +139,17 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         kw1 = keyvalues[0]
     ###### make command line in advance
     ### KISTI
-    kisti.vas = f"\t(VASP) for (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)"
+    kisti.vas = f"\t(VASP) :: (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)"
     kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
     kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh "
-    kisti.vas += f"\n\t      for (xy-relax)"
+    kisti.vas += f"\n\t      :: kpoints sampling"
+    kisti.vas += f"\n\t      $ python $(which vas_make_ini.py ) -s POSCAR -kdim 2 -kps 2 1 4 1 6 1 8 1"
+    kisti.vas += f"\n\t      :: slab, xy-relax"
+    kisti.vas += f"\n\t      $ python $(which vas_make_ini.py ) -s POSCAR.{qname} -j copt -exe xyrelax"
     kisti.vas += f"\n\t      $ qsub -N {qname} -v crelax=yes $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t      for (gamma, ncl)"
+    kisti.vas += f"\n\t      :: gamma, ncl"
     kisti.vas += f"\n\t      $ qsub -N {qname} -v exe=gamma $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t      (run half process to save memory usage)"
+    kisti.vas += f"\n\t      :: run half process to save memory usage"
     kisti.vas += f"\n\t      $ qsub -N {qname} -l select=20:ncpus=40:mpiprocs=20:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t      $ qsub -N {qname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
