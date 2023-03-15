@@ -142,6 +142,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     kisti.vas = f"\t(VASP) :: (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)"
     kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
     kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh "
+    kisti.vas += f"\n\t      $ python $(which vas_make_ini.py ) -s POSCAR.{qname} -j opt"
     kisti.vas += f"\n\t      :: kpoints sampling"
     kisti.vas += f"\n\t      $ python $(which vas_make_ini.py ) -s POSCAR -kdim 2 -kps 2 1 4 1 6 1 8 1"
     kisti.vas += f"\n\t      :: slab, xy-relax"

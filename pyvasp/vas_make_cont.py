@@ -196,8 +196,8 @@ def vasp_jobs(job, dirs, fixatom, kopt, iopt, incar_kws, incar_remove, Lrun, new
     return 0
 
 def main():
-    parser = argparse.ArgumentParser(description='remove files except initial files')
-    parser.add_argument('-j', '--job', choices=['sp','incar',"dos","band","pchg","chg","chgw","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
+    parser = argparse.ArgumentParser(description='How to make a continuous job dir')
+    parser.add_argument('-j', '--job', choices=['sp','incar',"dos","band","pchg","chg","chgw","md","cont","ini",'kp',"zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
     gdirectory = parser.add_mutually_exclusive_group()
     gdirectory.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
     gdirectory.add_argument('-p', '--prefix', help='select directories using prefix')
