@@ -73,13 +73,15 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,opt_incar, al
             ### cp input poscar to 'POSCAR'
             #print(f"{__name__}::{poscar}")
             get_poscar(poscar)
-            if not dirname:
+            if not dirname or len(poscars) != 1:
                 dirname = pos2dirname(poscar)
+        print(f"target directory {dirname}")
         ### use filename as it is
         files2copy.append('POSCAR')
         ### 2. get POTCAR will be made from scratch
         # POTCAR will be made after POSCAR moves to job directory
         ### 3. get KPOINTS
+        ### use kp inputs, if KPOINTS ready, KPOINTS.job, make KPOINTS file
         q = 'will you make KPOINTS?'
         if job:
             kpointjob = 'KPOINTS.' + job
