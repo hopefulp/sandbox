@@ -126,7 +126,7 @@ def smodify_incar(incar, ickw, icout, outf='INCAR.mod'):
                 line_key = line_key.replace('#', '')
             #print(f"{line_key}: {kws.keys()}")
             if line_key.upper() in kws.keys():
-                line = f" {line_key}  =  {kws[line_key]}   ! change in smodify_incar\n"
+                line = f" {line_key}   =  {kws[line_key]}   ! change in smodify_incar\n"
         ### if activated and in the list of delete
         elif icout and line_key in icout:
             line = f" #{line.rstrip()}    ! change in smodify_incar\n"
