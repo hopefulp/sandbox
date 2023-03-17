@@ -200,15 +200,15 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,opt_incar, al
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', choices=['pchg','chg','md','ini','zpe','mol','wav','opt','copt','sp','noD','kp'], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=["pchg","chg","md","ini","zpe","mol","wav","opt","copt","sp", 'noD'], help='inquire for each file')
     parser.add_argument('-s', '--poscar', nargs='+', help='poscar is required')
     parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
     parser.add_argument('-hpp', '--pseudoH', nargs='*', help='include pseudo H list ')
     parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz, or g for gamma')
     ### KP tests
     g_ktest = parser.add_argument_group(title='KP tests')
-    g_ktest.add_argument('-kd', '--kdim', default=3, type=int, choices=[1,2,3], help='input series of k-points [kx, ky, kz]*3')
-    g_ktest.add_argument('-kps', '--kpoints_test', nargs='*', type=int, help='input series of k-points [kx, ky, kz]*3')
+    g_ktest.add_argument('-kdim', '--kdim', default=3, type=int, choices=[1,2,3], help='input series of k-points [kx, ky, kz]*3')
+    g_ktest.add_argument('-kps', '--kp_test', nargs='*', type=int, help='input series of k-points [kx, ky, kz]*3')
     ### toggle default: unset in the bare dir, set to j when INCAR.job exists
     parser.add_argument('-i', '--incar', help='j: use INCAR.job, dirname: use d/INCAR')
     parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
@@ -228,9 +228,8 @@ def main():
     args = parser.parse_args()
 
     ### for kpoints-scan
-    #if args.kp_test:
-    if args.job == 'kp':
-        kparray = np.array(args.kpoints_test)
+    if args.kp_test:
+        kparray = np.array(args.kp_test)
         kps = kparray.reshape([-1,args.kdim])
         for kp in kps:
             if kp.size == 1:
