@@ -163,10 +163,10 @@ def poscar_sort(pos, atom_klist, natom, atom_file, ftype, suff, rename, sort_z):
                     atom_sort, katom_orig = get_atomlist(line)
                 if not atom_klist:
                     atom_klist = atom_sort
-                el_st = ''.join(atom_klist)
+                el_st = ' '.join(atom_klist) + "\n"
                 s = el_st + "   from " + pos + "\n"
                 print(s)
-                outf.write(s)               # write() doesnot make "\n"
+                outf.write(el_st)               # write() doesnot make "\n"
             ### copy cell parameters
             elif i < 5:
                 outf.write(line)
