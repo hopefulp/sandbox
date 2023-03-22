@@ -58,12 +58,15 @@ pbs.pbs_server     = f"QSUB JOB\
                     \n\t\t-n --np  nproc\
                     \n\t\t-no --node specify node\
                     "
-pbs.usage          ="qsub -N jobname -v var=a_variable /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh\
+pbs.usage           ="qsub -N jobname -v var=a_variable /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh\
                     \n\t\t$var can be used as variable in the script\
                     \n\t\tscript name should be full name\
                     "
-pbs.qdel           ="qdel (from) job-ID (to) job-ID\
+pbs.qdel            ="qdel (from) job-ID (to) job-ID\
                     \n\tto kill process in master node: rt. process.prockill\
+                    "
+pbs.qst             ="qstat -f for long jobname\
+                    \n\tOptions: (default) -o f\
                     "
                     
 process.prockill    ="kill (from) PID (to) PID\
