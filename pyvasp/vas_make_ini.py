@@ -55,7 +55,7 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,opt_incar, allprepared, dirname, iofile, atoms, issue, Lrun,Lmkdir,qx,qN,qn,vasp_exe):
+def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allprepared, dirname, iofile, atoms, issue, Lrun,Lmkdir,qx,qN,qn,vasp_exe):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -76,83 +76,7 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,opt_incar, al
             if not dirname or len(poscars) != 1:
                 dirname = pos2dirname(poscar)
         print(f"target directory {dirname}")
-        ### use filename as it is
-        files2copy.append('POSCAR')
-        ### 2. get POTCAR will be made from scratch
-        # POTCAR will be made after POSCAR moves to job directory
-        ### 3. get KPOINTS
-        ### use kp inputs, if KPOINTS ready, KPOINTS.job, make KPOINTS file
-        q = 'will you make KPOINTS?'
-        if job:
-            kpointjob = 'KPOINTS.' + job
-            q2 = f'will you use {kpointjob}?'
-        if kpoints:
-            if len(kpoints) == 3: 
-                method = "MH"
-            elif len(kpoints) == 1 and kpoints[0] == 'g':
-                kpoints = "1  1  1"
-                method = "gamma"
-            make_kpoints(kpoints, method)
-        elif allprepared:
-            print(f"KPOINTS in cwd will be copied to {dirname}")
-        elif os.path.isfile(kpointjob) and yes_or_no(q2):
-            os.system(f'cp {kpointjob} KPOINTS')
-        elif yes_or_no(q):
-            q = 'input nummber of kpoints: [gamma|3 digits such as "4 4 1" ]? '
-            kp_in = get_answers(q)
-            if re.match("g", kp_in, re.IGNORECASE) :
-                method = "gamma"
-                kps = "1  1  1"
-            else:
-                lkp = kp_in.split()
-                if len(lkp) == 3:
-                    method = 'MH'
-                    kps = kp_in
-                    print('default is MH')
-                else:
-                    print(f"input error for KPOINTS: {lkp} of length {len(lkp)}")
-                    exit(11)
-            print(kps, method)
-            make_kpoints(kps, method)
-        else:
-            print("Use wdir KPOINTS")
-        files2copy.append('KPOINTS')
-        ### 4. get INCAR :: use make_incar.py
-        incar_repo=f"{ini_dvasp}/INCAR.{job}"
-        incar_job=f"INCAR.{job}"
-        if opt_incar:
-            ### 4.1 use incar.job
-            if opt_incar == 'j':
-                if job and os.path.isfile(incar_job):
-                    incar = incar_job
-                else:
-                    print(f"There is no {incar_job} in wdir")
-            ### 4.2 use dir/INCAR
-            elif os.path.isdir(opt_incar):
-                incar = opt_incar + '/INCAR'
-            ### 4.3 use directed INCAR file
-            elif os.path.isfile(opt_incar):
-                incar = opt_incar
-        ### 4.4 iff INCAR is prepared in wdir
-        elif job:
-            if os.path.isfile(incar_job):
-                incar = incar_job
-        elif allprepared:
-            print(f"INCAR in cwd will be used")
-            incar = 'INCAR'
-        ### INCAR in repo will not be used
-        #elif os.path.isfile(incar_repo):
-        #    incar = incar_repo 
-        
-        if "incar" not in locals():
-            if os.path.isfile("INCAR"):
-                incar = 'INCAR'
-            else:
-                print("Error:: cannot find INCAR")
-                sys.exit()
-        print(f'{incar} will be copied to INCAR')
-        files2copy.append(f"{incar}")
-        ### 5. make work_dir
+        ### 1.1 make work_dir
         q = f'will you make dir? {dirname}...'
         if Lmkdir or yes_or_no(q):
             if Lktest:
@@ -172,14 +96,79 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,opt_incar, al
                 else:
                     print("Stop proceeding")
                     sys.exit(1)
-            
-        for f in files2copy:
-            if "INCAR" in f:
-                com = f"cp {f} {dirname}/INCAR"
+        ### use filename as it is
+        com = f"cp POSCAR {dirname}"
+        os.system(f'{com}')
+        
+        ### 2. get KPOINTS
+        ### use kp inputs, if KPOINTS ready, KPOINTS.job, make KPOINTS file
+        q = 'will you make KPOINTS?'
+
+        if job and os.path.isfile(f"KPOINTS.{job}"):
+            com = f'cp KPOINTS.{job} {dirname}'
+            os.system(f'{com}')
+            print(f"KPOINTS.{job} was copied to {dirname}/KPOINTS")
+        elif allprepared:
+            com = f'cp KPOINTS {dirname}'
+            os.system(f'{com}')
+            print(f"KPOINTS in cwd was copied to {dirname}")
+        elif kpoints:
+            if len(kpoints) == 3: 
+                method = "MH"
+            elif len(kpoints) == 1 and kpoints[0] == 'g':
+                kpoints = "1  1  1"
+                method = "gamma"
+            make_kpoints(kpoints, method)
+            com = f'cp KPOINTS {dirname}'
+            os.system(f'{com}')
+            print(f"KPOINTS was made and copied to {dirname}")
+        elif yes_or_no(q):
+            q = 'input nummber of kpoints: [gamma|3 digits such as "4 4 1" ]? '
+            kp_in = get_answers(q)
+            if re.match("g", kp_in, re.IGNORECASE) :
+                method = "gamma"
+                kps = "1  1  1"
             else:
-                com = f"cp {f} {dirname}"
-            os.system(com)
-        ### 6. check dir
+                lkp = kp_in.split()
+                if len(lkp) == 3:
+                    method = 'MH'
+                    kps = kp_in
+                    print('default is MH')
+                else:
+                    print(f"input error for KPOINTS: {lkp} of length {len(lkp)}")
+                    exit(11)
+            print(kps, method)
+            make_kpoints(kps, method)
+            com = f'cp KPOINTS {dirname}'
+            os.system(f'{com}')
+            print(f"KPOINTS was made and copied to {dirname}")
+        else:
+            com = f'cp KPOINTS {dirname}'
+            os.system(f'{com}')
+            print("Use wdir KPOINTS")
+
+        ### 3. get INCAR :: use make_incar.py
+        incar_repo=f"{ini_dvasp}/INCAR.{job}"
+        if job and os.path.isfile(f"INCAR.{job}"):
+            f_incar = f"INCAR.{job}"
+        ### 3.2 if INCAR is prepared in wdir
+        elif allprepared:
+            print(f"INCAR in cwd will be used")
+            f_incar = 'INCAR'
+        ### 3.3 use dir/INCAR
+        elif os.path.isdir(incar):
+            f_incar = incar + '/INCAR'
+        ### 4.3 use directed INCAR file
+        elif os.path.isfile(incar):
+            f_incar = incar
+        else:
+            print("Error:: cannot find INCAR")
+            sys.exit()
+        com = f'cp {f_incar} {dirname}/INCAR'
+        os.system(f'{com}')
+        print(f"{f_incar} was copied to {dirname}/INCAR")
+
+        ### 6. check POTCAR
         os.chdir(dirname)
         if not os.path.isfile('POTCAR'):
             if hostname == 'kisti':
@@ -210,7 +199,7 @@ def main():
     g_ktest.add_argument('-kd', '--kdim', default=3, type=int, choices=[1,2,3], help='input series of k-points [kx, ky, kz]*3')
     g_ktest.add_argument('-kps', '--kpoints_test', nargs='*', type=int, help='input series of k-points [kx, ky, kz]*3')
     ### toggle default: unset in the bare dir, set to j when INCAR.job exists
-    parser.add_argument('-i', '--incar', help='j: use INCAR.job, dirname: use d/INCAR')
+    parser.add_argument('-i', '--incar', help='[INCAR.job,INCAR,dirname/INCAR]')
     parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
     parser.add_argument('-d', '--dname', help='get directory name')
