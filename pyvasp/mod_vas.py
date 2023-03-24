@@ -64,9 +64,10 @@ def get_vasp_repository():
     #(out, err) = proc.communicate()
     #print "program output:", out
     hostname = get_hostname()
+    user=os.getenv('USER')
     #if hostname == 'chi' or hostname == 'pt' or hostname == 'iron' or hostname == 'mlet':
     if hostname == 'kisti':
-        ini_dvasp = '/home01/x2462a02/sandboxg/pyvasp/ini'
+        ini_dvasp = f"/home01/{user}/sandbox/pyvasp/ini'
     else:
         ini_dvasp = '/home/joonho/sandbox/pyvasp/ini'
 

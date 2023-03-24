@@ -105,7 +105,7 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
         q = 'will you make KPOINTS?'
 
         if job and os.path.isfile(f"KPOINTS.{job}"):
-            com = f'cp KPOINTS.{job} {dirname}'
+            com = f'cp KPOINTS.{job} {dirname}/KPOINTS'
             os.system(f'{com}')
             print(f"KPOINTS.{job} was copied to {dirname}/KPOINTS")
         elif allprepared:
