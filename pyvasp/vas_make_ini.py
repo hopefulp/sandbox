@@ -55,7 +55,7 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allprepared, dirname, iofile, atoms, issue, Lrun,Lmkdir,qx,qN,qn,vasp_exe):
+def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allprepared, dirname, iofile, atoms, issue, Lrun,Lmkdir,qx,qN,qn,vasp_exe,lkisti):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -188,7 +188,7 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
         ### run ? : first determin qx then qN
         if get_hostname()=='pt' and (not qx or not qN):
             qx, qN = get_queue_pt(qx=qx)
-        s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue, vasp_exe=vasp_exe)
+        s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue, vasp_exe=vasp_exe, lkisti=lkisti)
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
@@ -213,15 +213,19 @@ def main():
     ### VASP executable
     g_vasp  = parser.add_argument_group(title='VASP executable')
     g_vasp.add_argument('-exe', '--executable', choices=['gamma','xyrelax'], help='vasp execuatable: gamma, xy-relax')
+    ### PBS arguments
     g_queue = parser.add_argument_group(title='QUEUE')
     g_queue.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
     g_queue.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
     g_queue.add_argument('-n', '-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
+    g_queue.add_argument('-l', '--lkisti', nargs='*', help="kisti command line input")
     args = parser.parse_args()
 
     ### for kpoints-scan
     #if args.kp_test:
     if args.job == 'kp':
+        if not args.lkisti:
+            args.lkisti = 'kp'  # lkisti is changed to string from list
         kparray = np.array(args.kpoints_test)
         kps = kparray.reshape([-1,args.kdim])
         for kp in kps:
@@ -233,9 +237,9 @@ def main():
                 kp_in = list(kp)
             print(kp_in)
             kp_str = list(map(str, kp_in))
-            make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable)
+            make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
     else:
-        make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable)
+        make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
     return 0
 
 if __name__ == '__main__':
