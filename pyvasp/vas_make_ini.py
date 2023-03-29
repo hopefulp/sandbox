@@ -60,6 +60,9 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
     pwd = os.getcwd()
+    if not os.path.isfile(poscars[0]):
+        print(f"can't find POSCAR")
+        sys.exit(1)
     for poscar in poscars:
         files2copy=[]
         ### Now this is running
@@ -107,7 +110,7 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
         if job and os.path.isfile(f"KPOINTS.{job}"):
             com = f'cp KPOINTS.{job} {dirname}/KPOINTS'
             os.system(f'{com}')
-            print(f"KPOINTS.{job} was copied to {dirname}/KPOINTS")
+            print(f"{com}")
         elif allprepared:
             com = f'cp KPOINTS {dirname}'
             os.system(f'{com}')

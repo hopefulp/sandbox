@@ -67,7 +67,7 @@ def get_vasp_repository():
     user=os.getenv('USER')
     #if hostname == 'chi' or hostname == 'pt' or hostname == 'iron' or hostname == 'mlet':
     if hostname == 'kisti':
-        ini_dvasp = f"/home01/{user}/sandbox/pyvasp/ini'
+        ini_dvasp = f"/home01/{user}/sandbox/pyvasp/ini"
     else:
         ini_dvasp = '/home/joonho/sandbox/pyvasp/ini'
 
