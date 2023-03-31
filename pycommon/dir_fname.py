@@ -59,7 +59,11 @@ def ch_fname(job, m_tag, pattern, Linverse, style, new_word, L_dir, exceptions,e
         for f in l_file:
             comm = f'{job} {f} {dir_out}'
             print(comm)
-            commands.append(comm)
+            if not os.path.exists(f'{dir_out}/{f}'):
+                commands.append(comm)
+            else:
+                print(f"there exists target file {dir_out}/{f}")
+
     elif job == 'rename':
         #if not new_name: 
         #    print("add new name with -a or ")
@@ -127,7 +131,7 @@ def main():
     parser.add_argument( '-ip', '--include_parents', action='store_true', help='include dirname to filename')
     parser.add_argument( '-e', '--excluded', nargs='*', help='filename to be excluded')
     parser.add_argument( '-eo', '--excluded_opt', default='m',help='excluded fname option: matching or fullname')
-    parser.add_argument( '-d', '--directory', type=str, default='tmppy', help='target directory to move files')
+    parser.add_argument( '-d', '-nd', '--directory', type=str, default='tmppy', help='target directory to move files')
     parser.add_argument( '-r', '--run', action='store_true', help='run or not-False')
     args = parser.parse_args()
 

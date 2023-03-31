@@ -12,7 +12,8 @@ from mod_vas    import vasf_ini, vasf_default
 
 q_list=[]
 
-def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, Ldefault):
+#def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, Ldefault):
+def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes):
 
     print(f"{pwd} directory in {whereami()}")
     matches=[]
@@ -159,11 +160,11 @@ def main():
     parser.add_argument('-m', '--match', nargs='*', help='remove matching file')
     parser.add_argument('-e', '--exclude', nargs='*', help='remove all files except list') 
     parser.add_argument('-ef', '--excluded_files', nargs='*', help='save this file') 
-    parser.add_argument('-jd', '--new_dir', default='tmp', help='directory where files to move')
+    parser.add_argument('-nd', '-d', '--new_dir', default='tmp', help='directory where files to move')
     parser.add_argument('-ms', '--match_show', action='store_true')
     parser.add_argument('-a', '--all_remove', action='store_true', help='remove all the files')
     parser.add_argument('-y', '--yes', action='store_true', help='execute command')
-    parser.add_argument('-d', '--default', action='store_true', help='remove default files')
+    #parser.add_argument('-d', '--default', action='store_true', help='remove default files')
     args = parser.parse_args()
 
     if args.works==None and args.prefix==None and args.suffix==None and args.match==None:
@@ -172,7 +173,8 @@ def main():
         sys.exit(0)
     #if args.work == 'amp' and not args.excluded_files:
     #    args.excluded
-    dir_clean(args.dir1,args.works,args.subwork,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes, args.default)
+    #dir_clean(args.dir1,args.works,args.subwork,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes, args.default)
+    dir_clean(args.dir1,args.works,args.subwork,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes)
     return 0
 
 if __name__ == '__main__':
