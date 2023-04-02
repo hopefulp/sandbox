@@ -6,19 +6,21 @@ import os
 import sys
 from common import *
 
-def make_newfname(fname, pattern, style, new_word):
+def make_newfname(fname, pattern, style, ch_word):
     if style == 'ap':
         if re.search('\.',fname):
             fn = re.split('\.',fname)
-            newf = fn[0] + new_word + '.' + fn[1]
+            new_fname = fn[0] + ch_word + '.' + fn[1]
         else:
-            newf = fname + new_word
+            new_fname = fname + ch_word
     elif style == 'rp':
-        newf = fname.replace(pattern, new_word)
-    return newf
+        if not ch_word:
+            ch_word = ""
+        new_fname = fname.replace(pattern, ch_word)
+    return new_fname
 
 
-def ch_fname(job, m_tag, pattern, Linverse, style, new_word, L_dir, exceptions,ex_opt, dir_out, Lparents,run):
+def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex_opt, dir_out, Lparents,run):
     pwd = os.getcwd()
     # pattern should have 1 element
     print(pattern)
@@ -71,7 +73,7 @@ def ch_fname(job, m_tag, pattern, Linverse, style, new_word, L_dir, exceptions,e
         #else:
         for fname in l_file:
             ### 
-            new_name = make_newfname(fname, pattern[0], style, new_word)
+            new_name = make_newfname(fname, pattern[0], style, ch_word)
             #new_name = fname.replace(patt, new_patt)
             ### rename file with extension
             '''
