@@ -376,7 +376,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print("\t    kpy command.py kisti")
         print("\t    <- python $(which command.py ) kisti")
         print(pbs.queue)
-        print("\t$ kpy qst.py: 'qstat -f'")
+        print("\t$ kpy qst.py: runs 'qstat -f' to see long jobnames")
         print("\t=== VASP in KISTI ===")
         if subjob == 'vasp':
             print(comment_subj.vasp.run)
