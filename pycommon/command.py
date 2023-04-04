@@ -15,6 +15,10 @@ nc      =   MyClass('nc')
 dac     =   MyClass('dac')
 slurm   =   MyClass('slurm')
 kisti   =   MyClass('kisti')
+pbs     =   MyClass('pbs')
+
+user=os.getenv('USER')
+
 
 ### modify input-detail here
 ### AMP-NODE job
@@ -73,6 +77,16 @@ ga.dyn          =   "\nGA: Dynamics\
                     \n\tpytorch+gpu coding\
                     \n    GPU: iron, n076\
                     "
+
+pbs.queue       =   f"\tqs = qstat -u {user} ! alias\
+                    \n\th5 = watch -d -n 300 'ls -alt' ! to protect the connection in cf. KISTI\
+                    "
+
+slurm.pbs       =   pbs.queue +  "\n\tpe     to get free processes\
+                    \n\tpef    to get free nodes\
+                    \n\tpestat to see all nodes\
+                    \n\tsq: to check pending jobs in each partition\
+                    "
 slurm.amp       =   " AMP in slurm\
                     \n\t1. amp_jobs.sh fp outcar npartition idata | sh\
                     \n\t    amp_mkdir.py $dname -w amp -j des\
@@ -126,12 +140,12 @@ dac.build       =   "    Build graphene using nanocore\
                     \n\t\t-mv write to the input file\
                     "
 
-kisti.py  =     "\t(PYTHON) Running script\
-                \n\t    1st: make a cli-command\
-                \n\t\tpython_script.py args\
-                \n\t    2nd: add 'pypath.sh'\
-                \n\t\tpypath.sh cli-command\
-                "
+kisti.py    ="\t(PYTHON) Running script\
+             \n\t    1st: make a cli-command\
+             \n\t\tpython_script.py args\
+             \n\t    2nd: add 'pypath.sh'\
+             \n\t\tpypath.sh cli-command\
+             "
 
 def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar, nhl,idata,ndata):
     
@@ -353,12 +367,17 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print("    CRR:DAC =========================")
             print(nc.build)
             print(dac.build)
-        print("=== Node check ===")
-        print("\tpe     to get free processes")
-        print("\tpef    to get free nodes")
-        print("\tpestat to see all nodes")
-        print("\tqstat -u joonho     to check my job")
-    elif job == 'kisti':
+        print(slurm.pbs)
+    elif job == 'kisti' or job == 'pbs':
+        print("=== KISTI Jobs =======")
+        print(" KISTI runs PBS ")
+        print("    Commands in alias.sh or PYTHONPATH ")
+        print("\t$ kpy : to run default python instead of shebang")
+        print("\t    kpy command.py kisti")
+        print("\t    <- python $(which command.py ) kisti")
+        print(pbs.queue)
+        print("\t$ kpy qst.py: 'qstat -f'")
+        print("\t=== VASP in KISTI ===")
         if subjob == 'vasp':
             print(comment_subj.vasp.run)
             print(comment_sys.server.kisti.pbs)
