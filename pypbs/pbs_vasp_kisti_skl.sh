@@ -2,7 +2,7 @@
 #PBS -V
 #PBS -A vasp
 #PBS -q normal
-#PBS -l select=40:ncpus=40:mpiprocs=40:ompthreads=1
+#PBS -l select=20:ncpus=40:mpiprocs=40:ompthreads=1
 #PBS -l walltime=48:00:00
 
 if [ -z $PBS_JOBNAME ]; then
