@@ -71,19 +71,15 @@ def make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_remove):
      
 
 ### O: Use this to comtain all the jobs
-###            1     2      3       4     5      6           7         8      9    10    11    12 
-def vasp_jobs(job, odirs, newdir, kopt, iopt, incar_kws, incar_remove, Lrun, issue, np, xpart, nnode):
+###            1     2      3       4     5      6           7         8        9      10    11    12   13    14
+def vasp_jobs(job, dirs, fixatom, kopt, iopt, incar_kws, incar_remove, Lrun, newdir, suff, issue, np, xpart, nnode):
     pwd = os.getcwd()
 
-    for odir in odirs:
-        if re.match("suff", newdir):
-            suffix = newdir[4:]
-            ndir = odir + suffix
-        elif re.match("fixed", newdir):
-            fixatom = newdir[5:]
-            ndir = odir + fixatom
-        elif newdir:
+    for odir in dirs:
+        if newdir:
             ndir = newdir
+        elif suff:
+            ndir = odir + suff
         else:
             ndir = odir + job
         #com=[]
@@ -212,7 +208,7 @@ def main():
     ### job directory naming
     goutput = parser.add_mutually_exclusive_group()
     goutput.add_argument('-dn', '-nd', '--newdir', help='specify new dirname in case one job')
-    goutput.add_argument('-suf', '-suff', '--suffix', help='specify suffix of new directory')
+    goutput.add_argument('-suf', '--suffix', help='specify suffix of new directory')
     goutput.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
     ### INCAR
     parser.add_argument('-i', '--incar', help='specify incar file or dir')
@@ -250,11 +246,10 @@ def main():
         new_dir = "suff"+args.suffix
     elif args.fixed_atom:
         new_dir = "fixed"+args.fixed_atom
-    else:
-        new_dir = ""
 
-###            1         2         3        4          5          6               7                  8           9           10        11           12
-    vasp_jobs(args.job, odirs, new_dir, args.kopt, args.incar, args.incar_kws, args.incar_remove, args.run,  args.error, args.nproc, args.partition, args.nnode)
+
+###            1         2            3           4            5            6           7                   8           9           10        11           12           13           14
+    vasp_jobs(args.job, odirs, args.fixed_atom, args.kopt, args.incar, args.incar_kws, args.incar_remove, args.run, args.newdir, args.suffix,  args.error, args.nproc, args.partition, args.nnode)
 
     return 0
 
