@@ -4,9 +4,10 @@
 ### incar is not ready
 ### 2019.10.25 update
 ### 2021.05.07 update for EE
+### 2023.04.11 poscar canbe put by prefix: if not make dir, poscar is skipped
 
 import argparse
-import os
+import os, sys
 import shutil
 import re
 from common     import *
@@ -97,8 +98,11 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
                 if yes_or_no(q):
                     pass
                 else:
-                    print("Stop proceeding")
+                    print("skip overwriting")
                     sys.exit(1)
+        else:
+            print("Go to next poscar")
+            continue
         ### use filename as it is
         com = f"cp POSCAR {dirname}"
         os.system(f'{com}')
@@ -193,8 +197,13 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
     parser.add_argument('-j', '--job', choices=['pchg','chg','md','ini','zpe','mol','wav','opt','copt','sp','noD','kp'], help='inquire for each file')
-    parser.add_argument('-s', '--poscar', nargs='+', help='poscar is required')
-    parser.add_argument('-p', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
+    ### POSCARs
+    gposcar = parser.add_mutually_exclusive_group()
+    gposcar.add_argument('-s', '--poscar', nargs='+', help='poscars in narrative mode')
+    gposcar.add_argument('-p', '--prefix', help='select POSCAR using prefix lists for module common')
+    ###
+    parser.add_argument('-si', '--idposcar', nargs='+', help='in case poscar has index')
+    parser.add_argument('-pot', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
     parser.add_argument('-hpp', '--pseudoH', nargs='*', help='include pseudo H list ')
     parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz, or g for gamma')
     ### KP tests
@@ -221,6 +230,25 @@ def main():
     g_queue.add_argument('-l', '--lkisti', nargs='*', help="kisti command line input")
     args = parser.parse_args()
 
+    pwd = os.getcwd()
+    ### POSCAR fname mining
+    if args.poscar:
+        poscars=args.poscar
+    elif args.prefix:
+        prefix0='POSCAR.'+args.prefix
+        prefixes=[prefix0]
+        print(f"{prefixes}")
+        poscars = get_files_prefix(prefixes, pwd)
+        '''
+        if args.idposcar:
+            poscar=[]
+            if len(args.idposcar) == 2:
+                for posca in poscars0:
+                    if posca[
+        '''
+    print(poscars)
+    #sys.exit(0)
+
     ### for kpoints-scan
     #if args.kp_test:
     if args.job == 'kp':
@@ -237,9 +265,9 @@ def main():
                 kp_in = list(kp)
             print(kp_in)
             kp_str = list(map(str, kp_in))
-            make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
+            make_vasp_dir(args.job, poscars, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
     else:
-        make_vasp_dir(args.job, args.poscar, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
+        make_vasp_dir(args.job, poscars, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, args.dname, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
     return 0
 
 if __name__ == '__main__':

@@ -11,7 +11,6 @@ filejob = MyClass('filejob')
 linejob = MyClass('linejob')
 convert = MyClass('convert')
 command = MyClass('command')
-string  = MyClass('string')
 server  = MyClass('server')
 
 server.server_env   =   "=== Server-related ===\
@@ -165,7 +164,7 @@ convert.perl2python  =   " perl script to convert perl to python"
 command.command     = "show Recent Command"
 command.web_load    = "To load in web, copy files to ~/public_html/"
 
-string.common       =   "module for dir, string\
+dirjob.common       =   "module for directory & string\
                         \n\t    Classes\
                         \n\t\tMyClass_obj: class has its name as class attribute\
                         \n\t\tMyClass(MyClass_obj): inherits MyClass_obj\
@@ -173,10 +172,10 @@ string.common       =   "module for dir, string\
                         \n\t    Functions::\
                         \n\t\tsearch_dirs(dir_prefix, filename)\
                         \n\t\tyes_or_no(string): get y/n from stdio\
-                        \n\t      Get files from directory::\
+                        \n\t    Get files from directory::\
                         \n\t\tget_files_type(filetype, dirname)\
                         \n\t\tget_files_prefix(prefix, dirname, Lshow, Ldir)\
-                        \n\t      Filename::\
+                        \n\t    Filename::\
                         \n\t\tf_ext(fname): returns extension using [-1]\
                         \n\t\tf_root(fname): returns filename without extension\
                         \n\t\tfname_decom(fname): returns (fname, extension)\
