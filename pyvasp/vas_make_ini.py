@@ -56,7 +56,7 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allprepared, dirnames, iofile, atoms, issue, Lrun,Lmkdir,qx,qN,qn,vasp_exe,lkisti):
+def make_vasp_dir(job, subjob, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allprepared, dirnames, iofile, atoms, issue, Lrun,Lmkdir,qx,qN,qn,vasp_exe,lkisti):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -64,9 +64,8 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
     #if not os.path.isfile(poscars[0]):
     #    print(f"can't find POSCAR")
     #    sys.exit(1)
-    #if job == 'fake':
-    #    poscars = dirnames
-
+    if job == 'fake':
+        job = subjob    # job is changed to 'opt' to keep the previous code
     for poscar in poscars:
         files2copy=[]
         ### Now this is running
@@ -81,9 +80,10 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
                 dirname = dirnames.pop[0]
         ### in case dirs was used instead of poscar
         elif poscar in dirnames:
+            ### use poscar (-d dname) as dirname and read 'POSCAR' in directory
             dirname = poscar
+            poscar = 'POSCAR'
             ### any poscar will be used
-
         else:
             q = 'will you make POSCAR? '
             if yes_or_no(q):
@@ -209,7 +209,8 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', choices=['pchg','chg','md','ini','zpe','mol','wav','opt','copt','sp','noD','kp'], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=['pchg','chg','md','ini','zpe','mol','wav','opt','copt','sp','noD','kp','fake'], help='inquire for each file')
+    parser.add_argument('-sj', '--subjob', default='opt', choices=['opt', 'sp'], help='used for job=="fake"')
     ### POSCARs
     gposcar = parser.add_mutually_exclusive_group()
     gposcar.add_argument('-s', '--poscar', nargs='+', help='poscars in narrative mode')
@@ -252,16 +253,13 @@ def main():
         prefixes=[prefix0]
         print(f"{prefixes}")
         poscars = get_files_prefix(prefixes, pwd)
-        '''
-        if args.idposcar:
-            poscar=[]
-            if len(args.idposcar) == 2:
-                for posca in poscars0:
-                    if posca[
-        '''
-    ### Apply only dirnames to run fake job in KISTI
-    elif args.dnames:
-        poscars = args.dnames
+    ### Apply dirnames to run fake job in KISTI
+    elif args.job == 'fake':
+        if args.dnames:
+            poscars = args.dnames
+        else:
+            print(f"if job is {args.job}, use -d for dnames instead of -s POSCAR")
+            sys.exit(0)
     print(poscars)
     #sys.exit(0)
 
@@ -281,9 +279,9 @@ def main():
                 kp_in = list(kp)
             print(kp_in)
             kp_str = list(map(str, kp_in))
-            make_vasp_dir(args.job, poscars, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dnames, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
+            make_vasp_dir(args.job, args.subjob, poscars, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dnames, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
     else:
-        make_vasp_dir(args.job, poscars, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, args.dnames, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
+        make_vasp_dir(args.job, args.subjob, poscars, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, args.dnames, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
     return 0
 
 if __name__ == '__main__':
