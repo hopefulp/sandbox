@@ -73,7 +73,7 @@ def make_vasp_dir(job, subjob, poscars, apotcar, hpp_list, kpoints, Lktest,incar
         if os.path.isfile(poscar):
             ### cp input poscar to 'POSCAR'
             get_poscar(poscar)
-            if not dirname or len(poscars) != 1:
+            if not dirnames or len(poscars) != 1:
                 dirname = pos2dirname(poscar)
             ### len(poscars) == len(dirnames)
             else:
