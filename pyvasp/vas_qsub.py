@@ -59,7 +59,7 @@ def get_queue_pt(qx=None):
         else:
             return 1, free_node
 
-def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None, lkisti=None):
+def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None, lkisti=None, Lrun=None):
     if hostname == 'kisti':
         if vasp_exe:
             if vasp_exe == 'gamma':
@@ -78,6 +78,7 @@ def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None, lkisti=
             s = f"qsub -N {ndir} -l select={nnode}:ncpus={np}:mpiprocs={hproc}:ompthreads=1  $SB/pypbs/pbs_vasp_kisti_skl.sh"
         elif issue == 'opt':
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
+        ### for quick run: decrease walltime to fast run in kisti
         elif lkisti == 'kp':
             s = f"qsub -N {ndir} {str_vasp} -l walltime=1:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
         else:
@@ -103,7 +104,7 @@ def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None, lkisti=
         s=''
         sys.exit(10)
     print(s)
-    if yes_or_no("Will you run"):
+    if Lrun or yes_or_no("Will you run?"):
         os.system(s)
     return s        
 

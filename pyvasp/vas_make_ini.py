@@ -78,12 +78,11 @@ def make_vasp_dir(job, subjob, poscars, apotcar, hpp_list, kpoints, Lktest,incar
             ### len(poscars) == len(dirnames)
             else:
                 dirname = dirnames.pop[0]
-        ### in case dirs was used instead of poscar
+        ### For 'fake' job, dirs and poscars are same in preparation
+        ### Because dirname is prepared from poscars overall, use poscar for dirname
         elif poscar in dirnames:
-            ### use poscar (-d dname) as dirname and read 'POSCAR' in directory
             dirname = poscar
-            poscar = 'POSCAR'
-            ### any poscar will be used
+            poscar = 'POSCAR'   # need to be prepared in advance
         else:
             q = 'will you make POSCAR? '
             if yes_or_no(q):
@@ -205,12 +204,14 @@ def make_vasp_dir(job, subjob, poscars, apotcar, hpp_list, kpoints, Lktest,incar
         ### run ? : first determin qx then qN
         if get_hostname()=='pt' and (not qx or not qN):
             qx, qN = get_queue_pt(qx=qx)
-        s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue, vasp_exe=vasp_exe, lkisti=lkisti)
+        s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun)
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
     parser.add_argument('-j', '--job', choices=['pchg','chg','md','ini','zpe','mol','wav','opt','copt','sp','noD','kp','fake'], help='inquire for each file')
-    parser.add_argument('-sj', '--subjob', default='opt', choices=['opt', 'sp'], help='used for job=="fake"')
+    gfakejob = parser.add_argument_group(title='For fake job in kisti: requires -sj for real job name & -n for ndirs')
+    gfakejob.add_argument('-sj', '--subjob', default='opt', choices=['opt', 'sp'], help='used for job=="fake"')
+    gfakejob.add_argument('-nd', '--ndirs', default=5, type=int, help="number or dirs to make")
     ### POSCARs
     gposcar = parser.add_mutually_exclusive_group()
     gposcar.add_argument('-s', '--poscar', nargs='+', help='poscars in narrative mode')
@@ -256,7 +257,16 @@ def main():
     ### Apply dirnames to run fake job in KISTI
     elif args.job == 'fake':
         if args.dnames:
-            poscars = args.dnames
+            if len(args.dnames) == 1:
+                dirs = []
+                dname = args.dnames[0]
+                for i in range(args.ndirs):
+                    dirs.append(f"{dname}{i:02d}")
+                ### make the poscars and args.dnames same for fake job in kisti 
+                args.dnames = dirs
+                poscars = dirs
+            else:
+                poscars = args.dnames
         else:
             print(f"if job is {args.job}, use -d for dnames instead of -s POSCAR")
             sys.exit(0)

@@ -35,7 +35,9 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\tOPTIONS:\
                     \n\t    -s  poscar\
                     \n\t\tPOSCAR.dirname <- convention\
-                    \n\t\tPOSCAR for k-sampling\
+                    \n\t    -j [sp,opt,kp,fake,etc]\
+                    \n\t\tin case -j: INCAR.job, KPOINTS.job is used if it were\
+                    \n\t\tfake:: -sj for -j is required to use INCAR.job, KPOINTS.job\
                     \n\t    -r  run qsub on any server\
                     \n\t    -o  qopt to use different qscript\
                     \n\t    -al stop questioning except -s poscar\
@@ -51,10 +53,13 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\t    need to be prepared in advance\
                     \n\te.g. (KISTI)\
                     \n\t    python $sbvas/vas_make_ini.py -r -o -al -s POSCAR.pdh2sidetop\
-                    \n\te.g. (platinum)\
+                    \n\te.g. (Pseudo Hydrogen)\
                     \n\t    vas_make_ini.py -s POSCAR.sc11sHHf -j sp -al -hpp .66 1.33\
-                    \n\t    (kpoint sampling)\
+                    \n\te.g. (kpoint sampling in Pt)\
                     \n\t    vas_make_ini.py -s POSCAR -kdim 2 -kps 4 4 6 4 8 4 -x 2 -N 1 -n 4\
+                    \n\te.g. (fake job for kisti)\
+                    \n\t    vas_make_ini.py -j fake -sj opt -d dname -nd ndirs\
+                    \n\t===== END OF INI ===================\
                     "
 make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
                     \n\tvas_make_d2d.py old_dir new_dir job [options]\
