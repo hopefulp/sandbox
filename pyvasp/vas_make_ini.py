@@ -296,7 +296,7 @@ def main():
 
     print(poscars)
     print(dirnames)
-    if 'k' in Lrun:
+    if Lrun and 'k' in Lrun:
         print("stop before function")
         sys.exit(10)
     if len(poscars) != len(dirnames):
