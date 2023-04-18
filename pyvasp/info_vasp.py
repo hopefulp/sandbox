@@ -38,7 +38,9 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\t    -j [sp,opt,kp,fake,etc]\
                     \n\t\tin case -j: INCAR.job, KPOINTS.job is used if it were\
                     \n\t\tfake:: -sj for -j is required to use INCAR.job, KPOINTS.job\
-                    \n\t    -r  run qsub on any server\
+                    \n\t    -ra == -r a: yes for all\
+                    \n\t    -r  on [mkdir,qsub] overwrite/nosub\
+                    \n\t\tk kill but show poscars and dirs\
                     \n\t    -o  qopt to use different qscript\
                     \n\t    -al stop questioning except -s poscar\
                     \n\t    -hpp pseudo hydrogen in /TGM/Apps/VASP/POTCAR\
@@ -55,6 +57,7 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\t    python $sbvas/vas_make_ini.py -r -o -al -s POSCAR.pdh2sidetop\
                     \n\te.g. (Pseudo Hydrogen)\
                     \n\t    vas_make_ini.py -s POSCAR.sc11sHHf -j sp -al -hpp .66 1.33\
+                    \n\t    kpy vas_make_ini.py -s POSCAR.HfOHSe2MLf1 -j opt -d t1736a -hpp .5 .66 1.5 1.33\
                     \n\te.g. (kpoint sampling in Pt)\
                     \n\t    vas_make_ini.py -s POSCAR -kdim 2 -kps 4 4 6 4 8 4 -x 2 -N 1 -n 4\
                     \n\te.g. (fake job for kisti)\

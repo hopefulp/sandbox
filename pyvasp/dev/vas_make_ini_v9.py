@@ -14,7 +14,7 @@ import string
 from common     import *
 from vas_qsub   import get_queue_pt, qsub_command
 from mod_vas    import *
-from mod_poscar import get_poscar, get_dnames4pos 
+from mod_poscar import get_poscar, pos2dirname
 
 home = os.environ['HOME']
 hostname = get_hostname()
@@ -57,7 +57,7 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allprepared, dirnames, iofile, atoms, issue, qx,qN,qn,vasp_exe,lkisti,Lrun):
+def make_vasp_dir(job, subjob, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allprepared, dirnames, iofile, atoms, issue, Lrun,Lmkdir,qx,qN,qn,vasp_exe,lkisti):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -65,42 +65,59 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
     #if not os.path.isfile(poscars[0]):
     #    print(f"can't find POSCAR")
     #    sys.exit(1)
-    for poscar, dirname in zip(poscars, dirnames):
+    if job == 'fake':
+        job = subjob    # job is changed to 'opt' to keep the previous code
+    for poscar in poscars:
+        files2copy=[]
+        ### Now this is running
+        ### 1. get POSCAR: make dirname using poscar
+        if os.path.isfile(poscar):
+            ### cp input poscar to 'POSCAR'
+            get_poscar(poscar)
+            if not dirnames or len(poscars) != 1:
+                dirname = pos2dirname(poscar)
+            ### len(poscars) == len(dirnames)
+            else:
+                dirname = dirnames.pop[0]
+        ### For 'fake' job, dirs and poscars are same in preparation
+        ### Because dirname is prepared from poscars overall, use poscar for dirname
+        elif poscar in dirnames:
+            dirname = poscar
+            poscar = 'POSCAR'   # need to be prepared in advance
+        else:
+            q = 'will you make POSCAR? '
+            if yes_or_no(q):
+                q = 'input file: '
+                poscar = get_answers(q)
+            else:
+                poscar="POSCAR"
+
         print(f"target directory {dirname}")
         ### 1.1 make work_dir
-        #q = f'will you make dir? {dirname}'
-        #if yes_or_no(q):
-        if Lktest:
-            dirname += 'k' + list2str(kpoints)
-        print(f"dirname {dirname}")
-        if not os.path.isdir(dirname):
-            com1 = "mkdir " + dirname
-            print(com1)
-            os.system(com1)
-        #### if dir exists
-        else:
-            q = f"{dirname} exists: want to overwrite?"
-            #if Lrun or  yes_or_no(q):
-            ### overwrite
-            if Lrun and ('a' in Lrun or 'o' in Lrun):
-                pass
-            ### No modification & sumbit and go to next ele in for-loop
-            elif Lrun and 's' in Lrun:
-                s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun)
-                print(f"Job {dirname}  was submitted without modification")
-                continue
-            ### overwrite or not
-            elif yes_or_no(q):
-                pass
-            ### stop for this directory
+        q = f'will you make dir? {dirname}...'
+        if Lmkdir or yes_or_no(q):
+            if Lktest:
+                dirname += 'k' + list2str(kpoints)
+            print(f"dirname {dirname}")
+            if not "dirname" in locals():
+                q = 'input dirname: '
+                dirname = get_answers(q)
+            if not os.path.isdir(dirname):
+                com1 = "mkdir " + dirname
+                print(com1)
+                os.system(com1)
             else:
-                print("skip overwriting")
-                print("Go to next poscar")
-                continue
-        ### overwrite continues
-        ### 1.2 Copy POSCAR
-        com = f"cp {poscar} {dirname}/POSCAR"
-        print(f"{com}")
+                q = f"{dirname} exists: want to overwrite?"
+                if yes_or_no(q):
+                    pass
+                else:
+                    print("skip overwriting")
+                    sys.exit(1)
+        else:
+            print("Go to next poscar")
+            continue
+        ### use filename as it is
+        com = f"cp POSCAR {dirname}"
         os.system(f'{com}')
         
         ### 2. get KPOINTS
@@ -173,28 +190,22 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
 
         ### 6. check POTCAR
         os.chdir(dirname)
-        #if not os.path.isfile('POTCAR'):   # to make new POTCAR 
-        if hostname == 'kisti':
-            s = f"python {home}/sandboxg/pyvasp/genpotcar.py -pp pbe"
-        else:
-            #s = home + "/sandboxg/pyvasp/genpotcar.py -pp pbe"
-            s = "genpotcar.py -pp pbe"
-        if hpp_list:
-            s += f" -hpp {' '.join(hpp_list)}"
-        print(f"{s} in {dirname}")
-        os.system(s)
+        if not os.path.isfile('POTCAR'):
+            if hostname == 'kisti':
+                s = f"python {home}/sandboxg/pyvasp/genpotcar.py -pp pbe"
+            else:
+                #s = home + "/sandboxg/pyvasp/genpotcar.py -pp pbe"
+                s = "genpotcar.py -pp pbe"
+            if hpp_list:
+                s += f" -hpp {' '.join(hpp_list)}"
+            print(f"{s} in {dirname}")
+            os.system(s)
         os.chdir(pwd)
         ##################################################
-        ### first determine qx then qN for pt
-        ### if Lrun == n, pass but None, ask in qsub_command
-        if Lrun and 'n' in Lrun:
-            pass
-        else:
-            if get_hostname()=='pt' and (not qx or not qN):
-                qx, qN = get_queue_pt(qx=qx)
-            s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun)
-
-    return 0            
+        ### run ? : first determin qx then qN
+        if get_hostname()=='pt' and (not qx or not qN):
+            qx, qN = get_queue_pt(qx=qx)
+        s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun)
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
@@ -221,11 +232,8 @@ def main():
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
     parser.add_argument('-d', '--dnames', nargs='+', help='get directory name')
     parser.add_argument('-al', '--all', action='store_true', help="prepared in job dir if not -s, -p, -k, -i")
-    ### Running option
-    g_run = parser.add_argument_group(title='Running options')
-    g_run.add_argument('-ra', '--run_all', action='store_true', help="without asking")
-    g_run.add_argument('-r', '--run', choices=['a','o','on','s','k'], help="o:overwrite run,on:overwrite stop,s:just submit,k:test input")
-
+    parser.add_argument('-r', '--run', action='store_true', help="submit job")
+    parser.add_argument('-rd', '--mkdir', action='store_true', help="submit job")
     parser.add_argument('-err', '--error', choices=['opt','mem'], help="vasp error: converge, memory issue")
     ### VASP executable
     g_vasp  = parser.add_argument_group(title='VASP executable')
@@ -234,74 +242,36 @@ def main():
     g_queue = parser.add_argument_group(title='QUEUE')
     g_queue.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
     g_queue.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
-    g_queue.add_argument('-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
+    g_queue.add_argument('-n', '-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
     g_queue.add_argument('-l', '--lkisti', nargs='*', help="kisti command line input")
     args = parser.parse_args()
 
-    ### running option
-    if args.run_all:
-        Lrun = 'a'
-    elif args.run:
-        Lrun = args.run
-    else:
-        Lrun = None
-
     pwd = os.getcwd()
-    ### POSCARs and DIRECTORYs are abtained here and passed to make_vasp_dir()
-    ### Apply dirnames to run fake job in KISTI
-    job = args.job
-    if args.job == 'fake':
-        job = args.subjob
-        ### not perfect
-        if args.poscar:
-            inposcars = args.poscar
-        else:
-            if os.path.isfile('POSCAR'):
-                inposcar = 'POSCAR'
-            else:
-                print("input poscar or make POSCAR in wdir")
-                sys.exit(0)
-
-        if args.dnames:
-            if len(args.dnames) == 1:
-                dirnames = []
-                poscars  = []
-                dname = args.dnames[0]
-                ### make the poscars and args.dnames same for fake job in kisti 
-                for a in list(string.ascii_lowercase)[:args.ndirs]:
-                    dirnames.append(f"{dname}{a}")
-                    # if
-                    poscars.append(inposcar)
-            else:
-                poscars = args.dnames
-        else:
-            print("-j fake requires -d dnames")
-            sys.exit(1)
-    ### Normal jobs
-    elif args.poscar:
+    ### POSCAR fname mining
+    if args.poscar:
         poscars=args.poscar
-        if args.dnames:
-            dirnames = args.dnames
-        else:
-            dirnames = get_dnames4pos(poscars)     # get dirname from POSCAR.name
     elif args.prefix:
         prefix0='POSCAR.'+args.prefix
         prefixes=[prefix0]
         print(f"{prefixes}")
         poscars = get_files_prefix(prefixes, pwd)
+    ### Apply dirnames to run fake job in KISTI
+    elif args.job == 'fake':
         if args.dnames:
-            dirnames = args.dnames
+            if len(args.dnames) == 1:
+                dirs = []
+                dname = args.dnames[0]
+                for a in list(string.ascii_lowercase)[:args.ndirs]:
+                    dirs.append(f"{dname}{a}")
+                ### make the poscars and args.dnames same for fake job in kisti 
+                args.dnames = dirs
+                poscars = dirs
+            else:
+                poscars = args.dnames
         else:
-            dirnames = get_dnames4pos(poscars)
-
+            print(f"if job is {args.job}, use -d for dnames instead of -s POSCAR")
+            sys.exit(0)
     print(poscars)
-    print(dirnames)
-    if 'k' in Lrun:
-        print("stop before function")
-        sys.exit(10)
-    if len(poscars) != len(dirnames):
-        print(f"poscar {len(poscars)} != directory {len(dirnames)}")
-        sys.exit(11)
     #sys.exit(0)
 
     ### for kpoints-scan
@@ -320,9 +290,9 @@ def main():
                 kp_in = list(kp)
             print(kp_in)
             kp_str = list(map(str, kp_in))
-            make_vasp_dir(job, poscars, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dnames, args.iofile, args.atoms, args.error, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+            make_vasp_dir(args.job, args.subjob, poscars, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dnames, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
     else:
-        make_vasp_dir(job, poscars, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, dirnames, args.iofile, args.atoms, args.error, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+        make_vasp_dir(args.job, args.subjob, poscars, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, args.dnames, args.iofile, args.atoms, args.error, args.run, args.mkdir, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti)
     return 0
 
 if __name__ == '__main__':

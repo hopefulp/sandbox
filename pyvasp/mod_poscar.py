@@ -177,6 +177,13 @@ def pos2dirname(poscar):
         dirname = poscar
     return dirname
 
+def get_dnames4pos(poscars):
+    dnames=[]
+    for poscar in poscars:
+        dnames.append(pos2dirname(poscar))
+    return dnames
+
+
 def fixedMD_POSCAR(poscar, atom, atoms=None):
     '''
     poscar  to be modified
