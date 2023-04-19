@@ -254,7 +254,7 @@ def main():
         job = args.subjob
         ### not perfect
         if args.poscar:
-            inposcars = args.poscar
+            inposcar = args.poscar[0]
         else:
             if os.path.isfile('POSCAR'):
                 inposcar = 'POSCAR'
