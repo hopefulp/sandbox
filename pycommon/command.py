@@ -140,12 +140,16 @@ dac.build       =   "    Build graphene using nanocore\
                     \n\t\t-mv write to the input file\
                     "
 
-kisti.py    ="\t(PYTHON) Running script\
-             \n\t    1st: make a cli-command\
-             \n\t\tpython_script.py args\
-             \n\t    2nd: add 'pypath.sh'\
-             \n\t\tpypath.sh cli-command\
-             "
+kisti.shell     =   "\t:: Commands in alias.sh or PYTHONPATH\
+                    \n\t(kpy) to run python\
+                    \n\t    kpy to run default python instead of shebang\
+                    \n\t    $kpy command.py kisti\
+                    \n\t\t: the same as 'python $(which command.py ) kisti\
+                    "
+kisti.pbs       =   f"\tqst.py : runs 'qstat -f' to see long jobnames\
+                    \n\t    $ kpy qst.py\
+                    \n{pbs.queue}\
+                    "
 
 def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar, nhl,idata,ndata):
     
@@ -155,21 +159,19 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     ### KISTI
     kisti.vas = f"\t(VASP) :: (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)"
     kisti.vas += f"\n\t    $ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
-    kisti.vas += f"\n\t    $ python $(which vas_make_ini.py) -s POSCAR.{qname} -j opt"
-    kisti.vas += f"\n\t    --> can replace with"
-    kisti.vas += f"\n\t\tkpy vas_make_ini.py -s POSCAR.{qname} -j opt"
-    kisti.vas += f"\n\t    :: Rerun for failed opt"
+    kisti.vas += f"\n\t    $ kpy vas_make_ini.py -s POSCAR.{qname} -j opt"
+    kisti.vas += f"\n\t    :: (Rerun opt) for failed opt"
     kisti.vas += f"\n\t    $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
-    kisti.vas += f"\n\t    :: kpoints sampling"
+    kisti.vas += f"\n\t    :: (kpoints sampling)"
     kisti.vas += f"\n\t    $ python $(which vas_make_ini.py) -j kp -s POSCAR -kd 2 -kps 2 1 4 1 6 1 8 1"
-    kisti.vas += f"\n\t    :: Backfilling for fast run"
+    kisti.vas += f"\n\t    :: (fast run) using Backfillingn"
     kisti.vas += f"\n\t    $ qsub -N {qname} -l walltime=1:00:00 $SB/pypbs/pbs_vasp.sh "  
-    kisti.vas += f"\n\t    :: slab, xy-relax"
-    kisti.vas += f"\n\t    $ python $(which vas_make_ini.py) -s POSCAR.{qname} -j copt -exe xyrelax"
+    kisti.vas += f"\n\t    :: (slab) xy-relax"
+    kisti.vas += f"\n\t    $ kpy which vas_make_ini.py -s POSCAR.{qname} -j copt -exe xyrelax"
     kisti.vas += f"\n\t    $ qsub -N {qname} -v crelax=yes $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t    :: gamma, ncl"
+    kisti.vas += f"\n\t    :: (Gamma, ncl)"
     kisti.vas += f"\n\t    $ qsub -N {qname} -v exe=gamma $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t    :: run half process to save memory usage"
+    kisti.vas += f"\n\t    :: (Memory issue) run half process to save memory usage"
     kisti.vas += f"\n\t    $ qsub -N {qname} -l select=20:ncpus=40:mpiprocs=20:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t    $ qsub -N {qname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t    $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
@@ -369,15 +371,11 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print(dac.build)
         print(slurm.pbs)
     elif job == 'kisti' or job == 'pbs':
-        print("=== KISTI Jobs =======")
-        print(" KISTI runs PBS ")
-        print("    Commands in alias.sh or PYTHONPATH ")
-        print("\t$ kpy : to run default python instead of shebang")
-        print("\t    kpy command.py kisti")
-        print("\t    <- python $(which command.py ) kisti")
-        print(pbs.queue)
-        print("\t$ kpy qst.py: runs 'qstat -f' to see long jobnames")
-        print("\t=== VASP in KISTI ===")
+        print("=== PBS in KISTI ===")
+        print("    Bash ")
+        print(kisti.shell)
+        print(kisti.pbs)
+        print("=== VASP in KISTI ===")
         if subjob == 'vasp':
             print(comment_subj.vasp.run)
             print(comment_sys.server.kisti.pbs)
@@ -386,7 +384,8 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     elif job == 'vasp':
         print("KISTI: vasp")
         print(kisti.vas)
-        print(kisti.py)
+        print(kisti.shell)
+        print(kisti.pbs)
         print("Pt(platinum:slurm): vasp")
         print(slurm.vas)
 
