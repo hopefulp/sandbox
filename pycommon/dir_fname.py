@@ -7,6 +7,8 @@ import sys
 from common import *
 
 def make_newfname(fname, pattern, style, ch_word):
+    ### ap for append; rp for replace
+    print(f"{fname} {pattern} {style} {ch_word}")
     if style == 'ap':
         if re.search('\.',fname):
             fn = re.split('\.',fname)
@@ -29,21 +31,24 @@ def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex
         l_file = get_files_patterns(m_tag, pattern, pwd, Ldir=L_dir, Linverse=Linverse, Lparents = Lparents)
     else:
         l_file = pattern
-    print("\n".join(l_file))
+    print(f"{l_file} in 1st selection: {len(l_file)} files" )
     #sys.exit(1)
     n=0
     if exceptions:
         ### using whole word or matching word
+        print(f"there is exceptions {exceptions} with exopt {ex_opt}")
         if ex_opt == 'm':
             for fex in exceptions:
                 ### exclude by matching
                 for i in range(len(l_file)-1,-1,-1):
                     if re.match(fex, l_file[i]):
                         l_file.remove(l_file[i])
-        # remove by whole name
+        ### exception with matching, for whole matching: l_file.remove(fex) 
         else:
             for fex in exceptions:
-                l_file.remove(fex)         
+                l_file = [ x for x in l_file if fex not in x ]
+    print(f"{l_file} in 2nd selection: {len(l_file)} files" )
+                        
     # run job for the file list
     #print("\n".join(l_file))
     print(len(l_file), " files are selected")
@@ -51,8 +56,7 @@ def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex
     if job == "ls":
         if l_file:
             print(("\n".join(l_file)))
-    ### mvdir?            
-    #elif job in "mvdir" :
+    ### mv is move to dir
     elif job == "mv" :
         ### secure dir_out directory exists not to delete files
         if not os.path.isdir(dir_out):
@@ -60,7 +64,7 @@ def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex
             os.system(comm)
         for f in l_file:
             comm = f'{job} {f} {dir_out}'
-            print(comm)
+            #print(comm)
             if not os.path.exists(f'{dir_out}/{f}'):
                 commands.append(comm)
             else:
@@ -125,14 +129,14 @@ def main():
     group.add_argument( '-m', '--match', nargs='*', help='find matching string')
     group.add_argument( '-i', '--infiles', nargs='*', help='input file list')
     parser.add_argument( '-v', '--inverse', action='store_true', help='after find matching, inverse the selection')
-    parser.add_argument('-st', '--style', choices=['ap', 'rp', 'mo'], help='fname changing style: append, replace, mode')
+    parser.add_argument('-st', '--style', default='rp', choices=['ap', 'rp', 'mo'], help='fname changing style: append, replace, mode')
     parser.add_argument( '-rw', '--replace_word', help='string for replacement')
     #change.add_argument('-a', '--append', help="add suffix by -a to the original filename without extension")
     #change.add_argument('-mo', '--mode', default='755', choices=['755','644'], help="input chmod")
     parser.add_argument( '-id', '--include_dir', action='store_true', help='include dirname to filename')
     parser.add_argument( '-ip', '--include_parents', action='store_true', help='include dirname to filename')
     parser.add_argument( '-e', '--excluded', nargs='*', help='filename to be excluded')
-    parser.add_argument( '-eo', '--excluded_opt', default='m',help='excluded fname option: matching or fullname')
+    parser.add_argument( '-eo', '--excluded_opt', help='default==m, excluded fname option: matching or fullname')
     parser.add_argument( '-d', '-nd', '--directory', type=str, default='tmppy', help='target directory to move files')
     parser.add_argument( '-r', '--run', action='store_true', help='run or not-False')
     args = parser.parse_args()

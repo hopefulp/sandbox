@@ -89,7 +89,8 @@ dirjob.diramp       =   "Run multiple job in amp by scanning a value in bash\
                         "
 dirjob.dir_fname    =   "Treat Dir without work-style\
                         \n\t\tUsage:: dir_fname.py {ls, mv, rm, rename, cp, chmod} -options\
-                        \n\t\t    mv: it can be skipped if target exists\
+                        \n\t\t    mv    : mv to dir\
+                        \n\t\t    rename: change filename\
                         \n\t\tOptions::\
                         \n\t\t    -[p|s|m] for matching type\
                         \n\t\t    -id to include dir in scanning dir\
@@ -98,7 +99,7 @@ dirjob.dir_fname    =   "Treat Dir without work-style\
                         \n\t\t    -rw replacement word\
                         \n\t\t    -d, -nd  dirname for mv\
                         \n\t\t    -ip include_parents directory for matching is 'suffix'\
-                        \n\t\t    -e exception list\
+                        \n\t\t    -e exception list using matching\
                         \n\t\t    -eo default=m exception by matching or fullname\
                         \n\t\tUsage::\
                         \n\t\t    dir_fname.py rename -p G4 -st rp -rw G2 -id         ! rename with full replacement\
