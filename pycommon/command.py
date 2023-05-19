@@ -158,24 +158,26 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     ###### make command line in advance
     ### KISTI
     kisti.vas = f"\t(VASP) :: (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)"
-    kisti.vas += f"\n\t    $ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
-    kisti.vas += f"\n\t    $ kpy vas_make_ini.py -s POSCAR.{qname} -j opt"
-    kisti.vas += f"\n\t    :: (Rerun opt) for failed opt"
-    kisti.vas += f"\n\t    $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
-    kisti.vas += f"\n\t    :: (kpoints sampling)"
-    kisti.vas += f"\n\t    $ python $(which vas_make_ini.py) -j kp -s POSCAR -kd 2 -kps 2 1 4 1 6 1 8 1"
-    kisti.vas += f"\n\t    :: (fast run) using Backfillingn"
-    kisti.vas += f"\n\t    $ qsub -N {qname} -l walltime=1:00:00 $SB/pypbs/pbs_vasp.sh "  
-    kisti.vas += f"\n\t    :: (slab) xy-relax"
-    kisti.vas += f"\n\t    $ kpy which vas_make_ini.py -s POSCAR.{qname} -j copt -exe xyrelax"
-    kisti.vas += f"\n\t    $ qsub -N {qname} -v crelax=yes $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t    :: (Gamma, ncl)"
-    kisti.vas += f"\n\t    $ qsub -N {qname} -v exe=gamma $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t    :: (Memory issue) run half process to save memory usage"
-    kisti.vas += f"\n\t    $ qsub -N {qname} -l select=20:ncpus=40:mpiprocs=20:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t    $ qsub -N {qname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t    $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
-    kisti.vas += f"\n\t\tpbs_vasp_kisti_skl2 for half use of cpu for memory issue"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -j opt"
+    kisti.vas += f"\n\t    :: RERUN Opt for failed opt"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
+    kisti.vas += f"\n\t    :: KPOINTS Sampling"
+    kisti.vas += f"\n\t\t$ python $(which vas_make_ini.py) -j kp -s POSCAR -kd 2 -kps 2 1 4 1 6 1 8 1"
+    kisti.vas += f"\n\t    :: FAST Run using Backfillingn"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -l walltime=1:00:00 $SB/pypbs/pbs_vasp.sh "  
+    kisti.vas += f"\n\t    :: SLAB XY-relax"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -j copt -exe xyrelax"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -v crelax=yes $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t    :: GAMMA, ncl"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -v exe=gamma $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t    :: MEMORY Issue run half process to save memory usage"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -l select=20:ncpus=40:mpiprocs=20:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
+    kisti.vas += f"\n\t\t    pbs_vasp_kisti_skl2 for half use of cpu for memory issue"
+    kisti.vas += f"\n\t    :: FAKER Job"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -sj opt -d dname -nd ndirs -ra : more info_vasp.py"
     ### IRON(slurm)
     if not nproc:
         nproc = nnode * nXn[partition]
@@ -397,7 +399,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('job', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp','pbs'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-j', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '-q', '--qname', help="queue name for qsub shown by qstat")
