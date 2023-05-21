@@ -99,9 +99,18 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
                 continue
         ### overwrite continues
         ### 1.2 Copy POSCAR
-        com = f"cp {poscar} {dirname}/POSCAR"
-        print(f"{com}")
-        os.system(f'{com}')
+        try :
+            os.path.isfile(poscar)
+            com = f"cp {poscar} {dirname}/POSCAR"
+            print(f"{com}")
+            os.system(f'{com}')
+        except OSError :
+            print(f"cannot find {poscar}")
+            sys.exit(11)
+        #else:
+        #    print("POSCAR error")
+        #    sys.exit(12)
+            
         
         ### 2. get KPOINTS
         ### use kp inputs, if KPOINTS ready, KPOINTS.job, make KPOINTS file

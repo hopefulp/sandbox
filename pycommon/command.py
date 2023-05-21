@@ -80,6 +80,7 @@ ga.dyn          =   "\nGA: Dynamics\
 
 pbs.queue       =   f"\tqs = qstat -u {user} ! alias\
                     \n\th5 = watch -d -n 300 'ls -alt' ! to protect the connection in cf. KISTI\
+                    \n\thk = watch -d -n 60 'kpy qst.py'\
                     "
 
 slurm.pbs       =   pbs.queue +  "\n\tpe     to get free processes\
@@ -176,8 +177,9 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     kisti.vas += f"\n\t\t$ qsub -N {qname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
     kisti.vas += f"\n\t\t    pbs_vasp_kisti_skl2 for half use of cpu for memory issue"
-    kisti.vas += f"\n\t    :: FAKER Job"
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -sj opt -d dname -nd ndirs -ra : more info_vasp.py"
+    kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.small -sj opt -d dname -nd ndirs -ra : more info_vasp.py"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j opt -s POSCAR.s -d dnameid -r on : o-overwrite n-not submit job"
     ### IRON(slurm)
     if not nproc:
         nproc = nnode * nXn[partition]
