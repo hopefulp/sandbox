@@ -205,6 +205,9 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     slurm.vas += f"\n\t    -n number of total processes: {nproc} <= {nnode} * {nXn[partition]}, which proceed -c"
     slurm.vas += f"\n\t    -c (--cpus-per-task: ncpu/2 per node for memory {ncpu}"
     slurm.vas += f"\n\t    --ntasks-per-node {nXn[partition]/2} in case doesnot know ncpu/node"
+    slurm.siesta = " === Job submission"
+    slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_siesta.sh"
+    #slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     if nproc != nnode * nXn[partition]:
         print("Warning!! Not using all the processes in the node")
 
@@ -392,7 +395,9 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(kisti.pbs)
         print("Pt(platinum:slurm): vasp")
         print(slurm.vas)
-
+    elif job == 'siesta':
+        print("Pt(platinum:slurm): siesta")
+        print(slurm.siesta)
     else:
         print("build more jobs")
     return 0 
@@ -401,7 +406,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp','pbs'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('job', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp','pbs','siesta'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-j', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '-q', '--qname', help="queue name for qsub shown by qstat")
