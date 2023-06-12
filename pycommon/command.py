@@ -78,9 +78,10 @@ ga.dyn          =   "\nGA: Dynamics\
                     \n    GPU: iron, n076\
                     "
 
-pbs.queue       =   f"\tqs = qstat -u {user} ! alias\
-                    \n\th5 = watch -d -n 300 'ls -alt' ! to protect the connection in cf. KISTI\
-                    \n\thk = watch -d -n 60 'kpy qst.py'\
+pbs.queue       =   f"\t    qs = qstat -u {user} ! alias\
+                    \n\t    h5 = watch -d -n 300 'ls -alt' ! to protect the connection in cf. KISTI\
+                    \n\t    hk = watch -d -n 60 'kpy qst.py'\
+                    \n\t    kfake dname ndir    : bash function\
                     "
 
 slurm.pbs       =   pbs.queue +  "\n\tpe     to get free processes\
@@ -142,13 +143,13 @@ dac.build       =   "    Build graphene using nanocore\
                     "
 
 kisti.shell     =   "\t:: Commands in alias.sh or PYTHONPATH\
-                    \n\t(kpy) to run python\
-                    \n\t    kpy to run default python instead of shebang\
-                    \n\t    $kpy command.py kisti\
+                    \n\t    (kpy) to run python\
+                    \n\t\tkpy to run default python instead of shebang\
+                    \n\t\t$kpy command.py kisti\
                     \n\t\t: the same as 'python $(which command.py ) kisti\
                     "
-kisti.pbs       =   f"\tqst.py : runs 'qstat -f' to see long jobnames\
-                    \n\t    $ kpy qst.py\
+kisti.pbs       =   f"\t    qst.py : runs 'qstat -f' to see long jobnames\
+                    \n\t\t$ kpy qst.py\
                     \n{pbs.queue}\
                     "
 
