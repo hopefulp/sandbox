@@ -9,20 +9,21 @@ def fextract(fname, kw):
         fname += '/POTCAR'
     kwlines=[]
     kvs=[]
+    kw = kw.upper()
     ### READ POTCAR
     with open(fname, 'r') as f:
         for i, line in enumerate(f):          # line has "\n"
             #print line,         # print writes its own "\n"
             if re.search(kw, line):
                 kwlines.append(line)
-                print(line)
+                print(line.strip())
     if not kwlines:
         print(f"there is no kw {kw} in {fname}")
         return 1
     else:
         for line in kwlines:
             lstr = re.split(r'[\s;]+', line.strip()) #r'[;\s]+')
-            print(lstr)
+            #print(lstr)
             if lstr[0] == kw:
                 kvs.append(lstr[2])
     if kvs:
@@ -30,7 +31,7 @@ def fextract(fname, kw):
         enmax = list(map(float, kvs))
         print(f"{enmax}")
         default = round((max(enmax) * 1.3)/50)*50
-        print(f"enmax: {enmax} roundoff with 30%: {default}")
+        print(f"{kw}: {max(enmax)} roundoff with 30% for cell relaxation: {default}")
     return 0
 
 def main():
