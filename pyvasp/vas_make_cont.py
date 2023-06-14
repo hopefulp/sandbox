@@ -213,7 +213,7 @@ def main():
     goutput = parser.add_mutually_exclusive_group()
     goutput.add_argument('-dn', '-nd', '--newdir', help='specify new dirname in case one job')
     goutput.add_argument('-suf', '-suff', '--suffix', help='specify suffix of new directory')
-    goutput.add_argument('-a', '--fixed_atom', default='H', help='atom symbol to be fixed')
+    goutput.add_argument('-a', '--fixed_atom', help='atom symbol to be fixed')      # default='H'
     ### INCAR
     parser.add_argument('-i', '--incar', help='specify incar file or dir')
     #parser.add_argument('-io', '--ioption', help='in the order: u:use INCAR.job,a:append,c:change,o:out,r:reverse')

@@ -178,7 +178,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
     kisti.vas += f"\n\t\t    pbs_vasp_kisti_skl2 for half use of cpu for memory issue"
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.small -sj opt -d dname -nd ndirs -ra : more info_vasp.py"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.LiO2 -sj opt -ra -d ntime -nd 5 : more info_vasp.py"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j opt -s POSCAR.s -d dnameid -r on : o-overwrite n-not submit job"
     ### IRON(slurm)
     if not nproc:
