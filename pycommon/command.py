@@ -78,10 +78,9 @@ ga.dyn          =   "\nGA: Dynamics\
                     \n    GPU: iron, n076\
                     "
 
-pbs.queue       =   f"\t    qs = qstat -u {user} ! alias\
-                    \n\t    h5 = watch -d -n 300 'ls -alt' ! to protect the connection in cf. KISTI\
-                    \n\t    hk = watch -d -n 60 'kpy qst.py'\
-                    \n\t    kfake dname ndir    : bash function\
+pbs.queue       =   f"\tqs = qstat -u {user} ! alias\
+                    \n\th5 = watch -d -n 300 'ls -alt' ! to protect the connection in cf. KISTI\
+                    \n\thk = watch -d -n 60 'kpy qst.py'\
                     "
 
 slurm.pbs       =   pbs.queue +  "\n\tpe     to get free processes\
@@ -143,13 +142,13 @@ dac.build       =   "    Build graphene using nanocore\
                     "
 
 kisti.shell     =   "\t:: Commands in alias.sh or PYTHONPATH\
-                    \n\t    (kpy) to run python\
-                    \n\t\tkpy to run default python instead of shebang\
-                    \n\t\t$kpy command.py kisti\
+                    \n\t(kpy) to run python\
+                    \n\t    kpy to run default python instead of shebang\
+                    \n\t    $kpy command.py kisti\
                     \n\t\t: the same as 'python $(which command.py ) kisti\
                     "
-kisti.pbs       =   f"\t    qst.py : runs 'qstat -f' to see long jobnames\
-                    \n\t\t$ kpy qst.py\
+kisti.pbs       =   f"\tqst.py : runs 'qstat -f' to see long jobnames\
+                    \n\t    $ kpy qst.py\
                     \n{pbs.queue}\
                     "
 
@@ -179,7 +178,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
     kisti.vas += f"\n\t\t    pbs_vasp_kisti_skl2 for half use of cpu for memory issue"
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.LiO2 -sj opt -ra -nd {nnode} -d {qname} : more info_vasp.py"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.small -sj opt -d dname -nd ndirs -ra : more info_vasp.py"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j opt -s POSCAR.s -d dnameid -r on : o-overwrite n-not submit job"
     ### IRON(slurm)
     if not nproc:
@@ -307,10 +306,10 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     elif job == 'slurm':
         print(f" nproc {nproc} = nnode {nnode} * nproc/node_partition {nXn[partition]}")    
         print(f"Usage for {job}")
-        print(f"\t {os.path.basename(__file__)} {job} -sj vasp -qn dirname -p {partition} -N {nnode} -n {nproc}")
+        print(f"\t {os.path.basename(__file__)} {job} -j vasp -qn dirname -p {partition} -N {nnode} -n {nproc}")
         print("Run in slurm")
         if not subjob:
-            print("use -sj subjob [vasp|mldyn|nc]")
+            print("use -j subjob [vasp|mldyn|nc]")
 
         elif subjob == 'amp':
             if nhl:
