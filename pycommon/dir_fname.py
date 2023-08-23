@@ -70,11 +70,9 @@ def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex
             else:
                 print(f"there exists target file {dir_out}/{f}")
 
-    elif job == 'rename':
-        #if not new_name: 
-        #    print("add new name with -a or ")
-        #    exit(10)
-        #else:
+    elif job == 'rename' or job == 'cp':
+        if job == 'rename':
+            job = 'mv'
         for fname in l_file:
             ### 
             new_name = make_newfname(fname, pattern[0], style, ch_word)
@@ -91,7 +89,7 @@ def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex
             if os.path.isfile(new_name):
                 print(f"{new_name} will be overwritten. Stop!")
                 sys.exit(1)
-            comm  = "mv  " + fname + " " + new_name
+            comm  = f"{job}  " + fname + " " + new_name
             commands.append(comm)
     else:
         ### rewrite mode
@@ -100,7 +98,7 @@ def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex
                 com = job + " " + f
             elif job == 'cp':
                 for d in dir_out:
-                    com = 'cp %s %d' % (f, d)
+                    com = 'cp %s %s' % (f, d)
             elif job == 'chmod':
                 com = f'{job} {mode} {f}'
             #elif job == 'mv':

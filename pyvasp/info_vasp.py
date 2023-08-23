@@ -25,6 +25,7 @@ incar   = MyClass('incar')
 potcar  = MyClass('potcar')
 dosband = MyClass('dosband')
 procar  = MyClass('procar')
+outcar  = MyClass('outcar')
 ase     = MyClass('ase')
 charge  = MyClass('charge')
 convert = MyClass('convert')
@@ -100,7 +101,7 @@ make.vas_make_cont = " -d dir_list -j job -i incar_option -o option_poscar\
                     \n\tChange INCAR:\
                     \n\t    import mod_incar\
                     "
-make.myvasp         ="modules for make vasp directory\
+make.mod_vas        = "modules for make vasp directory\
                     \n\tcalled by 'vas_make_ini.py'\
                     \n\tfunctions:\
                     \n\t    get_vasp_repository\
@@ -111,7 +112,7 @@ make.myvasp         ="modules for make vasp directory\
                     \n\t\tcall get_atoms_4pos\
                     \n\t\treturn MAGMOM\
                     \n\t    make_incar\
-                    \n\tRun by 'python -m myvasp -j getmag -p poscar'\
+                    \n\tRun by 'python -m mod_vas -j getmag -s poscar'\
                     \n\t    to get MAGMOM\
                     "
 make.mod_incar     ="module for INCAR modification\
@@ -259,14 +260,22 @@ procar.procar_kb    =   "[procar_kb.pl] renamed from 'get_Procar.pl'\
                         \n\t\tE.g.:\
                         \n\t\t    procar_kb.pl e=-6:-5 '3 58'\
                         "
-procar.get_procar   =   "[.pl] similar to procar_kb.pl"
+procar.get_procar       =   "[.pl] similar to procar_kb.pl"
 procar.get_procar_kband = "[.pl] similar to get_procar.pl"
-procar.procar       =   "To extract and draw band\
+procar.procar           =   "To extract and draw band\
                         \n\t\t'to load PROCAR' can make a memory problem\
                         "
-procar.procar_byline=   "the same as procar.py\
+procar.procar_byline    =   "the same as procar.py\
                         \n\t\tread by line and calculate to save memory for what?\
                         "
+outcar.outcar_zpe_ts    = "Read OUTCAR: calculate T*S energy\
+                        \n\t\tOption:\
+                        \n\t\t    d [dir with OUTCAR|fname]\
+                        \n\t\t    -na number of atoms to be calculated for frequency\
+                        \n\t\tUsage:\
+                        \n\t\t    outcar_zpe_ts.py OUTCAR_test_1_catO2_vib -na 2\
+                        "
+outcar.outcar_zpe_ts_mj = "original version of zpe from mjstar"
 analysis.vas_anal    =   "(.sh) Charge analysis of Bader\
                         \n\tjobs: bader bader2(spin) convasp dos bchg end\
                         \n\tUsage: Run just above vasp directory\

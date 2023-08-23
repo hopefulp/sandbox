@@ -14,16 +14,16 @@ def file_len(fname):
             pass
     return i+1
 
-def cal_zpe_ts(dir1, natom, infile):
+def cal_zpe_ts(indir, natom):
     cwd = os.getcwd()
-    fname = dir1 + '/' + infile
-    if not os.path.isfile(fname):
-        print(f"There is no {infile} in {dir1}")
-        sys.exit(1)
+    if os.path.isdir(indir):
+        os.chdir(indir)
+        fname = "OUTCAR"
+    elif os.path.isfile(indir):
+        fname = indir
 
-    os.chdir(dir1)
     #### THz Data mining in OUTCAR ####
-    os.system('grep THz OUTCAR > THz.txt')
+    os.system(f'grep THz {fname} > THz.txt')
 
     TN_lines = file_len('THz.txt') # Total Number of Lines
 
@@ -110,12 +110,11 @@ def cal_zpe_ts(dir1, natom, infile):
 def main():
 
     parser = argparse.ArgumentParser(description='for ZPE & TS calculation to energy profile (HER, ORR, etc.)')
-    parser.add_argument('d', nargs='?', default=os.getcwd(), help='input dir which have OUTCAR w. ZPE calculation')
+    parser.add_argument('d', nargs='?', default=os.getcwd(), help='input dir|OUTCAR which have OUTCAR w. ZPE calculation ')
     parser.add_argument('-na', '--natom', type=int, help='THz is redundant in OUTCAR so fix the number of tested atoms')
-    parser.add_argument('-inf', '--infile', default='OUTCAR', help='OUTCAR')
     args = parser.parse_args()
 
-    cal_zpe_ts(args.d, args.natom, args.infile)
+    cal_zpe_ts(args.d, args.natom)
     return 0
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-#!/home/joonho/anaconda3/bin/python
+##!/home/joonho/anaconda3/bin/python
 ### module for INCAR modification
 '''
     modify_incar

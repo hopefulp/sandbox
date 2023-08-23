@@ -1,12 +1,4 @@
 ### python-vasp module
-
-import os
-import json
-import re
-import sys
-import argparse
-from common import whereami
-
 """ 
     repository for many vasp script 
     get_vasp_repository()
@@ -14,8 +6,16 @@ from common import whereami
     make_mag_4pos()
     def make_incar(dic, iofile):
     def make_kpoints(kp, MH|gamma, **args=[band])
-
 """
+
+import os
+import json
+import re
+import sys
+import argparse
+from common import whereami
+from nanocore import atoms as ncatoms
+
 ### VASP ini & outfiles
 vasf_default=['CHG','CHGCAR','CONTCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR',  'XDATCAR']
 vasf_ini=['POSCAR','KPOINTS','INCAR','POTCAR']
@@ -94,16 +94,24 @@ def get_atoms_4pos(pos='POSCAR'):
         return 'err' 
                 
 
-def make_mag_4pos(pos='POSCAR'):
+def make_mag_4pos(pos='POSCAR', magin=None):
+    '''
+    mag = { 'atom symbol': magmom }
+    '''
     natoms, atoms = get_atoms_4pos(pos)
     magstr="MAGMOM = "
     Lmag = False
     for index, atom in enumerate(atoms):
-        if atom in TMmag:
-            magstr += f"{natoms[index]}*{TMmag[atom]} "
+        if magin and atom in magin.keys():
+            magstr += f"{natoms[index]}*{magin[atom]} "
+            Lmag = True
+        elif atom in ncatoms.atom_prop.keys():
+            magstr += f"{natoms[index]}*{ncatoms.atom_prop[atom][1]} "
             Lmag = True
         else:
-            magstr += f"{natoms[index]}*0 "
+            print("ERROR: no magmom in input and repo")
+            sys.exit(10)
+            #magstr += f"{natoms[index]}*0 "
     if Lmag: return magstr + "100*0"
     else:    return "# " + magstr
 
@@ -494,10 +502,15 @@ def main():
     parser.add_argument('-j', '--job', choices=['getmag','ak','Ucorr'], help='read POSCAR then get MAGMOM')
     parser.add_argument('-s', '--poscar', default='POSCAR', help='POSCAR to be read')
     parser.add_argument('-ind', '--index', type=int, help='return index of Ucorr list')
+    parser.add_argument('-m', '--magmom',  nargs='*', help='magmom input as hash')
     args = parser.parse_args()
 
     if args.job == 'getmag':
-        st = make_mag_4pos(args.poscar)
+        magmom = {}
+        if args.magmom:
+            li = iter(args.mamom)
+            magmom = dict(zip(li, int(li)))
+        st = make_mag_4pos(args.poscar, magin=magmom)
         print(st)
     elif args.job == 'ak':
         _, atoms = get_atoms_4pos(args.poscar)
@@ -522,4 +535,5 @@ def main():
 
 
 if __name__ == '__main__':
+    print(f"in main: {__name__}")
     main()
