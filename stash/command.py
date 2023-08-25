@@ -389,19 +389,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print(comment_subj.vasp.run)
             print(comment_sys.server.kisti.pbs)
         print(kisti.vas)
-        print("=== NanoCore in KISTI ===")
-        print("qsub")
-        if keyvalues:
-            kv  = keyvalues[0]
-        else:
-            kv  =   'orr'
         
-        if not qname:
-            qname=f'{keyvalues}_test'
-        print(f"\tqsub -J {qname} pbs_vasp_kisti_skl.sh")
-        print(f"\tqsub -J {qname} --export=job='{kv}' pbs_vasp_kisti_skl.sh")
-        print("\nNonoCore Package Development:")
-        print(nc.build)
 
     elif job == 'vasp':
         print("KISTI: vasp")
