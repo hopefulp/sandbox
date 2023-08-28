@@ -181,7 +181,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.LiO2 -sj opt -ra -d ntime -nd 5 : more info_vasp.py"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j opt -r on -s POSCAR.s -d dnameid : o-overwrite n-not submit job"
     kisti.vas += f"\n\t    :: (NanoCore)"
-    kisti.vas += f"\n\t\t$ qsub -N {qname} -v cat='orr' pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} pbs_vasp_kisti_skl.sh"
     ### IRON(slurm)
     if not nproc:
         nproc = nnode * nXn[partition]
@@ -311,7 +311,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(f"\t {os.path.basename(__file__)} {job} -j vasp -qn dirname -p {partition} -N {nnode} -n {nproc}")
         print("Run in slurm")
         if not subjob:
-            print("use -j subjob [amp|vasp|mldyn|nc]")
+            print("use -j subjob [vasp|mldyn|nc]")
 
         elif subjob == 'amp':
             if nhl:
@@ -389,19 +389,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print(comment_subj.vasp.run)
             print(comment_sys.server.kisti.pbs)
         print(kisti.vas)
-        print("=== NanoCore in KISTI ===")
-        print("qsub")
-        if keyvalues:
-            kv  = keyvalues[0]
-        else:
-            kv  =   'orr'
         
-        if not qname:
-            qname=f'{keyvalues}_test'
-        print(f"\tqsub -N {qname} pbs_vasp_kisti_skl.sh")
-        print(f"\tqsub -N {qname} -v cat='{kv}' pbs_vasp_kisti_skl.sh")
-        print("\nNonoCore Package Development:")
-        print(nc.build)
 
     elif job == 'vasp':
         print("KISTI: vasp")
