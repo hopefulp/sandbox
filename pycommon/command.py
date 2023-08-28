@@ -309,7 +309,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print(f"\t {os.path.basename(__file__)} {job} -j vasp -qn dirname -p {partition} -N {nnode} -n {nproc}")
         print("Run in slurm")
         if not subjob:
-            print("use -j subjob [vasp|mldyn|nc]")
+            print("use -j subjob [amp|vasp|mldyn|nc]")
 
         elif subjob == 'amp':
             if nhl:
