@@ -370,7 +370,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             if not qname:
                 qname=f'{keyvalues}_test'
             print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
-            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=job='{kv}' slurm_sbatch_nc.sh")
+            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=cat='{kv}' slurm_sbatch_nc.sh")
             print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=main={inf} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
             print("\nNonoCore Package Development:")
             print(nc.build)
