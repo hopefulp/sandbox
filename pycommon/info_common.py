@@ -164,6 +164,7 @@ convert.py_2to3_nb  =   "to convert ipynb files of python2 to python3\
 convert.perl2python  =   " perl script to convert perl to python"
 command.command     = "show Recent Command"
 command.web_load    = "To load in web, copy files to ~/public_html/"
+command.repeat_command = "to repeat cli command"
 
 dirjob.common       =   "module for directory & string\
                         \n\t    Classes\

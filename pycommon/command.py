@@ -191,7 +191,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     if 'dirname' not in locals():
         dirname = qname
     ncpu =  int(nXn[partition]/2)
-    slurm.vas = " === Job submission"
+    slurm.vas = "==== Job submission"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
@@ -306,12 +306,12 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
 
     ### run VASP in SLURM
     elif job == 'slurm':
-        print(f" nproc {nproc} = nnode {nnode} * nproc/node_partition {nXn[partition]}")    
         print(f"Usage for {job}")
+        print(f" nproc {nproc} = nnode {nnode} * nproc/node_partition {nXn[partition]}")    
         print(f"\t {os.path.basename(__file__)} {job} -j vasp -qn dirname -p {partition} -N {nnode} -n {nproc}")
         print("Run in slurm")
         if not subjob:
-            print("use -j subjob [amp|vasp|mldyn|nc]")
+            print("use -j subjob [amp|vasp|mldyn|nc|vasnc|vaspnc]")
 
         elif subjob == 'amp':
             if nhl:
@@ -329,17 +329,34 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print(f"\t2. amp_jobs.sh db {inf} 1 | sh")
             print(f"\t3. amp_jobs.sh wrapper2 {inf} 2 | sh")
         
-        elif subjob == 'vasp':
-            print(f"=== Usage ===\
-                    \n\t{os.path.basename(__file__)} {job} -s {poscar} -p 3 -N 4 -n total_proc\
-                    \n\tN.B.:: (POSCAR.)name is dirname and qname in qsub") 
-            print("=== Prepare VASP directory in platinum")
-            print(f"    (1) vas_make_ini.py -s {poscar}")
-            print("\tmake POSCAR POTCAR KPOINTS INCAR & directory")
-            print(f"    python -m myvasp -j getmag -p {poscar}")
-            print(f"    sed -i 's/.*MAGMOM.*/ mag_moment/' INCAR")
-            print("\tto modify MAGMON in INCAR from POSCAR in module myvasp.py")
-            print(slurm.vas)
+        elif re.search('vas', subjob) or re.search('nc', subjob):
+            if re.search('vas', subjob):
+                print(f"=== Usage ===\
+                        \n\t{os.path.basename(__file__)} {job} -s {poscar} -p 3 -N 4 -n total_proc\
+                        \n\tN.B.:: (POSCAR.)name is dirname and qname in qsub") 
+                print("=== Prepare VASP directory in platinum")
+                print(f"    (1) vas_make_ini.py -s {poscar}")
+                print("\tmake POSCAR POTCAR KPOINTS INCAR & directory")
+                print(f"    python -m myvasp -j getmag -p {poscar}")
+                print(f"    sed -i 's/.*MAGMOM.*/ mag_moment/' INCAR")
+                print("\tto modify MAGMON in INCAR from POSCAR in module myvasp.py")
+                print(slurm.vas)
+            if re.search('nc', subjob):
+                print("NanoCore with SBATCH:")
+                if keyvalues:
+                    kv  = keyvalues[0]
+                else:
+                    kv  =   'orr'
+                
+                #if not qname:
+                #    qname=f'{keyvalues}_test'
+                print(f"\t:: cat=['orr' (default),'her'], pos=['cp' (default: copy), 'any_other_word']")
+                print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc}  slurm_sbatch_nc.sh")
+                print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=cat='{kv}' --export=pos='cp' slurm_sbatch_nc.sh")
+                print(f"\t:: if not 'cp', generate")
+                print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=pos='gen' slurm_sbatch_nc.sh")
+                print("\nNonoCore Package Development:")
+                print(nc.build)
         elif subjob == 'mldyn':
             print("SBATCH:")
             print(f"\tsbatch -J {qname} -p X2 -N 1 -n 1 --export=hl='{hlstr1}',sf='hl{hl2str}.pt' /home/joonho/sandbox/pypbs/slurm_sbatch_py.sh")
@@ -360,20 +377,6 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print("\t-mi max iteration, default=10^5")
             print("\t-dbp partition [2|3]: data to tr, [val, and] te")
             print(ga.dyn)
-        elif subjob == 'nc':
-            print("SBATCH:")
-            if keyvalues:
-                kv  = keyvalues[0]
-            else:
-                kv  =   'orr'
-            
-            if not qname:
-                qname=f'{keyvalues}_test'
-            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
-            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=cat='{kv}' slurm_sbatch_nc.sh")
-            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=main={inf} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
-            print("\nNonoCore Package Development:")
-            print(nc.build)
         elif subjob == 'crr':
             print("    CRR:DAC =========================")
             print(nc.build)
@@ -422,7 +425,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
     parser.add_argument('job', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp','pbs','siesta'],  help="one of amp, qchem, mldyn for ML dyn")
-    parser.add_argument('-j', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('-sj', '-j', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp', 'vaspnc', 'vasnc'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '-q', '--qname', help="queue name for qsub shown by qstat")
     parser.add_argument('-kv', '--keyvalues', nargs='*', help='change a keyword in print')
