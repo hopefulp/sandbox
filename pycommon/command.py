@@ -152,7 +152,7 @@ kisti.pbs       =   f"\tqst.py : runs 'qstat -f' to see long jobnames\
                     \n{pbs.queue}\
                     "
 
-def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar, nhl,idata,ndata):
+def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode, nproc, nodelist, sftype, dtype, partition,poscar, nhl,idata,ndata):
     
     if keyvalues:
         kw1 = keyvalues[0]
@@ -180,7 +180,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.LiO2 -sj opt -ra -d ntime -nd 5 : more info_vasp.py"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j opt -r on -s POSCAR.s -d dnameid : o-overwrite n-not submit job"
-    kisti.vas += f"\n\t    :: (NanoCore)"
+    kisti.vas += f"\n\t    :: (OORINano)"
     kisti.vas += f"\n\t\t$ qsub -N {qname} -v cat='orr' pbs_vasp_kisti_skl.sh"
     ### IRON(slurm)
     if not nproc:
@@ -307,9 +307,11 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     ### run VASP in SLURM
     elif job == 'slurm':
         print(f"Usage for {job}")
-        print(f" nproc {nproc} = nnode {nnode} * nproc/node_partition {nXn[partition]}")    
+        print(f"\tnproc {nproc} = nnode {nnode} * nproc/node_partition {nXn[partition]}")    
         print(f"\t {os.path.basename(__file__)} {job} -j vasp -qn dirname -p {partition} -N {nnode} -n {nproc}")
         print("Run in slurm")
+        print("\tsleep:")
+        print(f"\t    sbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --nodelist {nodelist} /home/joonho/sandbox/pypbs/slurm_sbatch_sleep.sh")
         if not subjob:
             print("use -j subjob [amp|vasp|mldyn|nc|vasnc|vaspnc]")
 
@@ -342,7 +344,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
                 print("\tto modify MAGMON in INCAR from POSCAR in module myvasp.py")
                 print(slurm.vas)
             if re.search('nc', subjob):
-                print("NanoCore with SBATCH:")
+                print("OORINano/catalysis with SBATCH:")
                 if keyvalues:
                     kv  = keyvalues[0]
                 else:
@@ -355,7 +357,12 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
                 print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=cat='{kv}' --export=pos='cp' slurm_sbatch_nc.sh")
                 print(f"\t:: if not 'cp', generate")
                 print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=pos='gen' slurm_sbatch_nc.sh")
-                print("\nNonoCore Package Development:")
+                print("OORINano/qtnegf with SBATCH:")
+                print(f"\t:: Make subdirectory with {qname} - default")
+                print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc}  slm_qtnegf.sh")
+                print(f"\t:: Run in main directory")
+                print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc}  --export=sub=0 slm_qtnegf.sh")
+                print("\nOORINano Package Development:")
                 print(nc.build)
         elif subjob == 'mldyn':
             print("SBATCH:")
@@ -434,7 +441,8 @@ def main():
     parser.add_argument('-inf', '--infile', help='input file in case')
     parser.add_argument('-N', '--nnode', default=1, type=int, help='number of nodes: if needed')
     parser.add_argument('-n', '--nproc', type=int, help='number of process: if needed')
-    parser.add_argument('-x', '--xpartition', default=3, type=int, choices=[1,2,3,4,5], help='if needed, specify nodename')
+    parser.add_argument('-nl', '--nodelist',  help='node list to assign nodes')
+    parser.add_argument('-x', '--xpartition', default=3, type=int, choices=[1,2,3,4,5,6], help='if needed, specify nodename')
     parser.add_argument('-s', '--poscar', default='POSCAR.name', help='if needed, specify nodename')
     parser.add_argument('-id', '--idata', default=0, type=int, help='start index of data')
     parser.add_argument('-nd', '--ndata', default=100, type=int, help='amount of data')
@@ -455,7 +463,7 @@ def main():
     else:
         infile = args.infile
 
-    show_command(args.job,args.subjob,args.job_submit,args.qname,infile,args.keyvalues,args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.xpartition,args.poscar, args.hidden_layers, args.idata, args.ndata)
+    show_command(args.job,args.subjob,args.job_submit,args.qname,infile,args.keyvalues,args.nodename,args.nnode,args.nproc,args.nodelist, args.func_type,args.data_type,args.xpartition,args.poscar, args.hidden_layers, args.idata, args.ndata)
 
 if __name__ == "__main__":
     main()

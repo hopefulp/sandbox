@@ -7,7 +7,8 @@
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.ticker as ticker
-import sys
+import sys, re
+import scipy
 import my_chem 
 import numpy as np
 from common import *
@@ -124,7 +125,7 @@ def lighten_2color(color, ncolors):
     return color_rgb
     #return colorsys.hls_to_rgb(c[0], amount * (1 - c[1]), c[2])
 
-def common_figure(ctype='darken', ncolor=4, Ltwinx=False):
+def common_figure(ctype='dark', ncolor=4, Ltwinx=False):
     '''
     ctype   darken to change intensity
             cycle to use designated color turns
@@ -442,25 +443,19 @@ def auto_nvector(x,y):
     plt.show()
     return 0
 ### most1
-def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, colors=None):
+def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, colors=None, vertical=None, v_legend=None):
     '''
     call with x=[] and y=[ [...
     x:: [] or [size]
     y:: [size] or [[size],[size],...[size]]
     '''
-    print(f"{legend} {len(legend)}")
-    nlegend = len(legend)
     if not colors:
-        fig, ax = common_figure(ncolor = nlegend)
-        #else:
-        #    fig, ax = common_figure(ncolor=4)
-    #else:
-    #    fig, ax = common_figure(ncolor=4)
-    #fig, ax = common_figure()
-    #if len(y):
-    #    camount= 1/len(y) *2
-    #color_rgb = lighten_2color('rb', len(y))
-    print(f"size of y vector {len(y)}")
+        fig, ax = common_figure(ncolor = len(legend))
+        print("no color input")
+    else:
+        fig, ax = common_figure()
+        print("colors")
+
     #plt.locator_params(axis='x', nbins=10)
     ys = np.array(y)
     if len(x) != 0:
@@ -470,31 +465,29 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
         x=range(xsize)
     print(f"x={len(x)} y={ys.shape} in {whereami()}()")
     plt.title(title)
-    if xlabel:
-        plt.xlabel(xlabel, fontsize=12)
+    xlabel = 'E - E$_F$ [eV]'
+    plt.xlabel(xlabel, fontsize=12)
     plt.ylabel(ylabel, fontsize=12)
-    ### test value of Spot
-    test = 0
-    if test == 1:
-        ndata = 100
-        pivot = len(x) - ndata
-        for i in range(ndata):
-            print(f"x {x[pivot+i]} y {y[0][pivot+i]}")
-
+    print(f"xlabel: {xlabel} ")
     if ys.ndim == 1:
         plt.plot(x, y, '-')
         #plt.scatter(x, y)
     elif ys.ndim == 2:
         for i in range(len(ys)):
-            #plt.plot(x,ys[i,:], color=color_rgb[i], label=legend[i] )
-            #plt.plot(x,ys[i,:], color=colors[i], label=legend[i] )
-            ### common_figure uses color_cycler
-            plt.plot(x,ys[i,:],  label=legend[i] )
+            if re.search('t', legend[i]):
+                d = scipy.zeros(len(ys[i,:]))
+                print(f"shape d {np.array(d).shape}")
+                ax.fill_between(x, ys[i,:], where=ys[i,:]>=d, color=colors[i])
+                plt.plot(x,ys[i,:],  label=legend[i] , color=colors[i])
+            else:
+                plt.plot(x,ys[i,:],  label=legend[i] , color=colors[i])
+
     else:
         print(f"Error:: obscure in y-dim {ys.ndim}")
     ### ADD LEGEND
     plt.legend(loc=1)                # locate after plot
-    #ax.set_xlim([-8, 6])
+    #plt.xlim([-20.0, 15.0])
+    #ax.set_xlim([-25, 15])
     ax.xaxis.set_major_locator(ticker.AutoLocator())
     ax.yaxis.set_major_locator(ticker.AutoLocator())
     plt.show()
