@@ -17,9 +17,6 @@ models= {
     'Diss_CHO': 'Diss_H2COH.extxyz',
     'water'   : 'water128.extxyz'}
 ### these are included as key in globals()
-amp     = MyClass('amp')
-ampplot = MyClass('ampplot')
-ampga   = MyClass('ampga')
 qchem   = MyClass('qchem')
 fconv   = MyClass('fconv')
 general = MyClass('general')
@@ -27,14 +24,20 @@ Gs      = MyClass('Gs')
 aux     = MyClass('aux')
 lammps  = MyClass('lammps')
 
-amp.stat_check          ="Machine Learning: statistics calculation for script check\
-                        \n\trun at work directory\
-                        "
-amp.amp_env_run         ="amp_run.py in (envs) anaconda\
-                        \n\t\t   when envs is not (base), detect envs and import proper module\
-                        "
+fconv.fdf2poscar    ="convert fdf to POSCAR\
+                    \n\t\tUsage::\
+                    \n\t\t    fdf2poscar.py STRUCT.fdf\
+                    \n\t\tgenerates:\
+                    \n\t\t    STRUCT.poscar\
+                    "
+fconv.fdf2xyz       ="convert fdf to extended XYZ format\
+                    \n\t\tUsage::\
+                    \n\t\t    fdf2xyz.py STRUCT.fdf\
+                    \n\t\tgenerates:\
+                    \n\t\t    STRUCT.xyz\
+                    "
 
-classobj_dict={'AMP_RUN': amp, 'FILE_CONV': fconv, 'QCHEM': qchem} 
+classobj_dict={'FILE_CONV': fconv, 'QCHEM': qchem} 
 
 def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
     
@@ -108,10 +111,6 @@ def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
             for f in sort_mod:
                 print(f"    {f}")
 
-    if job == 'amp':
-        print("For AMP::")
-        file_conversion()
-        run_amp(fname,HL, elimit, nc, Lgraph)
     ### print dictionary here
     if job in classobj_dict.keys():
         name_class = classobj_dict[job]
