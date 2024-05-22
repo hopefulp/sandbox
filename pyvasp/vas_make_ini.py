@@ -65,6 +65,7 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
     #if not os.path.isfile(poscars[0]):
     #    print(f"can't find POSCAR")
     #    sys.exit(1)
+    print(f"{poscars} {dirnames}")
     for poscar, dirname in zip(poscars, dirnames):
         print(f"target directory {dirname}")
         ### 1.1 make work_dir

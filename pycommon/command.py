@@ -158,9 +158,10 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         kw1 = keyvalues[0]
     ###### make command line in advance
     ### KISTI
-    kisti.vas = f"\t(VASP) :: (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)"
-    kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -j opt"
+    kisti.vas = f"\t(VASP) :: (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)\
+                \n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -al : all prepared except POSCAR\
+                \n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -j opt\
+                \n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
     kisti.vas += f"\n\t    :: RERUN Opt for failed opt"
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
     kisti.vas += f"\n\t    :: KPOINTS Sampling"
