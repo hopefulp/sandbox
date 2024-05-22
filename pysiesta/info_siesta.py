@@ -36,7 +36,12 @@ fconv.fdf2xyz       ="convert fdf to extended XYZ format\
                     \n\t\tgenerates:\
                     \n\t\t    STRUCT.xyz\
                     "
-
+fconv.poscar2fdf    ="convert POSCAR format to fdf\
+                    \n\t\tUsage::\
+                    \n\t\t    poscar2fdf.py a.pos\
+                    \n\t\tgenerates:\
+                    \n\t\t    STRUCT.fdf    'STRUCT' is default name\
+                    "
 classobj_dict={'FILE_CONV': fconv, 'QCHEM': qchem} 
 
 def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):

@@ -1,0 +1,130 @@
+    OPLS All-Atom Model Force Fields
+    W. L. Jorgesen, Department of Chemistry, Yale University
+ C -v0 means no verbosity form the OPLSAA server process; change this
+ C  to -p2 and activate "Option: 1" by using ARG4 of the FFLD operation
+ C  code in your *.com file to obtain output on force field assignments
+ C
+ C add "DEBG 41" to your *.com file to run the BMFF inter-process
+ C  communication layer with greater verbosity
+ C add "DEBG 42" to your *.com file to run the server process with
+ C  greater verbosity; this includes printing of information, such
+ C  as atom connectivity and parameters, which is passed between the
+ C  MacroModel process (bmin) and the OPLSAA server process (oplsaa_setup)
+ C  (DEBG 42 produces a subset of the output produced by using the -p2
+ C  flag)
+ C add "DEBG 43" to your *.com file for output from the MacroModel process
+ C  that has to do with BMFF; this includes printing of parameters
+ C  delivered by the server process to the MacroModel process
+ C
+ C					Copyright Columbia University 1990
+ C					All rights reserved
+ C
+ C   Energy Functions and Conversion Factors in Use              Up to four universal constants
+ C    aaa    nn    nnnnn.nnnnn  a aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa nnnnn.nnnnn nnnnn.nnnnn nnnnn.nnnnn nnnnn.nnnnn
+-1 
+ C --- stretching, bending, proper torsion, and improper torsion energies
+ C conversion factor (kcal/mol -> kJ/mol) = 4.184 
+ 0    STR     1        4.18400
+ 0    BND     1        4.18400
+ 0    TOR     3        4.18400
+ 0    IMP     3        4.18400
+ C
+ 0    S-B     0        1.00000                                       0.00000     0.0
+ 0    B-B     0        1.00000                                       0.00000     0.0
+ 0    T-S     0        1.00000                                       0.00000     0.0
+ C
+ C --- LJ potential
+ C Batchmin, OPLS: E = A/r^12 - B/r^6
+ 0    VDW     5        4.18400
+ C
+ C --- Coulombic potential
+ C Batchmin, OPLS: E = QiQj/rij
+ C conversion factor = 4.184 * e^1/2
+ 0    ELE     1     1389.38757
+ C
+ 0    HBD     0        1.00000
+ C
+ C --- 1,4 non-bonded interactions
+ C scale factor = 0.5
+ 0    V14     1        0.83333
+ 0    V14     2        0.83333
+ C
+ 0    FIX     1        1.00000
+ 0    BCI     1        1.00000
+ 0    FCH     1        1.00000
+ 0    SEL     1                 O Original MM3 Parameters
+ 0    SEL     1                 M Modified MM3 Parameters
+ 0    SEL     1                 A Added parameters
+ 0    SEL     2                 1 High quality parameters
+ 0    SEL     2                 2 Tentative value parameters
+ 0    SEL     2                 3 Low quality parameters
+ C
+ C  Field 1 (Origin):  O = Original MM2, M = Modified Parameter, A = Additional Parmeter
+ C  Field 2 (Quality): 1 = Final Values, 2 = Tentative Values, 3 = Low Quality Value
+ C  Field 3
+ C  Field 4
+ C  Field 5
+ C
+ C                             Interaction Template:
+ C  XX - XX - XX - XX      0.0000     0.0000     0.0000  0000 0000 0000 0000    1 2 3 4 5 Alt a Comments
+ C                        Substructure Interaction Template:
+ C  XX  XX  XX  XX         0.0000     0.0000     0.0000                                      1 2 3 4 5 Alt a Comments
+ C                        Substructure Charge Template:
+ C        1        2        3        4        5        6        7        8        9       10 1 2 3 4 5 Alt a Comments
+ C
+ C 
+ C New  Defined as                     New Atom Type Equivalencies
+ C  --  -- -- -- -- -- -- -- -- -- 
+-5
+ C 
+ C         Stretching Interactions (STR)                Opt. Descriptor            Parameter Referencing
+ C         ---------- ------------                      ---- ----------         --------- ----- -----------------------
+ C                    Bond Length   Constant  Bond Moment Atm1 Atm2             Select    Altrn 
+ C                         (ang)   (mdyn/ang)   (debye)                         1 2 3 4 5   S A Comment
+-2
+ C
+ C         Bending Interactions (BND)                   Opt. Descriptors
+ C         ------- ------------                         ---- -----------  
+ C                        Angle      Bend FC  Bend-Bend Atm1 Atm2 Atm3
+ C                        (deg)   (mdyn/rad**2)   FC
+-2
+ C
+ C         Stretch Bend Interactions (S-B)              Opt. Descriptor
+ C         ------- ---- ------------                    ---- ----------
+ C                     Str Bend Const                    Atm1 Atm2 Atm3
+-2
+ C
+ C
+ C         Torsional  Interactions (TOR)                  Opt. Descriptor
+ C         ---------  ------------                        ---- ----------
+ C                            V1         V2         V3   Atm1 Atm2 Atm3 Atm4
+ C                           (V1, V2 & V3 in kcal/mole)
+-2
+ C
+ C         Out of Plane Bending                           Opt. Descriptor
+ C         --- -- ----- -------                           ---- ----------
+ C                         Angle      Const.             Atm1 Atm2 Atm3 Atm4
+-2
+ C 
+ C         Van der Waals Interactions                           Opt. Descriptor
+ C         --- --- ----- ------------                                   ---- --
+ C       Radius      Eps       Offset     Charge                        Atm1 Lp   (For BMFF, only formal charge is used from this section.)
+ C        (ang)   (kcal/mole)   (ang)
+ C
+ C
+ C
+ C         Special Van der Waals Interactions            Opt. Descriptor
+ C         ------- --- --- ----- ------------            ---- ----------
+ C                         Radius      Eps               Atm1 Atm2
+ C                         (ang)   (kcal/mole)       
+-2
+ C
+ C      Hydrogen Bond Interactions (function and params from AMBER
+ C              modified for Lp-containing oxygens)
+ C      -----------------------------------------------------------
+ C Acceptor Donor           C/100     D/100              Atm1 Atm2 Atm3 Atm4
+-2
+ C
+ C
+ C                        Special Substructures
+ C                        ------- -------------

@@ -1,0 +1,2950 @@
+VERSION
+ CERIUS-II   1
+END
+#
+HEADER
+END
+#
+PREFERENCES
+ BONDS                                 T
+ ANGLES                                T
+ COULOMB                               F
+ INVERSIONS                            T
+ TORSIONS                              T
+ UREY_BRADLEY                          F
+ HYDROGEN_BONDS                        T
+ HARMONIC_CONSTRAINTS                  F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ SHRINK_CH_BONDS                       F
+ SHRINK_CH_H_ATOM                      H__C 
+ SHRINK_CH_FACTOR                         0.91500
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      T
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          1.00000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           T
+ H-BOND_DIRECT_RCUT                       4.00000
+ H-BOND_SPLINE_DISTANCE_ON                4.00000
+ H-BOND_SPLINE_DISTANCE_OFF               4.50000
+ H-BOND_SPLINE_ANGLE_ON                  65.00000
+ H-BOND_SPLINE_ANGLE_OFF                 90.00000
+ DISTANCE_DEPENDENT_DIELETRIC_CONSTANT T
+ COU_DIELETRIC_CONSTANT                   1.00000
+ COU_INTER_CUT_OFF                        8.50000
+ COU_SPLINE_OFF                           8.50000
+ COU_SPLINE_ON                            8.00000
+ EWALD_SUM_COU_ACCURACY                   0.00100
+ EWALD_SUM_COU_ETA                        2.50000
+ EWALD_SUM_COU_KCUT                       0.50000
+ EWALD_SUM_COU_RCUT                       6.00000
+ EWALD_SUM_COU_AUTO_OPT                F
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            SPLINE    
+ COU_DIRECT_CUT-OFF                       8.00000
+ VDW_RADII_COMBINATION_RULE            ARITHMETIC
+ VDW_INTER_CUT_OFF                        8.50000
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            SPLINE    
+ VDW_SPLINE_ON                            8.00000
+ VDW_SPLINE_OFF                           8.50000
+ EWALD_SUM_VDW_AUTO_OPT                F
+ EWALD_SUM_VDW_ACCURACY                   0.00100
+ EWALD_SUM_VDW_ETA                        2.50000
+ EWALD_SUM_VDW_KCUT                       0.50000
+ EWALD_SUM_VDW_RCUT                       6.00000
+ EWALD_SUM_VDW_REP_CUT                    6.00000
+ EWALD_SUM_VDW_RATIO                     10.00000
+ MINIMUM_IMAGE                         F
+ NON_BOND_LIST                         T
+ NON_BOND_LIST_CUT_OFF                    9.00000
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         F
+ ASSIGN_HYBRIDIZATION                  F
+ ATOM_TYPE                             T
+ CALCULATE_BOND_ORDER                  F
+ IGNORE_UNDEFINED_TERMS                F
+END
+#
+ATOMTYPES
+ H_         H       1.00800  0.0000   0   0   0
+ H___A      H       1.00800  0.0000   0  -1   0
+ C_33       C      15.03500  0.0000   3   3   0
+ C_32       C      14.02700  0.0000   3   2   0
+ C_31       C      13.01900  0.0000   3   1   0
+ C_3        C      12.01100  0.0000   3   0   0
+ C_22       C      14.02700  0.0000   2   2   0
+ C_21       C      13.01900  0.0000   2   1   0
+ C_2        C      12.01100  0.0000   2   0   0
+ C_R2       C      14.02700  0.0000   2   2   0
+ C_R1       C      13.01900  0.0000   2   1   0
+ C_R        C      12.01100  0.0000   2   0   0
+ C_11       C      13.01900  0.0000   1   1   0
+ C_1        C      12.01100  0.0000   1   0   0
+ N_33       N      14.00670  0.0000   3   3   0
+ N_32       N      14.00670  0.0000   3   2   1
+ N_31       N      14.00670  0.0000   3   1   1
+ N_3        N      14.00670  0.0000   3   0   1
+ N_22       N      14.00670  0.0000   2   2   0
+ N_21       N      14.00670  0.0000   2   1   1
+ N_2        N      14.00670  0.0000   2   0   1
+ N_R2       N      14.00670  0.0000   2   2   0
+ N_R1       N      14.00670  0.0000   2   1   0
+ N_R        N      14.00670  0.0000   2   0   1
+ N_1        N      14.00670  0.0000   1   0   1
+ O_32       O      15.99940  0.0000   3   2   2
+ O_31       O      15.99940  0.0000   3   1   2
+ O_3        O      15.99940  0.0000   3   0   2
+ O_2        O      15.99940  0.0000   2   0   2
+ O_R        O      15.99940  0.0000   2   0   2
+ O_R1       O      15.99940  0.0000   2   1   1
+ F_         F      18.99840 -1.0000   0   0   3
+ Na         Na     22.99000  1.0000   0   0   0
+ Al3        Al     26.98150  3.0000   3   0   0
+ Si3        Si     28.08600  0.0000   3   0   0
+ P_3        P      30.97380  0.0000   3   0   1
+ S_31       S      32.06000  0.0000   3   1   2
+ S_3        S      32.06000  0.0000   3   0   2
+ Cl         Cl     35.45300 -1.0000   0   0   3
+ Ca         Ca     40.08000  2.0000   0   0   0
+ Fe         Fe     55.84700  3.0000   0   0   0
+ Zn         Zn     65.37700  2.0000   0   0   0
+ Br         Br     79.90400 -1.0000   0   0   0
+ Ru         Ru    101.07000  3.0000   0   0   0
+ Ti         Ti     47.90000  3.0000   0   0   0
+END
+#
+DIAGONAL_VDW
+ H_          LJ_6_12        3.2000  0.1000E-01
+ H___A       IGNORE       0.0000E+00
+ C_33        LJ_6_12        4.1800  0.3050E+00
+ C_32        LJ_6_12        4.0800  0.2150E+00
+ C_31        LJ_6_12        3.9800  0.1450E+00
+ C_3         LJ_6_12        3.8800  0.9500E-01
+ C_22        LJ_6_12        4.0800  0.2150E+00
+ C_21        LJ_6_12        3.9800  0.1450E+00
+ C_2         LJ_6_12        3.8800  0.9500E-01
+ C_R2        LJ_6_12        4.0800  0.2150E+00
+ C_R1        LJ_6_12        3.9800  0.1450E+00
+ C_R         LJ_6_12        3.8800  0.9500E-01
+ C_11        LJ_6_12        3.9800  0.1450E+00
+ C_1         LJ_6_12        3.8800  0.9500E-01
+ N_33        LJ_6_12        3.9950  0.4150E+00
+ N_32        LJ_6_12        3.8950  0.3050E+00
+ N_31        LJ_6_12        3.7950  0.2150E+00
+ N_3         LJ_6_12        3.6950  0.1450E+00
+ N_22        LJ_6_12        3.8950  0.3050E+00
+ N_21        LJ_6_12        3.7950  0.2150E+00
+ N_2         LJ_6_12        3.6950  0.1450E+00
+ N_R2        LJ_6_12        3.8950  0.3050E+00
+ N_R1        LJ_6_12        3.7950  0.2150E+00
+ N_R         LJ_6_12        3.6950  0.1450E+00
+ N_1         LJ_6_12        3.6950  0.1450E+00
+ O_32        LJ_6_12        3.7100  0.4150E+00
+ O_31        LJ_6_12        3.6100  0.3050E+00
+ O_3         LJ_6_12        3.5100  0.2150E+00
+ O_2         LJ_6_12        3.5100  0.2150E+00
+ O_R         LJ_6_12        3.5100  0.2150E+00
+ O_R1        LJ_6_12        3.6100  0.2150E+00
+ F_          LJ_6_12        3.2850  0.3050E+00
+ Na          LJ_6_12        3.1440  0.5000E+00
+ Al3         LJ_6_12        4.6150  0.6500E-01
+ Si3         LJ_6_12        4.4350  0.9500E-01
+ P_3         LJ_6_12        4.2950  0.2150E+00
+ S_31        LJ_6_12        4.2400  0.3050E+00
+ S_3         LJ_6_12        4.1400  0.2150E+00
+ Cl          LJ_6_12        3.9150  0.3050E+00
+ Ca          LJ_6_12        3.4720  0.5000E-01
+ Fe          LJ_6_12        4.5400  0.5500E-01
+ Zn          LJ_6_12        4.5400  0.5500E-01
+ Br          LJ_6_12        4.2150  0.3050E+00
+ Ru          LJ_6_12        4.5400  0.5500E-01
+ Ti          LJ_6_12        4.5400  0.5500E-01
+END
+#
+ATOM_TYPING_RULES
+ H___A           H            0           0           0           1
+ H_              H            0           0           1           1
+                 C            0           0           0           1
+ H_              H            0           0           1           1
+                 Al           0           0           0           1
+ H_              H            0           0           1           1
+                 Si           0           0           0           1
+ H_              H            0           0           1           1
+                 P            0           0           0           1
+ C_3             C            3           0           0           1
+ C_31            C            3           0           1           1
+                 VH           0           0           0           1
+ C_32            C            3           0           2           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+ C_33            C            3           0           3           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+ C_R2            C            2           0           3           1
+                 **           2           0           2           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ C_R2            C            2           0           3           1
+                 **           2           0           2           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+                 **           2           0           0           1
+                 O            3           0           0           1
+ C_R1            C            2           0           2           1
+                 **           2           0           2           1
+                 VH           0           0           0           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ C_R1            C            2           0           2           1
+                 **           2           0           2           1
+                 VH           0           0           0           1
+                 **           2           0           0           1
+                 O            3           0           0           1
+ C_R1            C            2           0           3           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+                 VH           0           0           0           1
+ C_R1            C            2           0           3           1
+                 **           2           0           0           1
+                 O            3           0           0           1
+                 VH           0           0           0           1
+ C_R             C            2           0           1           1
+                 **           2           0           2           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ C_R             C            2           0           1           1
+                 **           2           0           2           1
+                 **           2           0           0           1
+                 O            3           0           0           1
+ C_R             C            2           0           2           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ C_R             C            2           0           2           1
+                 **           2           0           0           1
+                 O            3           0           0           1
+ C_22            C            2           0           2           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+ C_21            C            2           0           1           1
+                 VH           0           0           0           1
+ C_2             C            2           0           0           1
+ C_11            C            1           0           1           1
+                 VH           0           0           0           1
+ C_1             C            1           0           0           1
+ N_33            N            3           0           3           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+ N_33            N            3           0           3           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+ N_32            N            3           0           2           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+ N_32            N            3           0           2           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+ N_31            N            3           0           1           1
+                 H            0           0           0           1
+ N_31            N            3           0           1           1
+                 VH           0           0           0           1
+ N_3             N            3           0           0           1
+ N_R2            N            2           0           3           1
+                 **           2           0           2           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ N_R2            N            2           0           3           1
+                 **           2           0           2           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ N_R1            N            2           0           2           1
+                 **           2           0           2           1
+                 H            0           0           0           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ N_R1            N            2           0           2           1
+                 **           2           0           2           1
+                 VH           0           0           0           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ N_R1            N            2           0           3           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+                 H            0           0           0           1
+ N_R1            N            2           0           3           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+                 VH           0           0           0           1
+ N_R             N            2           0           1           1
+                 **           2           0           2           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ N_R             N            2           0           1           1
+                 **           2           0           2           1
+                 **           2           0           0           1
+                 O            3           0           0           1
+ N_R             N            2           0           2           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ N_R             N            2           0           2           1
+                 **           2           0           0           1
+                 O            3           0           0           1
+ N_22            N            2           0           2           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+ N_22            N            2           0           2           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+ N_21            N            2           0           1           1
+                 H            0           0           0           1
+ N_21            N            2           0           1           1
+                 VH           0           0           0           1
+ N_2             N            2           0           0           1
+ N_1             N            1           0           0           1
+ O_32            O            3           0           2           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+ O_32            O            3           0           2           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+ O_31            O            3           0           1           1
+                 H            0           0           0           1
+ O_31            O            3           0           1           1
+                 VH           0           0           0           1
+ O_3             O            3           0           0           1
+ O_R             O            2           0           2           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ O_R1            O            3           0           2           1
+                 **           2           0           0           1
+                 H            0           0           0           1
+ O_R1            O            3           0           2           1
+                 **           2           0           0           1
+                 VH           0           0           0           1
+ O_R             O            3           0           2           1
+                 **           2           0           0           1
+                 **           0           0           0           1
+ O_2             O            3           0           2           1
+                 VH           0           0           0           1
+                 **           0           0           1           1
+                 O            2           0           0           1
+ O_2             O            2           0           0           1
+ F_              F            0           0           0           1
+ Na              Na           0           0           0           1
+ Al3             Al           3           0           0           1
+ Si3             Si           3           0           0           1
+ P_3             P            3           0           0           1
+ S_31            S            3           0           1           1
+                 H            0           0           0           1
+ S_31            S            3           0           1           1
+                 VH           0           0           0           1
+ S_3             S            3           0           0           1
+ Cl              Cl           0           0           0           1
+ Ca              Ca           0           0           0           1
+ Fe              Fe           0           0           0           1
+ Zn              Zn           0           0           0           1
+ Br              Br           0           0           0           1
+ Ru              Ru           0           0           0           1
+ Ti              Ti           0           0           0           1
+END
+#
+#
+OFF_DIAGONAL_VDW
+END
+#
+BOND_STRETCH
+ H_       H_          HARMONIC    1000.0000    0.6500
+ H___A    H_          HARMONIC    1000.0000    0.6500
+ H___A    H___A       HARMONIC    1000.0000    0.6500
+ C_33     H_          HARMONIC    1000.0000    1.0900
+ C_33     H___A       HARMONIC    1000.0000    1.0900
+ C_33     C_33        HARMONIC    1000.0000    1.5300
+ C_32     H_          HARMONIC    1000.0000    1.0900
+ C_32     H___A       HARMONIC    1000.0000    1.0900
+ C_32     C_33        HARMONIC    1000.0000    1.5300
+ C_32     C_32        HARMONIC    1000.0000    1.5300
+ C_31     H_          HARMONIC    1000.0000    1.0900
+ C_31     H___A       HARMONIC    1000.0000    1.0900
+ C_31     C_33        HARMONIC    1000.0000    1.5300
+ C_31     C_32        HARMONIC    1000.0000    1.5300
+ C_31     C_31        HARMONIC    1000.0000    1.5300
+ C_3      H_          HARMONIC    1000.0000    1.0900
+ C_3      H___A       HARMONIC    1000.0000    1.0900
+ C_3      C_33        HARMONIC    1000.0000    1.5300
+ C_3      C_32        HARMONIC    1000.0000    1.5300
+ C_3      C_31        HARMONIC    1000.0000    1.5300
+ C_3      C_3         HARMONIC    1000.0000    1.5300
+ C_22     H_          HARMONIC    1000.0000    0.9900
+ C_22     H___A       HARMONIC    1000.0000    0.9900
+ C_22     C_33        HARMONIC    1000.0000    1.4300
+ C_22     C_32        HARMONIC    1000.0000    1.4300
+ C_22     C_31        HARMONIC    1000.0000    1.4300
+ C_22     C_3         HARMONIC    1000.0000    1.4300
+ C_22     C_22        HARMONIC    1000.0000    1.3300
+ C_21     H_          HARMONIC    1000.0000    0.9900
+ C_21     H___A       HARMONIC    1000.0000    0.9900
+ C_21     C_33        HARMONIC    1000.0000    1.4300
+ C_21     C_32        HARMONIC    1000.0000    1.4300
+ C_21     C_31        HARMONIC    1000.0000    1.4300
+ C_21     C_3         HARMONIC    1000.0000    1.4300
+ C_21     C_22        HARMONIC    1000.0000    1.3300
+ C_21     C_21        HARMONIC    1000.0000    1.3300
+ C_2      H_          HARMONIC    1000.0000    0.9900
+ C_2      H___A       HARMONIC    1000.0000    0.9900
+ C_2      C_33        HARMONIC    1000.0000    1.4300
+ C_2      C_32        HARMONIC    1000.0000    1.4300
+ C_2      C_31        HARMONIC    1000.0000    1.4300
+ C_2      C_3         HARMONIC    1000.0000    1.4300
+ C_2      C_22        HARMONIC    1000.0000    1.3300
+ C_2      C_21        HARMONIC    1000.0000    1.3300
+ C_2      C_2         HARMONIC    1000.0000    1.3300
+ C_R2     H_          HARMONIC    1000.0000    1.0200
+ C_R2     H___A       HARMONIC    1000.0000    1.0200
+ C_R2     C_33        HARMONIC    1000.0000    1.4600
+ C_R2     C_32        HARMONIC    1000.0000    1.4600
+ C_R2     C_31        HARMONIC    1000.0000    1.4600
+ C_R2     C_3         HARMONIC    1000.0000    1.4600
+ C_R2     C_22        HARMONIC    1000.0000    1.3600
+ C_R2     C_21        HARMONIC    1000.0000    1.3600
+ C_R2     C_2         HARMONIC    1000.0000    1.3600
+ C_R2     C_R2        HARMONIC    1000.0000    1.3900
+ C_R1     H_          HARMONIC    1000.0000    1.0200
+ C_R1     H___A       HARMONIC    1000.0000    1.0200
+ C_R1     C_33        HARMONIC    1000.0000    1.4600
+ C_R1     C_32        HARMONIC    1000.0000    1.4600
+ C_R1     C_31        HARMONIC    1000.0000    1.4600
+ C_R1     C_3         HARMONIC    1000.0000    1.4600
+ C_R1     C_22        HARMONIC    1000.0000    1.3600
+ C_R1     C_21        HARMONIC    1000.0000    1.3600
+ C_R1     C_2         HARMONIC    1000.0000    1.3600
+ C_R1     C_R2        HARMONIC    1000.0000    1.3900
+ C_R1     C_R1        HARMONIC    1000.0000    1.3900
+ C_R      H_          HARMONIC    1000.0000    1.0200
+ C_R      H___A       HARMONIC    1000.0000    1.0200
+ C_R      C_33        HARMONIC    1000.0000    1.4600
+ C_R      C_32        HARMONIC    1000.0000    1.4600
+ C_R      C_31        HARMONIC    1000.0000    1.4600
+ C_R      C_3         HARMONIC    1000.0000    1.4600
+ C_R      C_22        HARMONIC    1000.0000    1.3600
+ C_R      C_21        HARMONIC    1000.0000    1.3600
+ C_R      C_2         HARMONIC    1000.0000    1.3600
+ C_R      C_R2        HARMONIC    1000.0000    1.3900
+ C_R      C_R1        HARMONIC    1000.0000    1.3900
+ C_R      C_R         HARMONIC    1000.0000    1.3900
+ C_11     H_          HARMONIC    1000.0000    0.9220
+ C_11     H___A       HARMONIC    1000.0000    0.9220
+ C_11     C_33        HARMONIC    1000.0000    1.3620
+ C_11     C_32        HARMONIC    1000.0000    1.3620
+ C_11     C_31        HARMONIC    1000.0000    1.3620
+ C_11     C_3         HARMONIC    1000.0000    1.3620
+ C_11     C_22        HARMONIC    1000.0000    1.2620
+ C_11     C_21        HARMONIC    1000.0000    1.2620
+ C_11     C_2         HARMONIC    1000.0000    1.2620
+ C_11     C_R2        HARMONIC    1000.0000    1.2920
+ C_11     C_R1        HARMONIC    1000.0000    1.2920
+ C_11     C_R         HARMONIC    1000.0000    1.2920
+ C_11     C_11        HARMONIC    1000.0000    1.1940
+ C_1      H_          HARMONIC    1000.0000    0.9220
+ C_1      H___A       HARMONIC    1000.0000    0.9220
+ C_1      C_33        HARMONIC    1000.0000    1.3620
+ C_1      C_32        HARMONIC    1000.0000    1.3620
+ C_1      C_31        HARMONIC    1000.0000    1.3620
+ C_1      C_3         HARMONIC    1000.0000    1.3620
+ C_1      C_22        HARMONIC    1000.0000    1.2620
+ C_1      C_21        HARMONIC    1000.0000    1.2620
+ C_1      C_2         HARMONIC    1000.0000    1.2620
+ C_1      C_R2        HARMONIC    1000.0000    1.2920
+ C_1      C_R1        HARMONIC    1000.0000    1.2920
+ C_1      C_R         HARMONIC    1000.0000    1.2920
+ C_1      C_11        HARMONIC    1000.0000    1.1940
+ C_1      C_1         HARMONIC    1000.0000    1.1940
+ N_33     H_          HARMONIC    1000.0000    1.0200
+ N_33     H___A       HARMONIC    1000.0000    1.0200
+ N_33     C_33        HARMONIC    1000.0000    1.4600
+ N_33     C_32        HARMONIC    1000.0000    1.4600
+ N_33     C_31        HARMONIC    1000.0000    1.4600
+ N_33     C_3         HARMONIC    1000.0000    1.4600
+ N_33     C_22        HARMONIC    1000.0000    1.3600
+ N_33     C_21        HARMONIC    1000.0000    1.3600
+ N_33     C_2         HARMONIC    1000.0000    1.3600
+ N_33     C_R2        HARMONIC    1000.0000    1.3900
+ N_33     C_R1        HARMONIC    1000.0000    1.3900
+ N_33     C_R         HARMONIC    1000.0000    1.3900
+ N_33     C_11        HARMONIC    1000.0000    1.2920
+ N_33     C_1         HARMONIC    1000.0000    1.2920
+ N_33     N_33        HARMONIC    1000.0000    1.3900
+ N_32     H_          HARMONIC    1000.0000    1.0200
+ N_32     H___A       HARMONIC    1000.0000    1.0200
+ N_32     C_33        HARMONIC    1000.0000    1.4600
+ N_32     C_32        HARMONIC    1000.0000    1.4600
+ N_32     C_31        HARMONIC    1000.0000    1.4600
+ N_32     C_3         HARMONIC    1000.0000    1.4600
+ N_32     C_22        HARMONIC    1000.0000    1.3600
+ N_32     C_21        HARMONIC    1000.0000    1.3600
+ N_32     C_2         HARMONIC    1000.0000    1.3600
+ N_32     C_R2        HARMONIC    1000.0000    1.3900
+ N_32     C_R1        HARMONIC    1000.0000    1.3900
+ N_32     C_R         HARMONIC    1000.0000    1.3900
+ N_32     C_11        HARMONIC    1000.0000    1.2920
+ N_32     C_1         HARMONIC    1000.0000    1.2920
+ N_32     N_33        HARMONIC    1000.0000    1.3900
+ N_32     N_32        HARMONIC    1000.0000    1.3900
+ N_31     H_          HARMONIC    1000.0000    1.0200
+ N_31     H___A       HARMONIC    1000.0000    1.0200
+ N_31     C_33        HARMONIC    1000.0000    1.4600
+ N_31     C_32        HARMONIC    1000.0000    1.4600
+ N_31     C_31        HARMONIC    1000.0000    1.4600
+ N_31     C_3         HARMONIC    1000.0000    1.4600
+ N_31     C_22        HARMONIC    1000.0000    1.3600
+ N_31     C_21        HARMONIC    1000.0000    1.3600
+ N_31     C_2         HARMONIC    1000.0000    1.3600
+ N_31     C_R2        HARMONIC    1000.0000    1.3900
+ N_31     C_R1        HARMONIC    1000.0000    1.3900
+ N_31     C_R         HARMONIC    1000.0000    1.3900
+ N_31     C_11        HARMONIC    1000.0000    1.2920
+ N_31     C_1         HARMONIC    1000.0000    1.2920
+ N_31     N_33        HARMONIC    1000.0000    1.3900
+ N_31     N_32        HARMONIC    1000.0000    1.3900
+ N_31     N_31        HARMONIC    1000.0000    1.3900
+ N_3      H_          HARMONIC    1000.0000    1.0200
+ N_3      H___A       HARMONIC    1000.0000    1.0200
+ N_3      C_33        HARMONIC    1000.0000    1.4600
+ N_3      C_32        HARMONIC    1000.0000    1.4600
+ N_3      C_31        HARMONIC    1000.0000    1.4600
+ N_3      C_3         HARMONIC    1000.0000    1.4600
+ N_3      C_22        HARMONIC    1000.0000    1.3600
+ N_3      C_21        HARMONIC    1000.0000    1.3600
+ N_3      C_2         HARMONIC    1000.0000    1.3600
+ N_3      C_R2        HARMONIC    1000.0000    1.3900
+ N_3      C_R1        HARMONIC    1000.0000    1.3900
+ N_3      C_R         HARMONIC    1000.0000    1.3900
+ N_3      C_11        HARMONIC    1000.0000    1.2920
+ N_3      C_1         HARMONIC    1000.0000    1.2920
+ N_3      N_33        HARMONIC    1000.0000    1.3900
+ N_3      N_32        HARMONIC    1000.0000    1.3900
+ N_3      N_31        HARMONIC    1000.0000    1.3900
+ N_3      N_3         HARMONIC    1000.0000    1.3900
+ N_22     H_          HARMONIC    1000.0000    0.9400
+ N_22     H___A       HARMONIC    1000.0000    0.9400
+ N_22     C_33        HARMONIC    1000.0000    1.3800
+ N_22     C_32        HARMONIC    1000.0000    1.3800
+ N_22     C_31        HARMONIC    1000.0000    1.3800
+ N_22     C_3         HARMONIC    1000.0000    1.3800
+ N_22     C_22        HARMONIC    1000.0000    1.2800
+ N_22     C_21        HARMONIC    1000.0000    1.2800
+ N_22     C_2         HARMONIC    1000.0000    1.2800
+ N_22     C_R2        HARMONIC    1000.0000    1.3100
+ N_22     C_R1        HARMONIC    1000.0000    1.3100
+ N_22     C_R         HARMONIC    1000.0000    1.3100
+ N_22     C_11        HARMONIC    1000.0000    1.2120
+ N_22     C_1         HARMONIC    1000.0000    1.2120
+ N_22     N_33        HARMONIC    1000.0000    1.3100
+ N_22     N_32        HARMONIC    1000.0000    1.3100
+ N_22     N_31        HARMONIC    1000.0000    1.3100
+ N_22     N_3         HARMONIC    1000.0000    1.3100
+ N_22     N_22        HARMONIC    1000.0000    1.2300
+ N_21     H_          HARMONIC    1000.0000    0.9400
+ N_21     H___A       HARMONIC    1000.0000    0.9400
+ N_21     C_33        HARMONIC    1000.0000    1.3800
+ N_21     C_32        HARMONIC    1000.0000    1.3800
+ N_21     C_31        HARMONIC    1000.0000    1.3800
+ N_21     C_3         HARMONIC    1000.0000    1.3800
+ N_21     C_22        HARMONIC    1000.0000    1.2800
+ N_21     C_21        HARMONIC    1000.0000    1.2800
+ N_21     C_2         HARMONIC    1000.0000    1.2800
+ N_21     C_R2        HARMONIC    1000.0000    1.3100
+ N_21     C_R1        HARMONIC    1000.0000    1.3100
+ N_21     C_R         HARMONIC    1000.0000    1.3100
+ N_21     C_11        HARMONIC    1000.0000    1.2120
+ N_21     C_1         HARMONIC    1000.0000    1.2120
+ N_21     N_33        HARMONIC    1000.0000    1.3100
+ N_21     N_32        HARMONIC    1000.0000    1.3100
+ N_21     N_31        HARMONIC    1000.0000    1.3100
+ N_21     N_3         HARMONIC    1000.0000    1.3100
+ N_21     N_22        HARMONIC    1000.0000    1.2300
+ N_21     N_21        HARMONIC    1000.0000    1.2300
+ N_2      H_          HARMONIC    1000.0000    0.9400
+ N_2      H___A       HARMONIC    1000.0000    0.9400
+ N_2      C_33        HARMONIC    1000.0000    1.3800
+ N_2      C_32        HARMONIC    1000.0000    1.3800
+ N_2      C_31        HARMONIC    1000.0000    1.3800
+ N_2      C_3         HARMONIC    1000.0000    1.3800
+ N_2      C_22        HARMONIC    1000.0000    1.2800
+ N_2      C_21        HARMONIC    1000.0000    1.2800
+ N_2      C_2         HARMONIC    1000.0000    1.2800
+ N_2      C_R2        HARMONIC    1000.0000    1.3100
+ N_2      C_R1        HARMONIC    1000.0000    1.3100
+ N_2      C_R         HARMONIC    1000.0000    1.3100
+ N_2      C_11        HARMONIC    1000.0000    1.2120
+ N_2      C_1         HARMONIC    1000.0000    1.2120
+ N_2      N_33        HARMONIC    1000.0000    1.3100
+ N_2      N_32        HARMONIC    1000.0000    1.3100
+ N_2      N_31        HARMONIC    1000.0000    1.3100
+ N_2      N_3         HARMONIC    1000.0000    1.3100
+ N_2      N_22        HARMONIC    1000.0000    1.2300
+ N_2      N_21        HARMONIC    1000.0000    1.2300
+ N_2      N_2         HARMONIC    1000.0000    1.2300
+ N_R2     H_          HARMONIC    1000.0000    0.9400
+ N_R2     H___A       HARMONIC    1000.0000    0.9400
+ N_R2     C_33        HARMONIC    1000.0000    1.3800
+ N_R2     C_32        HARMONIC    1000.0000    1.3800
+ N_R2     C_31        HARMONIC    1000.0000    1.3800
+ N_R2     C_3         HARMONIC    1000.0000    1.3800
+ N_R2     C_22        HARMONIC    1000.0000    1.2800
+ N_R2     C_21        HARMONIC    1000.0000    1.2800
+ N_R2     C_2         HARMONIC    1000.0000    1.2800
+ N_R2     C_R2        HARMONIC    1000.0000    1.3100
+ N_R2     C_R1        HARMONIC    1000.0000    1.3100
+ N_R2     C_R         HARMONIC    1000.0000    1.3100
+ N_R2     C_11        HARMONIC    1000.0000    1.2120
+ N_R2     C_1         HARMONIC    1000.0000    1.2120
+ N_R2     N_33        HARMONIC    1000.0000    1.3100
+ N_R2     N_32        HARMONIC    1000.0000    1.3100
+ N_R2     N_31        HARMONIC    1000.0000    1.3100
+ N_R2     N_3         HARMONIC    1000.0000    1.3100
+ N_R2     N_22        HARMONIC    1000.0000    1.2300
+ N_R2     N_21        HARMONIC    1000.0000    1.2300
+ N_R2     N_2         HARMONIC    1000.0000    1.2300
+ N_R2     N_R2        HARMONIC    1000.0000    1.2300
+ N_R1     H_          HARMONIC    1000.0000    0.9400
+ N_R1     H___A       HARMONIC    1000.0000    0.9400
+ N_R1     C_33        HARMONIC    1000.0000    1.3800
+ N_R1     C_32        HARMONIC    1000.0000    1.3800
+ N_R1     C_31        HARMONIC    1000.0000    1.3800
+ N_R1     C_3         HARMONIC    1000.0000    1.3800
+ N_R1     C_22        HARMONIC    1000.0000    1.2800
+ N_R1     C_21        HARMONIC    1000.0000    1.2800
+ N_R1     C_2         HARMONIC    1000.0000    1.2800
+ N_R1     C_R2        HARMONIC    1000.0000    1.3100
+ N_R1     C_R1        HARMONIC    1000.0000    1.3100
+ N_R1     C_R         HARMONIC    1000.0000    1.3100
+ N_R1     C_11        HARMONIC    1000.0000    1.2120
+ N_R1     C_1         HARMONIC    1000.0000    1.2120
+ N_R1     N_33        HARMONIC    1000.0000    1.3100
+ N_R1     N_32        HARMONIC    1000.0000    1.3100
+ N_R1     N_31        HARMONIC    1000.0000    1.3100
+ N_R1     N_3         HARMONIC    1000.0000    1.3100
+ N_R1     N_22        HARMONIC    1000.0000    1.2300
+ N_R1     N_21        HARMONIC    1000.0000    1.2300
+ N_R1     N_2         HARMONIC    1000.0000    1.2300
+ N_R1     N_R2        HARMONIC    1000.0000    1.2300
+ N_R1     N_R1        HARMONIC    1000.0000    1.2300
+ N_R      H_          HARMONIC    1000.0000    0.9400
+ N_R      H___A       HARMONIC    1000.0000    0.9400
+ N_R      C_33        HARMONIC    1000.0000    1.3800
+ N_R      C_32        HARMONIC    1000.0000    1.3800
+ N_R      C_31        HARMONIC    1000.0000    1.3800
+ N_R      C_3         HARMONIC    1000.0000    1.3800
+ N_R      C_22        HARMONIC    1000.0000    1.2800
+ N_R      C_21        HARMONIC    1000.0000    1.2800
+ N_R      C_2         HARMONIC    1000.0000    1.2800
+ N_R      C_R2        HARMONIC    1000.0000    1.3100
+ N_R      C_R1        HARMONIC    1000.0000    1.3100
+ N_R      C_R         HARMONIC    1000.0000    1.3100
+ N_R      C_11        HARMONIC    1000.0000    1.2120
+ N_R      C_1         HARMONIC    1000.0000    1.2120
+ N_R      N_33        HARMONIC    1000.0000    1.3100
+ N_R      N_32        HARMONIC    1000.0000    1.3100
+ N_R      N_31        HARMONIC    1000.0000    1.3100
+ N_R      N_3         HARMONIC    1000.0000    1.3100
+ N_R      N_22        HARMONIC    1000.0000    1.2300
+ N_R      N_21        HARMONIC    1000.0000    1.2300
+ N_R      N_2         HARMONIC    1000.0000    1.2300
+ N_R      N_R2        HARMONIC    1000.0000    1.2300
+ N_R      N_R1        HARMONIC    1000.0000    1.2300
+ N_R      N_R         HARMONIC    1000.0000    1.2300
+ N_1      H_          HARMONIC    1000.0000    0.7080
+ N_1      H___A       HARMONIC    1000.0000    0.7080
+ N_1      C_33        HARMONIC    1000.0000    1.1480
+ N_1      C_32        HARMONIC    1000.0000    1.1480
+ N_1      C_31        HARMONIC    1000.0000    1.1480
+ N_1      C_3         HARMONIC    1000.0000    1.1480
+ N_1      C_22        HARMONIC    1000.0000    1.0480
+ N_1      C_21        HARMONIC    1000.0000    1.0480
+ N_1      C_2         HARMONIC    1000.0000    1.0480
+ N_1      C_R2        HARMONIC    1000.0000    1.0780
+ N_1      C_R1        HARMONIC    1000.0000    1.0780
+ N_1      C_R         HARMONIC    1000.0000    1.0780
+ N_1      C_11        HARMONIC    1000.0000    0.9800
+ N_1      C_1         HARMONIC    1000.0000    0.9800
+ N_1      N_33        HARMONIC    1000.0000    1.0780
+ N_1      N_32        HARMONIC    1000.0000    1.0780
+ N_1      N_31        HARMONIC    1000.0000    1.0780
+ N_1      N_3         HARMONIC    1000.0000    1.0780
+ N_1      N_22        HARMONIC    1000.0000    0.9980
+ N_1      N_21        HARMONIC    1000.0000    0.9980
+ N_1      N_2         HARMONIC    1000.0000    0.9980
+ N_1      N_R2        HARMONIC    1000.0000    0.9980
+ N_1      N_R1        HARMONIC    1000.0000    0.9980
+ N_1      N_R         HARMONIC    1000.0000    0.9980
+ N_1      N_1         HARMONIC    1000.0000    0.7660
+ O_32     H_          HARMONIC    1000.0000    0.9800
+ O_32     H___A       HARMONIC    1000.0000    0.9800
+ O_32     C_33        HARMONIC    1000.0000    1.4200
+ O_32     C_32        HARMONIC    1000.0000    1.4200
+ O_32     C_31        HARMONIC    1000.0000    1.4200
+ O_32     C_3         HARMONIC    1000.0000    1.4200
+ O_32     C_22        HARMONIC    1000.0000    1.3200
+ O_32     C_21        HARMONIC    1000.0000    1.3200
+ O_32     C_2         HARMONIC    1000.0000    1.3200
+ O_32     C_R2        HARMONIC    1000.0000    1.3500
+ O_32     C_R1        HARMONIC    1000.0000    1.3500
+ O_32     C_R         HARMONIC    1000.0000    1.3500
+ O_32     C_11        HARMONIC    1000.0000    1.2520
+ O_32     C_1         HARMONIC    1000.0000    1.2520
+ O_32     N_33        HARMONIC    1000.0000    1.3500
+ O_32     N_32        HARMONIC    1000.0000    1.3500
+ O_32     N_31        HARMONIC    1000.0000    1.3500
+ O_32     N_3         HARMONIC    1000.0000    1.3500
+ O_32     N_22        HARMONIC    1000.0000    1.2700
+ O_32     N_21        HARMONIC    1000.0000    1.2700
+ O_32     N_2         HARMONIC    1000.0000    1.2700
+ O_32     N_R2        HARMONIC    1000.0000    1.2700
+ O_32     N_R1        HARMONIC    1000.0000    1.2700
+ O_32     N_R         HARMONIC    1000.0000    1.2700
+ O_32     N_1         HARMONIC    1000.0000    1.0380
+ O_32     O_32        HARMONIC    1000.0000    1.3100
+ O_31     H_          HARMONIC    1000.0000    0.9800
+ O_31     H___A       HARMONIC    1000.0000    0.9800
+ O_31     C_33        HARMONIC    1000.0000    1.4200
+ O_31     C_32        HARMONIC    1000.0000    1.4200
+ O_31     C_31        HARMONIC    1000.0000    1.4200
+ O_31     C_3         HARMONIC    1000.0000    1.4200
+ O_31     C_22        HARMONIC    1000.0000    1.3200
+ O_31     C_21        HARMONIC    1000.0000    1.3200
+ O_31     C_2         HARMONIC    1000.0000    1.3200
+ O_31     C_R2        HARMONIC    1000.0000    1.3500
+ O_31     C_R1        HARMONIC    1000.0000    1.3500
+ O_31     C_R         HARMONIC    1000.0000    1.3500
+ O_31     C_11        HARMONIC    1000.0000    1.2520
+ O_31     C_1         HARMONIC    1000.0000    1.2520
+ O_31     N_33        HARMONIC    1000.0000    1.3500
+ O_31     N_32        HARMONIC    1000.0000    1.3500
+ O_31     N_31        HARMONIC    1000.0000    1.3500
+ O_31     N_3         HARMONIC    1000.0000    1.3500
+ O_31     N_22        HARMONIC    1000.0000    1.2700
+ O_31     N_21        HARMONIC    1000.0000    1.2700
+ O_31     N_2         HARMONIC    1000.0000    1.2700
+ O_31     N_R2        HARMONIC    1000.0000    1.2700
+ O_31     N_R1        HARMONIC    1000.0000    1.2700
+ O_31     N_R         HARMONIC    1000.0000    1.2700
+ O_31     N_1         HARMONIC    1000.0000    1.0380
+ O_31     O_32        HARMONIC    1000.0000    1.3100
+ O_31     O_31        HARMONIC    1000.0000    1.3100
+ O_3      H_          HARMONIC    1000.0000    0.9800
+ O_3      H___A       HARMONIC    1000.0000    0.9800
+ O_3      C_33        HARMONIC    1000.0000    1.4200
+ O_3      C_32        HARMONIC    1000.0000    1.4200
+ O_3      C_31        HARMONIC    1000.0000    1.4200
+ O_3      C_3         HARMONIC    1000.0000    1.4200
+ O_3      C_22        HARMONIC    1000.0000    1.3200
+ O_3      C_21        HARMONIC    1000.0000    1.3200
+ O_3      C_2         HARMONIC    1000.0000    1.3200
+ O_3      C_R2        HARMONIC    1000.0000    1.3500
+ O_3      C_R1        HARMONIC    1000.0000    1.3500
+ O_3      C_R         HARMONIC    1000.0000    1.3500
+ O_3      C_11        HARMONIC    1000.0000    1.2520
+ O_3      C_1         HARMONIC    1000.0000    1.2520
+ O_3      N_33        HARMONIC    1000.0000    1.3500
+ O_3      N_32        HARMONIC    1000.0000    1.3500
+ O_3      N_31        HARMONIC    1000.0000    1.3500
+ O_3      N_3         HARMONIC    1000.0000    1.3500
+ O_3      N_22        HARMONIC    1000.0000    1.2700
+ O_3      N_21        HARMONIC    1000.0000    1.2700
+ O_3      N_2         HARMONIC    1000.0000    1.2700
+ O_3      N_R2        HARMONIC    1000.0000    1.2700
+ O_3      N_R1        HARMONIC    1000.0000    1.2700
+ O_3      N_R         HARMONIC    1000.0000    1.2700
+ O_3      N_1         HARMONIC    1000.0000    1.0380
+ O_3      O_32        HARMONIC    1000.0000    1.3100
+ O_3      O_31        HARMONIC    1000.0000    1.3100
+ O_3      O_3         HARMONIC    1000.0000    1.3100
+ O_2      H_          HARMONIC    1000.0000    0.8800
+ O_2      H___A       HARMONIC    1000.0000    0.8800
+ O_2      C_33        HARMONIC    1000.0000    1.3200
+ O_2      C_32        HARMONIC    1000.0000    1.3200
+ O_2      C_31        HARMONIC    1000.0000    1.3200
+ O_2      C_3         HARMONIC    1000.0000    1.3200
+ O_2      C_22        HARMONIC    1000.0000    1.2200
+ O_2      C_21        HARMONIC    1000.0000    1.2200
+ O_2      C_2         HARMONIC    1000.0000    1.2200
+ O_2      C_R2        HARMONIC    1000.0000    1.2500
+ O_2      C_R1        HARMONIC    1000.0000    1.2500
+ O_2      C_R         HARMONIC    1000.0000    1.2500
+ O_2      C_11        HARMONIC    1000.0000    1.1520
+ O_2      C_1         HARMONIC    1000.0000    1.1520
+ O_2      N_33        HARMONIC    1000.0000    1.2500
+ O_2      N_32        HARMONIC    1000.0000    1.2500
+ O_2      N_31        HARMONIC    1000.0000    1.2500
+ O_2      N_3         HARMONIC    1000.0000    1.2500
+ O_2      N_22        HARMONIC    1000.0000    1.1700
+ O_2      N_21        HARMONIC    1000.0000    1.1700
+ O_2      N_2         HARMONIC    1000.0000    1.1700
+ O_2      N_R2        HARMONIC    1000.0000    1.1700
+ O_2      N_R1        HARMONIC    1000.0000    1.1700
+ O_2      N_R         HARMONIC    1000.0000    1.1700
+ O_2      N_1         HARMONIC    1000.0000    0.9380
+ O_2      O_32        HARMONIC    1000.0000    1.2100
+ O_2      O_31        HARMONIC    1000.0000    1.2100
+ O_2      O_3         HARMONIC    1000.0000    1.2100
+ O_2      O_2         HARMONIC    1000.0000    1.1100
+ O_R      H_          HARMONIC    1000.0000    0.9800
+ O_R      H___A       HARMONIC    1000.0000    0.9800
+ O_R      C_33        HARMONIC    1000.0000    1.4200
+ O_R      C_32        HARMONIC    1000.0000    1.4200
+ O_R      C_31        HARMONIC    1000.0000    1.4200
+ O_R      C_3         HARMONIC    1000.0000    1.4200
+ O_R      C_22        HARMONIC    1000.0000    1.3200
+ O_R      C_21        HARMONIC    1000.0000    1.3200
+ O_R      C_2         HARMONIC    1000.0000    1.3200
+ O_R      C_R2        HARMONIC    1000.0000    1.3500
+ O_R      C_R1        HARMONIC    1000.0000    1.3500
+ O_R      C_R         HARMONIC    1000.0000    1.3500
+ O_R      C_11        HARMONIC    1000.0000    1.2520
+ O_R      C_1         HARMONIC    1000.0000    1.2520
+ O_R      N_33        HARMONIC    1000.0000    1.3500
+ O_R      N_32        HARMONIC    1000.0000    1.3500
+ O_R      N_31        HARMONIC    1000.0000    1.3500
+ O_R      N_3         HARMONIC    1000.0000    1.3500
+ O_R      N_22        HARMONIC    1000.0000    1.2700
+ O_R      N_21        HARMONIC    1000.0000    1.2700
+ O_R      N_2         HARMONIC    1000.0000    1.2700
+ O_R      N_R2        HARMONIC    1000.0000    1.2700
+ O_R      N_R1        HARMONIC    1000.0000    1.2700
+ O_R      N_R         HARMONIC    1000.0000    1.2700
+ O_R      N_1         HARMONIC    1000.0000    1.0380
+ O_R      O_32        HARMONIC    1000.0000    1.3100
+ O_R      O_31        HARMONIC    1000.0000    1.3100
+ O_R      O_3         HARMONIC    1000.0000    1.3100
+ O_R      O_2         HARMONIC    1000.0000    1.2100
+ O_R      O_R         HARMONIC    1000.0000    1.3100
+ O_R1     H_          HARMONIC    1000.0000    0.9800
+ O_R1     H___A       HARMONIC    1000.0000    0.9800
+ O_R1     C_33        HARMONIC    1000.0000    1.4200
+ O_R1     C_32        HARMONIC    1000.0000    1.4200
+ O_R1     C_31        HARMONIC    1000.0000    1.4200
+ O_R1     C_3         HARMONIC    1000.0000    1.4200
+ O_R1     C_22        HARMONIC    1000.0000    1.3200
+ O_R1     C_21        HARMONIC    1000.0000    1.3200
+ O_R1     C_2         HARMONIC    1000.0000    1.3200
+ O_R1     C_R2        HARMONIC    1000.0000    1.3500
+ O_R1     C_R1        HARMONIC    1000.0000    1.3500
+ O_R1     C_R         HARMONIC    1000.0000    1.3500
+ O_R1     C_11        HARMONIC    1000.0000    1.2520
+ O_R1     C_1         HARMONIC    1000.0000    1.2520
+ O_R1     N_33        HARMONIC    1000.0000    1.3500
+ O_R1     N_32        HARMONIC    1000.0000    1.3500
+ O_R1     N_31        HARMONIC    1000.0000    1.3500
+ O_R1     N_3         HARMONIC    1000.0000    1.3500
+ O_R1     N_22        HARMONIC    1000.0000    1.2700
+ O_R1     N_21        HARMONIC    1000.0000    1.2700
+ O_R1     N_2         HARMONIC    1000.0000    1.2700
+ O_R1     N_R2        HARMONIC    1000.0000    1.2700
+ O_R1     N_R1        HARMONIC    1000.0000    1.2700
+ O_R1     N_R         HARMONIC    1000.0000    1.2700
+ O_R1     N_1         HARMONIC    1000.0000    1.0380
+ O_R1     O_32        HARMONIC    1000.0000    1.3100
+ O_R1     O_31        HARMONIC    1000.0000    1.3100
+ O_R1     O_3         HARMONIC    1000.0000    1.3100
+ O_R1     O_2         HARMONIC    1000.0000    1.2100
+ O_R1     O_R         HARMONIC    1000.0000    1.3100
+ O_R1     O_R1        HARMONIC    1000.0000    1.3100
+ F_       H_          HARMONIC    1000.0000    0.9310
+ F_       H___A       HARMONIC    1000.0000    0.9310
+ F_       C_33        HARMONIC    1000.0000    1.3710
+ F_       C_32        HARMONIC    1000.0000    1.3710
+ F_       C_31        HARMONIC    1000.0000    1.3710
+ F_       C_3         HARMONIC    1000.0000    1.3710
+ F_       C_22        HARMONIC    1000.0000    1.2710
+ F_       C_21        HARMONIC    1000.0000    1.2710
+ F_       C_2         HARMONIC    1000.0000    1.2710
+ F_       C_R2        HARMONIC    1000.0000    1.3010
+ F_       C_R1        HARMONIC    1000.0000    1.3010
+ F_       C_R         HARMONIC    1000.0000    1.3010
+ F_       C_11        HARMONIC    1000.0000    1.2030
+ F_       C_1         HARMONIC    1000.0000    1.2030
+ F_       N_33        HARMONIC    1000.0000    1.3010
+ F_       N_32        HARMONIC    1000.0000    1.3010
+ F_       N_31        HARMONIC    1000.0000    1.3010
+ F_       N_3         HARMONIC    1000.0000    1.3010
+ F_       N_22        HARMONIC    1000.0000    1.2210
+ F_       N_21        HARMONIC    1000.0000    1.2210
+ F_       N_2         HARMONIC    1000.0000    1.2210
+ F_       N_R2        HARMONIC    1000.0000    1.2210
+ F_       N_R1        HARMONIC    1000.0000    1.2210
+ F_       N_R         HARMONIC    1000.0000    1.2210
+ F_       N_1         HARMONIC    1000.0000    0.9890
+ F_       O_32        HARMONIC    1000.0000    1.2610
+ F_       O_31        HARMONIC    1000.0000    1.2610
+ F_       O_3         HARMONIC    1000.0000    1.2610
+ F_       O_2         HARMONIC    1000.0000    1.1610
+ F_       O_R         HARMONIC    1000.0000    1.2610
+ F_       O_R1        HARMONIC    1000.0000    1.2610
+ F_       F_          HARMONIC    1000.0000    1.2120
+ Na       H_          HARMONIC    1000.0000    0.3200
+ Na       H___A       HARMONIC    1000.0000    0.3200
+ Na       C_33        HARMONIC    1000.0000    0.7600
+ Na       C_32        HARMONIC    1000.0000    0.7600
+ Na       C_31        HARMONIC    1000.0000    0.7600
+ Na       C_3         HARMONIC    1000.0000    0.7600
+ Na       C_22        HARMONIC    1000.0000    0.6600
+ Na       C_21        HARMONIC    1000.0000    0.6600
+ Na       C_2         HARMONIC    1000.0000    0.6600
+ Na       C_R2        HARMONIC    1000.0000    0.6900
+ Na       C_R1        HARMONIC    1000.0000    0.6900
+ Na       C_R         HARMONIC    1000.0000    0.6900
+ Na       C_11        HARMONIC    1000.0000    0.5920
+ Na       C_1         HARMONIC    1000.0000    0.5920
+ Na       N_33        HARMONIC    1000.0000    0.6900
+ Na       N_32        HARMONIC    1000.0000    0.6900
+ Na       N_31        HARMONIC    1000.0000    0.6900
+ Na       N_3         HARMONIC    1000.0000    0.6900
+ Na       N_22        HARMONIC    1000.0000    0.6100
+ Na       N_21        HARMONIC    1000.0000    0.6100
+ Na       N_2         HARMONIC    1000.0000    0.6100
+ Na       N_R2        HARMONIC    1000.0000    0.6100
+ Na       N_R1        HARMONIC    1000.0000    0.6100
+ Na       N_R         HARMONIC    1000.0000    0.6100
+ Na       N_1         HARMONIC    1000.0000    0.3780
+ Na       O_32        HARMONIC    1000.0000    0.6500
+ Na       O_31        HARMONIC    1000.0000    0.6500
+ Na       O_3         HARMONIC    1000.0000    0.6500
+ Na       O_2         HARMONIC    1000.0000    0.5500
+ Na       O_R         HARMONIC    1000.0000    0.6500
+ Na       O_R1        HARMONIC    1000.0000    0.6500
+ Na       F_          HARMONIC    1000.0000    0.6010
+ Na       Na          HARMONIC    1000.0000    0.0100
+ Al3      H_          HARMONIC    1000.0000    1.3910
+ Al3      H___A       HARMONIC    1000.0000    1.3910
+ Al3      C_33        HARMONIC    1000.0000    1.8310
+ Al3      C_32        HARMONIC    1000.0000    1.8310
+ Al3      C_31        HARMONIC    1000.0000    1.8310
+ Al3      C_3         HARMONIC    1000.0000    1.8310
+ Al3      C_22        HARMONIC    1000.0000    1.7310
+ Al3      C_21        HARMONIC    1000.0000    1.7310
+ Al3      C_2         HARMONIC    1000.0000    1.7310
+ Al3      C_R2        HARMONIC    1000.0000    1.7610
+ Al3      C_R1        HARMONIC    1000.0000    1.7610
+ Al3      C_R         HARMONIC    1000.0000    1.7610
+ Al3      C_11        HARMONIC    1000.0000    1.6630
+ Al3      C_1         HARMONIC    1000.0000    1.6630
+ Al3      N_33        HARMONIC    1000.0000    1.7610
+ Al3      N_32        HARMONIC    1000.0000    1.7610
+ Al3      N_31        HARMONIC    1000.0000    1.7610
+ Al3      N_3         HARMONIC    1000.0000    1.7610
+ Al3      N_22        HARMONIC    1000.0000    1.6810
+ Al3      N_21        HARMONIC    1000.0000    1.6810
+ Al3      N_2         HARMONIC    1000.0000    1.6810
+ Al3      N_R2        HARMONIC    1000.0000    1.6810
+ Al3      N_R1        HARMONIC    1000.0000    1.6810
+ Al3      N_R         HARMONIC    1000.0000    1.6810
+ Al3      N_1         HARMONIC    1000.0000    1.4490
+ Al3      O_32        HARMONIC    1000.0000    1.7210
+ Al3      O_31        HARMONIC    1000.0000    1.7210
+ Al3      O_3         HARMONIC    1000.0000    1.7210
+ Al3      O_2         HARMONIC    1000.0000    1.6210
+ Al3      O_R         HARMONIC    1000.0000    1.7210
+ Al3      O_R1        HARMONIC    1000.0000    1.7210
+ Al3      F_          HARMONIC    1000.0000    1.6720
+ Al3      Na          HARMONIC    1000.0000    1.0610
+ Al3      Al3         HARMONIC    1000.0000    2.1320
+ Si3      H_          HARMONIC    1000.0000    1.2570
+ Si3      H___A       HARMONIC    1000.0000    1.2570
+ Si3      C_33        HARMONIC    1000.0000    1.6970
+ Si3      C_32        HARMONIC    1000.0000    1.6970
+ Si3      C_31        HARMONIC    1000.0000    1.6970
+ Si3      C_3         HARMONIC    1000.0000    1.6970
+ Si3      C_22        HARMONIC    1000.0000    1.5970
+ Si3      C_21        HARMONIC    1000.0000    1.5970
+ Si3      C_2         HARMONIC    1000.0000    1.5970
+ Si3      C_R2        HARMONIC    1000.0000    1.6270
+ Si3      C_R1        HARMONIC    1000.0000    1.6270
+ Si3      C_R         HARMONIC    1000.0000    1.6270
+ Si3      C_11        HARMONIC    1000.0000    1.5290
+ Si3      C_1         HARMONIC    1000.0000    1.5290
+ Si3      N_33        HARMONIC    1000.0000    1.6270
+ Si3      N_32        HARMONIC    1000.0000    1.6270
+ Si3      N_31        HARMONIC    1000.0000    1.6270
+ Si3      N_3         HARMONIC    1000.0000    1.6270
+ Si3      N_22        HARMONIC    1000.0000    1.5470
+ Si3      N_21        HARMONIC    1000.0000    1.5470
+ Si3      N_2         HARMONIC    1000.0000    1.5470
+ Si3      N_R2        HARMONIC    1000.0000    1.5470
+ Si3      N_R1        HARMONIC    1000.0000    1.5470
+ Si3      N_R         HARMONIC    1000.0000    1.5470
+ Si3      N_1         HARMONIC    1000.0000    1.3150
+ Si3      O_32        HARMONIC    1000.0000    1.5870
+ Si3      O_31        HARMONIC    1000.0000    1.5870
+ Si3      O_3         HARMONIC    1000.0000    1.5870
+ Si3      O_2         HARMONIC    1000.0000    1.4870
+ Si3      O_R         HARMONIC    1000.0000    1.5870
+ Si3      O_R1        HARMONIC    1000.0000    1.5870
+ Si3      F_          HARMONIC    1000.0000    1.5380
+ Si3      Na          HARMONIC    1000.0000    0.9270
+ Si3      Al3         HARMONIC    1000.0000    1.9980
+ Si3      Si3         HARMONIC    1000.0000    1.8640
+ P_3      H_          HARMONIC    1000.0000    1.2100
+ P_3      H___A       HARMONIC    1000.0000    1.2100
+ P_3      C_33        HARMONIC    1000.0000    1.6500
+ P_3      C_32        HARMONIC    1000.0000    1.6500
+ P_3      C_31        HARMONIC    1000.0000    1.6500
+ P_3      C_3         HARMONIC    1000.0000    1.6500
+ P_3      C_22        HARMONIC    1000.0000    1.5500
+ P_3      C_21        HARMONIC    1000.0000    1.5500
+ P_3      C_2         HARMONIC    1000.0000    1.5500
+ P_3      C_R2        HARMONIC    1000.0000    1.5800
+ P_3      C_R1        HARMONIC    1000.0000    1.5800
+ P_3      C_R         HARMONIC    1000.0000    1.5800
+ P_3      C_11        HARMONIC    1000.0000    1.4820
+ P_3      C_1         HARMONIC    1000.0000    1.4820
+ P_3      N_33        HARMONIC    1000.0000    1.5800
+ P_3      N_32        HARMONIC    1000.0000    1.5800
+ P_3      N_31        HARMONIC    1000.0000    1.5800
+ P_3      N_3         HARMONIC    1000.0000    1.5800
+ P_3      N_22        HARMONIC    1000.0000    1.5000
+ P_3      N_21        HARMONIC    1000.0000    1.5000
+ P_3      N_2         HARMONIC    1000.0000    1.5000
+ P_3      N_R2        HARMONIC    1000.0000    1.5000
+ P_3      N_R1        HARMONIC    1000.0000    1.5000
+ P_3      N_R         HARMONIC    1000.0000    1.5000
+ P_3      N_1         HARMONIC    1000.0000    1.2680
+ P_3      O_32        HARMONIC    1000.0000    1.5400
+ P_3      O_31        HARMONIC    1000.0000    1.5400
+ P_3      O_3         HARMONIC    1000.0000    1.5400
+ P_3      O_2         HARMONIC    1000.0000    1.4400
+ P_3      O_R         HARMONIC    1000.0000    1.5400
+ P_3      O_R1        HARMONIC    1000.0000    1.5400
+ P_3      F_          HARMONIC    1000.0000    1.4910
+ P_3      Na          HARMONIC    1000.0000    0.8800
+ P_3      Al3         HARMONIC    1000.0000    1.9510
+ P_3      Si3         HARMONIC    1000.0000    1.8170
+ P_3      P_3         HARMONIC    1000.0000    1.7700
+ S_31     H_          HARMONIC    1000.0000    1.3600
+ S_31     H___A       HARMONIC    1000.0000    1.3600
+ S_31     C_33        HARMONIC    1000.0000    1.8000
+ S_31     C_32        HARMONIC    1000.0000    1.8000
+ S_31     C_31        HARMONIC    1000.0000    1.8000
+ S_31     C_3         HARMONIC    1000.0000    1.8000
+ S_31     C_22        HARMONIC    1000.0000    1.7000
+ S_31     C_21        HARMONIC    1000.0000    1.7000
+ S_31     C_2         HARMONIC    1000.0000    1.7000
+ S_31     C_R2        HARMONIC    1000.0000    1.7300
+ S_31     C_R1        HARMONIC    1000.0000    1.7300
+ S_31     C_R         HARMONIC    1000.0000    1.7300
+ S_31     C_11        HARMONIC    1000.0000    1.6320
+ S_31     C_1         HARMONIC    1000.0000    1.6320
+ S_31     N_33        HARMONIC    1000.0000    1.7300
+ S_31     N_32        HARMONIC    1000.0000    1.7300
+ S_31     N_31        HARMONIC    1000.0000    1.7300
+ S_31     N_3         HARMONIC    1000.0000    1.7300
+ S_31     N_22        HARMONIC    1000.0000    1.6500
+ S_31     N_21        HARMONIC    1000.0000    1.6500
+ S_31     N_2         HARMONIC    1000.0000    1.6500
+ S_31     N_R2        HARMONIC    1000.0000    1.6500
+ S_31     N_R1        HARMONIC    1000.0000    1.6500
+ S_31     N_R         HARMONIC    1000.0000    1.6500
+ S_31     N_1         HARMONIC    1000.0000    1.4180
+ S_31     O_32        HARMONIC    1000.0000    1.6900
+ S_31     O_31        HARMONIC    1000.0000    1.6900
+ S_31     O_3         HARMONIC    1000.0000    1.6900
+ S_31     O_2         HARMONIC    1000.0000    1.5900
+ S_31     O_R         HARMONIC    1000.0000    1.6900
+ S_31     O_R1        HARMONIC    1000.0000    1.6900
+ S_31     F_          HARMONIC    1000.0000    1.6410
+ S_31     Na          HARMONIC    1000.0000    1.0300
+ S_31     Al3         HARMONIC    1000.0000    2.1010
+ S_31     Si3         HARMONIC    1000.0000    1.9670
+ S_31     P_3         HARMONIC    1000.0000    1.9200
+ S_31     S_31        HARMONIC    1000.0000    2.0700
+ S_3      H_          HARMONIC    1000.0000    1.3300
+ S_3      H___A       HARMONIC    1000.0000    1.3300
+ S_3      C_33        HARMONIC    1000.0000    1.7700
+ S_3      C_32        HARMONIC    1000.0000    1.7700
+ S_3      C_31        HARMONIC    1000.0000    1.7700
+ S_3      C_3         HARMONIC    1000.0000    1.7700
+ S_3      C_22        HARMONIC    1000.0000    1.6700
+ S_3      C_21        HARMONIC    1000.0000    1.6700
+ S_3      C_2         HARMONIC    1000.0000    1.6700
+ S_3      C_R2        HARMONIC    1000.0000    1.7000
+ S_3      C_R1        HARMONIC    1000.0000    1.7000
+ S_3      C_R         HARMONIC    1000.0000    1.7000
+ S_3      C_11        HARMONIC    1000.0000    1.6020
+ S_3      C_1         HARMONIC    1000.0000    1.6020
+ S_3      N_33        HARMONIC    1000.0000    1.7000
+ S_3      N_32        HARMONIC    1000.0000    1.7000
+ S_3      N_31        HARMONIC    1000.0000    1.7000
+ S_3      N_3         HARMONIC    1000.0000    1.7000
+ S_3      N_22        HARMONIC    1000.0000    1.6200
+ S_3      N_21        HARMONIC    1000.0000    1.6200
+ S_3      N_2         HARMONIC    1000.0000    1.6200
+ S_3      N_R2        HARMONIC    1000.0000    1.6200
+ S_3      N_R1        HARMONIC    1000.0000    1.6200
+ S_3      N_R         HARMONIC    1000.0000    1.6200
+ S_3      N_1         HARMONIC    1000.0000    1.3880
+ S_3      O_32        HARMONIC    1000.0000    1.6600
+ S_3      O_31        HARMONIC    1000.0000    1.6600
+ S_3      O_3         HARMONIC    1000.0000    1.6600
+ S_3      O_2         HARMONIC    1000.0000    1.5600
+ S_3      O_R         HARMONIC    1000.0000    1.6600
+ S_3      O_R1        HARMONIC    1000.0000    1.6600
+ S_3      F_          HARMONIC    1000.0000    1.6110
+ S_3      Na          HARMONIC    1000.0000    1.0000
+ S_3      Al3         HARMONIC    1000.0000    2.0710
+ S_3      Si3         HARMONIC    1000.0000    1.9370
+ S_3      P_3         HARMONIC    1000.0000    1.8900
+ S_3      S_31        HARMONIC    1000.0000    2.0400
+ S_3      S_3         HARMONIC    1000.0000    2.0100
+ Cl       H_          HARMONIC    1000.0000    1.3170
+ Cl       H___A       HARMONIC    1000.0000    1.3170
+ Cl       C_33        HARMONIC    1000.0000    1.7570
+ Cl       C_32        HARMONIC    1000.0000    1.7570
+ Cl       C_31        HARMONIC    1000.0000    1.7570
+ Cl       C_3         HARMONIC    1000.0000    1.7570
+ Cl       C_22        HARMONIC    1000.0000    1.6570
+ Cl       C_21        HARMONIC    1000.0000    1.6570
+ Cl       C_2         HARMONIC    1000.0000    1.6570
+ Cl       C_R2        HARMONIC    1000.0000    1.6870
+ Cl       C_R1        HARMONIC    1000.0000    1.6870
+ Cl       C_R         HARMONIC    1000.0000    1.6870
+ Cl       C_11        HARMONIC    1000.0000    1.5890
+ Cl       C_1         HARMONIC    1000.0000    1.5890
+ Cl       N_33        HARMONIC    1000.0000    1.6870
+ Cl       N_32        HARMONIC    1000.0000    1.6870
+ Cl       N_31        HARMONIC    1000.0000    1.6870
+ Cl       N_3         HARMONIC    1000.0000    1.6870
+ Cl       N_22        HARMONIC    1000.0000    1.6070
+ Cl       N_21        HARMONIC    1000.0000    1.6070
+ Cl       N_2         HARMONIC    1000.0000    1.6070
+ Cl       N_R2        HARMONIC    1000.0000    1.6070
+ Cl       N_R1        HARMONIC    1000.0000    1.6070
+ Cl       N_R         HARMONIC    1000.0000    1.6070
+ Cl       N_1         HARMONIC    1000.0000    1.3750
+ Cl       O_32        HARMONIC    1000.0000    1.6470
+ Cl       O_31        HARMONIC    1000.0000    1.6470
+ Cl       O_3         HARMONIC    1000.0000    1.6470
+ Cl       O_2         HARMONIC    1000.0000    1.5470
+ Cl       O_R         HARMONIC    1000.0000    1.6470
+ Cl       O_R1        HARMONIC    1000.0000    1.6470
+ Cl       F_          HARMONIC    1000.0000    1.5980
+ Cl       Na          HARMONIC    1000.0000    0.9870
+ Cl       Al3         HARMONIC    1000.0000    2.0580
+ Cl       Si3         HARMONIC    1000.0000    1.9240
+ Cl       P_3         HARMONIC    1000.0000    1.8770
+ Cl       S_31        HARMONIC    1000.0000    2.0270
+ Cl       S_3         HARMONIC    1000.0000    1.9970
+ Cl       Cl          HARMONIC    1000.0000    1.9840
+ Ca       H_          HARMONIC    1000.0000    0.3200
+ Ca       H___A       HARMONIC    1000.0000    0.3200
+ Ca       C_33        HARMONIC    1000.0000    0.7600
+ Ca       C_32        HARMONIC    1000.0000    0.7600
+ Ca       C_31        HARMONIC    1000.0000    0.7600
+ Ca       C_3         HARMONIC    1000.0000    0.7600
+ Ca       C_22        HARMONIC    1000.0000    0.6600
+ Ca       C_21        HARMONIC    1000.0000    0.6600
+ Ca       C_2         HARMONIC    1000.0000    0.6600
+ Ca       C_R2        HARMONIC    1000.0000    0.6900
+ Ca       C_R1        HARMONIC    1000.0000    0.6900
+ Ca       C_R         HARMONIC    1000.0000    0.6900
+ Ca       C_11        HARMONIC    1000.0000    0.5920
+ Ca       C_1         HARMONIC    1000.0000    0.5920
+ Ca       N_33        HARMONIC    1000.0000    0.6900
+ Ca       N_32        HARMONIC    1000.0000    0.6900
+ Ca       N_31        HARMONIC    1000.0000    0.6900
+ Ca       N_3         HARMONIC    1000.0000    0.6900
+ Ca       N_22        HARMONIC    1000.0000    0.6100
+ Ca       N_21        HARMONIC    1000.0000    0.6100
+ Ca       N_2         HARMONIC    1000.0000    0.6100
+ Ca       N_R2        HARMONIC    1000.0000    0.6100
+ Ca       N_R1        HARMONIC    1000.0000    0.6100
+ Ca       N_R         HARMONIC    1000.0000    0.6100
+ Ca       N_1         HARMONIC    1000.0000    0.3780
+ Ca       O_32        HARMONIC    1000.0000    0.6500
+ Ca       O_31        HARMONIC    1000.0000    0.6500
+ Ca       O_3         HARMONIC    1000.0000    0.6500
+ Ca       O_2         HARMONIC    1000.0000    0.5500
+ Ca       O_R         HARMONIC    1000.0000    0.6500
+ Ca       O_R1        HARMONIC    1000.0000    0.6500
+ Ca       F_          HARMONIC    1000.0000    0.6010
+ Ca       Na          HARMONIC    1000.0000    0.0100
+ Ca       Al3         HARMONIC    1000.0000    1.0610
+ Ca       Si3         HARMONIC    1000.0000    0.9270
+ Ca       P_3         HARMONIC    1000.0000    0.8800
+ Ca       S_31        HARMONIC    1000.0000    1.0300
+ Ca       S_3         HARMONIC    1000.0000    1.0000
+ Ca       Cl          HARMONIC    1000.0000    0.9870
+ Ca       Ca          HARMONIC    1000.0000    0.0100
+ Fe       H_          HARMONIC    1000.0000    1.6250
+ Fe       H___A       HARMONIC    1000.0000    1.6250
+ Fe       C_33        HARMONIC    1000.0000    2.0650
+ Fe       C_32        HARMONIC    1000.0000    2.0650
+ Fe       C_31        HARMONIC    1000.0000    2.0650
+ Fe       C_3         HARMONIC    1000.0000    2.0650
+ Fe       C_22        HARMONIC    1000.0000    1.9650
+ Fe       C_21        HARMONIC    1000.0000    1.9650
+ Fe       C_2         HARMONIC    1000.0000    1.9650
+ Fe       C_R2        HARMONIC    1000.0000    1.9950
+ Fe       C_R1        HARMONIC    1000.0000    1.9950
+ Fe       C_R         HARMONIC    1000.0000    1.9950
+ Fe       C_11        HARMONIC    1000.0000    1.8970
+ Fe       C_1         HARMONIC    1000.0000    1.8970
+ Fe       N_33        HARMONIC    1000.0000    1.9950
+ Fe       N_32        HARMONIC    1000.0000    1.9950
+ Fe       N_31        HARMONIC    1000.0000    1.9950
+ Fe       N_3         HARMONIC    1000.0000    1.9950
+ Fe       N_22        HARMONIC    1000.0000    1.9150
+ Fe       N_21        HARMONIC    1000.0000    1.9150
+ Fe       N_2         HARMONIC    1000.0000    1.9150
+ Fe       N_R2        HARMONIC    1000.0000    1.9150
+ Fe       N_R1        HARMONIC    1000.0000    1.9150
+ Fe       N_R         HARMONIC    1000.0000    1.9150
+ Fe       N_1         HARMONIC    1000.0000    1.6830
+ Fe       O_32        HARMONIC    1000.0000    1.9550
+ Fe       O_31        HARMONIC    1000.0000    1.9550
+ Fe       O_3         HARMONIC    1000.0000    1.9550
+ Fe       O_2         HARMONIC    1000.0000    1.8550
+ Fe       O_R         HARMONIC    1000.0000    1.9550
+ Fe       O_R1        HARMONIC    1000.0000    1.9550
+ Fe       F_          HARMONIC    1000.0000    1.9060
+ Fe       Na          HARMONIC    1000.0000    1.2950
+ Fe       Al3         HARMONIC    1000.0000    2.3660
+ Fe       Si3         HARMONIC    1000.0000    2.2320
+ Fe       P_3         HARMONIC    1000.0000    2.1850
+ Fe       S_31        HARMONIC    1000.0000    2.3350
+ Fe       S_3         HARMONIC    1000.0000    2.3050
+ Fe       Cl          HARMONIC    1000.0000    2.2920
+ Fe       Ca          HARMONIC    1000.0000    1.2950
+ Fe       Fe          HARMONIC    1000.0000    2.6000
+ Zn       H_          HARMONIC    1000.0000    1.6000
+ Zn       H___A       HARMONIC    1000.0000    1.6000
+ Zn       C_33        HARMONIC    1000.0000    2.0400
+ Zn       C_32        HARMONIC    1000.0000    2.0400
+ Zn       C_31        HARMONIC    1000.0000    2.0400
+ Zn       C_3         HARMONIC    1000.0000    2.0400
+ Zn       C_22        HARMONIC    1000.0000    1.9400
+ Zn       C_21        HARMONIC    1000.0000    1.9400
+ Zn       C_2         HARMONIC    1000.0000    1.9400
+ Zn       C_R2        HARMONIC    1000.0000    1.9700
+ Zn       C_R1        HARMONIC    1000.0000    1.9700
+ Zn       C_R         HARMONIC    1000.0000    1.9700
+ Zn       C_11        HARMONIC    1000.0000    1.8720
+ Zn       C_1         HARMONIC    1000.0000    1.8720
+ Zn       N_33        HARMONIC    1000.0000    1.9700
+ Zn       N_32        HARMONIC    1000.0000    1.9700
+ Zn       N_31        HARMONIC    1000.0000    1.9700
+ Zn       N_3         HARMONIC    1000.0000    1.9700
+ Zn       N_22        HARMONIC    1000.0000    1.8900
+ Zn       N_21        HARMONIC    1000.0000    1.8900
+ Zn       N_2         HARMONIC    1000.0000    1.8900
+ Zn       N_R2        HARMONIC    1000.0000    1.8900
+ Zn       N_R1        HARMONIC    1000.0000    1.8900
+ Zn       N_R         HARMONIC    1000.0000    1.8900
+ Zn       N_1         HARMONIC    1000.0000    1.6580
+ Zn       O_32        HARMONIC    1000.0000    1.9300
+ Zn       O_31        HARMONIC    1000.0000    1.9300
+ Zn       O_3         HARMONIC    1000.0000    1.9300
+ Zn       O_2         HARMONIC    1000.0000    1.8300
+ Zn       O_R         HARMONIC    1000.0000    1.9300
+ Zn       O_R1        HARMONIC    1000.0000    1.9300
+ Zn       F_          HARMONIC    1000.0000    1.8810
+ Zn       Na          HARMONIC    1000.0000    1.2700
+ Zn       Al3         HARMONIC    1000.0000    2.3410
+ Zn       Si3         HARMONIC    1000.0000    2.2070
+ Zn       P_3         HARMONIC    1000.0000    2.1600
+ Zn       S_31        HARMONIC    1000.0000    2.3100
+ Zn       S_3         HARMONIC    1000.0000    2.2800
+ Zn       Cl          HARMONIC    1000.0000    2.2670
+ Zn       Ca          HARMONIC    1000.0000    1.2700
+ Zn       Fe          HARMONIC    1000.0000    2.5750
+ Zn       Zn          HARMONIC    1000.0000    2.5500
+ Br       H_          HARMONIC    1000.0000    1.4870
+ Br       H___A       HARMONIC    1000.0000    1.4870
+ Br       C_33        HARMONIC    1000.0000    1.9270
+ Br       C_32        HARMONIC    1000.0000    1.9270
+ Br       C_31        HARMONIC    1000.0000    1.9270
+ Br       C_3         HARMONIC    1000.0000    1.9270
+ Br       C_22        HARMONIC    1000.0000    1.8270
+ Br       C_21        HARMONIC    1000.0000    1.8270
+ Br       C_2         HARMONIC    1000.0000    1.8270
+ Br       C_R2        HARMONIC    1000.0000    1.8570
+ Br       C_R1        HARMONIC    1000.0000    1.8570
+ Br       C_R         HARMONIC    1000.0000    1.8570
+ Br       C_11        HARMONIC    1000.0000    1.7590
+ Br       C_1         HARMONIC    1000.0000    1.7590
+ Br       N_33        HARMONIC    1000.0000    1.8570
+ Br       N_32        HARMONIC    1000.0000    1.8570
+ Br       N_31        HARMONIC    1000.0000    1.8570
+ Br       N_3         HARMONIC    1000.0000    1.8570
+ Br       N_22        HARMONIC    1000.0000    1.7770
+ Br       N_21        HARMONIC    1000.0000    1.7770
+ Br       N_2         HARMONIC    1000.0000    1.7770
+ Br       N_R2        HARMONIC    1000.0000    1.7770
+ Br       N_R1        HARMONIC    1000.0000    1.7770
+ Br       N_R         HARMONIC    1000.0000    1.7770
+ Br       N_1         HARMONIC    1000.0000    1.5450
+ Br       O_32        HARMONIC    1000.0000    1.8170
+ Br       O_31        HARMONIC    1000.0000    1.8170
+ Br       O_3         HARMONIC    1000.0000    1.8170
+ Br       O_2         HARMONIC    1000.0000    1.7170
+ Br       O_R         HARMONIC    1000.0000    1.8170
+ Br       O_R1        HARMONIC    1000.0000    1.8170
+ Br       F_          HARMONIC    1000.0000    1.7680
+ Br       Na          HARMONIC    1000.0000    1.1570
+ Br       Al3         HARMONIC    1000.0000    2.2280
+ Br       Si3         HARMONIC    1000.0000    2.0940
+ Br       P_3         HARMONIC    1000.0000    2.0470
+ Br       S_31        HARMONIC    1000.0000    2.1970
+ Br       S_3         HARMONIC    1000.0000    2.1670
+ Br       Cl          HARMONIC    1000.0000    2.1540
+ Br       Ca          HARMONIC    1000.0000    1.1570
+ Br       Fe          HARMONIC    1000.0000    2.4620
+ Br       Zn          HARMONIC    1000.0000    2.4370
+ Br       Br          HARMONIC    1000.0000    2.3240
+ Ru       H_          HARMONIC    1000.0000    1.6250
+ Ru       H___A       HARMONIC    1000.0000    1.6250
+ Ru       C_33        HARMONIC    1000.0000    2.0650
+ Ru       C_32        HARMONIC    1000.0000    2.0650
+ Ru       C_31        HARMONIC    1000.0000    2.0650
+ Ru       C_3         HARMONIC    1000.0000    2.0650
+ Ru       C_22        HARMONIC    1000.0000    1.9650
+ Ru       C_21        HARMONIC    1000.0000    1.9650
+ Ru       C_2         HARMONIC    1000.0000    1.9650
+ Ru       C_R2        HARMONIC    1000.0000    1.9950
+ Ru       C_R1        HARMONIC    1000.0000    1.9950
+ Ru       C_R         HARMONIC    1000.0000    1.9950
+ Ru       C_11        HARMONIC    1000.0000    1.8970
+ Ru       C_1         HARMONIC    1000.0000    1.8970
+ Ru       N_33        HARMONIC    1000.0000    1.9950
+ Ru       N_32        HARMONIC    1000.0000    1.9950
+ Ru       N_31        HARMONIC    1000.0000    1.9950
+ Ru       N_3         HARMONIC    1000.0000    1.9950
+ Ru       N_22        HARMONIC    1000.0000    1.9150
+ Ru       N_21        HARMONIC    1000.0000    1.9150
+ Ru       N_2         HARMONIC    1000.0000    1.9150
+ Ru       N_R2        HARMONIC    1000.0000    1.9150
+ Ru       N_R1        HARMONIC    1000.0000    1.9150
+ Ru       N_R         HARMONIC    1000.0000    1.9150
+ Ru       N_1         HARMONIC    1000.0000    1.6830
+ Ru       O_32        HARMONIC    1000.0000    1.9550
+ Ru       O_31        HARMONIC    1000.0000    1.9550
+ Ru       O_3         HARMONIC    1000.0000    1.9550
+ Ru       O_2         HARMONIC    1000.0000    1.8550
+ Ru       O_R         HARMONIC    1000.0000    1.9550
+ Ru       O_R1        HARMONIC    1000.0000    1.9550
+ Ru       F_          HARMONIC    1000.0000    1.9060
+ Ru       Na          HARMONIC    1000.0000    1.2950
+ Ru       Al3         HARMONIC    1000.0000    2.3660
+ Ru       Si3         HARMONIC    1000.0000    2.2320
+ Ru       P_3         HARMONIC    1000.0000    2.1850
+ Ru       S_31        HARMONIC    1000.0000    2.3350
+ Ru       S_3         HARMONIC    1000.0000    2.3050
+ Ru       Cl          HARMONIC    1000.0000    2.2920
+ Ru       Ca          HARMONIC    1000.0000    1.2950
+ Ru       Fe          HARMONIC    1000.0000    2.6000
+ Ru       Zn          HARMONIC    1000.0000    2.5750
+ Ru       Br          HARMONIC    1000.0000    2.4620
+ Ru       Ru          HARMONIC    1000.0000    2.6000
+ Ti       H_          HARMONIC    1000.0000    1.6300
+ Ti       H___A       HARMONIC    1000.0000    1.6300
+ Ti       C_33        HARMONIC    1000.0000    2.0700
+ Ti       C_32        HARMONIC    1000.0000    2.0700
+ Ti       C_31        HARMONIC    1000.0000    2.0700
+ Ti       C_3         HARMONIC    1000.0000    2.0700
+ Ti       C_22        HARMONIC    1000.0000    1.9700
+ Ti       C_21        HARMONIC    1000.0000    1.9700
+ Ti       C_2         HARMONIC    1000.0000    1.9700
+ Ti       C_R2        HARMONIC    1000.0000    2.0000
+ Ti       C_R1        HARMONIC    1000.0000    2.0000
+ Ti       C_R         HARMONIC    1000.0000    2.0000
+ Ti       C_11        HARMONIC    1000.0000    1.9020
+ Ti       C_1         HARMONIC    1000.0000    1.9020
+ Ti       N_33        HARMONIC    1000.0000    2.0000
+ Ti       N_32        HARMONIC    1000.0000    2.0000
+ Ti       N_31        HARMONIC    1000.0000    2.0000
+ Ti       N_3         HARMONIC    1000.0000    2.0000
+ Ti       N_22        HARMONIC    1000.0000    1.9200
+ Ti       N_21        HARMONIC    1000.0000    1.9200
+ Ti       N_2         HARMONIC    1000.0000    1.9200
+ Ti       N_R2        HARMONIC    1000.0000    1.9200
+ Ti       N_R1        HARMONIC    1000.0000    1.9200
+ Ti       N_R         HARMONIC    1000.0000    1.9200
+ Ti       N_1         HARMONIC    1000.0000    1.6880
+ Ti       O_32        HARMONIC    1000.0000    1.9600
+ Ti       O_31        HARMONIC    1000.0000    1.9600
+ Ti       O_3         HARMONIC    1000.0000    1.9600
+ Ti       O_2         HARMONIC    1000.0000    1.8600
+ Ti       O_R         HARMONIC    1000.0000    1.9600
+ Ti       O_R1        HARMONIC    1000.0000    1.9600
+ Ti       F_          HARMONIC    1000.0000    1.9110
+ Ti       Na          HARMONIC    1000.0000    1.3000
+ Ti       Al3         HARMONIC    1000.0000    2.3710
+ Ti       Si3         HARMONIC    1000.0000    2.2370
+ Ti       P_3         HARMONIC    1000.0000    2.1900
+ Ti       S_31        HARMONIC    1000.0000    2.3400
+ Ti       S_3         HARMONIC    1000.0000    2.3100
+ Ti       Cl          HARMONIC    1000.0000    2.2970
+ Ti       Ca          HARMONIC    1000.0000    1.3000
+ Ti       Fe          HARMONIC    1000.0000    2.6050
+ Ti       Zn          HARMONIC    1000.0000    2.5800
+ Ti       Br          HARMONIC    1000.0000    2.4670
+ Ti       Ru          HARMONIC    1000.0000    2.6050
+ Ti       Ti          HARMONIC    1000.0000    2.6100
+END
+#
+ANGLE_BEND
+ X        C_33     X           THETA_HARM   100.0000  109.4710
+ X        C_32     X           THETA_HARM   100.0000  109.4710
+ X        C_31     X           THETA_HARM   100.0000  109.4710
+ X        C_3      X           THETA_HARM   100.0000  109.4710
+ X        C_22     X           THETA_HARM   100.0000  120.0000
+ X        C_21     X           THETA_HARM   100.0000  120.0000
+ X        C_2      X           THETA_HARM   100.0000  120.0000
+ X        C_R2     X           THETA_HARM   100.0000  120.0000
+ X        C_R1     X           THETA_HARM   100.0000  120.0000
+ X        C_R      X           THETA_HARM   100.0000  120.0000
+ X        C_11     X           THETA_HARM   100.0000  180.0000
+ X        C_1      X           THETA_HARM   100.0000  180.0000
+ X        N_33     X           THETA_HARM   100.0000  109.4710
+ X        N_32     X           THETA_HARM   100.0000  109.4710
+ X        N_31     X           THETA_HARM   100.0000  109.4710
+ X        N_3      X           THETA_HARM   100.0000  109.4710
+ X        N_22     X           THETA_HARM   100.0000  120.0000
+ X        N_21     X           THETA_HARM   100.0000  120.0000
+ X        N_2      X           THETA_HARM   100.0000  120.0000
+ X        N_R2     X           THETA_HARM   100.0000  120.0000
+ X        N_R1     X           THETA_HARM   100.0000  120.0000
+ X        N_R      X           THETA_HARM   100.0000  120.0000
+ X        N_1      X           THETA_HARM   100.0000  180.0000
+ X        O_32     X           THETA_HARM   100.0000  109.4710
+ X        O_31     X           THETA_HARM   100.0000  109.4710
+ X        O_3      X           THETA_HARM   100.0000  109.4710
+ X        O_2      X           THETA_HARM   100.0000  120.0000
+ X        O_R      X           THETA_HARM   100.0000  120.0000
+ X        O_R1     X           THETA_HARM   100.0000  120.0000
+ X        F_       X           THETA_HARM   100.0000  180.0000
+ X        Na       X           THETA_HARM   100.0000   90.0000
+ X        Al3      X           THETA_HARM   100.0000  109.4710
+ X        Si3      X           THETA_HARM   100.0000  109.4710
+ X        P_3      X           THETA_HARM   100.0000  109.4710
+ X        S_31     X           THETA_HARM   100.0000   97.2000
+ X        S_3      X           THETA_HARM   100.0000  104.2000
+ X        Cl       X           THETA_HARM   100.0000  180.0000
+ X        Ca       X           THETA_HARM   100.0000   90.0000
+ X        Fe       X           THETA_HARM   100.0000   90.0000
+ X        Zn       X           THETA_HARM   100.0000  109.4710
+ X        Br       X           THETA_HARM   100.0000  180.0000
+ X        Ru       X           THETA_HARM   100.0000   90.0000
+ X        Ti       X           THETA_HARM   100.0000   90.0000
+END
+#
+TORSIONS
+ X        C_33     C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        C_32     C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        C_32     C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        C_31     C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        C_31     C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        C_31     C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        C_3      C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        C_3      C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        C_3      C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        C_3      C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        C_22     C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_22     C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_22     C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_22     C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_22     C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_21     C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_21     C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_21     C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_21     C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_21     C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_21     C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_2      C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_2      C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_2      C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_2      C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_2      C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_2      C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_2      C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R2     C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R2     C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R2     C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R2     C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R2     C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R2     C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R2     C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R2     C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R1     C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R1     C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R1     C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R1     C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R1     C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R1     C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R1     C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R1     C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R1     C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R      C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R      C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R      C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R      C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_R      C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R      C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R      C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R      C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R      C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_R      C_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        C_11     C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_11     C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_11     C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_11     C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_11     C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_11     C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_11     C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_11     C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_11     C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_11     C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_11     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        C_1      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_33     C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_33     C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_33     C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_33     C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_33     C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_33     C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_33     C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_33     C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_33     C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_33     C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_33     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_33     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_33     N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_32     C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_32     C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_32     C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_32     C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_32     C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_32     C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_32     C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_32     C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_32     C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_32     C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_32     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_32     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_32     N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_32     N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_31     C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_31     C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_31     C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_31     C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_31     C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_31     C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_31     C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_31     C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_31     C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_31     C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_31     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_31     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_31     N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_31     N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_31     N_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_3      C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_3      C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_3      C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_3      C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_3      C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_3      C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_3      C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_3      C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_3      C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_3      C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_3      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_3      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_3      N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_3      N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_3      N_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_3      N_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        N_22     C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_22     C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_22     C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_22     C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_22     C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_22     C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_22     C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_22     C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_22     C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_22     C_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_22     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_22     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_22     N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_22     N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_22     N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_22     N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_22     N_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_21     C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_21     C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_21     C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_21     C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_21     C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_21     C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_21     C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_21     C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_21     C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_21     C_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_21     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_21     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_21     N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_21     N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_21     N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_21     N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_21     N_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_21     N_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_2      C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_2      C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_2      C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_2      C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_2      C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_2      C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_2      C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_2      C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_2      C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_2      C_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_2      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_2      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_2      N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_2      N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_2      N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_2      N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_2      N_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_2      N_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_2      N_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R2     C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R2     C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R2     C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R2     C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R2     C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R2     C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R2     C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R2     C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R2     C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R2     C_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R2     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R2     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R2     N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R2     N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R2     N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R2     N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R2     N_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R2     N_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R2     N_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R2     N_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R1     C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R1     C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R1     C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R1     C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     C_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R1     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R1     N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R1     N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R1     N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R1     N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R1     N_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     N_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     N_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     N_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R1     N_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R      C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R      C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R      C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R      C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      C_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R      N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R      N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R      N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R      N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_R      N_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      N_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      N_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      N_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      N_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_R      N_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        N_1      C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        N_1      N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_32     C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_32     C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_32     C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_32     C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_32     N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_32     N_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_32     N_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_32     N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_32     O_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_31     C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_31     C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_31     C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_31     C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_31     C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_31     N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_31     N_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_31     N_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_31     N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_31     O_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_31     O_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      N_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      N_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_3      O_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      O_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_3      O_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        O_2      C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      C_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      N_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      N_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      N_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      N_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      N_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      N_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_2      N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_2      O_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      C_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      N_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      N_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      N_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      N_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      N_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      N_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R      O_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R      O_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     C_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     C_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     C_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     C_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     C_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     C_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     N_22     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     N_21     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     N_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     N_R2     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     N_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     N_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        O_R1     O_2      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     O_R      X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        O_R1     O_R1     X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        F_       C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        F_       F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Na       Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      N_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      N_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      O_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      O_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      O_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Al3      O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Al3      Al3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      N_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      N_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      O_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      O_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      O_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Si3      Al3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Si3      Si3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      N_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      N_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      O_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      O_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      O_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        P_3      Al3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      Si3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        P_3      P_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     N_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     N_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     O_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     O_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     O_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_31     Al3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     Si3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     P_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_31     S_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      C_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      C_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      C_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      C_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      N_33     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      N_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      N_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      N_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      O_32     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      O_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      O_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        S_3      Al3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      Si3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      P_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      S_31     X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        S_3      S_3      X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        Cl       C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       Al3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       Si3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       P_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       S_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       S_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Cl       Cl       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       Al3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       Si3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       P_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       S_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       S_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       Cl       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ca       Ca       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       Al3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       Si3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       P_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       S_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       S_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       Cl       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       Ca       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Fe       Fe       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       Al3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       Si3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       P_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       S_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       S_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       Cl       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       Ca       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       Fe       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Zn       Zn       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       Al3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       Si3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       P_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       S_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       S_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       Cl       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       Ca       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       Fe       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       Zn       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Br       Br       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       Al3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       Si3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       P_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       S_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       S_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       Cl       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       Ca       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       Fe       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       Zn       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       Br       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ru       Ru       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_11     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       C_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_33     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_22     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_21     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_R2     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       N_1      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       O_32     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       O_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       O_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       O_2      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       O_R      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       O_R1     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       F_       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       Na       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       Al3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       Si3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       P_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       S_31     X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       S_3      X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       Cl       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       Ca       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       Fe       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       Zn       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       Br       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       Ru       X           DIHEDRAL       0.2000    3.0000   -1.0000
+ X        Ti       Ti       X           DIHEDRAL       0.2000    3.0000   -1.0000
+END
+#
+INVERSIONS
+ C_33     X        X        X           IT_IJKL       40.0000   35.2640
+ C_33     X        X        H_          IT_IJKL       40.0000   31.4000
+ C_33     X        X        H___A       IT_IJKL       40.0000   31.4000
+ C_32     X        X        X           IT_IJKL       40.0000   35.2640
+ C_32     X        X        H_          IT_IJKL       40.0000   31.4000
+ C_32     X        X        H___A       IT_IJKL       40.0000   31.4000
+ C_31     X        X        X           IT_IJKL       40.0000   35.2640
+ C_31     X        X        H_          IT_IJKL       40.0000   31.4000
+ C_31     X        X        H___A       IT_IJKL       40.0000   31.4000
+ C_3      X        X        X           IT_IJKL       40.0000   35.2640
+ C_3      X        X        H_          IT_IJKL       40.0000   31.4000
+ C_3      X        X        H___A       IT_IJKL       40.0000   31.4000
+ C_22     X        X        X           IT_IJKL     1000.0000    0.0000
+ C_21     X        X        X           IT_IJKL     1000.0000    0.0000
+ C_2      X        X        X           IT_IJKL     1000.0000    0.0000
+ C_R2     X        X        X           IT_IJKL     1000.0000    0.0000
+ C_R1     X        X        X           IT_IJKL     1000.0000    0.0000
+ C_R      X        X        X           IT_IJKL     1000.0000    0.0000
+ C_11     X        X        X           IT_IJKL       40.0000   35.2640
+ C_11     X        X        H_          IT_IJKL       40.0000   31.4000
+ C_11     X        X        H___A       IT_IJKL       40.0000   31.4000
+ C_1      X        X        X           IT_IJKL       40.0000   35.2640
+ C_1      X        X        H_          IT_IJKL       40.0000   31.4000
+ C_1      X        X        H___A       IT_IJKL       40.0000   31.4000
+ N_33     X        X        X           IT_IJKL       40.0000   35.2640
+ N_33     X        X        H_          IT_IJKL       40.0000   31.4000
+ N_33     X        X        H___A       IT_IJKL       40.0000   31.4000
+ N_32     X        X        X           IT_IJKL       40.0000   35.2640
+ N_32     X        X        H_          IT_IJKL       40.0000   31.4000
+ N_32     X        X        H___A       IT_IJKL       40.0000   31.4000
+ N_31     X        X        X           IT_IJKL       40.0000   35.2640
+ N_31     X        X        H_          IT_IJKL       40.0000   31.4000
+ N_31     X        X        H___A       IT_IJKL       40.0000   31.4000
+ N_3      X        X        X           IT_IJKL       40.0000   35.2640
+ N_3      X        X        H_          IT_IJKL       40.0000   31.4000
+ N_3      X        X        H___A       IT_IJKL       40.0000   31.4000
+ N_22     X        X        X           IT_IJKL     1000.0000    0.0000
+ N_21     X        X        X           IT_IJKL     1000.0000    0.0000
+ N_2      X        X        X           IT_IJKL     1000.0000    0.0000
+ N_R2     X        X        X           IT_IJKL     1000.0000    0.0000
+ N_R1     X        X        X           IT_IJKL     1000.0000    0.0000
+ N_R      X        X        X           IT_IJKL     1000.0000    0.0000
+ N_1      X        X        X           IT_IJKL       40.0000   35.2640
+ N_1      X        X        H_          IT_IJKL       40.0000   31.4000
+ N_1      X        X        H___A       IT_IJKL       40.0000   31.4000
+ O_32     X        X        X           IT_IJKL       40.0000   35.2640
+ O_32     X        X        H_          IT_IJKL       40.0000   31.4000
+ O_32     X        X        H___A       IT_IJKL       40.0000   31.4000
+ O_31     X        X        X           IT_IJKL       40.0000   35.2640
+ O_31     X        X        H_          IT_IJKL       40.0000   31.4000
+ O_31     X        X        H___A       IT_IJKL       40.0000   31.4000
+ O_3      X        X        X           IT_IJKL       40.0000   35.2640
+ O_3      X        X        H_          IT_IJKL       40.0000   31.4000
+ O_3      X        X        H___A       IT_IJKL       40.0000   31.4000
+ O_2      X        X        X           IT_IJKL     1000.0000    0.0000
+ O_R      X        X        X           IT_IJKL     1000.0000    0.0000
+ O_R1     X        X        X           IT_IJKL     1000.0000    0.0000
+ F_       X        X        X           IT_IJKL       40.0000   35.2640
+ F_       X        X        H_          IT_IJKL       40.0000   31.4000
+ F_       X        X        H___A       IT_IJKL       40.0000   31.4000
+ Na       X        X        X           IT_IJKL       40.0000   35.2640
+ Na       X        X        H_          IT_IJKL       40.0000   31.4000
+ Na       X        X        H___A       IT_IJKL       40.0000   31.4000
+ Al3      X        X        X           IT_IJKL       40.0000   35.2640
+ Al3      X        X        H_          IT_IJKL       40.0000   31.4000
+ Al3      X        X        H___A       IT_IJKL       40.0000   31.4000
+ Si3      X        X        X           IT_IJKL       40.0000   35.2640
+ Si3      X        X        H_          IT_IJKL       40.0000   31.4000
+ Si3      X        X        H___A       IT_IJKL       40.0000   31.4000
+ P_3      X        X        X           IT_IJKL       40.0000   35.2640
+ P_3      X        X        H_          IT_IJKL       40.0000   31.4000
+ P_3      X        X        H___A       IT_IJKL       40.0000   31.4000
+ S_31     X        X        X           IT_IJKL       40.0000   35.2640
+ S_31     X        X        H_          IT_IJKL       40.0000   31.4000
+ S_31     X        X        H___A       IT_IJKL       40.0000   31.4000
+ S_3      X        X        X           IT_IJKL       40.0000   35.2640
+ S_3      X        X        H_          IT_IJKL       40.0000   31.4000
+ S_3      X        X        H___A       IT_IJKL       40.0000   31.4000
+ Cl       X        X        X           IT_IJKL       40.0000   35.2640
+ Cl       X        X        H_          IT_IJKL       40.0000   31.4000
+ Cl       X        X        H___A       IT_IJKL       40.0000   31.4000
+ Ca       X        X        X           IT_IJKL       40.0000   35.2640
+ Ca       X        X        H_          IT_IJKL       40.0000   31.4000
+ Ca       X        X        H___A       IT_IJKL       40.0000   31.4000
+ Fe       X        X        X           IT_IJKL       40.0000   35.2640
+ Fe       X        X        H_          IT_IJKL       40.0000   31.4000
+ Fe       X        X        H___A       IT_IJKL       40.0000   31.4000
+ Zn       X        X        X           IT_IJKL       40.0000   35.2640
+ Zn       X        X        H_          IT_IJKL       40.0000   31.4000
+ Zn       X        X        H___A       IT_IJKL       40.0000   31.4000
+ Br       X        X        X           IT_IJKL       40.0000   35.2640
+ Br       X        X        H_          IT_IJKL       40.0000   31.4000
+ Br       X        X        H___A       IT_IJKL       40.0000   31.4000
+ Ru       X        X        X           IT_IJKL       40.0000   35.2640
+ Ru       X        X        H_          IT_IJKL       40.0000   31.4000
+ Ru       X        X        H___A       IT_IJKL       40.0000   31.4000
+ Ti       X        X        X           IT_IJKL       40.0000   35.2640
+ Ti       X        X        H_          IT_IJKL       40.0000   31.4000
+ Ti       X        X        H___A       IT_IJKL       40.0000   31.4000
+END
+#
+UREY_BRADLEY
+END
+#
+HYDROGEN_BONDS
+ X        X           LJ_12_10     0.9500E+01    2.7500
+ N_33     N_33        LJ_12_10     0.9500E+01    2.7500
+ N_32     N_33        LJ_12_10     0.9500E+01    2.7500
+ N_32     N_32        LJ_12_10     0.9500E+01    2.7500
+ N_31     N_33        LJ_12_10     0.9500E+01    2.7500
+ N_31     N_32        LJ_12_10     0.9500E+01    2.7500
+ N_31     N_31        LJ_12_10     0.9500E+01    2.7500
+ N_3      N_33        LJ_12_10     0.9500E+01    2.7500
+ N_3      N_32        LJ_12_10     0.9500E+01    2.7500
+ N_3      N_31        LJ_12_10     0.9500E+01    2.7500
+ N_3      N_3         LJ_12_10     0.9500E+01    2.7500
+ N_22     N_33        LJ_12_10     0.9500E+01    2.7500
+ N_22     N_32        LJ_12_10     0.9500E+01    2.7500
+ N_22     N_31        LJ_12_10     0.9500E+01    2.7500
+ N_22     N_3         LJ_12_10     0.9500E+01    2.7500
+ N_22     N_22        LJ_12_10     0.9500E+01    2.7500
+ N_21     N_33        LJ_12_10     0.9500E+01    2.7500
+ N_21     N_32        LJ_12_10     0.9500E+01    2.7500
+ N_21     N_31        LJ_12_10     0.9500E+01    2.7500
+ N_21     N_3         LJ_12_10     0.9500E+01    2.7500
+ N_21     N_22        LJ_12_10     0.9500E+01    2.7500
+ N_21     N_21        LJ_12_10     0.9500E+01    2.7500
+ N_2      N_33        LJ_12_10     0.9500E+01    2.7500
+ N_2      N_32        LJ_12_10     0.9500E+01    2.7500
+ N_2      N_31        LJ_12_10     0.9500E+01    2.7500
+ N_2      N_3         LJ_12_10     0.9500E+01    2.7500
+ N_2      N_22        LJ_12_10     0.9500E+01    2.7500
+ N_2      N_21        LJ_12_10     0.9500E+01    2.7500
+ N_2      N_2         LJ_12_10     0.9500E+01    2.7500
+ N_R2     N_33        LJ_12_10     0.9500E+01    2.7500
+ N_R2     N_32        LJ_12_10     0.9500E+01    2.7500
+ N_R2     N_31        LJ_12_10     0.9500E+01    2.7500
+ N_R2     N_3         LJ_12_10     0.9500E+01    2.7500
+ N_R2     N_22        LJ_12_10     0.9500E+01    2.7500
+ N_R2     N_21        LJ_12_10     0.9500E+01    2.7500
+ N_R2     N_2         LJ_12_10     0.9500E+01    2.7500
+ N_R2     N_R2        LJ_12_10     0.9500E+01    2.7500
+ N_R1     N_33        LJ_12_10     0.9500E+01    2.7500
+ N_R1     N_32        LJ_12_10     0.9500E+01    2.7500
+ N_R1     N_31        LJ_12_10     0.9500E+01    2.7500
+ N_R1     N_3         LJ_12_10     0.9500E+01    2.7500
+ N_R1     N_22        LJ_12_10     0.9500E+01    2.7500
+ N_R1     N_21        LJ_12_10     0.9500E+01    2.7500
+ N_R1     N_2         LJ_12_10     0.9500E+01    2.7500
+ N_R1     N_R2        LJ_12_10     0.9500E+01    2.7500
+ N_R1     N_R1        LJ_12_10     0.9500E+01    2.7500
+ N_R      N_33        LJ_12_10     0.9500E+01    2.7500
+ N_R      N_32        LJ_12_10     0.9500E+01    2.7500
+ N_R      N_31        LJ_12_10     0.9500E+01    2.7500
+ N_R      N_3         LJ_12_10     0.9500E+01    2.7500
+ N_R      N_22        LJ_12_10     0.9500E+01    2.7500
+ N_R      N_21        LJ_12_10     0.9500E+01    2.7500
+ N_R      N_2         LJ_12_10     0.9500E+01    2.7500
+ N_R      N_R2        LJ_12_10     0.9500E+01    2.7500
+ N_R      N_R1        LJ_12_10     0.9500E+01    2.7500
+ N_R      N_R         LJ_12_10     0.9500E+01    2.7500
+ N_1      N_33        LJ_12_10     0.9500E+01    2.7500
+ N_1      N_32        LJ_12_10     0.9500E+01    2.7500
+ N_1      N_31        LJ_12_10     0.9500E+01    2.7500
+ N_1      N_3         LJ_12_10     0.9500E+01    2.7500
+ N_1      N_22        LJ_12_10     0.9500E+01    2.7500
+ N_1      N_21        LJ_12_10     0.9500E+01    2.7500
+ N_1      N_2         LJ_12_10     0.9500E+01    2.7500
+ N_1      N_R2        LJ_12_10     0.9500E+01    2.7500
+ N_1      N_R1        LJ_12_10     0.9500E+01    2.7500
+ N_1      N_R         LJ_12_10     0.9500E+01    2.7500
+ N_1      N_1         LJ_12_10     0.9500E+01    2.7500
+ O_32     N_33        LJ_12_10     0.9500E+01    2.7500
+ O_32     N_32        LJ_12_10     0.9500E+01    2.7500
+ O_32     N_31        LJ_12_10     0.9500E+01    2.7500
+ O_32     N_3         LJ_12_10     0.9500E+01    2.7500
+ O_32     N_22        LJ_12_10     0.9500E+01    2.7500
+ O_32     N_21        LJ_12_10     0.9500E+01    2.7500
+ O_32     N_2         LJ_12_10     0.9500E+01    2.7500
+ O_32     N_R2        LJ_12_10     0.9500E+01    2.7500
+ O_32     N_R1        LJ_12_10     0.9500E+01    2.7500
+ O_32     N_R         LJ_12_10     0.9500E+01    2.7500
+ O_32     N_1         LJ_12_10     0.9500E+01    2.7500
+ O_32     O_32        LJ_12_10     0.9500E+01    2.7500
+ O_31     N_33        LJ_12_10     0.9500E+01    2.7500
+ O_31     N_32        LJ_12_10     0.9500E+01    2.7500
+ O_31     N_31        LJ_12_10     0.9500E+01    2.7500
+ O_31     N_3         LJ_12_10     0.9500E+01    2.7500
+ O_31     N_22        LJ_12_10     0.9500E+01    2.7500
+ O_31     N_21        LJ_12_10     0.9500E+01    2.7500
+ O_31     N_2         LJ_12_10     0.9500E+01    2.7500
+ O_31     N_R2        LJ_12_10     0.9500E+01    2.7500
+ O_31     N_R1        LJ_12_10     0.9500E+01    2.7500
+ O_31     N_R         LJ_12_10     0.9500E+01    2.7500
+ O_31     N_1         LJ_12_10     0.9500E+01    2.7500
+ O_31     O_32        LJ_12_10     0.9500E+01    2.7500
+ O_31     O_31        LJ_12_10     0.9500E+01    2.7500
+ O_3      N_33        LJ_12_10     0.9500E+01    2.7500
+ O_3      N_32        LJ_12_10     0.9500E+01    2.7500
+ O_3      N_31        LJ_12_10     0.9500E+01    2.7500
+ O_3      N_3         LJ_12_10     0.9500E+01    2.7500
+ O_3      N_22        LJ_12_10     0.9500E+01    2.7500
+ O_3      N_21        LJ_12_10     0.9500E+01    2.7500
+ O_3      N_2         LJ_12_10     0.9500E+01    2.7500
+ O_3      N_R2        LJ_12_10     0.9500E+01    2.7500
+ O_3      N_R1        LJ_12_10     0.9500E+01    2.7500
+ O_3      N_R         LJ_12_10     0.9500E+01    2.7500
+ O_3      N_1         LJ_12_10     0.9500E+01    2.7500
+ O_3      O_32        LJ_12_10     0.9500E+01    2.7500
+ O_3      O_31        LJ_12_10     0.9500E+01    2.7500
+ O_3      O_3         LJ_12_10     0.9500E+01    2.7500
+ O_2      N_33        LJ_12_10     0.9500E+01    2.7500
+ O_2      N_32        LJ_12_10     0.9500E+01    2.7500
+ O_2      N_31        LJ_12_10     0.9500E+01    2.7500
+ O_2      N_3         LJ_12_10     0.9500E+01    2.7500
+ O_2      N_22        LJ_12_10     0.9500E+01    2.7500
+ O_2      N_21        LJ_12_10     0.9500E+01    2.7500
+ O_2      N_2         LJ_12_10     0.9500E+01    2.7500
+ O_2      N_R2        LJ_12_10     0.9500E+01    2.7500
+ O_2      N_R1        LJ_12_10     0.9500E+01    2.7500
+ O_2      N_R         LJ_12_10     0.9500E+01    2.7500
+ O_2      N_1         LJ_12_10     0.9500E+01    2.7500
+ O_2      O_32        LJ_12_10     0.9500E+01    2.7500
+ O_2      O_31        LJ_12_10     0.9500E+01    2.7500
+ O_2      O_3         LJ_12_10     0.9500E+01    2.7500
+ O_2      O_2         LJ_12_10     0.9500E+01    2.7500
+ O_R      N_33        LJ_12_10     0.9500E+01    2.7500
+ O_R      N_32        LJ_12_10     0.9500E+01    2.7500
+ O_R      N_31        LJ_12_10     0.9500E+01    2.7500
+ O_R      N_3         LJ_12_10     0.9500E+01    2.7500
+ O_R      N_22        LJ_12_10     0.9500E+01    2.7500
+ O_R      N_21        LJ_12_10     0.9500E+01    2.7500
+ O_R      N_2         LJ_12_10     0.9500E+01    2.7500
+ O_R      N_R2        LJ_12_10     0.9500E+01    2.7500
+ O_R      N_R1        LJ_12_10     0.9500E+01    2.7500
+ O_R      N_R         LJ_12_10     0.9500E+01    2.7500
+ O_R      N_1         LJ_12_10     0.9500E+01    2.7500
+ O_R      O_32        LJ_12_10     0.9500E+01    2.7500
+ O_R      O_31        LJ_12_10     0.9500E+01    2.7500
+ O_R      O_3         LJ_12_10     0.9500E+01    2.7500
+ O_R      O_2         LJ_12_10     0.9500E+01    2.7500
+ O_R      O_R         LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_33        LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_32        LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_31        LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_3         LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_22        LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_21        LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_2         LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_R2        LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_R1        LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_R         LJ_12_10     0.9500E+01    2.7500
+ O_R1     N_1         LJ_12_10     0.9500E+01    2.7500
+ O_R1     O_32        LJ_12_10     0.9500E+01    2.7500
+ O_R1     O_31        LJ_12_10     0.9500E+01    2.7500
+ O_R1     O_3         LJ_12_10     0.9500E+01    2.7500
+ O_R1     O_2         LJ_12_10     0.9500E+01    2.7500
+ O_R1     O_R         LJ_12_10     0.9500E+01    2.7500
+ O_R1     O_R1        LJ_12_10     0.9500E+01    2.7500
+ F_       N_33        LJ_12_10     0.9500E+01    2.7500
+ F_       N_32        LJ_12_10     0.9500E+01    2.7500
+ F_       N_31        LJ_12_10     0.9500E+01    2.7500
+ F_       N_3         LJ_12_10     0.9500E+01    2.7500
+ F_       N_22        LJ_12_10     0.9500E+01    2.7500
+ F_       N_21        LJ_12_10     0.9500E+01    2.7500
+ F_       N_2         LJ_12_10     0.9500E+01    2.7500
+ F_       N_R2        LJ_12_10     0.9500E+01    2.7500
+ F_       N_R1        LJ_12_10     0.9500E+01    2.7500
+ F_       N_R         LJ_12_10     0.9500E+01    2.7500
+ F_       N_1         LJ_12_10     0.9500E+01    2.7500
+ F_       O_32        LJ_12_10     0.9500E+01    2.7500
+ F_       O_31        LJ_12_10     0.9500E+01    2.7500
+ F_       O_3         LJ_12_10     0.9500E+01    2.7500
+ F_       O_2         LJ_12_10     0.9500E+01    2.7500
+ F_       O_R         LJ_12_10     0.9500E+01    2.7500
+ F_       O_R1        LJ_12_10     0.9500E+01    2.7500
+ F_       F_          LJ_12_10     0.9500E+01    2.7500
+ Na       N_33        LJ_12_10     0.9500E+01    2.7500
+ Na       N_32        LJ_12_10     0.9500E+01    2.7500
+ Na       N_31        LJ_12_10     0.9500E+01    2.7500
+ Na       N_3         LJ_12_10     0.9500E+01    2.7500
+ Na       N_22        LJ_12_10     0.9500E+01    2.7500
+ Na       N_21        LJ_12_10     0.9500E+01    2.7500
+ Na       N_2         LJ_12_10     0.9500E+01    2.7500
+ Na       N_R2        LJ_12_10     0.9500E+01    2.7500
+ Na       N_R1        LJ_12_10     0.9500E+01    2.7500
+ Na       N_R         LJ_12_10     0.9500E+01    2.7500
+ Na       N_1         LJ_12_10     0.9500E+01    2.7500
+ Na       O_32        LJ_12_10     0.9500E+01    2.7500
+ Na       O_31        LJ_12_10     0.9500E+01    2.7500
+ Na       O_3         LJ_12_10     0.9500E+01    2.7500
+ Na       O_2         LJ_12_10     0.9500E+01    2.7500
+ Na       O_R         LJ_12_10     0.9500E+01    2.7500
+ Na       O_R1        LJ_12_10     0.9500E+01    2.7500
+ Na       F_          LJ_12_10     0.9500E+01    2.7500
+ Na       Na          LJ_12_10     0.9500E+01    2.7500
+ Al3      N_33        LJ_12_10     0.9500E+01    2.7500
+ Al3      N_32        LJ_12_10     0.9500E+01    2.7500
+ Al3      N_31        LJ_12_10     0.9500E+01    2.7500
+ Al3      N_3         LJ_12_10     0.9500E+01    2.7500
+ Al3      N_22        LJ_12_10     0.9500E+01    2.7500
+ Al3      N_21        LJ_12_10     0.9500E+01    2.7500
+ Al3      N_2         LJ_12_10     0.9500E+01    2.7500
+ Al3      N_R2        LJ_12_10     0.9500E+01    2.7500
+ Al3      N_R1        LJ_12_10     0.9500E+01    2.7500
+ Al3      N_R         LJ_12_10     0.9500E+01    2.7500
+ Al3      N_1         LJ_12_10     0.9500E+01    2.7500
+ Al3      O_32        LJ_12_10     0.9500E+01    2.7500
+ Al3      O_31        LJ_12_10     0.9500E+01    2.7500
+ Al3      O_3         LJ_12_10     0.9500E+01    2.7500
+ Al3      O_2         LJ_12_10     0.9500E+01    2.7500
+ Al3      O_R         LJ_12_10     0.9500E+01    2.7500
+ Al3      O_R1        LJ_12_10     0.9500E+01    2.7500
+ Al3      F_          LJ_12_10     0.9500E+01    2.7500
+ Al3      Na          LJ_12_10     0.9500E+01    2.7500
+ Al3      Al3         LJ_12_10     0.9500E+01    2.7500
+ Si3      N_33        LJ_12_10     0.9500E+01    2.7500
+ Si3      N_32        LJ_12_10     0.9500E+01    2.7500
+ Si3      N_31        LJ_12_10     0.9500E+01    2.7500
+ Si3      N_3         LJ_12_10     0.9500E+01    2.7500
+ Si3      N_22        LJ_12_10     0.9500E+01    2.7500
+ Si3      N_21        LJ_12_10     0.9500E+01    2.7500
+ Si3      N_2         LJ_12_10     0.9500E+01    2.7500
+ Si3      N_R2        LJ_12_10     0.9500E+01    2.7500
+ Si3      N_R1        LJ_12_10     0.9500E+01    2.7500
+ Si3      N_R         LJ_12_10     0.9500E+01    2.7500
+ Si3      N_1         LJ_12_10     0.9500E+01    2.7500
+ Si3      O_32        LJ_12_10     0.9500E+01    2.7500
+ Si3      O_31        LJ_12_10     0.9500E+01    2.7500
+ Si3      O_3         LJ_12_10     0.9500E+01    2.7500
+ Si3      O_2         LJ_12_10     0.9500E+01    2.7500
+ Si3      O_R         LJ_12_10     0.9500E+01    2.7500
+ Si3      O_R1        LJ_12_10     0.9500E+01    2.7500
+ Si3      F_          LJ_12_10     0.9500E+01    2.7500
+ Si3      Na          LJ_12_10     0.9500E+01    2.7500
+ Si3      Al3         LJ_12_10     0.9500E+01    2.7500
+ Si3      Si3         LJ_12_10     0.9500E+01    2.7500
+ P_3      N_33        LJ_12_10     0.9500E+01    2.7500
+ P_3      N_32        LJ_12_10     0.9500E+01    2.7500
+ P_3      N_31        LJ_12_10     0.9500E+01    2.7500
+ P_3      N_3         LJ_12_10     0.9500E+01    2.7500
+ P_3      N_22        LJ_12_10     0.9500E+01    2.7500
+ P_3      N_21        LJ_12_10     0.9500E+01    2.7500
+ P_3      N_2         LJ_12_10     0.9500E+01    2.7500
+ P_3      N_R2        LJ_12_10     0.9500E+01    2.7500
+ P_3      N_R1        LJ_12_10     0.9500E+01    2.7500
+ P_3      N_R         LJ_12_10     0.9500E+01    2.7500
+ P_3      N_1         LJ_12_10     0.9500E+01    2.7500
+ P_3      O_32        LJ_12_10     0.9500E+01    2.7500
+ P_3      O_31        LJ_12_10     0.9500E+01    2.7500
+ P_3      O_3         LJ_12_10     0.9500E+01    2.7500
+ P_3      O_2         LJ_12_10     0.9500E+01    2.7500
+ P_3      O_R         LJ_12_10     0.9500E+01    2.7500
+ P_3      O_R1        LJ_12_10     0.9500E+01    2.7500
+ P_3      F_          LJ_12_10     0.9500E+01    2.7500
+ P_3      Na          LJ_12_10     0.9500E+01    2.7500
+ P_3      Al3         LJ_12_10     0.9500E+01    2.7500
+ P_3      Si3         LJ_12_10     0.9500E+01    2.7500
+ P_3      P_3         LJ_12_10     0.9500E+01    2.7500
+ S_31     N_33        LJ_12_10     0.9500E+01    2.7500
+ S_31     N_32        LJ_12_10     0.9500E+01    2.7500
+ S_31     N_31        LJ_12_10     0.9500E+01    2.7500
+ S_31     N_3         LJ_12_10     0.9500E+01    2.7500
+ S_31     N_22        LJ_12_10     0.9500E+01    2.7500
+ S_31     N_21        LJ_12_10     0.9500E+01    2.7500
+ S_31     N_2         LJ_12_10     0.9500E+01    2.7500
+ S_31     N_R2        LJ_12_10     0.9500E+01    2.7500
+ S_31     N_R1        LJ_12_10     0.9500E+01    2.7500
+ S_31     N_R         LJ_12_10     0.9500E+01    2.7500
+ S_31     N_1         LJ_12_10     0.9500E+01    2.7500
+ S_31     O_32        LJ_12_10     0.9500E+01    2.7500
+ S_31     O_31        LJ_12_10     0.9500E+01    2.7500
+ S_31     O_3         LJ_12_10     0.9500E+01    2.7500
+ S_31     O_2         LJ_12_10     0.9500E+01    2.7500
+ S_31     O_R         LJ_12_10     0.9500E+01    2.7500
+ S_31     O_R1        LJ_12_10     0.9500E+01    2.7500
+ S_31     F_          LJ_12_10     0.9500E+01    2.7500
+ S_31     Na          LJ_12_10     0.9500E+01    2.7500
+ S_31     Al3         LJ_12_10     0.9500E+01    2.7500
+ S_31     Si3         LJ_12_10     0.9500E+01    2.7500
+ S_31     P_3         LJ_12_10     0.9500E+01    2.7500
+ S_31     S_31        LJ_12_10     0.9500E+01    2.7500
+ S_3      N_33        LJ_12_10     0.9500E+01    2.7500
+ S_3      N_32        LJ_12_10     0.9500E+01    2.7500
+ S_3      N_31        LJ_12_10     0.9500E+01    2.7500
+ S_3      N_3         LJ_12_10     0.9500E+01    2.7500
+ S_3      N_22        LJ_12_10     0.9500E+01    2.7500
+ S_3      N_21        LJ_12_10     0.9500E+01    2.7500
+ S_3      N_2         LJ_12_10     0.9500E+01    2.7500
+ S_3      N_R2        LJ_12_10     0.9500E+01    2.7500
+ S_3      N_R1        LJ_12_10     0.9500E+01    2.7500
+ S_3      N_R         LJ_12_10     0.9500E+01    2.7500
+ S_3      N_1         LJ_12_10     0.9500E+01    2.7500
+ S_3      O_32        LJ_12_10     0.9500E+01    2.7500
+ S_3      O_31        LJ_12_10     0.9500E+01    2.7500
+ S_3      O_3         LJ_12_10     0.9500E+01    2.7500
+ S_3      O_2         LJ_12_10     0.9500E+01    2.7500
+ S_3      O_R         LJ_12_10     0.9500E+01    2.7500
+ S_3      O_R1        LJ_12_10     0.9500E+01    2.7500
+ S_3      F_          LJ_12_10     0.9500E+01    2.7500
+ S_3      Na          LJ_12_10     0.9500E+01    2.7500
+ S_3      Al3         LJ_12_10     0.9500E+01    2.7500
+ S_3      Si3         LJ_12_10     0.9500E+01    2.7500
+ S_3      P_3         LJ_12_10     0.9500E+01    2.7500
+ S_3      S_31        LJ_12_10     0.9500E+01    2.7500
+ S_3      S_3         LJ_12_10     0.9500E+01    2.7500
+ Fe       N_33        LJ_12_10     0.9500E+01    2.7500
+ Fe       N_32        LJ_12_10     0.9500E+01    2.7500
+ Fe       N_31        LJ_12_10     0.9500E+01    2.7500
+ Fe       N_3         LJ_12_10     0.9500E+01    2.7500
+ Fe       N_22        LJ_12_10     0.9500E+01    2.7500
+ Fe       N_21        LJ_12_10     0.9500E+01    2.7500
+ Fe       N_2         LJ_12_10     0.9500E+01    2.7500
+ Fe       N_R2        LJ_12_10     0.9500E+01    2.7500
+ Fe       N_R1        LJ_12_10     0.9500E+01    2.7500
+ Fe       N_R         LJ_12_10     0.9500E+01    2.7500
+ Fe       N_1         LJ_12_10     0.9500E+01    2.7500
+ Fe       O_32        LJ_12_10     0.9500E+01    2.7500
+ Fe       O_31        LJ_12_10     0.9500E+01    2.7500
+ Fe       O_3         LJ_12_10     0.9500E+01    2.7500
+ Fe       O_2         LJ_12_10     0.9500E+01    2.7500
+ Fe       O_R         LJ_12_10     0.9500E+01    2.7500
+ Fe       O_R1        LJ_12_10     0.9500E+01    2.7500
+ Fe       F_          LJ_12_10     0.9500E+01    2.7500
+ Fe       Na          LJ_12_10     0.9500E+01    2.7500
+ Fe       Al3         LJ_12_10     0.9500E+01    2.7500
+ Fe       Si3         LJ_12_10     0.9500E+01    2.7500
+ Fe       P_3         LJ_12_10     0.9500E+01    2.7500
+ Fe       S_31        LJ_12_10     0.9500E+01    2.7500
+ Fe       S_3         LJ_12_10     0.9500E+01    2.7500
+ Fe       Fe          LJ_12_10     0.9500E+01    2.7500
+ Zn       N_33        LJ_12_10     0.9500E+01    2.7500
+ Zn       N_32        LJ_12_10     0.9500E+01    2.7500
+ Zn       N_31        LJ_12_10     0.9500E+01    2.7500
+ Zn       N_3         LJ_12_10     0.9500E+01    2.7500
+ Zn       N_22        LJ_12_10     0.9500E+01    2.7500
+ Zn       N_21        LJ_12_10     0.9500E+01    2.7500
+ Zn       N_2         LJ_12_10     0.9500E+01    2.7500
+ Zn       N_R2        LJ_12_10     0.9500E+01    2.7500
+ Zn       N_R1        LJ_12_10     0.9500E+01    2.7500
+ Zn       N_R         LJ_12_10     0.9500E+01    2.7500
+ Zn       N_1         LJ_12_10     0.9500E+01    2.7500
+ Zn       O_32        LJ_12_10     0.9500E+01    2.7500
+ Zn       O_31        LJ_12_10     0.9500E+01    2.7500
+ Zn       O_3         LJ_12_10     0.9500E+01    2.7500
+ Zn       O_2         LJ_12_10     0.9500E+01    2.7500
+ Zn       O_R         LJ_12_10     0.9500E+01    2.7500
+ Zn       O_R1        LJ_12_10     0.9500E+01    2.7500
+ Zn       F_          LJ_12_10     0.9500E+01    2.7500
+ Zn       Na          LJ_12_10     0.9500E+01    2.7500
+ Zn       Al3         LJ_12_10     0.9500E+01    2.7500
+ Zn       Si3         LJ_12_10     0.9500E+01    2.7500
+ Zn       P_3         LJ_12_10     0.9500E+01    2.7500
+ Zn       S_31        LJ_12_10     0.9500E+01    2.7500
+ Zn       S_3         LJ_12_10     0.9500E+01    2.7500
+ Zn       Fe          LJ_12_10     0.9500E+01    2.7500
+ Zn       Zn          LJ_12_10     0.9500E+01    2.7500
+ Br       N_33        LJ_12_10     0.9500E+01    2.7500
+ Br       N_32        LJ_12_10     0.9500E+01    2.7500
+ Br       N_31        LJ_12_10     0.9500E+01    2.7500
+ Br       N_3         LJ_12_10     0.9500E+01    2.7500
+ Br       N_22        LJ_12_10     0.9500E+01    2.7500
+ Br       N_21        LJ_12_10     0.9500E+01    2.7500
+ Br       N_2         LJ_12_10     0.9500E+01    2.7500
+ Br       N_R2        LJ_12_10     0.9500E+01    2.7500
+ Br       N_R1        LJ_12_10     0.9500E+01    2.7500
+ Br       N_R         LJ_12_10     0.9500E+01    2.7500
+ Br       N_1         LJ_12_10     0.9500E+01    2.7500
+ Br       O_32        LJ_12_10     0.9500E+01    2.7500
+ Br       O_31        LJ_12_10     0.9500E+01    2.7500
+ Br       O_3         LJ_12_10     0.9500E+01    2.7500
+ Br       O_2         LJ_12_10     0.9500E+01    2.7500
+ Br       O_R         LJ_12_10     0.9500E+01    2.7500
+ Br       O_R1        LJ_12_10     0.9500E+01    2.7500
+ Br       F_          LJ_12_10     0.9500E+01    2.7500
+ Br       Na          LJ_12_10     0.9500E+01    2.7500
+ Br       Al3         LJ_12_10     0.9500E+01    2.7500
+ Br       Si3         LJ_12_10     0.9500E+01    2.7500
+ Br       P_3         LJ_12_10     0.9500E+01    2.7500
+ Br       S_31        LJ_12_10     0.9500E+01    2.7500
+ Br       S_3         LJ_12_10     0.9500E+01    2.7500
+ Br       Fe          LJ_12_10     0.9500E+01    2.7500
+ Br       Zn          LJ_12_10     0.9500E+01    2.7500
+ Br       Br          LJ_12_10     0.9500E+01    2.7500
+ Ru       N_33        LJ_12_10     0.9500E+01    2.7500
+ Ru       N_32        LJ_12_10     0.9500E+01    2.7500
+ Ru       N_31        LJ_12_10     0.9500E+01    2.7500
+ Ru       N_3         LJ_12_10     0.9500E+01    2.7500
+ Ru       N_22        LJ_12_10     0.9500E+01    2.7500
+ Ru       N_21        LJ_12_10     0.9500E+01    2.7500
+ Ru       N_2         LJ_12_10     0.9500E+01    2.7500
+ Ru       N_R2        LJ_12_10     0.9500E+01    2.7500
+ Ru       N_R1        LJ_12_10     0.9500E+01    2.7500
+ Ru       N_R         LJ_12_10     0.9500E+01    2.7500
+ Ru       N_1         LJ_12_10     0.9500E+01    2.7500
+ Ru       O_32        LJ_12_10     0.9500E+01    2.7500
+ Ru       O_31        LJ_12_10     0.9500E+01    2.7500
+ Ru       O_3         LJ_12_10     0.9500E+01    2.7500
+ Ru       O_2         LJ_12_10     0.9500E+01    2.7500
+ Ru       O_R         LJ_12_10     0.9500E+01    2.7500
+ Ru       O_R1        LJ_12_10     0.9500E+01    2.7500
+ Ru       F_          LJ_12_10     0.9500E+01    2.7500
+ Ru       Na          LJ_12_10     0.9500E+01    2.7500
+ Ru       Al3         LJ_12_10     0.9500E+01    2.7500
+ Ru       Si3         LJ_12_10     0.9500E+01    2.7500
+ Ru       P_3         LJ_12_10     0.9500E+01    2.7500
+ Ru       S_31        LJ_12_10     0.9500E+01    2.7500
+ Ru       S_3         LJ_12_10     0.9500E+01    2.7500
+ Ru       Fe          LJ_12_10     0.9500E+01    2.7500
+ Ru       Zn          LJ_12_10     0.9500E+01    2.7500
+ Ru       Br          LJ_12_10     0.9500E+01    2.7500
+ Ru       Ru          LJ_12_10     0.9500E+01    2.7500
+ Ti       N_33        LJ_12_10     0.9500E+01    2.7500
+ Ti       N_32        LJ_12_10     0.9500E+01    2.7500
+ Ti       N_31        LJ_12_10     0.9500E+01    2.7500
+ Ti       N_3         LJ_12_10     0.9500E+01    2.7500
+ Ti       N_22        LJ_12_10     0.9500E+01    2.7500
+ Ti       N_21        LJ_12_10     0.9500E+01    2.7500
+ Ti       N_2         LJ_12_10     0.9500E+01    2.7500
+ Ti       N_R2        LJ_12_10     0.9500E+01    2.7500
+ Ti       N_R1        LJ_12_10     0.9500E+01    2.7500
+ Ti       N_R         LJ_12_10     0.9500E+01    2.7500
+ Ti       N_1         LJ_12_10     0.9500E+01    2.7500
+ Ti       O_32        LJ_12_10     0.9500E+01    2.7500
+ Ti       O_31        LJ_12_10     0.9500E+01    2.7500
+ Ti       O_3         LJ_12_10     0.9500E+01    2.7500
+ Ti       O_2         LJ_12_10     0.9500E+01    2.7500
+ Ti       O_R         LJ_12_10     0.9500E+01    2.7500
+ Ti       O_R1        LJ_12_10     0.9500E+01    2.7500
+ Ti       F_          LJ_12_10     0.9500E+01    2.7500
+ Ti       Na          LJ_12_10     0.9500E+01    2.7500
+ Ti       Al3         LJ_12_10     0.9500E+01    2.7500
+ Ti       Si3         LJ_12_10     0.9500E+01    2.7500
+ Ti       P_3         LJ_12_10     0.9500E+01    2.7500
+ Ti       S_31        LJ_12_10     0.9500E+01    2.7500
+ Ti       S_3         LJ_12_10     0.9500E+01    2.7500
+ Ti       Fe          LJ_12_10     0.9500E+01    2.7500
+ Ti       Zn          LJ_12_10     0.9500E+01    2.7500
+ Ti       Br          LJ_12_10     0.9500E+01    2.7500
+ Ti       Ru          LJ_12_10     0.9500E+01    2.7500
+ Ti       Ti          LJ_12_10     0.9500E+01    2.7500
+END
+#
+GENERATOR
+END

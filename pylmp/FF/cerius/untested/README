@@ -1,0 +1,15 @@
+HEADER
+**************************************************************************
+ 
+			    IMPORTANT NOTICE
+
+The parameter  files in this  directory are supplied as a convenience to
+our customers and are not officially supported by MSI.
+
+The parameters  contained in these files have been taken from literature
+references.  These files are not complete  implementations  of the force
+fields, and are only intended as examples of how  parameters  from other
+force fields can be used in Cerius2.
+
+**************************************************************************
+END

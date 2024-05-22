@@ -1,0 +1,112 @@
+#
+# Resource File for XCluster.
+# Copyright 1993.  Columbia University.
+#
+# Major Background Color
+XCluster*background:      wheat2
+XCluster*foreground:      black
+XCluster*threshform.background: wheat2
+XCluster*MacroModel Help*background:    wheat2
+
+# Fonts.
+XCluster*fontList: -adobe-times-bold-r-normal--14-*
+XCluster*MosaicBox*XmText*fontList: -adobe-courier-medium-r-normal-*-11-*
+XCluster*MapLabel.fontList: -adobe-courier-medium-r-normal-*-11-*
+XCluster*BarMinText.fontList: -adobe-courier-medium-r-normal-*-11-*
+XCluster*BarMaxText.fontList: -adobe-courier-medium-r-normal-*-11-*
+XCluster*MessageText.fontList: -adobe-courier-medium-r-normal-*-14-*
+XCluster*MacroModel Help*scrolled help text.fontList: -adobe-courier-medium-r-normal-*-14-*
+XCluster*MacroModel Help*scrolled help text.rows: 24
+XCluster*torsionpickerform*XmList*fontList: -adobe-courier-medium-r-normal-*-14-*
+XCluster*torsionpickerform*XmText*fontList: -adobe-courier-medium-r-normal-*-14-*
+XCluster*atompickerform*XmList*fontList: -adobe-courier-medium-r-normal-*-14-*
+XCluster*atompickerform*XmText*fontList: -adobe-courier-medium-r-normal-*-14-*
+
+#  Focus Policy should be set to "pointer"
+XCluster*keyboardFocusPolicy: pointer
+
+# Distance Map colors.  Col0 is lowest value -> Col9 is the highest.
+XCluster*Col0:  DarkViolet
+XCluster*Col1:  BlueViolet
+XCluster*Col2:  Blue
+XCluster*Col3:  cyan
+XCluster*Col4:  green
+XCluster*Col5:  GreenYellow
+XCluster*Col6:  yellow
+XCluster*Col7:  Orange
+XCluster*Col8:  IndianRed
+XCluster*Col9:  Red
+
+# The color of the "crosshair" in the mosaic panel.
+XCluster*MosaicDA*foreground:	yellow
+
+# The about box drawing area
+XCluster*aboutda*background: white
+XCluster*aboutda*foreground: cornflowerblue
+XCluster*aboutda*width:	400 
+XCluster*aboutda*height:	200 
+
+
+# All editable text is "tan"
+XCluster*FileForm*XmText*background: tan
+XCluster*CommentForm*XmText*background: tan
+XCluster*threshform*XmText*background: tan
+XCluster*FileSelection*XmText*background: tan
+XCluster*PlotBox*XmText*background: tan
+XCluster*MapBox*XmText*background: tan
+XCluster*atompickerform*XmText*background: tan
+XCluster*torsionpickerform*XmText*background: tan
+XCluster*writedstform*XmText*background: tan
+XCluster*writeclsform*XmText*background: tan
+XCluster*writemapform*XmText*background: tan
+XCluster*MacroModel Help*XmText.background:    tan
+XCluster*PromptBox*XmText.background:    tan
+XCluster*SymForm*XmText.background:    tan
+
+# All push buttons are "tan".
+XCluster*XmToggleButtonGadget*selectColor: tan
+XCluster*DMatrixForm*XmPushButton.background: tan
+XCluster*FileForm*XmPushButton.background: tan
+XCluster*CommandButtonFrame*XmPushButton*background: tan
+XCluster*menubar*background: tan
+XCluster*threshform*XmPushButton*background: tan
+XCluster*MapBox*XmPushButton*background: tan
+XCluster*MosaicBox*XmPushButton*background: tan
+XCluster*PlotBox*XmPushButton*background: tan
+XCluster*writeclsform*XmPushButton*background: tan
+XCluster*writedstform*XmPushButton*background: tan
+XCluster*writemapform*XmPushButton*background: tan
+XCluster*MacroModel Help*XmPushButton*background:    tan
+XCluster*PromptBox*XmPushButton*background:    tan
+XCluster*PromptBox*XmToggleButtonGadget*selectColor: tan
+XCluster*AskDialog*XmPushButton*background:	tan
+XCluster*AboutBox*XmPushButton*background:	tan
+
+# All non-editable text and lists are "antiquewhite2".
+XCluster*ProgressFrame*background: 	antiquewhite2
+XCluster*MessageText*background:	antiquewhite2
+XCluster*MapBox*MapLabel*background: antiquewhite2
+XCluster*MapBox*BarMinText*background: antiquewhite2
+XCluster*MapBox*BarMaxText*background: antiquewhite2
+XCluster*MosaicBox*XmText*background: antiquewhite2
+XCluster*atompickerform*XmList*background: antiquewhite2
+XCluster*torsionpickerform*XmList*background: antiquewhite2
+XCluster*MacroModel Help*scrolled help text.background:    antiquewhite2
+XCluster*MacroModel Help*XmList*background:    antiquewhite2
+
+#Label fonts
+XCluster*StatisticsPlot*legendfont: -*-courier-medium-r-*-*-14-100-*-*-*-*-*-*
+XCluster*StatisticsPlot*axislabelfont: -*-courier-bold-r-*-*-14-100-*-*-*-*-*-*
+XCluster*StatisticsPlot*ticklabelfont: -*-courier-medium-r-*-*-14-100-*-*-*-*-*-*
+
+# PostScript Fonts and Sizes
+XCluster*StatisticsPlot*legendPSfont: Times-Roman
+XCluster*StatisticsPlot*axislabelPSfont: Times-Bold
+XCluster*StatisticsPlot*ticklabelPSfont: Times-Roman
+XCluster*StatisticsPlot*titlePSfont: Times-Bold
+# These are PostScript output fonts; not affected by screen resolution:
+XCluster*StatisticsPlot*legendPSsize: 12
+XCluster*StatisticsPlot*axislabelPSsize: 12
+XCluster*StatisticsPlot*ticklabelPSsize: 12
+XCluster*StatisticsPlot*titlePSsize: 18
+

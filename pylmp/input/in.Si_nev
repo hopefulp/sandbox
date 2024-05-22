@@ -1,0 +1,29 @@
+units           metal
+newton          on
+dimension       3
+boundary        p p p
+atom_style 	atomic  
+
+neighbor        2.0 bin
+neigh_modify    delay 5 every 1 check no
+
+read_data coo   
+                                       
+                                       
+pair_style nn  
+pair_coeff * * potential   Si
+mass 1 28.0855
+compute 	_rg all gyration             
+
+timestep        0.002
+velocity        all create 2000 1 dist gaussian
+fix             my_nvt all  nve
+
+
+dump dMovie all custom 10 Si_MD.dump id  x y z vx vy vz fx fy fz
+dump_modify  dMovie  sort  id
+variable E equal etotal
+variable Step equal step
+fix E_print all print 10 "Step ${Step} Total energy $E" file total_e.dat
+run             5000
+write_data      coo_after_MD.dat

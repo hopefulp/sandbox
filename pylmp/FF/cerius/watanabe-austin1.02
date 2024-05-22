@@ -1,0 +1,109 @@
+VERSION
+ CERIUS2   1
+END
+#
+HEADER
+**********************************************************************
+           A force field specifically parametrized for
+  Oxygen, Nitrogen and Argon adsorption in Zeolite Types A, X and Y.
+                                                   
+                              by                           
+
+          K. Watanabe, N. Austin and M.R. Stapleton
+          Molecular Simulation, 1995, Vol. 15, pp 197-221
+
+                  PROPRIETARY AND CONFIDENTIAL
+       Copyright (c) 2001, Accelrys Inc. All rights reserved
+**********************************************************************
+END
+#
+PREFERENCES
+ HYDROGEN_BONDS                        F
+ BONDS                                 F
+ ANGLES                                F
+ TORSIONS                              F
+ INVERSIONS                            F
+ UREY_BRADLEY                          F
+ COULOMB                               T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                T
+ NON_BOND_LIST                         T
+ NON_BOND_LIST_CUT_OFF                    9.00000
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         F
+ ASSIGN_HYBRIDIZATION                  T
+END
+#
+ATOMTYPES
+ N          N      14.00670  0.0000   3   0   0
+ O          O      15.99940  0.0000   2   0   0
+ Ar         Ar     39.94800  0.0000   0   0   0
+ Si         Si     28.08550  0.0000   3   0   0
+ Al         Al     26.98154  0.0000   3   0   0
+ O_Al       O      15.99940  0.0000   2   0   0
+ O_Si       O      15.99940  0.0000   2   0   0
+ Na         Na     22.98977  0.0000   0   0   0
+ Ca         Ca     40.08000  0.0000   6   0   0
+ Li         Li      6.94000  0.0000   0   0   0
+ K          K      39.09830  0.0000   0   0   0
+ Block      Am    243.00000  0.0000   6   0   0
+ q          Qe      0.00000  0.0000   0   0   0
+END
+#
+LONE PAIRS
+END
+#
+DIAGONAL_VDW
+ N           LJ_6_12        3.7240  0.7230E-01
+ O           LJ_6_12        3.4240  0.1080E+00
+ Ar          LJ_6_12        3.8220  0.2380E+00
+ Si          LJ_6_12        0.7600  0.3710E-01
+ Al          LJ_6_12        1.1400  0.3840E-01
+ O_Al        LJ_6_12        3.0400  0.3342E+00
+ O_Si        LJ_6_12        3.0400  0.2018E+00
+ Na          LJ_6_12        1.9600  0.4140E-01
+ Ca          LJ_6_12        1.9800  0.2719E+00
+ Li          LJ_6_12        1.2208  0.8700E-02
+ K           IGNORE       0.0000E+00
+ Block       IGNORE       0.0000E+00
+ q           IGNORE       0.0000E+00
+END
+#
+ATOM_TYPING_RULES
+ O_Al            O            0           0           1           1
+                 Al           0           0           0           1
+ O_Si            O            0           0           2           1
+                 Si           0           0           0           1
+                 Si           0           0           0           1
+ Block           Am           0           0           0           1
+END
+#
+OFF_DIAGONAL_VDW
+END
+#
+BOND_STRETCH
+END
+#
+ANGLE_BEND
+END
+#
+TORSIONS
+END
+#
+INVERSIONS
+END
+#
+UREY_BRADLEY
+END
+#
+HYDROGEN_BONDS
+ X        X           LJ_12_10     0.9500E+01    2.7500
+END
+#
+STRETCH_BEND_STRETCH
+END
+#
+STRETCH_STRETCH
+END
+#

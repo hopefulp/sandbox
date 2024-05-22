@@ -14,10 +14,10 @@ import re
 import sys
 import argparse
 from common import whereami
-from nanocore import atoms as ncatoms
+from oorinano import atoms as ncatoms
 
 ### VASP ini & outfiles
-vasf_default=['CHG','CHGCAR','CONTCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR',  'XDATCAR']
+vasf_out=['CHG','CHGCAR','CONTCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR',  'XDATCAR']
 vasf_ini=['POSCAR','KPOINTS','INCAR','POTCAR']
 
 ### VASP jobs group with file to be modified

@@ -1,0 +1,257 @@
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+
+ ********************************************************************
+    INTERMOLECULAR (NON-BOND & HYDROGEN-BOND) POTENTIALS APPLICABLE
+        TO GROUPS FOUND IN THE NATURALLY OCCURRING AMINO-ACIDS
+
+                               from
+
+             G. Nemethy, M.S. Pottle & H.A. Scheraga
+
+              J. Phys. Chem., 87 (1983) 1883-1887
+
+ NOTE:
+     For interactions between atom types which may form hydrogen
+     bonds, a 12-10 potential is used in place of the regular 12-6
+     potential. The energetic contribution from such 12-10 potentials
+     will be included in the reported Van der Waals energy, rather
+     than in a specific hydrogen bond energy. Thus, the reported
+     hydrogen bond energy of zero which will be obtained does not
+     signify that hydrogen bonding effects are ignored.
+
+     For compatibility with the morph_momany force field, atom type
+     N_13 is still defined, but the parameters are adjusted to the
+     equivalent type N_14.
+ ********************************************************************
+
+END
+#
+PREFERENCES
+ BONDS                                 F
+ ANGLES                                F
+ COULOMB                               T
+ INVERSIONS                            F
+ TORSIONS                              F
+ UREY_BRADLEY                          F
+ STRETCH_STRETCH                       F
+ STRETCH_BEND_STRETCH                  F
+ BEND_BEND                             F
+ TORSION_STRETCH                       F
+ TORSION_BEND_BEND                     F
+ BEND_TORSION_BEND                     F
+ STRETCH_TORSION_STRETCH               F
+ HYDROGEN_BONDS                        F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                F
+ SHRINK_CH_BONDS                       F
+ SHRINK_CH_H_ATOM                      H__C 
+ SHRINK_CH_FACTOR                         0.91500
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      F
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          0.40000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           T
+ H-BOND_DIRECT_RCUT                       4.00000
+ H-BOND_SPLINE_DISTANCE_ON                4.00000
+ H-BOND_SPLINE_DISTANCE_OFF               4.50000
+ H-BOND_SPLINE_ANGLE_ON                  65.00000
+ H-BOND_SPLINE_ANGLE_OFF                 75.00000
+ H-BOND_LIST_DISTANCE_OFF                 6.50000
+ H-BOND_LIST_ANGLE_OFF                   90.00000
+ NON_BOND_LIST                         T
+ NON_BOND_LIST_CUT_OFF                   10.50000
+ COU_DIELETRIC_CONSTANT                   2.00000
+ COU_INTER_CUT_OFF                        8.50000
+ COU_SPLINE_OFF                           8.50000
+ COU_SPLINE_ON                            8.00000
+ EWALD_SUM_COU_ACCURACY                   0.00100
+ EWALD_SUM_COU_ETA                        2.50000
+ EWALD_SUM_COU_KCUT                       0.50000
+ EWALD_SUM_COU_RCUT                       6.00000
+ EWALD_SUM_COU_AUTO_OPT                F
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            SPLINE    
+ COU_DIRECT_CUT-OFF                       8.00000
+ VDW_RADII_COMBINATION_RULE            ARITHMETIC
+ VDW_INTER_CUT_OFF                        8.50000
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            SPLINE    
+ VDW_SPLINE_ON                            8.00000
+ VDW_SPLINE_OFF                           8.50000
+ EWALD_SUM_VDW_AUTO_OPT                F
+ EWALD_SUM_VDW_ACCURACY                   0.00100
+ EWALD_SUM_VDW_ETA                        2.50000
+ EWALD_SUM_VDW_KCUT                       0.50000
+ EWALD_SUM_VDW_RCUT                       6.00000
+ EWALD_SUM_VDW_REP_CUT                    6.00000
+ FAST_EWALD_SUM_RATIO                    10.00000
+ SLOW_EWALD_SUM_RATIO                     5.00000
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         F
+ ASSIGN_HYBRIDIZATION                  F
+ ATOM_TYPE                             T
+ ATOM_TYPE_ALL                         T
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ H_1        H       1.00790  0.0000   0   0   0
+ H_2        H       1.00790  0.0000   0   0   0
+ H_3        H       1.00790  0.0000   0   0   0
+ H_4        H       1.00790  0.0000   0   0   0
+ C_6        C      12.01100  0.0000   3   0   0
+ C_7        C      12.01100  0.0000   2   0   0
+ C_8        C      12.01100  0.0000   2   0   0
+ N_13       N      14.00670  0.0000   3   0   0
+ N_14       N      14.00670  0.0000   3   0   0
+ O_17       O      15.99940  0.0000   2   0   0
+ O_18       O      15.99940  0.0000   3   0   0
+ S_20       S      32.06000  0.0000   3   0   0
+END
+#
+DIAGONAL_VDW
+ H_1         IGNORE       0.0000E+00
+ H_2         IGNORE       0.0000E+00
+ H_3         IGNORE       0.0000E+00
+ H_4         IGNORE       0.0000E+00
+ C_6         IGNORE       0.0000E+00
+ C_7         IGNORE       0.0000E+00
+ C_8         IGNORE       0.0000E+00
+ N_13        IGNORE       0.0000E+00
+ N_14        IGNORE       0.0000E+00
+ O_17        IGNORE       0.0000E+00
+ O_18        IGNORE       0.0000E+00
+ S_20        IGNORE       0.0000E+00
+END
+#
+ATOM_TYPING_RULES
+ H_1             H            0           0           0           1
+ H_2             H            0           0           1           1
+                 N            0           0           0           1
+ H_3             H            0           0           1           1
+                 C            2           0           0           1
+ H_3             H            0           0           1           1
+                 S            0           0           0           1
+ H_4             H            0           0           1           1
+                 O            0           0           0           1
+ C_6             C            0           0           0           1
+ C_7             C            2           0           1           1
+                 O            2           0           0           1
+ C_8             C            2           0           1           1
+                 C            2           0           0           1
+ N_14            N            0           0           0           1
+ S_20            S            0           0           0           1
+ O_17            O            2           0           1           1
+                 C            2           0           0           1
+ O_18            O            3           0           2           1
+                 **           0           0           0           1
+                 **           0           0           0           1
+ N_13            N            0           0           1           1
+                 C            2           0           1           1
+                 O            2           0           0           1
+ N_13            N            0           0           4           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+                 **           0           0           0           1
+END
+#
+#
+OFF_DIAGONAL_VDW
+ H_1      H_1         LJ_6_12        2.9200  0.3700E-01
+ H_2      H_1         LJ_6_12        2.8000  0.4700E-01
+ H_2      H_2         LJ_6_12        2.6800  0.6100E-01
+ H_3      H_1         LJ_6_12        2.9250  0.3600E-01
+ H_3      H_2         LJ_6_12        2.8050  0.4700E-01
+ H_3      H_3         LJ_6_12        2.9300  0.3600E-01
+ H_4      H_1         LJ_6_12        2.8750  0.4000E-01
+ H_4      H_2         LJ_6_12        2.7550  0.5200E-01
+ H_4      H_3         LJ_6_12        2.8800  0.4000E-01
+ H_4      H_4         LJ_6_12        2.8300  0.4400E-01
+ C_6      H_1         LJ_6_12        3.5200  0.3300E-01
+ C_6      H_2         LJ_6_12        3.4000  0.4100E-01
+ C_6      H_3         LJ_6_12        3.5250  0.3300E-01
+ C_6      H_4         LJ_6_12        3.4750  0.3600E-01
+ C_6      C_6         LJ_6_12        4.1200  0.3800E-01
+ C_7      H_1         LJ_6_12        3.3300  0.6800E-01
+ C_7      H_2         LJ_6_12        3.2100  0.8500E-01
+ C_7      H_3         LJ_6_12        3.3350  0.6700E-01
+ C_7      H_4         LJ_6_12        3.2850  0.7400E-01
+ C_7      C_6         LJ_6_12        3.9300  0.7200E-01
+ C_7      C_7         LJ_6_12        3.7400  0.1400E+00
+ C_8      H_1         LJ_6_12        3.3100  0.5700E-01
+ C_8      H_2         LJ_6_12        3.1900  0.7100E-01
+ C_8      H_3         LJ_6_12        3.3150  0.5600E-01
+ C_8      H_4         LJ_6_12        3.2650  0.6200E-01
+ C_8      C_6         LJ_6_12        3.9100  0.6100E-01
+ C_8      C_7         LJ_6_12        3.7200  0.1180E+00
+ C_8      C_8         LJ_6_12        3.7000  0.9900E-01
+ N_13     H_1         LJ_6_12        3.2150  0.5900E-01
+ N_13     H_2         LJ_12_10       2.1880  0.5460E+00
+ N_13     H_3         LJ_6_12        3.2200  0.5800E-01
+ N_13     H_4         LJ_12_10       2.1880  0.5460E+00
+ N_13     C_6         LJ_6_12        3.8150  0.6200E-01
+ N_13     C_7         LJ_6_12        3.6250  0.1210E+00
+ N_13     C_8         LJ_6_12        3.6050  0.1030E+00
+ N_13     N_13        LJ_6_12        3.5100  0.1070E+00
+ N_14     H_1         LJ_6_12        3.2150  0.5900E-01
+ N_14     H_2         LJ_12_10       2.1880  0.5460E+00
+ N_14     H_3         LJ_6_12        3.2200  0.5800E-01
+ N_14     H_4         LJ_12_10       2.1880  0.5460E+00
+ N_14     C_6         LJ_6_12        3.8150  0.6200E-01
+ N_14     C_7         LJ_6_12        3.6250  0.1210E+00
+ N_14     C_8         LJ_6_12        3.6050  0.1030E+00
+ N_14     N_13        LJ_6_12        3.5100  0.1070E+00
+ N_14     N_14        LJ_6_12        3.5100  0.1070E+00
+ O_17     H_1         LJ_6_12        3.0200  0.8000E-01
+ O_17     H_2         LJ_12_10       1.8970  0.1107E+01
+ O_17     H_3         LJ_6_12        3.0250  0.8000E-01
+ O_17     H_4         LJ_12_10       1.6640  0.5921E+01
+ O_17     C_6         LJ_6_12        3.6200  0.8200E-01
+ O_17     C_7         LJ_6_12        3.4300  0.1590E+00
+ O_17     C_8         LJ_6_12        3.4100  0.1360E+00
+ O_17     N_13        LJ_6_12        3.3150  0.1450E+00
+ O_17     N_14        LJ_6_12        3.3150  0.1450E+00
+ O_17     O_17        LJ_6_12        3.1200  0.2000E+00
+ O_18     H_1         LJ_6_12        3.0800  0.5300E-01
+ O_18     H_2         LJ_12_10       1.6410  0.3084E+01
+ O_18     H_3         LJ_6_12        3.0850  0.5200E-01
+ O_18     H_4         LJ_12_10       3.6160  0.1709E+01
+ O_18     C_6         LJ_6_12        3.6800  0.5600E-01
+ O_18     C_7         LJ_6_12        3.4900  0.1080E+00
+ O_18     C_8         LJ_6_12        3.4700  0.9300E-01
+ O_18     N_13        LJ_6_12        3.3750  0.9900E-01
+ O_18     N_14        LJ_6_12        3.3750  0.9900E-01
+ O_18     O_17        LJ_6_12        3.1800  0.1360E+00
+ O_18     O_18        LJ_6_12        3.2400  0.9400E-01
+ S_20     H_1         LJ_6_12        3.3500  0.7900E-01
+ S_20     H_2         LJ_6_12        3.4150  0.9700E-01
+ S_20     H_3         LJ_6_12        3.5400  0.7800E-01
+ S_20     H_4         LJ_6_12        3.4900  0.8500E-01
+ S_20     C_6         LJ_6_12        4.1350  0.9200E-01
+ S_20     C_7         LJ_6_12        3.9450  0.1730E+00
+ S_20     C_8         LJ_6_12        3.9250  0.1460E+00
+ S_20     N_13        LJ_6_12        3.8300  0.1510E+00
+ S_20     N_14        LJ_6_12        3.8300  0.1510E+00
+ S_20     O_17        LJ_6_12        3.6350  0.1980E+00
+ S_20     O_18        LJ_6_12        3.6950  0.1370E+00
+ S_20     S_20        LJ_6_12        4.1500  0.2230E+00
+END
+#
+COULOMBIC
+ X        X           CONST-EPS 
+END

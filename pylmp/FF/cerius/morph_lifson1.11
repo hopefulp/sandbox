@@ -1,0 +1,138 @@
+########################################################################
+#
+# $Header: /cx2/c2cap_c410/data/Cerius2-Resources/FORCE-FIELD/RCS/morph_lifson1.11,v 1.1 1995/11/17 12:58:52 simonm Exp $
+#
+# Author:S. Miller
+#
+# Purpose:
+#  At 2.0 added lone pairs onto O and N.
+#
+########################################################################
+#
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+
+       ****************************************************
+       |           Lifson, Hagler and Dauber              |
+       |                                                  | 
+       |       J.Am.Ch.Soc. 101, 5111-41, (1979)          |
+       ****************************************************
+
+END
+#
+PREFERENCES
+ BONDS                                 F
+ ANGLES                                F
+ COULOMB                               T
+ INVERSIONS                            F
+ TORSIONS                              F
+ UREY_BRADLEY                          F
+ HYDROGEN_BONDS                        T
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                F
+ SHRINK_CH_BONDS                       F
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      F
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          0.40000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           T
+ NON_BOND_LIST                         T
+ DISTANCE_DEPENDENT_DIELETRIC_CONSTANT F
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            SPLINE    
+ VDW_RADII_COMBINATION_RULE            GEOMETRIC 
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            SPLINE    
+ EWALD_SUM_VDW_AUTO_OPT                F
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         F
+ ASSIGN_HYBRIDIZATION                  F
+ ATOM_TYPE                             T
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ H_C        H       1.00790  0.1000   0   0   0
+ H_O        H       1.00790  0.3800   0   0   0
+ H_N        H       1.00790  0.0000   0   0   0
+ C          C      12.01100  0.0000   3   0   0
+ C_O        C      12.01100  0.0000   2   0   0
+ N_p        N      14.00670 -0.8300   3   0   1
+ N_s        N      14.00670 -0.2800   3   0   1
+ O_C        O      15.99940 -0.3800   2   0   2
+ O_H        O      15.99940 -0.3800   2   0   2
+END
+#
+DIAGONAL_VDW
+ H_C         LJ_6_12        2.7523  0.3780E-01
+ H_O         LJ_6_12        1.0000  0.0000E+00
+ H_N         LJ_6_12        1.0000  0.0000E+00
+ C           LJ_6_12        4.3535  0.3910E-01
+ C_O         LJ_6_12        4.0648  0.1485E+00
+ N_p         LJ_6_12        3.9315  0.1665E+00
+ N_s         LJ_6_12        3.9315  0.1665E+00
+ O_C         LJ_6_12        3.2108  0.2291E+00
+ O_H         LJ_6_12        3.3545  0.1891E+00
+END
+#
+ATOM_TYPING_RULES
+ H_C             H            0           0           0           1
+ H_O             H            0           0           1           1
+                 O            0           0           0           1
+ H_N             H            0           0           1           1
+                 N            0           0           0           1
+ H_O             H            0           0           1           1
+                 N            0           0           0           1
+ C               C            0           0           0           1
+ C_O             C            0           0           1           1
+                 O            0           0           0           1
+ N_p             N            0           0           2           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+ N_s             N            0           0           1           1
+                 H            0           0           0           1
+ O_C             O            0           0           1           1
+                 C            0           0           0           1
+ O_H             O            0           0           2           1
+                 H            0           0           0           1
+                 **           0           0           0           1
+END
+#
+#
+OFF_DIAGONAL_VDW
+END
+#
+BOND_STRETCH
+END
+#
+ANGLE_BEND
+END
+#
+TORSIONS
+END
+#
+INVERSIONS
+END
+#
+UREY_BRADLEY
+END
+#
+HYDROGEN_BONDS
+ X        X           LJ_12_10     0.9500E+01    2.7500
+END
+#
+GENERATOR
+END

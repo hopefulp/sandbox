@@ -1,0 +1,925 @@
+VERSION
+ CERIUS-II   1
+END
+#
+HEADER
+END
+#
+PREFERENCES
+ BONDS                                 T
+ ANGLES                                T
+ COULOMB                               F
+ INVERSIONS                            T
+ TORSIONS                              T
+ UREY_BRADLEY                          F
+ HYDROGEN_BONDS                        F
+ HARMONIC_CONSTRAINTS                  F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ SHRINK_CH_BONDS                       F
+ SHRINK_CH_H_ATOM                      H__C 
+ SHRINK_CH_FACTOR                         0.91500
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      T
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          0.40000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           T
+ H-BOND_DIRECT_RCUT                       4.00000
+ H-BOND_SPLINE_DISTANCE_ON                4.00000
+ H-BOND_SPLINE_DISTANCE_OFF               4.50000
+ H-BOND_SPLINE_ANGLE_ON                  65.00000
+ H-BOND_SPLINE_ANGLE_OFF                 90.00000
+ DISTANCE_DEPENDENT_DIELETRIC_CONSTANT T
+ COU_DIELETRIC_CONSTANT                   1.00000
+ COU_INTER_CUT_OFF                        8.50000
+ COU_SPLINE_OFF                           8.50000
+ COU_SPLINE_ON                            8.00000
+ EWALD_SUM_COU_ACCURACY                   0.00100
+ EWALD_SUM_COU_ETA                        2.50000
+ EWALD_SUM_COU_KCUT                       0.50000
+ EWALD_SUM_COU_RCUT                       6.00000
+ EWALD_SUM_COU_AUTO_OPT                F
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     0.50000
+ COU_METHOD                            SPLINE    
+ COU_DIRECT_CUT-OFF                       8.00000
+ VDW_RADII_COMBINATION_RULE            ARITHMETIC
+ VDW_INTER_CUT_OFF                        8.50000
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     0.50000
+ VDW_METHOD                            SPLINE    
+ VDW_SPLINE_ON                            8.00000
+ VDW_SPLINE_OFF                           8.50000
+ EWALD_SUM_VDW_AUTO_OPT                F
+ EWALD_SUM_VDW_ACCURACY                   0.00100
+ EWALD_SUM_VDW_ETA                        2.50000
+ EWALD_SUM_VDW_KCUT                       0.50000
+ EWALD_SUM_VDW_RCUT                       6.00000
+ EWALD_SUM_VDW_REP_CUT                    6.00000
+ EWALD_SUM_VDW_RATIO                     10.00000
+ MINIMUM_IMAGE                         F
+ NON_BOND_LIST                         T
+ NON_BOND_LIST_CUT_OFF                    9.00000
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         F
+ ASSIGN_HYBRIDIZATION                  T
+ ATOM_TYPE                             T
+ CALCULATE_BOND_ORDER                  F
+ IGNORE_UNDEFINED_TERMS                F
+END
+#
+ATOMTYPES
+ HC         H       1.00800  0.0000   0   0   0
+ HO         H       1.00800  0.0000   0  -1   0
+ H          H       1.00800  0.0000   0  -1   0
+ H2         H       1.00800  0.0000   0  -1   0
+ H3         H       1.00800  0.0000   0  -1   0
+ HS         H       1.00800  0.0000   0  -1   0
+ CT         C      12.01100  0.0000   3   0   0
+ CH         C      13.01900  0.0000   3   1   0
+ C2         C      14.02700  0.0000   3   2   0
+ C3         C      15.03500  0.0000   3   3   0
+ CM         C      12.01100  0.0000   2   0   0
+ CJ         C      13.01900  0.0000   2   1   0
+ C          C      12.01100  0.0000   2   0   0
+ CA         C      12.01100  0.0000   2   0   0
+ CD         C      13.01900  0.0000   2   1   0
+ CI         C      13.01900  0.0000   2   1   0
+ C*         C      12.01100  0.0000   2   0   0
+ CC         C      12.01100  0.0000   2   0   0
+ CG         C      13.01900  0.0000   2   1   0
+ CF         C      13.01900  0.0000   2   1   0
+ CE         C      13.01900  0.0000   2   1   0
+ CP         C      13.01900  0.0000   2   1   0
+ CB         C      12.01100  0.0000   2   0   0
+ CN         C      12.01100  0.0000   2   0   0
+ OS         O      15.99940  0.0000   3   0   2
+ OH         O      15.99940  0.0000   3   0   2
+ O          O      15.99940  0.0000   2   0   2
+ O2         O      15.99940  0.0000   2   0   2
+ S          S      30.06000  0.0000   3   0   2
+ SH         S      30.06000  0.0000   3   0   2
+ LP         Rn      1.00000  0.0000   0   0   0
+ NT         N      14.00670  0.0000   3   0   1
+ N3         N      14.00670  0.0000   3   0   0
+ N*         N      14.00670  0.0000   2   0   0
+ N2         N      14.00670  0.0000   2   0   0
+ N          N      14.00670  0.0000   2   0   0
+ NC         N      14.00670  0.0000   2   0   1
+ NB         N      14.00670  0.0000   2   0   1
+ NA         N      14.00670  0.0000   2   0   0
+ P          P      30.97380  0.0000   4   0   1
+END
+#
+LONE PAIRS
+ S         LP
+ SH        LP
+END
+#
+DIAGONAL_VDW
+ HC          LJ_6_12        2.7500  0.3800E-01
+ HO          LJ_6_12        2.0000  0.2000E-01
+ H           LJ_6_12        2.0000  0.2000E-01
+ H2          LJ_6_12        2.0000  0.2000E-01
+ H3          LJ_6_12        2.0000  0.2000E-01
+ HS          LJ_6_12        2.0000  0.2000E-01
+ CT          LJ_6_12        3.6000  0.6000E-01
+ CH          LJ_6_12        3.7000  0.9000E-01
+ C2          LJ_6_12        3.8500  0.1200E+00
+ C3          LJ_6_12        4.0000  0.1500E+00
+ CM          LJ_6_12        3.7000  0.1200E+00
+ CJ          LJ_6_12        3.7000  0.1200E+00
+ C           LJ_6_12        3.7000  0.1200E+00
+ CA          LJ_6_12        3.7000  0.1200E+00
+ CD          LJ_6_12        3.7000  0.1200E+00
+ CI          LJ_6_12        3.7000  0.1200E+00
+ C*          LJ_6_12        3.7000  0.1200E+00
+ CC          LJ_6_12        3.7000  0.1200E+00
+ CG          LJ_6_12        3.7000  0.1200E+00
+ CF          LJ_6_12        3.7000  0.1200E+00
+ CE          LJ_6_12        3.7000  0.1200E+00
+ CP          LJ_6_12        3.7000  0.1200E+00
+ CB          LJ_6_12        3.7000  0.1200E+00
+ CN          LJ_6_12        3.7000  0.1200E+00
+ OS          LJ_6_12        3.3000  0.1500E+00
+ OH          LJ_6_12        3.3000  0.1500E+00
+ O           LJ_6_12        3.2000  0.2000E+00
+ O2          LJ_6_12        3.2000  0.2000E+00
+ S           LJ_6_12        4.0000  0.2000E+00
+ SH          LJ_6_12        4.0000  0.2000E+00
+ LP          LJ_6_12        2.4000  0.1600E-01
+ NT          LJ_6_12        3.7000  0.1200E+00
+ N3          LJ_6_12        3.7000  0.8000E-01
+ N*          LJ_6_12        3.5000  0.1600E+00
+ N2          LJ_6_12        3.5000  0.1600E+00
+ N           LJ_6_12        3.5000  0.1600E+00
+ NC          LJ_6_12        3.5000  0.1600E+00
+ NB          LJ_6_12        3.5000  0.1600E+00
+ NA          LJ_6_12        3.5000  0.1600E+00
+ P           LJ_6_12        4.2000  0.2000E+00
+END
+#
+ATOM_TYPING_RULES
+ HC              H            0           0           1           1
+                 C            0           0           0           1
+ HO              H            0           0           1           1
+                 O            0           0           0           1
+ H               H            0           0           1           1
+                 N            0           0           0           1
+ H2              H            0           0           1           1
+                 N            2           0           3           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+                 C            2           6           0           1
+ H3              H            0           0           1           1
+                 N            3           0           4           1
+                 H            0           0           0           1
+                 **           0           0           0           1
+                 **           0           0           0           1
+                 **           0           0           0           1
+ H3              H            0           0           1           1
+                 N            2           0           1           1
+                 C            2           0           3           1
+                 N            2           0           0           1
+                 N            2           0           0           1
+                 N            2           0           0           1
+ HS              H            0           0           1           1
+                 S            0           0           0           1
+ CT              C            3           0           0           1
+ CH              C            3           0           1           1
+                 VH           0           0           0           1
+ C2              C            3           0           2           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+ C3              C            3           0           3           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+                 VH           0           0           0           1
+ CJ              C            2           6           3           1
+                 VH           0           0           0           1
+                 C            2           6           0           1
+                 N            2           6           0           1
+ CJ              C            2           6           3           1
+                 VH           0           0           0           1
+                 C            2           6           1           1
+                 C            2           6           1           1
+                 N            2           6           0           1
+                 N            2           6           0           1
+ CM              C            2           6           3           1
+                 C            3           0           0           1
+                 C            2           6           1           1
+                 C            2           6           1           1
+                 N            2           6           0           1
+                 N            0           6           0           1
+ CA              C            2           6           3           1
+                 VH           0           0           0          -1
+                 **           2           0           0           1
+                 **           2           0           0           1
+ CA              C            2           0           3           1
+                 N            2           0           0           1
+                 N            2           0           0           1
+                 N            2           0           0           1
+ CD              C            2           6           3           1
+                 **           2           0           0           1
+                 **           2           0           0           1
+                 VH           0           0           0           1
+ C               C            0           0           5           1
+                 VH           0           0           0           1
+                 H            0           0           0          -1
+                 O            0           0           0           1
+                 O            0           0           0           1
+                 C            0           0           0           1
+ C               C            2           0           4           1
+                 O            0           0           0           1
+                 VH           0           0           0          -1
+                 VH           0           0           0          -1
+                 VH           0           0           0          -1
+ CC              C            2           5           4           1
+                 VH           0           0           0          -1
+                 N            0           5           1           1
+                 **           0           5           0           1
+                 **           0           0           0           1
+                 H            0           0           0           1
+ CI              C            2           6           3           1
+                 N            2           0           1           1
+                 N            2           0           1           1
+                 VH           0           0           0           1
+                 VH           0           0           0          -1
+                 VH           0           0           0          -1
+ C*              C            2           5           3           1
+                 C            2           0           0           1
+                 C            2           0           0           1
+                 C            3           0           0           1
+ C*              C            2           5           1           1
+                 C            2           0           1           1
+                 N            2           0           0           1
+ CG              C            2           5           3           1
+                 VH           0           0           0           1
+                 C            2           5           0           1
+                 N            2           5           1           1
+                 H            0           0           0           1
+ CF              C            2           5           2           1
+                 VH           0           0           0           1
+                 N            2           0           1           1
+                 H            0           0           0          -1
+ CE              C            2           5           3           1
+                 VH           0           0           0           1
+                 N            2           0           1           1
+                 N            2           0           1           1
+                 H            0           0           0          -1
+                 H            0           0           0          -1
+ CP              C            2           5           3           1
+                 VH           0           0           0           1
+                 N            2           5           0           1
+                 N            2           5           1           1
+                 H            0           0           0           1
+ CB              C            2           5           2           1
+                 C            2           6           0           1
+                 C            2           5           3           1
+                 C            2           5           0           1
+                 **           2           5           0           1
+                 **           0           0           0           1
+ CB              C            2           5           3           1
+                 N            2           6           0           1
+                 N            2           5           0           1
+                 VH           0           0           0          -1
+ CN              C            2           5           4           1
+                 VH           0           0           0          -1
+                 C            2           5           0           1
+                 C            2           6           0           1
+                 N            2           5           3           1
+                 H            0           0           0           1
+                 C            2           5           0           1
+                 C            2           5           0           1
+ OS              O            3           0           2           1
+                 VH           0           0           0          -1
+                 H            0           0           0          -1
+ OS              O            2           0           2           1
+                 C            3           0           0           1
+                 C            2           0           2           1
+                 O            2           0           0           1
+                 O            2           0           0           1
+ OH              O            3           0           2           1
+                 H            0           0           0           1
+                 **           0           0           0           1
+ OH              O            3           0           2           1
+                 VH           0           0           0           1
+                 **           0           0           0           1
+ O               O            2           0           1           1
+                 C            2           0           0           1
+ O2              O            0           0           3           1
+                 VH           0           0           0           1
+                 H            0           0           0          -1
+                 C            0           0           5           1
+                 VH           0           0           0           1
+                 H            0           0           0          -1
+                 C            0           0           0           1
+                 O            0           0           0           1
+                 O            0           0           0           1
+ O2              O            2           0           1           1
+                 C            2           0           2           1
+                 O            3           0           0           1
+                 O            2           0           0           1
+ O2              O            3           0           1           1
+                 C            2           0           2           1
+                 O            2           0           0           1
+                 O            3           0           0           1
+ O2              O            2           0           1           1
+                 C            2           0           2           1
+                 O            2           0           0           1
+                 O            2           0           0           1
+ O2              O            2           0           1           1
+                 P            0           0           0           1
+ O2              O            0           0           3           1
+                 H            0           0           0          -1
+                 C            0           0           0          -1
+                 P            0           0           4           1
+                 O            0           0           0           1
+                 O            0           0           0           1
+                 O            0           0           0           1
+                 O            0           0           0           1
+ SH              S            3           0           1           1
+                 H            0           0           0           1
+ S               S            3           0           0           1
+ LP              LP           0           0           1           1
+                 S            0           0           0           1
+ NT              N            3           0           0           1
+ N3              N            3           0           4           1
+                 **           0           0           0           1
+                 **           0           0           0           1
+                 **           0           0           0           1
+                 **           0           0           0           1
+ N*              N            2           6           4           1
+                 VH           0           0           0          -1
+                 C            3           0           0           1
+                 C            2           0           0           1
+                 C            2           0           0           1
+ N*              N            2           5           3           1
+                 C            3           0           0           1
+                 C            2           0           0           1
+                 C            2           0           0           1
+ NC              N            2           6           4           1
+                 C            2           0           0           1
+                 C            2           0           0           1
+                 C            3           0           0          -1
+                 H            0           0           0          -1
+ NB              N            2           5           4           1
+                 C            2           0           0           1
+                 C            2           0           0           1
+                 C            3           0           0          -1
+                 H            0           0           0          -1
+ NA              N            2           5           4           1
+                 H            0           0           0           1
+                 C            2           5           0           1
+                 C            2           5           0           1
+                 C            3           0           0          -1
+ NA              N            2           6           3           1
+                 H            0           0           0           1
+                 C            2           6           1           1
+                 C            2           6           1           1
+                 N            2           0           0           1
+                 N            2           0           0           1
+ N2              N            2           0           2           1
+                 H            0           0           0           1
+                 C            2           0           2           1
+                 N            2           0           0           1
+                 N            2           0           0           1
+ N               N            2           0           2           1
+                 H            0           0           0           1
+                 C            2           0           1           1
+                 O            2           0           0           1
+ N               N            2           0           2           1
+                 VH           0           0           0           1
+                 C            2           0           1           1
+                 O            2           0           0           1
+ N               N            2           5           3           1
+                 C            3           5           0           1
+                 C            3           5           0           1
+                 C            2           0           1           1
+                 O            2           0           0           1
+ P               P            0           0           0           1
+END
+#
+#
+OFF_DIAGONAL_VDW
+ OH       HO          LJ_12_10       1.9500  0.5000E+00
+ OH       H           LJ_12_10       1.9500  0.5000E+00
+ OH       H2          LJ_12_10       1.8500  0.5000E+00
+ OH       H3          LJ_12_10       1.8500  0.5000E+00
+ OH       HS          LJ_12_10       2.3500  0.1000E+00
+ O        HO          LJ_12_10       1.9500  0.5000E+00
+ O        H           LJ_12_10       1.9500  0.5000E+00
+ O        H2          LJ_12_10       2.0000  0.5000E+00
+ O        H3          LJ_12_10       1.8500  0.5000E+00
+ O        HS          LJ_12_10       2.3500  0.1000E+00
+ O2       HO          LJ_12_10       1.8500  0.5000E+00
+ O2       H           LJ_12_10       1.8500  0.5000E+00
+ O2       H2          LJ_12_10       1.8500  0.5000E+00
+ O2       H3          LJ_12_10       1.8500  0.5000E+00
+ O2       HS          LJ_12_10       1.8500  0.5000E+00
+ S        HO          LJ_12_10       3.0000  0.1000E+00
+ S        H           LJ_12_10       3.0000  0.1000E+00
+ S        H2          LJ_12_10       3.0000  0.1000E+00
+ S        H3          LJ_12_10       1.9500  0.5000E+00
+ S        HS          LJ_12_10       3.0000  0.1000E+00
+ SH       HO          LJ_12_10       3.0000  0.1000E+00
+ SH       H           LJ_12_10       3.0000  0.1000E+00
+ SH       H2          LJ_12_10       3.0000  0.1000E+00
+ SH       H3          LJ_12_10       1.9500  0.5000E+00
+ SH       HS          LJ_12_10       3.0000  0.1000E+00
+ NC       H           LJ_12_10       2.0000  0.5000E+00
+ NB       HO          LJ_12_10       1.9500  0.5000E+00
+ NB       H           LJ_12_10       1.9500  0.5000E+00
+ NB       H2          LJ_12_10       1.8500  0.5000E+00
+ NB       H3          LJ_12_10       1.8500  0.5000E+00
+ NB       HS          LJ_12_10       2.3500  0.1000E+00
+END
+#
+BOND_STRETCH
+ CT       HC          HARMONIC     662.0000    1.0900
+ CT       CT          HARMONIC     620.0000    1.5260
+ CH       CH          HARMONIC     520.0000    1.5260
+ C2       CH          HARMONIC     520.0000    1.5260
+ C2       C2          HARMONIC     520.0000    1.5260
+ C3       CH          HARMONIC     520.0000    1.5260
+ C3       C2          HARMONIC     520.0000    1.5260
+ CM       C3          HARMONIC     634.0000    1.5100
+ CJ       CM          HARMONIC    1120.0000    1.3430
+ CJ       CJ          HARMONIC    1098.0000    1.3500
+ C        CT          HARMONIC     634.0000    1.5220
+ C        CH          HARMONIC     634.0000    1.5220
+ C        C2          HARMONIC     634.0000    1.5220
+ C        C3          HARMONIC     634.0000    1.5220
+ C        CM          HARMONIC     820.0000    1.4440
+ C        CJ          HARMONIC     820.0000    1.4440
+ CA       HC          HARMONIC     680.0000    1.0080
+ CA       CT          HARMONIC     634.0000    1.5100
+ CA       C2          HARMONIC     634.0000    1.5100
+ CA       CJ          HARMONIC     854.0000    1.4330
+ CA       C           HARMONIC     938.0000    1.4000
+ CA       CA          HARMONIC     938.0000    1.4000
+ CD       C           HARMONIC     938.0000    1.4000
+ CD       CA          HARMONIC     938.0000    1.4000
+ CD       CD          HARMONIC     938.0000    1.4000
+ C*       C2          HARMONIC     634.0000    1.4950
+ CC       C2          HARMONIC     634.0000    1.5040
+ CG       C*          HARMONIC    1092.0000    1.3520
+ CG       CC          HARMONIC    1036.0000    1.3710
+ CF       CC          HARMONIC    1024.0000    1.3750
+ CB       C           HARMONIC     894.0000    1.4190
+ CB       CA          HARMONIC     938.0000    1.4040
+ CB       CD          HARMONIC     938.0000    1.4000
+ CB       C*          HARMONIC     776.0000    1.4590
+ CB       CB          HARMONIC    1040.0000    1.3700
+ CN       CD          HARMONIC     938.0000    1.4000
+ CN       CB          HARMONIC     894.0000    1.4190
+ OS       HO          HARMONIC    1106.0000    0.9600
+ OS       CH          HARMONIC     640.0000    1.4250
+ OS       C2          HARMONIC     640.0000    1.4250
+ OS       C3          HARMONIC     640.0000    1.4250
+ OH       HO          HARMONIC    1106.0000    0.9600
+ OH       CH          HARMONIC     772.0000    1.4250
+ OH       C2          HARMONIC     772.0000    1.4250
+ OH       C           HARMONIC     900.0000    1.3640
+ O        C           HARMONIC    1140.0000    1.2290
+ O2       C           HARMONIC    1312.0000    1.2500
+ S        C2          HARMONIC     444.0000    1.8100
+ S        C3          HARMONIC     444.0000    1.8100
+ S        S           HARMONIC     332.0000    2.0380
+ SH       HS          HARMONIC     548.0000    1.3360
+ SH       C2          HARMONIC     444.0000    1.8100
+ LP       S           HARMONIC    1200.0000    0.6790
+ LP       SH          HARMONIC    1200.0000    0.6790
+ NT       H2          HARMONIC     868.0000    1.0100
+ NT       CH          HARMONIC     734.0000    1.4710
+ NT       C2          HARMONIC     734.0000    1.4710
+ N3       H3          HARMONIC     868.0000    1.0100
+ N3       C2          HARMONIC     734.0000    1.4710
+ N3       C3          HARMONIC     734.0000    1.4710
+ N*       CH          HARMONIC     674.0000    1.4750
+ N*       C3          HARMONIC     674.0000    1.4750
+ N*       CJ          HARMONIC     896.0000    1.3650
+ N*       C           HARMONIC     848.0000    1.3830
+ N*       CE          HARMONIC     880.0000    1.3710
+ N*       CB          HARMONIC     872.0000    1.3740
+ N2       H           HARMONIC     868.0000    1.0100
+ N2       H2          HARMONIC     868.0000    1.0100
+ N2       H3          HARMONIC     868.0000    1.0100
+ N2       C2          HARMONIC     674.0000    1.4630
+ N2       C3          HARMONIC     674.0000    1.4630
+ N2       CA          HARMONIC     962.0000    1.3400
+ N        H           HARMONIC     868.0000    1.0100
+ N        H2          HARMONIC     868.0000    1.0100
+ N        CT          HARMONIC     674.0000    1.4490
+ N        CH          HARMONIC     754.0000    1.4490
+ N        C2          HARMONIC     674.0000    1.4490
+ N        C3          HARMONIC     674.0000    1.4490
+ N        C           HARMONIC     980.0000    1.3350
+ NC       C           HARMONIC     914.0000    1.3580
+ NC       CA          HARMONIC     966.0000    1.3390
+ NC       CI          HARMONIC    1004.0000    1.3240
+ NC       CB          HARMONIC     922.0000    1.3540
+ NB       CC          HARMONIC     820.0000    1.3940
+ NB       CF          HARMONIC     820.0000    1.3940
+ NB       CE          HARMONIC    1058.0000    1.3040
+ NB       CP          HARMONIC     976.0000    1.3350
+ NB       CB          HARMONIC     828.0000    1.3910
+ NA       H           HARMONIC     868.0000    1.0100
+ NA       C           HARMONIC     836.0000    1.3880
+ NA       CA          HARMONIC     854.0000    1.3810
+ NA       CC          HARMONIC     844.0000    1.3850
+ NA       CG          HARMONIC     854.0000    1.3810
+ NA       CP          HARMONIC     954.0000    1.3430
+ NA       CN          HARMONIC     856.0000    1.3800
+ P        OS          HARMONIC     460.0000    1.6100
+ P        OH          HARMONIC     460.0000    1.6100
+ P        O2          HARMONIC    1050.0000    1.4800
+END
+#
+ANGLE_BEND
+ HC       CT       HC          THETA_HARM    92.0000  109.4000
+ CH       CH       CH          THETA_HARM   126.0000  111.5000
+ C2       CH       CH          THETA_HARM   126.0000  111.5000
+ C3       CH       CH          THETA_HARM   126.0000  111.5000
+ C3       CH       C2          THETA_HARM   126.0000  111.5000
+ C3       CH       C3          THETA_HARM   126.0000  111.5000
+ C        CH       CH          THETA_HARM   126.0000  111.1000
+ C        CH       C2          THETA_HARM   126.0000  111.1000
+ C        CH       C3          THETA_HARM   126.0000  111.1000
+ OS       CH       CH          THETA_HARM   160.0000  109.5000
+ OS       CH       C2          THETA_HARM   160.0000  109.5000
+ OH       CH       CH          THETA_HARM   160.0000  109.5000
+ OH       CH       C2          THETA_HARM   160.0000  109.5000
+ OH       CH       C3          THETA_HARM   160.0000  109.5000
+ NT       CH       CH          THETA_HARM   160.0000  109.7000
+ NT       CH       C2          THETA_HARM   160.0000  109.7000
+ NT       CH       C           THETA_HARM   160.0000  109.7000
+ N*       CH       CH          THETA_HARM   160.0000  109.5000
+ N*       CH       C2          THETA_HARM   160.0000  109.5000
+ N*       CH       OS          THETA_HARM   160.0000  109.5000
+ N        CH       CH          THETA_HARM   160.0000  109.7000
+ N        CH       C2          THETA_HARM   160.0000  109.7000
+ N        CH       C3          THETA_HARM   160.0000  109.5000
+ N        CH       C           THETA_HARM   126.0000  110.1000
+ CH       C2       CH          THETA_HARM   126.0000  112.4000
+ C2       C2       CH          THETA_HARM   126.0000  112.4000
+ C2       C2       C2          THETA_HARM   126.0000  112.4000
+ C3       C2       CH          THETA_HARM   126.0000  112.4000
+ C        C2       CH          THETA_HARM   126.0000  112.4000
+ C        C2       C2          THETA_HARM   126.0000  112.4000
+ CA       C2       CH          THETA_HARM   126.0000  114.0000
+ C*       C2       CH          THETA_HARM   126.0000  115.6000
+ CC       C2       CH          THETA_HARM   126.0000  113.1000
+ OS       C2       CH          THETA_HARM   160.0000  109.5000
+ OS       C2       C2          THETA_HARM   160.0000  109.5000
+ OS       C2       C3          THETA_HARM   160.0000  109.5000
+ OH       C2       CH          THETA_HARM   160.0000  109.5000
+ S        C2       CH          THETA_HARM   100.0000  114.7000
+ S        C2       C2          THETA_HARM   100.0000  114.7000
+ SH       C2       CH          THETA_HARM   100.0000  108.6000
+ NT       C2       C2          THETA_HARM   160.0000  111.2000
+ NT       C2       C           THETA_HARM   160.0000  111.2000
+ N3       C2       C2          THETA_HARM   160.0000  111.2000
+ N2       C2       C2          THETA_HARM   160.0000  111.2000
+ N        C2       C2          THETA_HARM   160.0000  111.2000
+ N        C2       C           THETA_HARM   160.0000  110.3000
+ CJ       CM       C3          THETA_HARM   170.0000  119.7000
+ C        CM       C3          THETA_HARM   170.0000  119.7000
+ C        CM       CJ          THETA_HARM   170.0000  120.7000
+ C        CJ       CJ          THETA_HARM   170.0000  120.7000
+ CA       CJ       CJ          THETA_HARM   170.0000  117.0000
+ N*       CJ       CM          THETA_HARM   140.0000  121.2000
+ N*       CJ       CJ          THETA_HARM   140.0000  121.2000
+ CD       C        CD          THETA_HARM   170.0000  120.0000
+ OH       C        CH          THETA_HARM   140.0000  115.0000
+ OH       C        CD          THETA_HARM   140.0000  120.0000
+ O        C        CT          THETA_HARM   160.0000  120.4000
+ O        C        CH          THETA_HARM   160.0000  120.4000
+ O        C        C2          THETA_HARM   160.0000  120.4000
+ O        C        C3          THETA_HARM   160.0000  120.4000
+ O        C        CM          THETA_HARM   160.0000  125.3000
+ O        C        CJ          THETA_HARM   160.0000  125.3000
+ O        C        CB          THETA_HARM   160.0000  128.8000
+ O2       C        CH          THETA_HARM   130.0000  117.0000
+ O2       C        C2          THETA_HARM   140.0000  117.0000
+ O2       C        C3          THETA_HARM   140.0000  117.0000
+ O2       C        O2          THETA_HARM   160.0000  126.0000
+ N*       C        O           THETA_HARM   160.0000  120.9000
+ N        C        CT          THETA_HARM   140.0000  116.6000
+ N        C        CH          THETA_HARM   140.0000  116.6000
+ N        C        C2          THETA_HARM   140.0000  116.6000
+ N        C        C3          THETA_HARM   140.0000  116.6000
+ N        C        O           THETA_HARM   160.0000  122.9000
+ NC       C        O           THETA_HARM   160.0000  122.5000
+ NC       C        N*          THETA_HARM   140.0000  118.6000
+ NA       C        CM          THETA_HARM   140.0000  114.1000
+ NA       C        CJ          THETA_HARM   140.0000  114.1000
+ NA       C        CB          THETA_HARM   140.0000  111.3000
+ NA       C        O           THETA_HARM   160.0000  120.6000
+ NA       C        N*          THETA_HARM   140.0000  115.4000
+ CA       CA       CA          THETA_HARM   170.0000  120.0000
+ CD       CA       C2          THETA_HARM   140.0000  120.0000
+ CD       CA       CD          THETA_HARM   170.0000  120.0000
+ N2       CA       CJ          THETA_HARM   140.0000  120.1000
+ N2       CA       CB          THETA_HARM   140.0000  123.5000
+ N2       CA       N2          THETA_HARM   140.0000  120.0000
+ NC       CA       CJ          THETA_HARM   140.0000  121.5000
+ NC       CA       CB          THETA_HARM   140.0000  117.3000
+ NC       CA       N2          THETA_HARM   140.0000  119.8000
+ NA       CA       N2          THETA_HARM   140.0000  116.0000
+ NA       CA       NC          THETA_HARM   140.0000  123.3000
+ CD       CD       C           THETA_HARM   170.0000  120.0000
+ CD       CD       CA          THETA_HARM   170.0000  120.0000
+ CD       CD       CD          THETA_HARM   170.0000  120.0000
+ CB       CD       CD          THETA_HARM   170.0000  120.0000
+ CN       CD       CD          THETA_HARM   170.0000  120.0000
+ NC       CI       NC          THETA_HARM   140.0000  129.1000
+ CG       C*       C2          THETA_HARM   140.0000  125.0000
+ CB       C*       C2          THETA_HARM   140.0000  128.6000
+ CB       C*       CG          THETA_HARM   170.0000  106.4000
+ CG       CC       C2          THETA_HARM   140.0000  129.0500
+ CF       CC       C2          THETA_HARM   140.0000  131.9000
+ NB       CC       C2          THETA_HARM   140.0000  121.0500
+ NB       CC       CG          THETA_HARM   140.0000  109.9000
+ NA       CC       C2          THETA_HARM   140.0000  122.2000
+ NA       CC       CG          THETA_HARM   140.0000  108.7500
+ NA       CC       CF          THETA_HARM   140.0000  105.9000
+ NA       CG       C*          THETA_HARM   140.0000  108.7000
+ NA       CG       CC          THETA_HARM   140.0000  105.9000
+ NB       CF       CC          THETA_HARM   140.0000  109.9000
+ NB       CE       N*          THETA_HARM   140.0000  113.9000
+ NA       CP       NB          THETA_HARM   140.0000  111.6000
+ NA       CP       NA          THETA_HARM   140.0000  110.7500
+ C*       CB       CD          THETA_HARM   170.0000  134.9000
+ CB       CB       C           THETA_HARM   170.0000  119.2000
+ CB       CB       CA          THETA_HARM   170.0000  117.3000
+ CN       CB       CD          THETA_HARM   170.0000  116.2000
+ CN       CB       C*          THETA_HARM   170.0000  108.8000
+ N*       CB       CB          THETA_HARM   140.0000  106.2000
+ NC       CB       CB          THETA_HARM   140.0000  127.7000
+ NC       CB       N*          THETA_HARM   140.0000  126.0000
+ NB       CB       C           THETA_HARM   140.0000  130.0000
+ NB       CB       CA          THETA_HARM   140.0000  132.4000
+ NB       CB       CB          THETA_HARM   140.0000  110.4000
+ CB       CN       CD          THETA_HARM   170.0000  122.7000
+ NA       CN       CD          THETA_HARM   140.0000  132.8000
+ NA       CN       CB          THETA_HARM   140.0000  104.4000
+ CH       OS       HO          THETA_HARM   110.0000  108.5000
+ CH       OS       CH          THETA_HARM   200.0000  111.8000
+ C2       OS       HO          THETA_HARM   110.0000  108.5000
+ C2       OS       C2          THETA_HARM   200.0000  111.8000
+ C3       OS       C2          THETA_HARM   200.0000  111.8000
+ P        OS       CH          THETA_HARM   200.0000  120.5000
+ P        OS       C2          THETA_HARM   200.0000  120.5000
+ P        OS       C3          THETA_HARM   200.0000  120.5000
+ HO       OH       HO          THETA_HARM    94.0000  104.5000
+ CH       OH       HO          THETA_HARM   110.0000  108.5000
+ C2       OH       HO          THETA_HARM   110.0000  108.5000
+ C3       OH       HO          THETA_HARM   110.0000  108.5000
+ C        OH       HO          THETA_HARM    70.0000  113.0000
+ P        OH       HO          THETA_HARM    90.0000  108.5000
+ C3       S        C2          THETA_HARM   124.0000   98.9000
+ S        S        C2          THETA_HARM   136.0000  103.7000
+ S        S        C3          THETA_HARM   136.0000  103.7000
+ LP       S        C2          THETA_HARM  1200.0000   96.7000
+ LP       S        C3          THETA_HARM  1200.0000   96.7000
+ LP       S        S           THETA_HARM  1200.0000   96.7000
+ LP       S        LP          THETA_HARM  1200.0000  160.0000
+ C2       SH       HS          THETA_HARM    88.0000   96.0000
+ C3       SH       HS          THETA_HARM    88.0000   96.0000
+ LP       SH       HS          THETA_HARM  1200.0000   96.7000
+ LP       SH       C2          THETA_HARM  1200.0000   96.7000
+ LP       SH       LP          THETA_HARM  1200.0000  160.0000
+ H2       NT       H2          THETA_HARM    70.0000  109.5000
+ CH       NT       H2          THETA_HARM    70.0000  109.5000
+ C2       NT       H2          THETA_HARM    70.0000  109.5000
+ H3       N3       H3          THETA_HARM    70.0000  109.5000
+ C2       N3       H3          THETA_HARM    70.0000  109.5000
+ C3       N3       H3          THETA_HARM    70.0000  109.5000
+ CJ       N*       CH          THETA_HARM   140.0000  121.2000
+ C        N*       CH          THETA_HARM   140.0000  117.6000
+ C        N*       CJ          THETA_HARM   140.0000  121.6000
+ CE       N*       CH          THETA_HARM   140.0000  128.8000
+ CE       N*       C3          THETA_HARM   140.0000  128.8000
+ CB       N*       CH          THETA_HARM   140.0000  125.8000
+ CB       N*       C3          THETA_HARM   140.0000  125.8000
+ CB       N*       CE          THETA_HARM   140.0000  105.4000
+ H2       N2       H2          THETA_HARM    70.0000  120.0000
+ H3       N2       H3          THETA_HARM    70.0000  120.0000
+ C2       N2       H2          THETA_HARM    70.0000  118.4000
+ C2       N2       H3          THETA_HARM    70.0000  118.4000
+ C3       N2       H2          THETA_HARM    70.0000  118.4000
+ CA       N2       H           THETA_HARM    70.0000  120.0000
+ CA       N2       H2          THETA_HARM    70.0000  120.0000
+ CA       N2       H3          THETA_HARM    70.0000  120.0000
+ CA       N2       C2          THETA_HARM   100.0000  123.2000
+ CA       N2       C3          THETA_HARM   100.0000  123.2000
+ H        N        H           THETA_HARM    70.0000  120.0000
+ H3       N        H3          THETA_HARM    70.0000  120.0000
+ CT       N        H           THETA_HARM    76.0000  118.4000
+ CH       N        H           THETA_HARM    76.0000  118.4000
+ C2       N        H           THETA_HARM    76.0000  118.4000
+ C2       N        CH          THETA_HARM   100.0000  118.0000
+ C3       N        H           THETA_HARM    76.0000  118.4000
+ C        N        H           THETA_HARM    70.0000  119.8000
+ C        N        H2          THETA_HARM    70.0000  120.0000
+ C        N        CT          THETA_HARM   100.0000  121.9000
+ C        N        CH          THETA_HARM   100.0000  121.9000
+ C        N        C2          THETA_HARM   100.0000  121.9000
+ C        N        C3          THETA_HARM   100.0000  121.9000
+ CA       NC       C           THETA_HARM   140.0000  120.5000
+ CI       NC       CA          THETA_HARM   140.0000  118.6000
+ CB       NC       CA          THETA_HARM   140.0000  112.2000
+ CB       NC       CI          THETA_HARM   140.0000  111.0000
+ CP       NB       CC          THETA_HARM   140.0000  105.3000
+ CP       NB       CF          THETA_HARM   140.0000  105.3000
+ CB       NB       CE          THETA_HARM   140.0000  103.8000
+ C        NA       H           THETA_HARM    70.0000  116.8000
+ C        NA       C           THETA_HARM   140.0000  126.4000
+ CA       NA       H           THETA_HARM    70.0000  118.0000
+ CA       NA       C           THETA_HARM   140.0000  125.2000
+ CC       NA       H           THETA_HARM    70.0000  126.3500
+ CG       NA       H           THETA_HARM    70.0000  126.3500
+ CP       NA       H           THETA_HARM    70.0000  126.3500
+ CP       NA       CC          THETA_HARM   140.0000  107.3000
+ CP       NA       CG          THETA_HARM   140.0000  107.3000
+ CN       NA       H           THETA_HARM    70.0000  124.2000
+ CN       NA       CG          THETA_HARM   140.0000  111.6000
+ OS       P        OS          THETA_HARM    90.0000  102.6000
+ OH       P        OS          THETA_HARM    90.0000  102.6000
+ O2       P        OS          THETA_HARM   200.0000  108.2000
+ O2       P        OH          THETA_HARM    90.0000  108.2000
+ O2       P        O2          THETA_HARM   280.0000  119.9000
+END
+#
+TORSIONS
+ X        CT       CT       X           DIHEDRAL       3.2000    3.0000   -1.0000
+ X        CH       CH       X           DIHEDRAL       4.0000    3.0000   -1.0000
+ OS       CH       CH       OS          DIHEDRAL       4.0000    2.0000   -1.0000
+ OS       CH       CH       OS          DIHEDRAL       4.0000    3.0000   -1.0000
+ OH       CH       CH       OS          DIHEDRAL       4.0000    3.0000   -1.0000
+ OH       CH       CH       OS          DIHEDRAL       4.0000    2.0000   -1.0000
+ OH       CH       CH       OH          DIHEDRAL       4.0000    3.0000   -1.0000
+ OH       CH       CH       OH          DIHEDRAL       4.0000    2.0000   -1.0000
+ X        C2       CH       X           DIHEDRAL       4.0000    3.0000   -1.0000
+ OS       C2       CH       OS          DIHEDRAL       4.0000    3.0000   -1.0000
+ OS       C2       CH       OS          DIHEDRAL       2.0000    2.0000   -1.0000
+ OS       C2       CH       OH          DIHEDRAL       4.0000    3.0000   -1.0000
+ OS       C2       CH       OH          DIHEDRAL       2.0000    2.0000   -1.0000
+ OH       C2       CH       OS          DIHEDRAL       2.0000    2.0000   -1.0000
+ OH       C2       CH       OS          DIHEDRAL       4.0000    3.0000   -1.0000
+ OH       C2       CH       OH          DIHEDRAL       2.0000    2.0000   -1.0000
+ OH       C2       CH       OH          DIHEDRAL       4.0000    3.0000   -1.0000
+ X        C2       C2       X           DIHEDRAL       4.0000    3.0000   -1.0000
+ OS       C2       C2       OS          DIHEDRAL       1.0000    2.0000   -1.0000
+ OS       C2       C2       OS          DIHEDRAL       4.0000    3.0000   -1.0000
+ OH       C2       C2       OS          DIHEDRAL       1.0000    2.0000   -1.0000
+ OH       C2       C2       OS          DIHEDRAL       4.0000    3.0000   -1.0000
+ OH       C2       C2       OH          DIHEDRAL       4.0000    3.0000   -1.0000
+ OH       C2       C2       OH          DIHEDRAL       1.0000    2.0000   -1.0000
+ X        CJ       CM       X           DIHEDRAL      54.4000    2.0000    1.0000
+ X        CJ       CJ       X           DIHEDRAL      48.8000    2.0000    1.0000
+ X        C        CT       X           DIHEDRAL       0.0000    2.0000   -1.0000
+ O        C        CT       HC          DIHEDRAL       0.8000    3.0000    1.0000
+ O        C        CT       CT          DIHEDRAL       0.8000    3.0000    1.0000
+ O        C        CT       N           DIHEDRAL       0.8000    3.0000    1.0000
+ X        C        CH       X           DIHEDRAL       0.0000    2.0000   -1.0000
+ O        C        CH       CH          DIHEDRAL       0.8000    3.0000    1.0000
+ O        C        CH       C2          DIHEDRAL       0.8000    3.0000    1.0000
+ O        C        CH       N           DIHEDRAL       0.8000    3.0000    1.0000
+ X        C        C2       X           DIHEDRAL       0.0000    3.0000    1.0000
+ O        C        C2       N           DIHEDRAL       0.8000    3.0000    1.0000
+ X        C        CM       X           DIHEDRAL       6.2000    2.0000    1.0000
+ X        C        CJ       X           DIHEDRAL       6.2000    2.0000    1.0000
+ X        CA       CT       X           DIHEDRAL       0.0000    2.0000   -1.0000
+ X        CA       CH       X           DIHEDRAL       0.0000    2.0000   -1.0000
+ X        CA       C2       X           DIHEDRAL       0.0000    2.0000   -1.0000
+ X        CA       CJ       X           DIHEDRAL       7.4000    2.0000    1.0000
+ X        CA       C        X           DIHEDRAL      10.6000    2.0000    1.0000
+ X        CA       CA       X           DIHEDRAL      10.6000    2.0000    1.0000
+ X        CD       C        X           DIHEDRAL      10.6000    2.0000    1.0000
+ X        CD       CA       X           DIHEDRAL      10.6000    2.0000    1.0000
+ X        CD       CD       X           DIHEDRAL      10.6000    2.0000    1.0000
+ X        C*       C2       X           DIHEDRAL       0.0000    2.0000   -1.0000
+ X        CC       C2       X           DIHEDRAL       0.0000    2.0000   -1.0000
+ X        CG       C*       X           DIHEDRAL      47.2000    2.0000    1.0000
+ X        CG       CC       X           DIHEDRAL      31.8000    2.0000    1.0000
+ X        CF       CC       X           DIHEDRAL      28.6000    2.0000    1.0000
+ X        CB       C        X           DIHEDRAL       8.8000    2.0000    1.0000
+ X        CB       CA       X           DIHEDRAL      10.2000    2.0000    1.0000
+ X        CB       CD       X           DIHEDRAL      10.6000    2.0000    1.0000
+ X        CB       CI       X           DIHEDRAL      32.6000    2.0000    1.0000
+ X        CB       C*       X           DIHEDRAL       4.8000    2.0000    1.0000
+ X        CB       CB       X           DIHEDRAL      32.6000    2.0000    1.0000
+ X        CN       CD       X           DIHEDRAL      10.6000    2.0000    1.0000
+ X        CN       CB       X           DIHEDRAL       8.8000    2.0000    1.0000
+ X        OS       CH       X           DIHEDRAL       2.9000    3.0000   -1.0000
+ CH       OS       CH       CH          DIHEDRAL       2.9000    3.0000   -1.0000
+ CH       OS       CH       CH          DIHEDRAL       0.4000    2.0000   -1.0000
+ CH       OS       CH       C2          DIHEDRAL       2.9000    3.0000   -1.0000
+ CH       OS       CH       C2          DIHEDRAL       0.4000    2.0000   -1.0000
+ CH       OS       CH       N*          DIHEDRAL       2.9000    3.0000   -1.0000
+ CH       OS       CH       N*          DIHEDRAL       0.0000    2.0000   -1.0000
+ C2       OS       CH       C2          DIHEDRAL       2.9000    3.0000   -1.0000
+ C2       OS       CH       C2          DIHEDRAL       0.4000    2.0000   -1.0000
+ C2       OS       CH       C3          DIHEDRAL       2.9000    3.0000   -1.0000
+ C2       OS       CH       C3          DIHEDRAL       0.4000    2.0000   -1.0000
+ C3       OS       CH       C3          DIHEDRAL       2.9000    3.0000   -1.0000
+ C3       OS       CH       C3          DIHEDRAL       0.4000    2.0000   -1.0000
+ X        OS       C2       X           DIHEDRAL       2.9000    3.0000   -1.0000
+ C2       OS       C2       C2          DIHEDRAL       2.9000    3.0000   -1.0000
+ C2       OS       C2       C2          DIHEDRAL       0.2000    2.0000   -1.0000
+ C2       OS       C2       C3          DIHEDRAL       2.9000    3.0000   -1.0000
+ C2       OS       C2       C3          DIHEDRAL       0.2000    2.0000   -1.0000
+ C3       OS       C2       C3          DIHEDRAL       2.9000    3.0000   -1.0000
+ C3       OS       C2       C3          DIHEDRAL       0.2000    2.0000   -1.0000
+ X        OH       CH       X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        OH       C2       X           DIHEDRAL       1.0000    3.0000   -1.0000
+ X        OH       C        X           DIHEDRAL       3.6000    2.0000    1.0000
+ X        S        C2       X           DIHEDRAL       2.0000    3.0000   -1.0000
+ LP       S        C2       C2          DIHEDRAL       0.0000    3.0000   -1.0000
+ C2       S        S        C2          DIHEDRAL       1.2000    3.0000   -1.0000
+ C2       S        S        C2          DIHEDRAL       7.0000    2.0000   -1.0000
+ LP       S        S        C2          DIHEDRAL       0.0000    3.0000   -1.0000
+ LP       S        S        LP          DIHEDRAL       0.0000    3.0000   -1.0000
+ X        SH       C2       X           DIHEDRAL       1.5000    3.0000   -1.0000
+ LP       SH       C2       CH          DIHEDRAL       0.0000    3.0000   -1.0000
+ X        NT       C2       X           DIHEDRAL       2.0000    3.0000   -1.0000
+ X        N3       C2       X           DIHEDRAL       2.8000    3.0000   -1.0000
+ X        N*       CH       X           DIHEDRAL       0.0000    2.0000   -1.0000
+ X        N*       CJ       X           DIHEDRAL      14.8000    2.0000    1.0000
+ X        N*       C        X           DIHEDRAL      11.6000    2.0000    1.0000
+ X        N*       CE       X           DIHEDRAL      13.4000    2.0000    1.0000
+ X        N*       CB       X           DIHEDRAL      13.2000    2.0000    1.0000
+ X        N2       C2       X           DIHEDRAL       0.0000    3.0000   -1.0000
+ X        N2       CA       X           DIHEDRAL      13.6000    2.0000    1.0000
+ X        N2       CI       X           DIHEDRAL       5.2000    1.0000   -1.0000
+ X        N        CT       X           DIHEDRAL       0.0000    3.0000   -1.0000
+ X        N        CH       X           DIHEDRAL       0.0000    3.0000   -1.0000
+ X        N        C2       X           DIHEDRAL       0.0000    3.0000   -1.0000
+ X        N        C        X           DIHEDRAL      20.0000    2.0000    1.0000
+ H        N        C        O           DIHEDRAL      20.0000    2.0000    1.0000
+ H        N        C        O           DIHEDRAL       5.2000    1.0000   -1.0000
+ X        NC       C        X           DIHEDRAL      16.0000    2.0000    1.0000
+ X        NC       CA       X           DIHEDRAL      19.2000    2.0000    1.0000
+ X        NC       CI       X           DIHEDRAL      27.0000    2.0000    1.0000
+ X        NC       CB       X           DIHEDRAL      16.6000    2.0000    1.0000
+ X        NB       CC       X           DIHEDRAL       9.6000    2.0000    1.0000
+ X        NB       CF       X           DIHEDRAL       9.6000    2.0000    1.0000
+ X        NB       CE       X           DIHEDRAL      40.0000    2.0000    1.0000
+ X        NB       CP       X           DIHEDRAL      20.0000    2.0000    1.0000
+ X        NB       CB       X           DIHEDRAL      10.2000    2.0000    1.0000
+ X        NA       C        X           DIHEDRAL      10.8000    2.0000    1.0000
+ X        NA       CA       X           DIHEDRAL      12.0000    2.0000    1.0000
+ X        NA       CC       X           DIHEDRAL      11.2000    2.0000    1.0000
+ X        NA       CG       X           DIHEDRAL      12.0000    2.0000    1.0000
+ X        NA       CP       X           DIHEDRAL      18.6000    2.0000    1.0000
+ X        NA       CN       X           DIHEDRAL      12.2000    2.0000    1.0000
+ X        P        OS       X           DIHEDRAL       1.5000    3.0000   -1.0000
+ OS       P        OS       CH          DIHEDRAL       1.5000    3.0000   -1.0000
+ OS       P        OS       CH          DIHEDRAL       3.0000    2.0000   -1.0000
+ OS       P        OS       C2          DIHEDRAL       1.5000    3.0000   -1.0000
+ OS       P        OS       C2          DIHEDRAL       3.0000    2.0000   -1.0000
+ OS       P        OS       C3          DIHEDRAL       1.5000    3.0000   -1.0000
+ OS       P        OS       C3          DIHEDRAL       3.0000    2.0000   -1.0000
+ OH       P        OS       CH          DIHEDRAL       1.5000    3.0000   -1.0000
+ OH       P        OS       CH          DIHEDRAL       3.0000    2.0000   -1.0000
+ OH       P        OS       C2          DIHEDRAL       1.5000    3.0000   -1.0000
+ OH       P        OS       C2          DIHEDRAL       3.0000    2.0000   -1.0000
+ OH       P        OS       C3          DIHEDRAL       1.5000    3.0000   -1.0000
+ OH       P        OS       C3          DIHEDRAL       3.0000    2.0000   -1.0000
+ X        P        OH       X           DIHEDRAL       1.5000    3.0000   -1.0000
+END
+#
+INVERSIONS
+ CH       X        X        CH          IT_JIKL       28.0000  120.0000    3.0000
+ CH       X        X        C2          IT_JIKL       28.0000  120.0000    3.0000
+ CH       C3       C3       CA          IT_JIKL       14.0000  120.0000    3.0000
+ CH       C        CH       N3          IT_JIKL       14.0000  120.0000    3.0000
+ CH       C        C2       N3          IT_JIKL       14.0000  120.0000    3.0000
+ CH       C        X        N           IT_JIKL       28.0000  120.0000    3.0000
+ C        O        X        X           IT_JIKL       21.0000  180.0000    2.0000
+ C        O2       X        O2          IT_JIKL       21.0000  180.0000    2.0000
+ CA       N2       X        N2          IT_JIKL       21.0000  180.0000    2.0000
+ N2       H2       X        H2          IT_JIKL        2.0000  180.0000    2.0000
+ N        X        X        H           IT_JIKL        2.0000  180.0000    2.0000
+ N        H2       X        H2          IT_JIKL        2.0000  180.0000    2.0000
+ N        C2       X        CH          IT_JIKL        2.0000  180.0000    2.0000
+ NA       H        X        X           IT_JIKL        2.0000  180.0000    2.0000
+END
+#
+UREY_BRADLEY
+END
+#
+HYDROGEN_BONDS
+ X        X           LJ_12_10     0.9500E+01    2.7500
+END
+#
+GENERATOR
+END

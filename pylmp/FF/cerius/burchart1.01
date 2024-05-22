@@ -1,0 +1,133 @@
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+
+ **********************************************************************
+           A Zeolites and Aluminophosphates force field    
+                              by                           
+                     Erik de Vos Burchart                  
+                                                           
+   Ph.D. Thesis, 1992, 'Studies on Zeolites: Molecular Mechanics,
+   Framework Stability and Crystal Growth', Table I, Chapter XII.     
+
+
+NOTE: This implementation differs from the published one in three
+      respects:
+
+      * Ignores the Coulomb interaction if an atom pair interacts
+        via a bond interaction where Burchart does not.
+      * Does not allow van der Waals or Coulomb interaction of pairs
+        of atoms when they interact via a Urey-Bradley interaction
+        where Burchart does.
+      * Applies a 0 to 15A spline to both van der Waals and Coulomb
+        interactions whereas Burchart applies such a spline on the
+        Coulombic term only.
+ **********************************************************************
+
+END
+#
+PREFERENCES
+ BONDS                                 T
+ ANGLES                                F
+ COULOMB                               T
+ INVERSIONS                            F
+ TORSIONS                              F
+ UREY_BRADLEY                          T
+ HYDROGEN_BONDS                        F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                F
+ SHRINK_CH_BONDS                       F
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      F
+ SINGLE_INVERSION                      F
+ H-BOND_LIST                           T
+ NON_BOND_LIST                         T
+ NON_BOND_LIST_CUT_OFF                   15.00000
+ DISTANCE_DEPENDENT_DIELETRIC_CONSTANT F
+ COU_DIELETRIC_CONSTANT                   4.30000
+ COU_INTER_CUT_OFF                       15.00000
+ COU_SPLINE_OFF                          15.00000
+ COU_SPLINE_ON                            0.00000
+ EWALD_SUM_COU_AUTO_OPT                F
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            SPLINE    
+ COU_DIRECT_CUT-OFF                       0.00000
+ VDW_RADII_COMBINATION_RULE            ARITHMETIC
+ VDW_INTER_CUT_OFF                       15.00000
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            SPLINE    
+ VDW_SPLINE_ON                            0.00000
+ VDW_SPLINE_OFF                          15.00000
+ EWALD_SUM_VDW_AUTO_OPT                F
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         T
+ ASSIGN_HYBRIDIZATION                  T
+ ATOM_TYPE                             T
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ O_z        O      15.99940 -0.1900   3   0   0
+ Si_z       Si     28.08550  0.3800   3   0   0
+ Al_z       Al     26.98154  0.5500   3   0   0
+ P_z        P      30.97376  0.2300   3   0   0
+END
+#
+DIAGONAL_VDW
+ O_z         EXPO_6         3.3000  0.1648E+00   12.5000
+ Si_z        EXPO_6         4.2000  0.4690E-01   12.5000
+ Al_z        EXPO_6         4.2400  0.2920E-01   12.5000
+ P_z         EXPO_6         3.8000  0.6290E-01   12.5000
+END
+#
+ATOM_TYPING_RULES
+END
+#
+#
+OFF_DIAGONAL_VDW
+ Si_z     O_z         EXPO_6         3.7500  0.8410E-01   12.5000
+ Al_z     O_z         EXPO_6         3.7700  0.6590E-01   12.5000
+ P_z      O_z         EXPO_6         3.5500  0.9940E-01   12.5000
+END
+#
+BOND_STRETCH
+ Si_z     O_z         MORSE        526.0000    1.5910  106.9158  106.9200
+ Al_z     O_z         MORSE        545.2300    1.7300  109.7583  109.7550
+ P_z      O_z         MORSE        677.3050    1.5100   84.7988   84.7980
+END
+#
+ANGLE_BEND
+END
+#
+TORSIONS
+END
+#
+INVERSIONS
+END
+#
+UREY_BRADLEY
+ Si_z     O_z      Si_z        HARMONIC     190.6100    3.0800    0.0000
+ Al_z     O_z      Si_z        HARMONIC     177.5680    3.2200    0.0000
+ P_z      O_z      Al_z        HARMONIC     125.2700    3.1100    0.0000
+ O_z      Si_z     O_z         HARMONIC     137.3900    2.6000    0.0000
+ O_z      Al_z     O_z         HARMONIC      53.1900    2.8300    0.0000
+ O_z      P_z      O_z         HARMONIC     149.8700    2.4700    0.0000
+END
+#
+HYDROGEN_BONDS
+ X        X           LJ_12_10     0.9500E+01    2.7500
+END
+#
+GENERATOR
+END

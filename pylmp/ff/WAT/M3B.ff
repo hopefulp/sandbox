@@ -1,0 +1,254 @@
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+END
+#
+PREFERENCES
+ BONDS                                 T
+ ANGLES                                T
+ COULOMB                               F
+ INVERSIONS                            F
+ TORSIONS                              T
+ UREY_BRADLEY                          F
+ STRETCH_STRETCH                       F
+ SEPARATED_STRETCH_STRETCH             F
+ STRETCH_BEND_STRETCH                  F
+ BEND_BEND                             F
+ TORSION_STRETCH                       F
+ TORSION_BEND_BEND                     F
+ BEND_TORSION_BEND                     F
+ STRETCH_TORSION_STRETCH               F
+ HYDROGEN_BONDS                        F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ IGNORE_UNDEFINED_TERMS                T
+ NON-BONDED_3-BODY                     F
+ SHRINK_CH_BONDS                       F
+ SHRINK_CH_H_ATOM                      H__C 
+ SHRINK_CH_FACTOR                         0.91500
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      T
+ SCALE_BY_N_DEFINED_TORSIONS           T
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          0.40000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           F
+ H-BOND_DIRECT_RCUT                       4.50000
+ H-BOND_SPLINE_DISTANCE_ON                4.50000
+ H-BOND_SPLINE_DISTANCE_OFF               5.00000
+ H-BOND_SPLINE_ANGLE_ON                  65.00000
+ H-BOND_SPLINE_ANGLE_OFF                 75.00000
+ H-BOND_LIST_DISTANCE_OFF                 7.00000
+ H-BOND_LIST_ANGLE_OFF                   90.00000
+ NB_NEIGHBOUR_SEARCH_METHOD            SMART                         
+ NON_BOND_BUFFER_DISTANCE                 2.00000
+ H-BOND_BUFFER_DISTANCE                   2.00000
+ COU_DIELETRIC_CONSTANT                     1.00000000000000000      
+ COU_INTER_CUT_OFF                       14.00000
+ COU_SPLINE_OFF                          18.00000
+ COU_SPLINE_ON                           16.00000
+ EWALD_SUM_COU_ACCURACY                   0.00100
+ EWALD_SUM_COU_ETA                        2.50000
+ EWALD_SUM_COU_KCUT                       0.50000
+ EWALD_SUM_COU_RCUT                       6.00000
+ EWALD_SUM_COU_OPTIMIZE                SMART                         
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            EWALD                         
+ COU_DIRECT_CUT-OFF                      20.00000
+ VDW_COMBINATION_RULE                  GEOMETRIC                     
+ VDW_INTER_CUT_OFF                       14.00000
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            SPLINE                        
+ VDW_SPLINE_ON                           12.00000
+ VDW_SPLINE_OFF                          13.00000
+ EWALD_SUM_VDW_OPTIMIZE                NEVER                         
+ EWALD_SUM_VDW_ACCURACY                   0.00100
+ EWALD_SUM_VDW_ETA                        2.50000
+ EWALD_SUM_VDW_KCUT                       0.50000
+ EWALD_SUM_VDW_RCUT                      30.00000
+ EWALD_SUM_VDW_REP_CUT                   20.00000
+ FAST_EWALD_SUM_RATIO                    10.00000
+ SLOW_EWALD_SUM_RATIO                     5.00000
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         F
+ ASSIGN_HYBRIDIZATION                  F
+ ASSIGN_VALBOND_CENTER                 F
+ ATOM_TYPE                             F
+ ATOM_TYPE_ALL                         F
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ Ar0        Ar     75.00000  0.0000   0   0   0
+ Ne0        Ne     75.00000  0.0000   0   0   0
+ He0        He     30.00000  0.0000   0   0   0
+ Ar3        Ar     75.00000  0.0000   0   0   0
+ Ne3        Ne     75.00000  0.0000   0   0   0
+ He         He     30.00000  0.0000   0   0   0
+ Ar1        Ar     66.00000  0.0000   0   0   0
+ Ne1        Ne     66.00000  0.0000   0   0   0
+ Ar2        Ar     66.00000  0.0000   0   0   0
+ Ne2        Ne     66.00000  0.0000   0   0   0
+ Xe         Xe     18.00000  0.0000   0   0   0
+END
+#
+DIAGONAL_VDW
+ Ar0         VDW_MORSE     6.110340118408203        1.949550032615662        10.50000000000000    
+ Ne0         VDW_MORSE     5.124800205230713        2.046469926834106        11.00000000000000    
+ He0         VDW_MORSE     4.632030010223389        1.787719964981079        11.00000000000000    
+ Ar3         VDW_MORSE     5.651110172271729        1.218000054359436        10.50000000000000    
+ Ne3         VDW_MORSE     4.790740013122559        1.254999995231628        11.00000000000000    
+ He          VDW_MORSE     4.699999809265137        1.190013051033020        11.00000000000000    
+ Ar1         VDW_MORSE     6.731259822845459        1.218000054359436        10.50000000000000    
+ Ne1         VDW_MORSE     5.761700153350830        1.254999995231628        11.00000000000000    
+ Ar2         VDW_MORSE     6.731259822845459        1.218000054359436        10.50000000000000    
+ Ne2         VDW_MORSE     5.761700153350830        1.254999995231628        11.00000000000000    
+ Xe          VDW_MORSE     3.770000000000000        1.150000000000000         8.00000000000000    
+END
+#
+ATOM_TYPING_RULES
+ Ar1             Ar           0           0           0           1
+ Ne1             Ne           0           0           0           1
+ He              He           0           0           0           1
+END
+#
+#
+OFF_DIAGONAL_VDW
+END
+#
+BOND_STRETCH
+ Ne0      Ar0         HARMONIC     425.0000    2.9150               
+ Ne1      Ar1         HARMONIC     425.0000    2.9150               
+ Ne2      Ar2         HARMONIC     425.0000    2.9150               
+ Ar2      Ne3         HARMONIC     425.0000    2.9150               
+ Ar1      Ne3         HARMONIC     425.0000    2.9150               
+ Ne1      Ar3         HARMONIC     425.0000    2.9150               
+ Ne2      Ar3         HARMONIC     425.0000    2.9150               
+ Ar2      Ne1         HARMONIC     410.0000    2.4800               
+ Ne2      Ar1         HARMONIC     410.0000    2.4800               
+ He0      Ne0         HARMONIC     235.0000    3.6890               
+ Ne1      He          HARMONIC     235.0000    3.6890               
+ Ne2      He          HARMONIC     235.0000    3.6890               
+ He       Ne3         HARMONIC     235.0000    3.6890               
+ He0      Ar0         HARMONIC     435.0000    2.5760               
+ Ar1      He          HARMONIC     435.0000    2.5760               
+ Ar2      He          HARMONIC     435.0000    2.5760               
+ He       Ar3         HARMONIC     435.0000    2.5760               
+END
+#
+ANGLE_BEND
+ Ne2      Ar2      Ne1         THETA_HARM    75.0000  142.0000               
+ Ne2      Ar1      Ne1         THETA_HARM    75.0000  142.0000               
+ Ne1      Ar2      Ne3         THETA_HARM    75.0000  142.0000               
+ Ne2      Ar1      Ne3         THETA_HARM    75.0000  142.0000               
+ Ar2      Ne1      Ar1         THETA_HARM   150.0000  121.0000               
+ Ar2      Ne2      Ar1         THETA_HARM   150.0000  121.0000               
+ Ar1      Ne2      Ar3         THETA_HARM   150.0000  121.0000               
+ Ar2      Ne1      Ar3         THETA_HARM   150.0000  121.0000               
+ Ar1      Ne2      He          THETA_HARM   110.0000  105.0000               
+ Ar2      Ne1      He          THETA_HARM   110.0000  105.0000               
+ Ne2      Ar1      He          THETA_HARM   100.0000  110.0000               
+ Ne1      Ar2      He          THETA_HARM   100.0000  110.0000               
+ Ne2      He       Ar2         IGNORE                   
+ Ne1      He       Ar1         IGNORE                   
+ Ar1      Ne1      He          IGNORE                   
+ Ar2      Ne2      He          IGNORE                   
+ Ne2      Ar2      He          IGNORE                   
+ Ne1      Ar1      He          IGNORE                   
+ Ar2      He       Ne3         IGNORE                   
+ Ar1      He       Ne3         IGNORE                   
+ Ne1      He       Ar3         IGNORE                   
+ Ne2      He       Ar3         IGNORE                   
+ He       Ne1      Ar3         IGNORE                   
+ He       Ne2      Ar3         IGNORE                   
+ Ar1      Ne3      He          IGNORE                   
+ Ar2      Ne3      He          IGNORE                   
+ Ne2      Ar3      He          IGNORE                   
+ Ne1      Ar3      He          IGNORE                   
+ He       Ar1      Ne3         IGNORE                   
+ He       Ar2      Ne3         IGNORE                   
+ He0      Ar0      Ne0         IGNORE                   
+ He0      Ne0      Ar0         IGNORE                   
+ Ne0      He0      Ar0         IGNORE                   
+END
+#
+TORSIONS
+ He       Ar2      Ne1      He          SHFT_DIHDR     4.3000    1.0000 -135.0000               
+                                                       2.8000    2.0000  130.0000
+ He       Ne2      Ar1      He          SHFT_DIHDR     4.3000    1.0000 -135.0000               
+                                                       2.8000    2.0000  130.0000
+ Ar2      Ne2      Ar1      Ne1         SHFT_DIHDR     1.0000    1.0000   55.0000               
+                                                       1.8000    2.0000  -20.0000
+ Ne2      Ar2      Ne1      Ar1         SHFT_DIHDR     1.0000    1.0000   55.0000               
+                                                       1.8000    2.0000  -20.0000
+ Ar3      Ne2      Ar1      Ne1         SHFT_DIHDR     1.0000    1.0000   55.0000               
+                                                       1.8000    2.0000  -20.0000
+ Ne2      Ar2      Ne1      Ar3         SHFT_DIHDR     1.0000    1.0000   55.0000               
+                                                       1.8000    2.0000  -20.0000
+ Ar2      Ne2      Ar1      Ne3         SHFT_DIHDR     1.0000    1.0000   55.0000               
+                                                       1.8000    2.0000  -20.0000
+ Ne3      Ar2      Ne1      Ar1         SHFT_DIHDR     1.0000    1.0000   55.0000               
+                                                       1.8000    2.0000  -20.0000
+ Ar2      Ne1      Ar1      Ne2         SHFT_DIHDR    15.0000    1.0000 -160.0000               
+ Ar1      Ne2      Ar2      Ne1         SHFT_DIHDR    15.0000    1.0000 -160.0000               
+ Ar1      Ne2      He       Ar2         SHFT_DIHDR    30.0000    1.0000  -58.0000               
+ Ar2      Ne1      He       Ar1         SHFT_DIHDR    30.0000    1.0000  -58.0000               
+ Ar1      Ne2      He       Ar3         SHFT_DIHDR    30.0000    1.0000  -58.0000               
+ Ar2      Ne1      He       Ar3         SHFT_DIHDR    30.0000    1.0000  -58.0000               
+ Ne2      Ar1      He       Ne1         SHFT_DIHDR    42.0000    1.0000   40.0000               
+                                                       4.0000    3.0000   30.0000
+ Ne1      Ar2      He       Ne2         SHFT_DIHDR    42.0000    1.0000   40.0000               
+                                                       4.0000    3.0000   30.0000
+ Ne2      Ar1      He       Ne3         SHFT_DIHDR    42.0000    1.0000   40.0000               
+                                                       4.0000    3.0000   30.0000
+ Ne1      Ar2      He       Ne3         SHFT_DIHDR    42.0000    1.0000   40.0000               
+                                                       4.0000    3.0000   30.0000
+ He       Ar2      Ne1      Ar1         SHFT_DIHDR     3.6000    1.0000   93.0000               
+                                                       2.5000    2.0000 -145.0000
+ Ar2      Ne2      Ar1      He          SHFT_DIHDR     3.6000    1.0000   93.0000               
+                                                       2.5000    2.0000 -145.0000
+ He       Ar2      Ne1      Ar3         SHFT_DIHDR     3.6000    1.0000   93.0000               
+                                                       2.5000    2.0000 -145.0000
+ Ar3      Ne2      Ar1      He          SHFT_DIHDR     3.6000    1.0000   93.0000               
+                                                       2.5000    2.0000 -145.0000
+ He       Ne2      Ar1      Ne1         SHFT_DIHDR     1.0000    1.0000   27.0000               
+                                                       2.1000    2.0000 -115.0000
+ Ne2      Ar2      Ne1      He          SHFT_DIHDR     1.0000    1.0000   27.0000               
+                                                       2.1000    2.0000 -115.0000
+ He       Ne2      Ar1      Ne3         SHFT_DIHDR     1.0000    1.0000   27.0000               
+                                                       2.1000    2.0000 -115.0000
+ Ne3      Ar2      Ne1      He          SHFT_DIHDR     1.0000    1.0000   27.0000               
+                                                       2.1000    2.0000 -115.0000
+ Ar1      Ne2      Ar2      He          SHFT_DIHDR    15.7000    1.0000  112.0000               
+                                                       4.3000    2.0000  -29.0000
+ Ar2      Ne1      Ar1      He          SHFT_DIHDR    15.7000    1.0000  112.0000               
+                                                       4.3000    2.0000  -29.0000
+ Ar1      Ne2      Ar3      He          SHFT_DIHDR    15.7000    1.0000  112.0000               
+                                                       4.3000    2.0000  -29.0000
+ Ar2      Ne1      Ar3      He          SHFT_DIHDR    15.7000    1.0000  112.0000               
+                                                       4.3000    2.0000  -29.0000
+ He       Ne1      Ar1      Ne2         SHFT_DIHDR    10.1000    1.0000  -65.0000               
+                                                       1.3000    2.0000   71.0000
+ He       Ne2      Ar2      Ne1         SHFT_DIHDR    10.1000    1.0000  -65.0000               
+                                                       1.3000    2.0000   71.0000
+ Ne2      Ar1      Ne3      He          SHFT_DIHDR    10.1000    1.0000  -65.0000               
+                                                       1.3000    2.0000   71.0000
+ Ne1      Ar2      Ne3      He          SHFT_DIHDR    10.1000    1.0000  -65.0000               
+                                                       1.3000    2.0000   71.0000
+ Ar3      Ne2      Ar1      Ne3         SHFT_DIHDR     1.0000    1.0000   55.0000               
+                                                       1.8000    2.0000  -20.0000
+ Ne3      Ar2      Ne1      Ar3         SHFT_DIHDR     1.0000    1.0000   55.0000               
+                                                       1.8000    2.0000  -20.0000
+END
+#
+COULOMBIC
+END

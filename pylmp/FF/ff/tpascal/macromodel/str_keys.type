@@ -1,0 +1,136 @@
+# First neighbors of the first atom in the pattern have to be given
+# exact unless the first atom is a C atom connected to a H atom.      
+#
+#  '#' indicates the start of a comment
+#  
+#
+#                   
+# Structure keys for common organic elements
+[#1]                                         H
+[#5]                                         B
+[#6]                                         C
+[#7]                                         N
+[#8]                                         O
+[#9]                                         F
+[#14]                                        Si
+[#15]                                        P
+[#16]                                        S
+[#17]                                        Cl
+[#26]                                        Fe
+[#35]                                        Br
+[#53]                                        I
+# All N-H and O-H hydrogens are initially accepted as neutral donors
+[#1]~[N,n]                                  Num H-N
+[#1]~[O,o]                                  Num H-O
+# Charged HB donor groups
+[#1][#7;X4]                                 Charged amines
+[#1][N;X3]=[*]                              Charged imines
+[#1][N;X3][#6;X3]=[#7;X3]                   Charged amidine 
+[#1][N;X3]-[c;X3](~[n;X3])~[n;X3]           Charged HN-imidazole
+[#1][n;X3;+1]~[#6;X3](~[#7;X3])-[*]         Charged imidazole
+[n;X3;H1;r6]                                Charged pyridine
+# Structure keys to generate needed data
+C                                           Aliphatic carbon
+c                                           Aromatic carbon
+[#1][N;X3]-[*]=[X1]                         Num amide Hydrogens
+[#1][N;X3](-[*])-[*]                        Num amine/amide Hydrogens
+[#1][N;X2]=[*]                              Num imine Hydrogens
+[#1][n;X3;r6][c;X3;r6][n;r6]                Catch for uncharged guanine H
+[n,o,s,p]                                   Num heteroarom atoms
+[O;X2;!H]                                   Num divalent oxygen atoms
+[n;X2;!H]                                   Num heteroaromatic n w.outH
+[#1][N;X2]~[N;X2]~[N;X2]                    Num N=N=N-H
+# Structural keys for generic hydrogen bond acceptors
+[O;X1]=[S;X4](=O)(-[!X1])-[!X1]             Neutral Sulfones
+[O;X1]=[S;X3](-[!X1])-[!X1]                 Neutral Sulfenes
+[O;X1]=[c,C](~[!X1])~[!X1]                  Neutral Carbonyls
+[O;X1]=[P;X4](-[!X1])(-[!X1])-[!X1]         Neutral P=O-R3
+[O;X1]=[P;X4](=O)(-[!X1])-[!X1]             Neutral P(=O)2-R2
+[N&X2](=[*])-[!X1]                          Num imine N donors
+[N;X2;H1](=[*])                             Num imine NH
+[O;X1]=C                                    Carbonyls
+[O;X1]=P                                    P=O
+[O;X1]=S                                    S=O
+[N;X3](~[O;X1])~[O;X1]                      Nitro
+[O;X2]([C,c])[C,c]                          Ethers
+[N;X3]([O;X1])(-[*])-[*]                    Charged N-O
+[N;X3]([O;X1])(=[*])-[*]                    Neutral N-O
+[n;X3][O;X1]                                aromatic N-O
+[N;X4]([O;X1])(-[*])(-[*])-[*]              Neutral NR3-O
+[#1][O;X2][P;X4](~[O;X1])([O;X2])[F,Cl,Br,I]        Neutral halo-phosphoric acid
+# Structural keys for generic hydrogen bond donors
+[O;X2;H1]                                   Alcohols
+[S;X2;H1]                                   Thiols
+[N;X3](-[*])(-[*])-[*]                      Amine/Amides
+[NX3;H1,H2,H3]                              Num Amine/Amides w.H
+[n;H1;r5;-0]                                N-Pyrrole H
+[#8;X1]~[N;X3]~[O;X1]                       O in =O in nitro
+[#7;X1]#[C,c]                               N in R%N
+[F,Cl,Br,I][S;X4](=O)=O                     sulfonyl-halide
+[F,Cl,Br,I][C;X3]=O                         acyl halide
+[F,Cl,Br,I][C;X4;H2,H3]                        alkyl halide
+[F,Cl,Br,I]c(nc)nc                          halopyrimidine
+[O;X2]([C;X3]=O)([C;X3]=O)                  anhydride
+[C;X3](=O)([C;X3](=O))                      1,2-dicarbonyl
+[C;X4]([C;X3](=O)[C;X4;H2])([F,Cl,Br,I])([F,Cl,Br,I])[F,Cl,Br,I]        perhalo-ketone
+[C;X4;H3][C;X3](=O)[C;X4;H2,H3]             aliphatic ketone
+[O;X2;r3]                                   epoxide
+[N;X3;r3]                                   aziridine
+[O;X2]([!#1])[C;X3](=O)[C;X4;H2,H3]         aliphatic ester
+[S;X2]([!#1])[C;X3](=O)[C;X4;H2,H3]         aliphatic thioester
+[S;X4]([C;H2,H3])(=O)(=O)[O;X2][!#1]        sulphonate ester
+[P;X4]([C;H2,H3])(=O)(-O)[O;X2][!#1]        phosphonate ester
+[N;X2]([!#1])=[C;X3][C;H2,H3]               imine
+[O;X1]=[C;H1]                               aldehyde
+[O;X1]=C[C;H1]=[C;H1]                       michael acceptor
+[O;X1]=C[C;H2]C[F,Cl,Br,I]                  b-heterosubstituted carbonyl
+[O;X2]~[O;X2]                               R-O-O-R
+[S;X2]~[O;X2]                               R-S-O-R
+[N;X2]~[N;X2]                               R-N-N-R
+[N;X2]~[S;X2]                               R-N-S-R
+[S;X2]~[S;X2]                               R-S-S-R
+[N;X3][C;X3]([N;X3])=[N;X2]                 Guanidine
+[N;X3][C;X3](C)=[N;X2]                      Amidine
+# Structural keys for charged acidic groups - SMARTS keys adopted from ionizer
+[#7;X2](-[*])~[S;X4](~[O;X1])(~[O;X1])-[*]              Charged -N-S(=O)(=O)-
+[#8;X1]~[C;X3]~[O;X1]                             Charged carboxylic acid
+[#8;X1]~[P;X4](~[O;X1])([O;X2])[O;X2]             Charged phosphoric acid
+[#8;X1]~[P;X4](~[O;X1])([O;X2])[F,Cl,Br,I]        Charged halo-phosphoric acid
+[#8;X1]~[P;X4](~[O;X1])(~[O;X1])[O;X2]            Charged O-PO3
+[#8;X1]~[P;X4](~[O;X1])(~[O;X1])C                 Charged C-PO3-
+[#8;X1]~[P;X4](~[O;X1])([O;X2])N                  Charged phosphorylamide
+[#8;X1]~[P;X4](~[O;X1])([O;X2])C                  Charged phosphonic acid
+[#8;X1]~[P;X4](~[O;X1])(C)N                       Charged phosphonamide
+[#8;X1]~[S;X4](~[O;X1])(~[O;X1])[O;X2]            Charged sulfuric acid
+[#8;X1]~[S;X3](~[O;X1])[C,c]                      Charged sulfenic acid
+[#8;X1]~[S;X4](~[O;X1])(~[O;X1])[C,c,N]           Charged sulfonic acid
+[#8;X1][N;X3]([C,#1])C=O                          Charged hydroxamic acid
+[#7;X2]~([S;X4](~[O;X1])(~[O;X1])(-C))[n,c]       Charged sulfonamide
+[#7;X2]1[#6;X3][#7;X2][#7;X2][#7;X2]1             Charged tetrazole
+[#16;X1;-1][C;X4]                              Charged alkylthiol
+[#8;X1]ccN(=O)-O                            Charged 2-nitrophenol
+[#8;X1]ccccN(=O)-O                          Charged 4-nitrophenol
+[#8;X1]c(cc(N(=O)(-O)))(cc(N(=O)(-O)))       Charged 3,5-nitrophenol
+#[#16;X1][cc[O;H1],c[c,n,o,s]c[O;H1],c[c,n,o,s][c,n,o,s]c[O;H1]]           Charged thiophenol hetero ok
+# Structural keys for charged basic groups 
+[#1][#8;X2][C,S,P]=[O;X1]                                      Acidic Hydrogens
+[#1][#7;X3]([C&X4,#1])=C([N;X3]([C&X4,#1])([C&X4,#1]))C        Charged amidines
+[#1][N;X3]=[C;X3]([N;X3])[N;X3]                                  Charged guanidines
+[#1][#7;X4](-[C;X3](=C)([C&X4,#1]))([C&X4,#1])([C&X4,#1])        Charged enamines
+[#1][#7;X4](-[#1,CX4])(-[C&X4,#1])(c1ccccc1)                              Charged aniline
+[#1][#7;X4]([C;X4])([C;X4])(c1ccccc1)                            Charged dialkyl aniline
+[#1][#7;X4]([C;X4])([C;X4])(cccc[#7;X3]([C;X4])([C;X4]))         Charged diaminobenzene
+[#1][n;X3]c(N[C&X4,#1])cccc                                      Charged 2-aminopyridine
+[#1][n;X3]ccc(N[C&X4,#1])cc                                      Charged 4-aminopyridine
+[#1][n;X3]ccc(OC)cc                                              Charged 4-methoxypyridine
+# Structural keys for neutral basic groups 
+[#7;X3]([C&X4,N&X3,#1])([C&X4,N&X3,#1])[C&X4,N&X3,#1]            Neu amines
+[#6;X3;r5]~[#7;X2;r5]~[#7;X2;r5]~[#7;X2;r5]~[#7;X2;r5]           Catch for R-CN4
+# Structural keys for nrot adjustments
+[#6](F)(F)F                                                      CF3
+[#6](Cl)(Cl)Cl                                                   CCl3
+[#6](Br)(Br)Br                                                   CBr3
+[#6](I)(I)I                                                      CI3
+[#6]([C;H3])([C;H3])[C;H3]                                       t-Butyl
+[n;X2;-0]1c(-[A,H])[n;X3](-[A,H])c(-[A,H])c(-[A,H])1         Neutral imidazole
+[n;X2;H0;r6]1c(-[A,H])c(-[A,H])c(-[A,H])c(-[A,H])c(-[A,H])1      Neutral pyridine

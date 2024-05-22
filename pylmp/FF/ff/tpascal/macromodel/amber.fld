@@ -1,0 +1,2234 @@
+     Amber Force Field  $Date: 2006/06/08 11:41:49 $ $Revision: 1.9 $
+     P. Kollman, JACS, 106, 765 (1984); J. Comp. Chem., 7, 230 (1986)
+ C
+ C					Copyright Columbia University 1987
+ C					All rights reserved
+ C
+ C                                      Includes All Atom and United Atom
+ C                                               Force Field Parameters
+ C                                      
+ C
+ C   ENERGY FUNCTIONS AND CONVERSION FACTORS IN USE
+ C   ______________________________________________
+-1
+ 0    STR     1        8.36800
+ 0    BND     1        8.36800
+ 0    S-B     0        0.00001
+ 0    TOR     2        4.18400
+ 0    IMP     2        4.18400
+ 0    VDW     2        4.18400
+ 0    ELE     1     1389.50000
+ 0    HBD     0      418.40000
+ 0    V14     3        0.50000
+ 0    FIX     1        4.18400
+ 0    BCI     2        1.00000
+ 0    FCH     2        1.00000
+ 0    SEL     1                 O Original AMBER params
+ 0    SEL     1                 M Modified params
+ 0    SEL     1                 A Added params
+ 0    SEL     2                 1 Specific, high quality params
+ 0    SEL     2                 2 Tentative values for params
+ 0    SEL     2                 3 Generalized, low quality params
+ 0    ALT     1                 b United atom field charges
+ 0    ALT     2                 N Sodium
+ 0    ALT     3                 L 6,12-Lennard Jones H-Bonding
+ 0    ALT     4                 M McDonald-Still amide params
+ 0    ALT     5                 S Sender.-Parish-Still carbohyd
+ C    END
+ C  Field 1 (Origin):  O = Original AMBER, M = Modified Parameter, A = Additional Parmeter
+ C  Field 2 (Quality): 1 = Final Values, 2 = Tentative Values, 3 = Generalized Value
+ C  Field 3
+ C  Field 4
+ C  Field 5
+ C  Alternative 001:  a - Atomic charges from the all atom paper (JCC, 230 (86))
+ C                    b - Atomic charges from the united atom paper (JACS, 765 (84))
+ C  Alternative 002:  L - Lithium (JACS, 2212 (85))
+ C                    N - Sodium (JACS, 3258 (82))
+ C                    K - Potassium (JACS, 3258 (82))
+ C                    R - Rubidium (JACS, 3258 (82))
+ C                    C - Cesium (JACS, 3258 (82))
+ C                    B - Barium (TL, 2817 (87))
+ C  Alternative 003:  H - H nonbonded params from original 10,12 treatment
+ C                    L - H nonbonded params from new 6,12 Lennard Jones) treatment (JCC, 620, (91)) (HBD should be 0)
+ C  Alternative 004:  O - Original AMBER amide/peptide backbone parameters
+ C                    M - McDonald-Still amide/peptide backbone parameters
+ C  Alternative 005:  S - Senderowitz-Parish-Still carbohydrate params
+ C                    H - Homans carbohydrate parameters
+ C
+ C                             Interaction Template:
+ C  XX - XX - XX - XX      0.0000     0.0000     0.0000  0000 0000 0000 0000    1 2 3 4 5 Alt a Comments
+ C                        Substructure Interaction Template:
+ C  XX  XX  XX  XX         0.0000     0.0000     0.0000                                      1 2 3 4 5 Alt a Comments
+ C                        Substructure Charge Template:
+ C        1        2        3        4        5        6        7        8        9       10 1 2 3 4 5 Alt a Comments
+ C 
+ C  EQUIVALENCED ATOM TYPES
+-5
+ 1  CS  CA CB CC
+ 2  CT  CA CB CC C3
+ 3  CU  C2 CD CE
+ 4  CH  CA CB CC C3 H1
+ 5  AA  C2 CD N2 N4 O3 S1
+ 6  NN  N2 N4
+ 7  HN  H3 H4
+ 8  HC  CA CB CC C3 H2 C2
+ 9  PX  P0 P3 P5
+10  SX  S1 S4 S6 ST
+ C
+ C
+ C           Stretching Interactions (STR)               Opt. Descriptor
+ C           -----------------------------               ---------------
+ C                     Bond Length  Constant Bond Moment Atm1 Atm2
+-2
+ 1  CT - H1                1.0900   331.0000    -0.6597  N400 0000              O 1             C(NO2)-H, JACS, 4046 (89)
+ 1  CT - H1                1.0900   331.0000    -0.8220  C100 0000              O 1             C(CN)-H, JACS, 4046 (89)
+ 1  CT - H1                1.0900   331.0000    -0.2000  0000 0000              O 1             C(sp3)-H
+ 1  C2 - H1                1.0800   340.0000     0.0518  O200 0000              O 2             C(=O)-H
+ 1  CU - H1                1.0800   340.0000    -0.7781  0000 0000              O 1             C(sp2)-H
+ 1  CB - CB                1.5150   250.0000             N200 O300              A 2             C(N2)-C(O3), WCS (CU)
+ 1  CS - CS                1.5260   260.0000             0000 0000              O 1             C(sp3)-C(sp3), UA
+ 1  C3 - CS                1.5260   285.0000             0000 0000              O 2             C(sp3)-C(UA,sp3)
+ 1  C3 - C3                1.5260   310.0000             0000 0000              O 1             C(sp3)-C(sp3), AA
+ 1  C2 - CS                1.5220   317.0000     0.8187  O2N2 0000              O 1         1 a C(sp3)-C(amide), AA charges
+ 1  C2 - CS                1.5220   317.0000     0.1900  O2N2 0000              O 1         1 b C(sp3)-C(amide), UA charges
+ 1  C2 - CS                1.5220   317.0000     0.8188  O2OM N000              O 1         1 a C(sp3)(N)-C(carboxylate) AA chg
+ 1  C2 - CS                1.5220   317.0000     0.2340  O2OM N000              O 1         1 b C(sp3)(N)-C(carboxylate) UA chg
+ 1  C2 - CS                1.5220   317.0000     1.8250  O2OM 0000              O 1             C(sp3)-C(carboxylate)
+ 1  C2 - CS                1.5050   317.0000    -0.2500  AAAA C2N0              A 2             C(sp3)-C(aromatic),Phegly WCS (CU)
+ 1  C2 - CS                1.5100   317.0000    -0.2500  AAAA 0000              O 1             C(sp3)-C(aromatic)
+ 1  CU - CS                1.5250   317.0000    -0.3662  O2O3 0000              A 2             Ester C(sp2)-C(sp3), WCS (CU)
+ 1  CU - CS                1.5100   317.0000    -0.3626  O2O3 0000              A 2             Ester C(sp2)-C(sp3), WCS (CU)
+ 1  CU - CS                1.5100   317.0000    -0.3626  O200 0000              A 2             Ald/Keto C(sp2)-C(sp3), WCS (CU)
+ 1  CU - CS                1.5220   317.0000    -1.0000  CU00 0000              A 2             Alkene C(sp2)-C(sp3), WCS/GC (CU)
+ 1  C2 - CS                1.5220   317.0000             0000 0000              O 2             Gen C(sp2)-C(sp3)            
+ 1  C2 - C3                1.5220   335.0000     0.8184  O2N2 0000              O 1         1 a C(sp3)-C(amide), AA charges
+ 1  C2 - C3                1.5220   335.0000     0.1900  O2N2 0000              O 1         1 b C(sp3)-C(amide), UA charges
+ 1  C2 - C3                1.5220   335.0000     0.8188  O2OM N000              O 1         1 a C(sp3)(N)-C(carboxylate) AA chg
+ 1  C2 - C3                1.5220   335.0000     0.2340  O2OM N000              O 1         1 b C(sp3)(N)-C(carboxylate) UA chg
+ 1  C2 - C3                1.5220   335.0000     1.8250  O2OM 0000              O 1             C(sp3)-C(carboxylate)
+ 1  C2 - C3                1.5100   335.0000     0.7250  AAAA 0000              O 1             C(sp3)-C(aromatic)
+ 1  C2 - C3                1.5220   335.0000    -0.8000  CU00 0000              A 2             Alkene C(sp2)-C(sp3), WCS/GC (CU)
+ 1  C2 - C3                1.5220   335.0000             0000 0000              O 2             Gen C(sp2)-C(sp3)
+ 1  CU - CT                1.5220   317.0000             0000 0000              O 2             Gen C(UA,sp2)-C(UA,sp3)
+ 1  C2 - C2                1.4950   325.0000             CUCU CUCU              A 1             Ph-Ph, WCS (CU)
+ 1  C2 - C2                1.5300   317.0000             O200 O2N2              A 1             alpha-keto amide, Babine, Agouron
+ 1  C2 - C2                1.3550   490.0000             O200 O200              A 2             C(=O)-C(=O), JACS, 9483 (91)
+ 1  C2 - C2                1.4850   280.0000             O200 N200              A 2             C(=O)-C(=,-N2), JACS 5634 (92)
+ 1  C2 - C2                1.4700   300.0000             O200 0000              A 2             C(=O)-C(sp2), WCS (CU)
+ 1  C2 = CU                1.3200   450.0000             C2N2 0000              A 2             C(-N2,-C2)=C, JACS 5634 (92)
+ 1  CU = CU                1.4000   450.0000     0.3362  N200 0000              A 3             C=C(-N(sp2)), WCS/GC (CU)
+ 1  CU = CU                1.3800   450.0000     0.2518  O300 0000              A 3             C=C(-O), WCS/GC (CU)
+ 1  CU - CU                1.4750   400.0000             AA00 AA00              A 3             Aromatic C-C, WCS (CU)
+ 1  CU = CU                1.4000   500.0000             AA00 AA00              A 3             Aromatic C=C, WCS (CU)
+ 1  CU = CU                1.3370   480.0000             0000 0000              A 3             C=C, WCS/GC (CU)
+ 1  CU - CU                1.4630   300.0000             0000 0000              A 3             C(sp2)-C(sp2), WCS (CU)
+ 1  C2 = N4                1.3400   481.0000     1.3510  N2N2 0000              O 1             C(sp2)=N+(sp2),Guanidine
+ 1  C2 - N2                1.3400   481.0000     1.3510  N4N2 0000              O 1             C(sp2)-N(sp2),Guanidine
+ 1  C2 - N2                1.3400   450.0000     0.9000  O200 C200              A 3             C(=O)-N(-C=O)
+ 1  C2 - N2                1.3100   457.0000     1.2200  O2O3 0000              O 2             C(=O)(-O)-N(sp2), JACS, 2058 (86)
+ 1  C2 - N2                1.3400   457.0000     0.4830  O2N2 0000              A 2             C(=O)(-N)-N(sp2), Urea, WCS (CU)
+ 1  C2 - N2                1.3550   490.0000     0.0000  O200 N000              A 2             C(=O)-N(sp2)(-N), WCS/Nowick
+ 1  C2 - N2                1.3350   490.0000     0.0000  O200 0000              O 1             C(=O)-N(sp2)
+ 1  C2 - N2                1.3900   400.0000             CU00 C200              A 2             C(=C)-N(sp2,C2), JACS 5634 (92)
+ 1  CU - N2                1.4200   400.0000     1.0000  0000 0000              A 3             C(sp2)-N(sp2)
+ 1  CU = N2                1.2700   543.0000     1.1700  0000 O300              A 3             C=N(-O), WCS (CU)
+ 1  CU = N2                1.3400   490.0000     0.9000  O300 0000              A 3             C(-O)=N, WCS (CU)
+ 1  CU = N2                1.2800   600.0000     0.5840  0000 0000              A 3             C(sp2)=N(sp2), JCC 57(92)
+ 1  C2 = O2                1.2240   570.0000     3.1144  O3N2 0000              O 2             O=C(-O)(-N), JACS, 2058 (86)
+ 1  C2 = O2                1.2560   565.0000     2.5400  N2N2 0000              A 2             O=C(-N)(-N), Urea, WCS (CU)
+ 1  C2 = O2                1.2000   570.0000     2.5937  O300 0000              A 2             O=C(-O), Ester/Acid, WCS (CU)
+ 1  C2 = O2                1.2500   656.0000     1.2368  OM00 0000              O 1             O=C(-OM), AA & UA charges
+ 1  C2 - OM                1.2500   656.0000     1.2368  O200 0000              O 1             OM-C(=O), AA & UA charges
+ 1  CU - OM                1.2200   630.0000     2.5000  0000 0000              A 3             OM-C(sp2), GC (CU)
+ 1  C2 = O2                1.2290   570.0000     2.6551 1N200 0000              A 2             O=C(-N-N), WCS/Nowick
+                                                         N000 0000
+ 1  C2 = O2                1.2290   570.0000     2.9737  N200 0000              O 1         1 a O=C(-N), AA charges
+ 1  C2 = O2                1.2290   570.0000     2.9500  N200 0000              O 1         1 b O=C(-N), UA charges
+ 1  C2 = O2                1.2200   630.0000     2.7528  H100 0000              O 2             O=C(-H)
+ 1  CU = O2                1.2200   630.0000     2.6370  0000 0000              A 2             O=C, Keto, WCS/GC (CU)
+ 1  CU = SX                1.6110   500.0000     1.0000  0000 0000              A 3             S=C, WCS (CU)
+ 1  C0 - N2                1.4490   337.0000    -0.7861  0000 PX00              A 2             C-N(sp2)(-P), JACS, 5649 (89)
+ 1  C3 - N2                1.4490   355.0000     1.4678  0000 0000              O 1         1 a C-N(sp2), AA charges
+ 1  CS - N2                1.4490   337.0000     1.4678  0000 0000              O 1         1 a C-N(sp2), AA charges
+ 1  C3 - N2                1.4490   355.0000     1.8921  0000 0000              O 1         1 b C-N(sp2), UA charges
+ 1  CS - N2                1.4490   337.0000     1.8921  0000 0000              O 1         1 b C-N(sp2), UA charges
+ 1  C0 - O3                1.4250   320.0000    -0.0958  0000 PX00              A 2             C-O(-P), JACS, 5649 (89)
+ 1  C2 - O3                1.4000   450.0000     0.5000 1CUCU C200              A 2             PhO-C(=O), WCS (CU)
+                                                         0000 O200
+ 1  C2 - O3                1.3600   450.0000     0.9800  CUCU C200              A 2             Ph-OPh, WCS (CU)
+ 1  C2 - O3                1.3640   450.0000     1.2704  CUCU 0000              O 1         1 a O-C(*CU)(*CU), AA charges
+ 1  C2 - O3                1.3640   450.0000     0.1900  CUCU 0000              O 1         1 b O-C(*CU)(*CU), UA charges
+ 1  C2 - O3                1.3900   320.0000     1.6500  N2O2 0000              O 2             O-C(=O)(-N), JACS, 2058 (86)
+ 1  C2 - O3                1.3300   450.0000     0.9582  O200 0000              A 2             O-C(=O), Ester/Acid, WCS(CU)
+ 1  CU - O3                1.3600   450.0000     0.2900  N200 0000              A 3             O-C(sp2)(-N), WCS (CU)
+ 1  CU - O3                1.3640   450.0000     0.5000  0000 0000              O 3             C(sp2)-O   
+ 1  CT - O3                1.4250   350.0000     1.0262  O300 0000              O 2             O-C(-O)
+ 1  CT - O3                1.3800   350.0000     1.0000  Cl00 0000              A 3             O-C(-Cl), WCS (CU)
+ 1  CT - O3                1.4250   320.0000     1.7111  0000 C200              A 2             O-C(-Csp2), Ester, WCS (CU)
+ 1  CS - O3                1.4250   386.0000     1.6420  0000 H200              O 1             C-O(-H)
+ 1  CS - O3                1.4250   320.0000     1.1970  0000 0000              O 1             C-O, UA
+ 1  C3 - O3                1.4100   320.0000     1.6250  0000 0000              O 1             C-O, AA
+ 1  C3 - OM                1.4100   300.0000    -2.0040  0000 0000              O 2             C-OM, Tetrahedral intermediate
+ 1  O3 - H2                0.9600   553.0000    -1.5400  C200 0000              O 1         1 a H-O(-Csp2), AA charges
+ 1  O3 - H2                0.9600   553.0000    -1.5631  C200 0000              O 1         1 b H-O(-Csp2), UA charges
+ 1  O3 - H2                0.9572   553.0000    -1.9172  H200 0000              O 1             H-O, water, JCompChem, 620 (91)
+ 1  O3 - H2                0.9600   553.0000    -1.4287  0000 0000              O 1             H-O
+ 1  CT - N3                1.5300   300.0000     1.5425  OM00 0000              O 2             C-N(sp3), Tetrahedral intermediate
+ 1  CT - N3                1.4550   367.0000     0.6988  CU00 0000              A 2             N(sp3)-C(-C(sp2)), Free amine
+ 1  CT - N3                1.4710   367.0000     0.4027 1CT00 0000              A 2             N(sp3)-C(C-O), JACS, 5976 (91)
+                                                         O300 0000              
+ 1  CT - N3                1.4710   367.0000     1.0598  0000 0000              O 1             N(sp3)-C, Free amine
+ 1  CT - N4                1.4600   240.0000     0.4207  0000 OMO2              O 1             Nitro, JACS, 4046 (1989)
+ 1  CU - N4                1.4700   275.0000     0.6820  0000 OMO2              A 3             Nitro, WCS (CU)
+ 1  CT - N4                1.4490   355.0000     1.4678  0000 0000              O 1         1 a N+(sp2)-C, AA charges
+ 1  CT - N4                1.4490   355.0000     1.8921  0000 0000              O 1         1 b N+(sp2)-C, UA charges
+ 1  CT - N5                1.5100   367.0000     2.3893 1C200 0000              A 2             N+(sp3)-C(-Ar)), WCS (CU)
+                                                         CUCU 0000
+ 1  CT - N5                1.4710   367.0000     2.3126  C200 0000              O 1             N+(sp3)-C(-Csp2))
+ 1  CT - N5                1.4710   367.0000     1.8080  0000 0000              O 1             N+(sp3)-C
+ 1  CT - SX                1.8100   222.0000     0.5352  0000 0000              O 1             S-C
+ 1  CT - SM                1.8340   222.0000    -0.8809  0000 0000              A 3             S(-)-C From OPLS
+ 1  C1 = SX                1.5600   320.0000     1.0000  0000 0000              A 3             C(sp)=S, WCS (CU)
+ 1  CU = SX                1.5800   300.0000     1.0000  0000 0000              A 3             C(sp2)=S, WCS (CU)
+ 1  N2 - H3                1.0100   434.0000    -1.1498  PX00 0000              A 2             H-N(sp2)(-P), JACS, 5649 (89)
+ 1  N2 - H3                1.0100   434.0000    -1.6680  S000 0000              A 3             H-N(sp2)(-S), WCS (CU)
+ 1  N2 - H3                1.0100   434.0000    -1.6680  H300 0000              O 1             H-N(sp2)(-H)
+ 1  N2 - H3                1.0100   434.0000    -1.2219  0000 0000              O 1         1 a H-N(sp2), AA charges
+ 1  N2 - H3                1.0100   434.0000    -1.2025  0000 0000              O 1         1 b H-N(sp2), UA charges
+ 1  N3 - H3                1.0100   434.0000    -1.6979  0000 0000              A 2             H-N(sp3), OPLS Free amine
+ 1  N3 - H3                1.0100   434.0000    -0.9700  0000 0000              O 2             H-N(sp3), Free amine
+ 1  N3 - Lp                0.8000   300.0000     1.0000  0000 0000              A 3             N-Lp
+ 1  N3 - F0                1.4200   350.0000     1.0000  0000 0000              A 3             N(sp3)-F, JACS, 9131 (91)
+ 1  N4 - H4                1.0100   434.0000    -1.7512  0000 0000              O 1             H-N+(sp2)
+ 1  N5 - H4                1.0100   434.0000    -1.5135  0000 0000              O 1             H-N+(sp3), AA & UA Charges 
+ 1  H1 - SX                1.3360   274.0000     0.9659  0000 0000              O 1             H-S
+ 1  SX - Lp                0.6790   600.0000     1.3192  SX00 0000              O 1             Lp-S(-S)
+ 1  SX - Lp                0.6790   600.0000     1.5687  H100 0000              O 1             Lp-S(-H)
+ 1  SX - Lp                0.6790   600.0000     1.2425  0000 0000              O 1             Lp-S
+ 1  SX = O2                1.4500   480.0000     1.4393  OM00 0000              O 2             S=O, JACS, 4484(91)
+ 1  SX = O2                1.4500   350.0000     3.0300  O200 0000              A 2             S(=O)=O, MM2
+ 1  SX = O2                1.4800   300.0000     2.9300  0000 0000              A 2             S=O, MM2
+ 1  SX - OM                1.4500   480.0000     1.4393  0000 0000              O 2             S-OM, JACS, 4484(91)
+ 1  SX - O3                1.3460   217.0000     1.0000  0000 0000              A 3             S-O, WCS (CU)
+ 1  OM - PX                1.5690   525.0000    -0.8817  0000 N2O2              A 1             OM-P(N), JACS, 5649(89)
+ 1  OM - PX                1.5580   525.0000    -1.0210  0000 O3O2              A 1             OM-P(O), JACS, 5649(89)
+ 1  OM - PX                1.5750   525.0000    -1.0434  0000 C0O2              A 1             OM-P(O)(C), JACS, 5649(89)
+ 1  OM - PX                1.4800   525.0000    -2.4667  0000 0000              O 1         1 a OM-P, AA Charges 
+ 1  OM - PX                1.4800   525.0000    -2.4880  0000 0000              O 1         1 b OM-P, UA Charges
+ 1  O2 = PX                1.5690   525.0000    -0.8817  0000 N2OM              A 1             O=P(N), JACS, 5649(89)
+ 1  O2 = PX                1.5580   525.0000    -1.0210  0000 O3OM              A 1             O=P(O), JACS, 5649(89)
+ 1  O2 = PX                1.5750   525.0000    -1.0434  0000 C0OM              A 1             O=P(OM)(C), JACS, 5649(89)
+ 1  O2 = PX                1.4800   525.0000    -2.4667  0000 0000              O 1         1 a O=P, AA Charges
+ 1  O2 = PX                1.4800   525.0000    -2.4880  0000 0000              O 1         1 b O=P, UA Charges
+ 1  O3 - PX                1.7080   230.0000    -4.4792  0000 C0O2              A 1             O3-P(-C), JACS, 5649(89)
+ 1  O3 - PX                1.6100   230.0000    -2.6717  0000 0000              O 1         1 a O-P, AA Charges
+ 1  O3 - PX                1.6100   230.0000    -2.8187  0000 0000              O 1         1 b O-P, UA Charges
+ 1  N2 - PX                1.7400   230.0000    -4.0199  0000 0000              A 1             N-P, JACS, 5649(89)
+ 1  C0 - PX                1.8650   331.0000    -0.7700  0000 OMN2              A 1             C-P(O2N), JACS, 5649(89)
+ 1  C0 - PX                1.8500   331.0000    -0.7383  0000 OMO3              A 1             C-P(O3), JACS, 5649(89)
+ 1  C0 - PX                1.8780   331.0000    -0.9872  0000 OMO2              A 1             C-P(O2C), JACS, 5649(89)
+ 1  SX - SX                2.0380   166.0000     0.0000  0000 0000              O 1             S-S
+ 1  CU - SX                1.7500   222.0000     1.2000  0000 O200              A 3             C(sp2)-S(=O), WCS (CU)
+ 1  CU - SX                1.7200   222.0000     1.2000  0000 0000              A 3             C(sp2)-S, WCS (CU)
+ 1  CU - SM                1.7500   222.0000    -0.8809  0000 0000              A 3             C(sp2)-SM, WCS (CU)
+ 1  C1 - F0                1.2700   260.0000     1.5000  0000 0000              A 3             C(sp)-F, WCS (CU)
+ 1  CU - F0                1.3330   250.0000     1.6000  0000 0000              A 3             C(sp2)-F, WCS (CU)
+ 1  CT - F0                1.3800   250.0000     1.6571  0000 0000              A 3             C(sp3)-F, WCS (CU)
+ 1  C1 - Cl                1.6400   245.0000     1.2500  0000 0000              A 3             C(sp)-Cl, WCS (CU)
+ 1  CU - Cl                1.7400   233.0000     1.1100 1CU00 0000              A 2             C(sp2)-Cl, DQM(CU) HF/6-31G**
+                                                         O300 0000
+ 1  CU - Cl                1.7300   233.0000     1.5000  0000 0000              A 3             C(sp2)-Cl, WCS (CU)
+ 1  CT - Cl                1.8400   233.0000     1.5000  O300 0000              A 3             C(sp3,O)-Cl, WCS (CU)
+ 1  CT - Cl                1.7950   233.0000     1.2070  ClCl 0000              A 3             C(sp3)-Cl(3), WCS (CU)
+ 1  CT - Cl                1.7950   233.0000     2.1550  0000 0000              A 3             C(sp3)-Cl, WCS (CU)
+ 1  C1 - Br                1.7900   175.0000     1.2500  0000 0000              A 3             C(sp)-Br, WCS (CU)
+ 1  CU - Br                1.8900   166.0000     1.5000  0000 0000              A 3             C(sp2)-Br, WCS (CU)
+ 1  CT - Br                1.9490   166.0000     1.8722  0000 0000              A 3             C(sp3)-Br, WCS (CU)
+ 1  C1 - I0                1.9900   110.0000     0.5000  0000 0000              A 3             C(sp)-I, WCS (CU)
+ 1  CU - I0                2.1000   100.0000     0.7060  0000 0000              O 2             C(sp2)-I, JACS, 6424 (82)
+ 1  CT - I0                2.1490   100.0000     1.5483  0000 0000              A 3             C(sp3)-I, WCS (CU)
+ 1  CU * N2                1.3800   400.0000     1.0000  0000 0000              A 3             C(sp2)-N(sp2), WCS (CU)
+ 1  CU * N4                1.3500   500.0000     2.0000  0000 0000              A 3             C(sp2)*N+(sp2), WCS (CU)
+ 1  N2 . Z0                2.0500   100.0000             0000 0000              A 3             N2...Z0, WCS (CU)
+ 1  O2 = N4                1.2000   600.0000     0.3862  0000 0000              O 1             O=N+(sp2), JACS, 4046 (89)
+ 1  OM - N4                1.2000   600.0000     0.3862  0000 0000              O 1             OM-N+(sp2), JACS, 4046 (89)
+ 1  C1 % N1                1.1640  1303.0000     2.7339  0000 0000              O 1             C%N, JACS, 4046 (89)
+ 1  C1 - CT                1.4450   360.0000    -0.3262  N100 0000              O 1             C-CN, JACS, 4046 (89)
+ 1  C1 - CT                1.4450   360.0000    -0.5000  0000 0000              A 3             C(sp3)-C(sp), WCS (CU)
+ 1  C1 - C2                1.4400   360.0000     0.0000  0000 O200              A 3             C(=O)-C(sp), WCS (CU)
+ 1  C1 - CU                1.4000   400.0000    -0.2500  0000 0000              A 3             C(sp2)-C(sp), WCS (CU)
+ 1  C1 % C1                1.2060   600.0000     0.5210  0000 H100              O 2             C%C(H)
+ 1  C1 % C1                1.2060   600.0000     0.0000  0000 0000              O 2             C%C
+ 1  C1 = C1                1.3000   750.0000     0.0000  0000 0000              A 3             C(sp)=C(sp), WCS (CU)
+ 1  C1 = CU                1.3130   700.0000     0.0000  0000 0000              A 2             C=C(sp), WCS (CU)
+ 1  C1 = O2                1.1610   800.0000     2.0000  0000 0000              A 2             C(sp)=O, WCS (CU)
+ 1  C1 - O3                1.3300   500.0000     0.1000  0000 0000              A 2             C(sp)-O, WCS (CU)
+ 1  C1 - H1                1.0560   400.0000    -1.5209  0000 0000              O 2             C(sp)-H
+ 1  O3 - N3                1.4800   240.0000     0.0000  0000 0000              A 3             O-N(sp3) WCS (CU)
+ 1  O3 - N2                1.4000   240.0000    -0.1100  0000 0000              A 3             O-N(sp2), Oxime, WCS (CU)
+ 1  N3 - N3                1.3810   325.0000             0000 0000              A 3             N3-N3, WCS (CU)
+ 1  N2 - N3                1.3750   290.0000             0000 0000              A 3             N2-N3, WCS (CU)
+ 1  N2 - N2                1.3800   300.0000            1C200 C200              A 2             N2(C=O)-N2(C=O), WCS/Nowick
+                                                         O200 O200
+ 1  N2 - N2                1.3700   300.0000            1C200 0000              A 2             N2(C=O)-N2, WCS/Nowick
+                                                         O200 0000
+ 1  N2 * N2                1.2700   500.0000             0000 0000              A 3             N(sp2)*N(sp2), Diazene, WCS (CU)
+ 1  SX - N0                1.6200   400.0000             O200 0000              A 3             S(=O)-N, WCS (CU)
+ 1  PX - F0                1.5600   187.0000     1.2488  0000 0000              A 3             Hexafluorophosphate, WCS (CU)
+ 1  Cl = O2                1.4200   200.0000             0000 0000              A 3             Chlorate, WCS (CU)
+ 1  Cl - OM                1.4200   200.0000             0000 0000              A 3             Chlorate, WCS (CU)
+ 1  Br = O2                1.5000   150.0000             0000 0000              A 3             Bromate, WCS (CU)
+ 1  Br - OM                1.5000   150.0000             0000 0000              A 3             Bromate, WCS (CU)
+ 1  I0 = O2                1.6500   100.0000             0000 0000              A 3             Iodate, WCS (CU)
+ 1  I0 - OM                1.6500   100.0000             0000 0000              A 3             Iodate, WCS (CU)
+ 1  O2 * O2                1.2070   300.0000             0000 0000              A 3             Dioxygen, WCS (CU)
+ 1  Si - CT                1.8800   175.0000     0.6000  0000 0000              A 3             Si-C(sp3), from MM2, WCS (CU)
+ 1  Si - CU                1.8650   200.0000     0.6500  0000 0000              A 3             Si-C(sp2), from MM2, WCS (CU)
+ 1  Si - O3                1.6450   250.0000     3.1600  0000 0000              A 3             Si-O, JCompChem, 25 (88)
+ 1  Du . 00                3.0000     0.0001     0.0000  0000 0000              A 1             Dummy stretch
+ 1  Du - 00                0.5000   100.0000     0.0000  0000 0000              A 1             Dummy stretch
+ C
+ C
+ C        Bending Interactions (BND)                     Opt. Descriptor
+ C        __________________________                     _______________
+ C                        Angle      Constant            Atm1 Atm2 Atm3
+ C                        (deg)     (KCal/mol)
+-2
+ 2  00 * Du * 00         109.5000    10.0000             0000 0000 0000         A 3             X-Du-X
+ 2  Du * 00 * 00         109.5000    10.0000             0000 0000 0000         A 3             Du-X-X
+ 2  00 * Du . 00         109.5000    10.0000             0000 0000 0000         A 3             X-Du-X
+ 2  Du . 00 * 00         109.5000    10.0000             0000 0000 0000         A 3             Du-X-X
+ 2  H1 - CT - H1         109.5000    36.0000             0000 0000 0000         O 1             H-C-H
+ 2  C0 - CT - H1         109.5000    35.0000             0000 0000 0000         O 1             C0-C-H
+ 2  N2 - CT - H1         109.5000    38.0000             0000 0000 0000         O 1             N(sp2)-C-H
+ 2  N0 - CT - H1         109.5000    35.0000             0000 0000 0000         O 1             N0-C-H
+ 2  O3 - CT - H1         109.5000    35.0000             0000 0000 0000         O 1             O-C-H
+ 2  CB - CB - N2         111.2000    80.0000             0000 0000 0000         O 1             CH2-CH2-N(sp2)
+ 2  CC - CA - N2         109.5000    80.0000             0000 0000 0000         O 1             CH3-CH-N(sp2)
+ 2  CT - CT - N2         109.5000    80.0000             0000 0000 CUCU         O 1             C-C-N(sp2)(*CU)(*CU)
+ 2  CT - CT - N2         109.7000    80.0000             0000 0000 0000         O 1             C-C-N(sp2)
+ 2  C2 - CB - N2         110.3000    80.0000             O200 0000 0000         O 1             C(=O)-CH2-N(sp2)
+ 2  C2 - CT - N5         110.0000    80.0000             CUCU 0000 0000         A 3             Benzylammonium
+ 2  C2 - CB - N5         111.2000    80.0000             O200 0000 0000         O 1             C(=O)-CH2-N+(sp3)
+ 2  C2 - CT - N2         110.1000    63.0000             O200 0000 0000         O 1             C(=O)-C-N(sp2)
+ 2  C2 - CT - N5         109.7000    80.0000             O200 0000 0000         O 1             C(=O)-C-N+(sp3)
+ 2  C2 - CA - CT         111.1000    63.0000             O200 0000 0000         O 1             C(=O)-CH-C
+ 2  C2 - CB - CT         112.4000    63.0000             O200 0000 0000         O 1             C(=O)-CH2-C
+ 2  C2 - CT - CT         111.1000    63.0000             O200 0000 0000         O 1             C(=O)-C-C
+ 2  C2 - CT - CT         114.0000    63.0000             CUCU 0000 0000         O 1             C-C-C(*CU)(*CU)
+ 2  C3 - C3 - C3         109.5000    40.0000             0000 0000 0000         O 1             C-C-C
+ 2  CT - C3 - CT         109.5000    40.0000             0000 0000 0000         O 3             C-C-C
+ 2  CT - CA - CT         111.5000    63.0000             0000 0000 0000         O 1             C-CH-C
+ 2  CT - CB - CT         112.4000    63.0000             0000 0000 0000         O 1             C-CH2-C
+ 2  C2 - N2 - CT         121.9000    50.0000             O200 0000 0000         O 1             C-N(sp2)-C(=O)
+ 2  C2 - N2 - H3         119.8000    35.0000             O200 0000 0000         O 1             H-N(sp2)-C(=O)
+ 2  C2 - N2 - H3         120.0000    35.0000             N400 0000 0000         O 1             H-N(sp2)-C(=N+)
+ 2  CT - N2 - H3         118.4000    35.0000            10000 CU00 0000         O 1             H-N(sp2)-C(-CU-N2) (HS)
+                                                         0000 N200 0000
+ 2  CT - N4 - H4         118.4000    35.0000            10000 CU00 0000         A 1             H-N(cation)-C(-CU-N2) - Guanidinium (HS)
+                                                         0000 N200 0000
+ 2  CT - N2 - H3         118.4000    38.0000             0000 0000 0000         O 1             H-N(sp2)-C
+ 2  CT - N2 - CT         118.0000    50.0000             0000 0000 0000         O 1             C-N(sp2)-C
+ 2  H3 - N2 - H3         120.0000    35.0000             0000 C200 0000         O 1             H-N(sp2)-H
+ 2  C0 - C2 = O2         120.4000    80.0000             0000 C000 0000         A 2             O=C(-C)-C, JACS 9483(91)
+ 2  C0 - C2 - C0         117.2000    80.0000             0000 O200 0000         A 2             C-C(=O)-C, JACS 9483(91)
+ 2  C3 - C2 = O2         120.4000    87.0000             0000 N200 0000         O 1             O=C(-N)-C
+ 2  C0 - C2 = O2         120.4000    80.0000             0000 N200 0000         O 1             O=C(-N)-C0
+ 2  CA - C2 - OM         117.0000    65.0000             0000 O200 0000         O 1             OM-C(=O)-CH
+ 2  CA - C2 = O2         117.0000    65.0000             0000 OM00 0000         O 1             O=C(-OM)-CH
+ 2  C0 - C2 - OM         117.0000    70.0000             0000 O200 0000         O 1             OM-C(=O)-C0
+ 2  C0 - C2 = O2         117.0000    70.0000             0000 OM00 0000         O 1             O=C(-OM)-C0
+ 2  C0 - C2 - OM         117.0000    70.0000             0000 O200 0000         O 1             OM-C(=O)-C0
+ 2  C0 - C2 = O2         125.0000    80.0000             0000 O300 0000         A 2             O=C(-O)-C0, Ester/Acid, WCS (CU)
+ 2  O2 = C2 - N2         129.7000    65.0000             0000 O300 0000         O 2             O=C(-O)-N, JACS, 2058 (86)
+ 2  O2 = C2 - N2         122.9000    80.0000             0000 0000 0000         O 1             O=C-N
+ 2  O2 = C2 - OM         126.0000    80.0000             0000 0000 0000         O 1             O=C-OM
+ 2  O2 = C2 - O3         119.7000    80.0000             0000 N200 0000         O 2             O=C(-N)-O, JACS, 2058 (86)
+ 2  O2 = C2 - O3         124.0000    80.0000             0000 0000 0000         A 2             O=C-O, Ester/Acid, WCS (CU)
+ 2  O3 - C2 - N2         110.6000    80.0000             0000 O200 0000         O 2             O-C(=O)-N, JACS, 2058 (86)
+ 2  C2 - C2 - N2         111.5000    70.0000             O200 CU00 C200         A 2             C(sp2)-C(=C)-N(sp2), JACS 5634 (92)
+ 2  CU = C2 - N2         118.0000    70.0000            10000 C200 C200         A 2             C=C(-C2=O2)-N(sp2), JACS 5634 (92)
+                                                         0000 O200 0000
+ 2  CU - C2 - N2         120.0000    70.0000             0000 O200 0000         A 2             N-C(=O)-C(sp2), WCS/Nowick
+ 2  C0 - C2 - N2         116.6000    70.0000             0000 O200 0000         O 1             N-C(=O)-C0
+ 2  C0 - C2 - O3         109.0000    80.0000             0000 O200 0000         A 2             O-C(=O)-C0, Ester/Acid, WCS (CU)
+ 2  N2 - C2 - N2         118.0000    70.0000             0000 O200 0000         A 2             N-C(=O)-N, WCS (CU)
+ 2  N2 - C2 - N2         120.0000    70.0000             0000 N400 0000         O 1             N-C(=N+)-N
+ 2  N2 - C2 = N4         120.0000    70.0000             0000 N200 0000         O 1             N-C(-N)=N+
+ 2  CU = CD - C0         122.5000    70.0000             0000 0000 0000         A 2             C(sp2)=CD(sp2)-C(sp2), WCS(CU)
+ 2  CU = C2 - C0         122.5000    70.0000             0000 H100 0000         A 2             C(sp2)=CH(sp2)-C(sp2), WCS(CU)
+ 2  CU = CU - CU         120.0000    85.0000             0000 0000 0000         O 1             C(sp2)=C(sp2)-C(sp2)
+ 2  CU * C2 - CT         120.0000    70.0000             0000 CU00 0000         O 1             C(sp2)*C(*Csp2)-C
+ 2  CU * C2 - H1         120.0000    35.0000             0000 CU00 0000         O 1             C(sp2)*C(*Csp2)-H
+ 2  CU * C2 - O3         120.0000    70.0000             0000 CU00 0000         O 1             C(sp2)*C(*Csp2)-O
+ 2  CT - CT - N3         109.7000    80.0000             0000 0000 0000         O 1             N(sp3)-C-C
+ 2  CT - CT - N4         111.2000    80.0000             0000 0000 0000         O 1             N+(sp2)-C-C
+ 2  CT - CT - N5         111.2000    80.0000             0000 0000 0000         O 1             N+(sp3)-C-C
+ 2  H1 - CT - N3         109.5000    35.0000             0000 0000 0000         A 2             N(sp3)-C-H, WCS (CU)
+ 2  H1 - CT - N4         109.5000    35.0000             0000 0000 0000         O 1             N+(sp2)-C-H
+ 2  H1 - CT - N5         109.5000    35.0000             0000 0000 0000         O 1             N+(sp3)-C-H
+ 2  O3 - CA - N2         109.5000    80.0000             0000 0000 CUCU         O 1             O-CH-N(sp2)(*CU)(*CU)
+ 2  O3 - CT - N2         109.5000    50.0000             0000 0000 CUCU         O 1             O-C-N(sp2)(*CU)(*CU)
+ 2  CT - CU = N2         116.8000    70.0000             0000 0000 0000         A 3             C-C=N, JCC 57(92)
+ 2  CU - CU = N2         120.4000    75.0000             0000 0000 0000         A 3             C(sp2)-C=N, JCC 57(92)
+ 2  H1 - CU = N2         119.5000    75.0000             0000 0000 0000         A 3             H-C=N, JCC 57(92)
+ 2  CU = N2 - CT         111.0000    70.0000             0000 0000 0000         A 3             C=N-C(sp3), JCC 57(92)
+ 2  CU = N2 - H3         110.0000    70.0000             0000 0000 0000         A 3             C=N-H, JCC 57(92)
+ 2  CU = N2 - CU         115.0000    70.0000             0000 0000 0000         A 3             C=N(sp2)-C(sp2), JCC 57(92)
+ 2  CU - N2 - CU         110.0000    70.0000             0000 0000 0000         A 3             C(sp2)-N(sp2)-C(sp2)
+ 2  N0 - N2 - C2         117.0000    50.0000             0000 0000 O200         A 2             N-N(sp2)-C(=O), WCS/Nowick
+ 2  N0 - N2 - C0         116.0000    50.0000             0000 0000 0000         A 2             N-N(sp2)-C, WCS/Nowick
+ 2  H3 - N2 - N2         116.0000    35.0000             0000 0000 C200         A 2             H-N(sp2)-N(sp2,Csp2), WCS/Nowick
+ 2  CT - N2 - C2         123.2000    50.0000             0000 0000 N4N2         O 1             C-N-C(=N+)(-N)
+ 2  CT - N4 = C2         123.2000    50.0000             0000 0000 N2N2         O 1             C-N+=C(-N)(-N)
+ 2  C2 * N4 - H4         120.0000    35.0000             0000 0000 0000         O 1             C(sp2)*N+(sp2)-H
+ 2  H4 - N4 - H4         120.0000    35.0000             0000 0000 0000         O 1             N-N+(sp2)-H
+ 2  C0 - N3 - C0         108.0000    40.0000             0000 0000 0000         A 3             C0-N(sp3)-C0, WCS (CU)
+ 2  C0 - N3 - H3         109.5000    35.0000             0000 0000 0000         O 2             C0-N(sp3)-H
+ 2  H3 - N3 - H3         109.5000    35.0000             0000 0000 0000         O 2             H-N(sp3)-H
+ 2  C0 - N5 - H4         109.5000    35.0000             0000 0000 0000         O 1             C0-N+(sp3)-H
+ 2  H4 - N5 - H4         109.5000    35.0000             0000 0000 0000         O 1             H-N+(sp3)-H
+ 2  CT - C3 - O3         109.5000    50.0000             0000 0000 0000         O 1             C-C-O, all atom
+ 2  CT - CS - O3         109.5000    80.0000             0000 0000 0000         O 1             C-C-O, united atom
+ 2  CT - O3 - H2         108.5000    55.0000             0000 0000 0000         O 1             C-O-H
+ 2  C3 - O3 - C3         109.5000    60.0000             0000 0000 0000         O 1             C-O-C, all atom
+ 2  CT - O3 - CT         111.8000   100.0000             0000 0000 0000         O 1             C-O-C, united atom
+ 2  H2 - O3 - H2         104.5200   100.0000             0000 0000 0000         O 1             H-O-H, water, JCompChem,620,91
+ 2  CT - C2 - O3         115.0000    70.0000             0000 O200 H200         O 1             C-C(=O)-O(-H)
+ 2  C2 - O3 - H2         113.0000    35.0000             CUCU 0000 0000         O 1             C(*Csp2)(*Csp2)-O-H
+ 2  C2 - O3 - CT         113.5000    65.0000             CUCU 0000 0000         A 2             C(*Csp2)(*Csp2)-O-C, WCS (CU)
+ 2  C2 - O3 - H2         113.0000    35.0000             O200 0000 0000         A 2             C(=O)-O-H, WCS (CU)
+ 2  C2 - O3 - C2         121.0000   100.0000             CUCU 0000 CUCU         A 1             Ph-OPh, WCS (CU)
+ 2  C2 - O3 - CT         114.6000    63.0000             N2O2 0000 0000         O 2             C(=O)(-N)-O-C, JACS, 2058 (86)
+ 2  C2 - O3 - CT         112.0000    85.0000             O200 0000 0000         A 2             C(=O)-O-C, WCS (CU)
+ 2  H1 - CT - SX         109.5000    35.0000             0000 0000 0000         O 1             S-C-H
+ 2  CT - CT - SX         108.6000    50.0000             0000 0000 H100         O 1             S(-H)-C-C
+ 2  CT - CT - SX         114.7000    50.0000             0000 0000 0000         O 1             S-C-C
+ 2  CT - SX - CT          98.9000    62.0000             0000 0000 0000         O 1             C-S-C
+ 2  CT - SX - H1          96.0000    44.0000             0000 0000 0000         O 1             C-S-H
+ 2  CT - SX - SX         103.7000    68.0000             0000 0000 0000         O 1             C-S-S
+ 2  Lp - SX - Lp         160.0000   600.0000             0000 0000 0000         O 1             Lp-S-Lp
+ 2  00 - SX - Lp          96.7000   600.0000             0000 0000 0000         O 1             Lp-S-00
+ 2  O2 * SX * O2         118.0000    75.0000             0000 0000 0000         A 3             O=S=O, WCS (CU)
+ 2  O2 * SX * O3         106.0000    65.0000             0000 0000 0000         A 3             O=S-O, WCS (CU)
+ 2  C0 * SX * O2         109.0000    65.0000             0000 0000 0000         A 3             C-S=O, WCS (CU)
+ 2  C2 * SX * N0         110.0000    65.0000             0000 O200 0000         A 3             C2-S(O)-N, WCS (CU)
+ 2  O2 * SX * N0         107.0000    65.0000             0000 0000 0000         A 3             O=S-N, WCS (CU)
+ 2  C0 - CT - N3         109.7000    80.0000             0000 0000 0000         O 2             C-C-N(sp3)
+ 2  H1 - C3 - N3         109.5000    35.0000             0000 0000 0000         O 2             H-C-N(sp3)
+ 2  CT - CT - N5         109.7000    80.0000             C200 0000 0000         O 1             C-C(Csp2)-N+(sp3)
+ 2  OM - N4 = O2         124.0000    80.0000             0000 CU00 0000         A 2             OM-N(+,Ar)=O
+ 2  OM - N4 = O2         118.0000    80.0000             0000 0000 0000         O 1             OM-N(+)=O, JACS, 4046 (89)
+ 2  CU - N4 = O2         118.0000    70.0000             0000 0000 0000         A 2             C(sp2)-NO2
+ 2  CU - N4 - OM         118.0000    70.0000             0000 0000 0000         A 2             C(sp2)-NO2
+ 2  CT - N4 = O2         119.0000    70.0000             0000 0000 0000         O 1             C(sp3)-NO2, JACS, 4046 (89)
+ 2  CT - N4 - OM         119.0000    70.0000             0000 0000 0000         O 1             C(sp3)-NO2, JACS, 4046 (89)
+ 2  CT - C1 % N1         180.0000    35.0000             0000 0000 0000         O 1             C(sp3)-C%N, JACS, 4046 (89)
+ 2  C1 - CT - C1         112.0000    35.0000             0000 0000 0000         O 1             NC-C-CN, JACS, 4046 (89)
+ 2  C0 - O3 - PX         120.5000   100.0000             0000 0000 0000         O 1             P-O-C0
+ 2  H2 - O3 - PX         108.5000    45.0000             0000 0000 0000         O 1             P-O-H
+ 2  O2 = PX - OM         119.9000   140.0000             0000 0000 0000         O 1             OM-P=O
+ 2  O2 = PX = O2         119.9000   140.0000             0000 0000 0000         A 2             O=P=O, WCS (CU)
+ 2  O3 - PX - OM         108.2000    45.0000             H200 0000 0000         O 1             OM-P-O(-H)
+ 2  O3 - PX - OM         108.2000   100.0000             0000 0000 0000         O 1             OM-P-O
+ 2  O2 = PX - O3         108.2000    45.0000             0000 0000 H200         O 1             O=P-O(-H)
+ 2  O2 = PX - O3         108.2000   100.0000             0000 0000 0000         O 1             O=P-O
+ 2  O3 - PX - O3         102.6000    45.0000             0000 0000 0000         O 1             O-P-O
+ 2  OM - PX - OM         119.9000   140.0000             0000 0000 0000         O 2             O(-)-P-O(-), WCS (CU)
+ 2  C0 - PX - N2         103.2000    85.0000             0000 OMO2 0000         A 2             C-P(O2)-N, JACS, 5649 (89)
+ 2  C0 - PX - O3          97.0500    85.0000             0000 OMO2 0000         A 2             C-P(O2)-O, JACS, 5649 (89)
+ 2  C0 - PX - C0         101.5000    85.0000             0000 OMO2 0000         A 2             C-P(O2)-C, JACS, 5649 (89)
+ 2  F0 - PX - F0          90.0000   100.0000             0000 F0F0 0000         A 2             Hexafluorophosphate, WCS (CU)
+ 2  H1 - C2 * 00         120.0000    35.0000             0000 0000 0000         O 1             H1-C(sp2)*
+ 2  CT - CU = CU         120.0000    70.0000             0000 CU00 CU00         O 2             *C(sp2)* Aromatic
+ 2  CT - CU = CU         127.0000    70.0000             O300 0000 0000         A 3             (RO-)C-C=C, GC (CU)
+ 2  00 * CU * 00         120.0000    70.0000             0000 0000 0000         O 2             *C(sp2)* Aromatic
+ 2  H1 - CT - 00         109.5000    35.0000             0000 0000 0000         A 2             H-C(sp3)-
+ 2  00 - CA - 00         111.5000    63.0000             0000 0000 0000         O 2             -CA-
+ 2  00 - CB - 00         112.4000    63.0000             0000 0000 0000         O 2             -CB-
+ 2  00 - C3 - 00         109.5000    40.0000             0000 0000 0000         O 2             -C3-
+ 2  00 * C1 * 00         180.0000    35.0000             0000 0000 0000         A 3             -C(sp)-, WCS (CU)
+ 2  00 * N2 * 00         120.0000    50.0000             0000 0000 0000         A 2             *N(sp2)*
+ 2  00 - N3 - 00         108.5000    40.0000             0000 0000 0000         A 3             -N(sp3)-
+ 2  00 * N4 * 00         120.0000    50.0000             0000 0000 0000         O 3             *N+(sp2)*
+ 2  00 - N5 - 00         109.5000    50.0000             0000 0000 0000         O 2             -N+(sp3)-
+ 2  00 - O3 - 00         108.0000    60.0000             0000 0000 0000         A 3             -O-
+ 2  00 * PX * 00         109.5000    45.0000             0000 0000 0000         A 3             -P-
+ 2  00 * SX * 00         105.0000    62.0000             0000 0000 0000         A 3             -S-
+ 2  00 - Si - 00         110.8000    67.0000             0000 0000 0000         A 3             -Si-, from MM2
+ 2  00 * Cl * 00         109.5000    50.0000             0000 0000 0000         A 3             *Cl*
+ 2  00 * Br * 00         109.5000    50.0000             0000 0000 0000         A 3             *Br*
+ 2  00 * I0 * 00         109.5000    50.0000             0000 0000 0000         A 3             *I*
+ 2  00 * Z0 * 00          90.0000    25.0000             0000 0000 0000         A 3             -Z- (90 deg)
+ C
+ C
+ C        Torsional Interaction (TOR)                    Opt. Descriptor
+ C        ___________________________                    _______________
+ C                         V1/2       V2/2       V3/2    Atm1 Atm2 Atm3 Atm4
+ C                      (Constants in Kcal/mol)   
+-2
+ 4  Du * 00 * 00 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 2             Dummy torsion 1
+ 4  00 * Du * 00 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 2             Dummy torsion 2
+ 4  Du . 00 * 00 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 2             Dummy torsion 3
+ 4  00 . Du * 00 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 2             Dummy torsion 4
+ 4  00 * Du . 00 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 2             Dummy torsion 5
+54                         0.0000     0.0000     0.0000
+ 4  O2 = C2 - N2 - N0      0.3700     2.5000     0.0000  0000 0000 0000 0000    A 2             O=C-N-N, WCS/Nowick
+ 4  O2 = C2 - N2 - 00      0.0000     2.2625     0.0000  0000 O300 0000 0000    O 2             O=C(-O)-N-, JACS, 2058 (86)
+ 4  O3 - C2 - N2 - 00      0.0000     2.2625     0.0000  0000 O200 0000 0000    O 2             O-C(=O)-N-, JACS, 2058 (86)
+ 4  O2 = C2 - N2 - 00      0.0000     2.0000     0.0000  0000 N200 0000 0000    A 2             O=C(-N)-N-, Urea, WCS (CU)
+ 4  N2 - C2 - N2 - 00      0.0000     2.0000     0.0000  0000 O200 0000 0000    A 2             N-C(=O)-N-, Urea, WCS (CU)
+ 4  O2 = C2 - N2 - H3      0.6500     2.5000     0.0000  0000 0000 0000 0000    O 1             O=C-N-H
+ 4  O2 = C2 - N2 - 00      0.0000     2.5000     0.0000  0000 0000 0000 0000    O 1             O=C-N-X (X.NE.H)
+ 4  O2 = C2 - N2 - CU      0.0000     0.7500     0.0000  0000 0000 CU00 0000    A 3             O=C-N(*Csp2)-C(sp2), WCS (CU)
+ 4  00 - C2 - N2 - CU      0.0000     0.7500     0.0000  0000 O200 CU00 0000    A 3             X-C(=O)-N(*Csp2)-C(sp2), WCS (CU)
+ 4  O2 = C2 - N2 - CU      0.0000     1.5000     0.0000  0000 0000 0000 0000    A 3             O=C-N-C(sp2), WCS (CU)
+ 4  00 - C2 - N2 - CU      0.0000     1.5000     0.0000  0000 O200 0000 0000    A 3             O=C-N-C(sp2), WCS (CU)
+ 4  00 - C2 - N2 - 00      0.0000     2.5000     0.0000  0000 O200 0000 0000    O 1             X-C(=O)-N-X
+ 4  N2 - C2 - O3 - C0      0.0000     1.0000     0.0000  0000 O200 0000 0000    O 2             N-C(=O)-O-C0, JACS, 2058 (86)
+ 4  O2 = C2 - O3 - C0      0.0000     1.0000     0.0000  0000 N200 0000 0000    O 2             O=C(-N)-O-C0, JACS, 2058 (86)
+ 4  O2 = C2 - O3 - C3      0.2000     2.5000     0.0000  0000 0000 0000 0000    A 2             O=C-O-C, AA Ester, WCS (CU)
+ 4  O2 = C2 - O3 - C0      0.6000     3.0000     0.0000  0000 0000 0000 0000    A 2             O=C-O-C, UA Ester, WCS (CU)
+ 4  O2 = C2 - O3 - H2     -2.0000     2.5000     0.0000  0000 0000 0000 0000    A 2             O=C-O-H, Acid, WCS (CU)
+ 4  CU - C2 - O3 - C0      1.0000     2.7500     0.0000  0000 O200 0000 0000    A 2             C(sp2)-C(=O)-O-C, WCS (CU)
+ 4  C3 - C2 - O3 - C3      0.7500     2.5000     0.0000  0000 O200 0000 0000    A 2             C-C(=O)-O-C, AA Ester, WCS (CU)
+ 4  C0 - C2 - O3 - C3      0.5000     2.7500     0.0000  0000 O200 0000 0000    A 2             C0-C(=O)-O-C, Ester, WCS (CU)
+ 4  C0 - C2 - O3 - C0      0.2500     2.7500     0.0000  0000 O200 0000 0000    A 2             C0-C(=O)-O-C0, Ester, WCS (CU)
+ 4  O2 = C2 - CB - C2      2.1500     0.4000     0.0000  0000 N200 0000 O2N2    A 2         4 M O=C(N)-CB-C(=O,-N) DQM (CU)
+ 4  C3 - C3 - C2 - N2      0.0000     0.0000     0.0000  0000 0000 O200 0000    A 2         4 M C-C-C(=O)-N(sp2) DQM (CU) PSI
+ 4  C2 - N2 - CA - C2     -0.2000     0.6000     0.3000  O200 0000 0000 O2O3    A 2         4 M C(=O)-N(sp2)-C-C(=O)-O  Alanine/ester DQM (CU)
+ 4  C2 - N2 - C3 - C2      1.6000     0.6000     0.0000  O200 0000 0000 O200    A 2         4 M C(=O)-N(sp2)-C-C(=O) DQM (CU) PHI
+ 4  N2 - C3 - C2 - N2      1.6000     0.0000    -0.5000  0000 0000 O200 0000    A 2         4 M N(sp2)-C-C(=O)-N(sp2) DQM  (CU) PSI
+ 4  C2 - N2 - CB - C2      0.7000     1.2000     0.0000  O200 0000 0000 O200    A 2         4 M C(=O)-N(sp2)-CH2-C(=O) DQM (CU)
+ 4  H3 - N2 - CB - C2      0.0000     0.0000     0.0000  0000 0000 0000 O200    A 2         4 M H-N(sp2)-CH2-C(=O) DQM (CU)
+ 4  N2 - C2 - CB - N2      0.4500     0.9000    -0.5000  0000 O200 0000 0000    A 2         4 M N(sp2)-CH2-C(=O)N(sp2)  DQM (CU) PSI 
+ 4  O2 = C2 - CB - N2      0.0000     0.0000     0.0000  0000 N200 0000 0000    M 2         4 M O=C(-N)-CH2-N(sp2) DQM (CU)
+ 4  C2 - N2 - CA - C2      1.8500     0.0000     0.1000  O200 0000 0000 O200    A 2         4 M C(=O)-N(sp2)-C-C(=O) DQM (CU) PHI
+ 4  N2 - CA - C2 - N2      1.8500     0.5000     0.0000  0000 0000 O200 0000    A 2         4 M N(sp2)-C-C(=O)-N(sp2) DQM (CU) PSI
+ 4  C2 - N2 - CA - C0      0.3000     0.4000    -0.2000  O200 0000 0000 0000    A 2         4 M C(=O)-N(sp2)-CH-C  DQM (CU) PHI
+ 4  C0 - CA - C2 - N2      0.4000     0.2000    -0.3000  0000 0000 O200 0000    A 2         4 M C-CH-C(=O)-N(sp2) DQM (CU) PSI
+ 4  O2 = C2 - C3 - C0     -1.1305     0.3151     0.0000  0000 N200 H1H1 0000    M 2         4 M O=C(-N)-CH2-C0 DQM (CU) based on 6-31G* calc for propanamide
+ 4  O2 = C2 - C3 - C0     -0.5000     0.0000     0.0000  0000 N200 0000 0000    M 2         4 M O=C(-N)-C-C0 DQM (CU) based on 6-31G* calc for propanamide
+ 4  O2 = C2 - C3 - H1      0.0000     0.0000     0.0393  0000 N200 0000 0000    M 2         4 M O=C(-N)-C-H DQM (CU) based on 6-31G* calc for nma
+ 4  C2 - N2 - C3 - H1      0.0000     0.0000    -0.0780  O200 0000 0000 0000    A 2         4 M C(=O)-N-C-H DQM (CU) based on 6-31G* calc for nma
+ 4  C2 - N2 - CB - C0     -0.0579    -0.0702     0.0000  O200 0000 0000 0000    A 2         4 M C(=O)-N-C-C DQM (CU) based on 6-31G* calc for nea
+ 4  O2 = C2 - CB - C0      0.0000     1.4400    -0.4100  0000 N200 0000 0000    A 2         4 M O=C-C-C DQM (CU) based on 6-31G* calc for propanamide
+ 4  C2 - N2 - C3 - C0      0.0000    -0.5320     0.2317  O200 0000 H1H1 0000    A 2         4 M C(=O)-N-CH2-C DQM (CU) based on 6-31G* calc for nea
+ 4  C2 - N2 - C3 - C0      0.0000     0.0000     0.0000  O200 0000 0000 0000    A 2         4 M C(=O)-N-C-C DQM (CU) based on 6-31G* calc for nea
+ 4  O2 = C2 - C3 - C0      0.0000     0.0000    -0.0670  0000 N200 0000 0000    O 1             O=C(-N)-C-C0
+ 4  O2 = C2 - C3 - H1      0.0000     0.0000    -0.0670  0000 N200 0000 0000    O 1             O=C(-N)-C-H
+ 4  O2 = C2 - CA - CC      0.0000     0.0000     0.0000  0000 N200 0000 0000    O 1             O=C(-N)-CH-CH3
+ 4  O2 = C2 - CA - CT      0.0000     0.0000    -0.1000  0000 N200 0000 0000    O 1             O=C(-N)-CH-C
+ 4  O2 = C2 - C3 - N2      0.0000     0.0000    -0.0670  0000 N200 0000 0000    O 1             O=C(-N)-C-N(sp2)
+ 4  O2 = C2 - CA - N2      0.0000     0.0000    -0.1000  0000 N200 0000 0000    O 1             O=C(-N)-CH-N(sp2)
+ 4  O2 = C2 - CB - N2      0.0000     0.0000    -0.2000  0000 N200 0000 0000    O 1             O=C(-N)-CH2-N(sp2)
+ 4  O2 = C2 - C3 - N5      0.0000     0.0000    -0.0670  0000 N200 0000 0000    O 1             O=C(-N)-C-N+(sp3)
+ 4  O2 = C2 - CA - N5      0.0000     0.0000    -0.1000  0000 N200 0000 0000    O 1             O=C(-N)-CH-N+(sp3)
+ 4  O2 = C2 - CB - N5      0.0000     0.0000    -0.2000  0000 N200 0000 0000    O 1             O=C(-N)-CH2-N+(sp3)
+ 4  O2 = C2 - C3 - N0      0.0000     0.0000    -0.0670  0000 N200 0000 0000    O 2             O=C(-N)-C-N0
+ 4  O2 = C2 - CA - N0      0.0000     0.0000    -0.1000  0000 N200 0000 0000    O 2             O=C(-N)-CH-N0
+ 4  O2 = C2 - CB - N0      0.0000     0.0000    -0.2000  0000 N200 0000 0000    O 2             O=C(-N)-CH2-N0
+ 4  O2 = C2 - CT - O3     -0.1500     0.6500     0.0000  0000 O300 0000 0000    A 2             O=C-C-O, JACS, 5465 (90)
+ 4  O2 = C2 - CT - 00      0.0000     0.0000     0.0000  0000 N200 0000 0000    O 1             O=C(-N)-C-X
+ 4  O2 = C2 - CT - 00      0.0000     0.0000     0.0000  0000 OM00 0000 0000    O 1             O=C(-OM)-C-X
+ 4  OM - C2 - CT - 00      0.0000     0.0000     0.0000  0000 O200 0000 0000    O 1             OM-C(=O)-C-X
+ 4  O2 = C2 - CU * 00      0.0000     0.7000     0.0000  0000 OM00 0000 0000    A 2             O=C(OM)-C(sp2)*, WCS (CU)
+ 4  OM - C2 - CU * 00      0.0000     0.7000     0.0000  0000 O200 0000 0000    A 2             OM-C(=O)-C(sp2)*, WCS (CU)
+ 4  O2 = C2 - CS - N2      0.0000     0.0000     0.0000  0000 O300 0000 C200    A 2         4 M O=C(-O)-C-N2 Amino acid - ester, DQM (CU)
+ 4  O3 - C2 - CS - N2      1.5000    -0.5000     0.0000  0000 O200 0000 C200    A 2         4 M O-C(=O)-C-N2 Amino acid - ester, DQM (CU)
+ 4  O2 = C2 - CT - 00      0.0000     0.0000    -0.0300  0000 O300 0000 0000    A 2             O=C(-O)-C- Ester/Acid, WCS (CU)
+ 4  O3 - C2 - CT - O3      0.1500     0.6500     0.0000  0000 O200 0000 0000    A 2             O-C(=O)-C-O, JACS, 5465 (90)
+ 4  O3 - C2 - CT - 00      0.0000     0.0000     0.0300  0000 O200 0000 0000    A 2             O-C(=O)-C- Ester/Acid, WCS (CU)
+ 4  O2 = C2 - C0 - H1      0.2000    -0.1000    -0.1000  0000 0000 0000 0000    A 2             O=C-C-H, Ald,keto, WCS (CU)
+ 4  O2 = C2 - C3 - C0     -0.1000     0.1333    -0.0333  0000 0000 0000 0000    A 2             O=C-C-C Ald/keto, WCS (CU)
+ 4  O2 = C2 - C3 - 00      0.0000     0.1333    -0.0333  0000 0000 0000 0000    A 2             O=C-C- Ald/keto, WCS (CU)
+ 4  O2 = CU - CA - C0     -0.1500     0.2000    -0.0500  0000 0000 0000 0000    A 2             O=C-CA-C Ald/keto, WCS (CU)
+ 4  O2 = CU - CA - 00      0.0000     0.2000    -0.0500  0000 0000 0000 0000    A 2             O=C-CA- Ald/keto, WCS (CU)
+ 4  O2 = CU - CB - C0     -0.3000     0.4000    -0.1000  0000 0000 0000 0000    A 2             O=C-CB-C Ald/keto, WCS (CU)
+ 4  O2 = CU - CB - 00      0.0000     0.4000    -0.1000  0000 0000 0000 0000    A 2             O=C-CB- Ald/keto, WCS (CU)
+ 4  CH - C2 - C0 - H1     -0.2000    -0.1000     0.1000  0000 O200 0000 0000    A 2             -C(=O)-C-H, Ald/keto, WCS (CU)
+ 4  C0 - C2 - C3 - 00      0.1000     0.1333     0.0333  0000 O200 0000 0000    A 2             -C(=O)-C-, Keto, WCS (CU)
+ 4  C0 - C2 - CA - 00      0.1500     0.2000     0.0500  0000 O200 0000 0000    A 2             -C(=O)-CA-, Keto, WCS (CU)
+ 4  C0 - C2 - CB - 00      0.3000     0.4000     0.1000  0000 O200 0000 0000    A 2             -C(=O)-CB-, Keto, WCS (CU)
+ 4  H1 - C2 - C3 - 00      0.0667     0.1333     0.2000  0000 O200 0000 0000    A 2             H-C(=O)-C-, Ald, WCS (CU)
+ 4  H1 - C2 - CA - 00      0.1000     0.2000     0.3000  0000 O200 0000 0000    A 2             H-C(=O)-CA-, Ald, WCS (CU)
+ 4  H1 - C2 - CB - 00      0.2000     0.4000     0.6000  0000 O200 0000 0000    A 2             H-C(=O)-CB-, Ald, WCS (CU)
+ 4  CD * C2 - N2 - 00      0.0000     0.8500     0.0000  0000 CU00 0000 0000    A 2             CH(sp2)*C(sp2)-N(sp2)-X, WCS/Nowick
+ 4  C2 * C2 - N2 - 00      0.0000     1.2500     0.0000  0000 CU00 0000 0000    A 2             C(sp2)*C(sp2)-N(sp2)-X, WCS/Nowick
+54                         0.3000     0.0000     0.0000
+ 4  N2 - C2 - CT - 00      0.0000     0.0000     0.0000  0000 O200 0000 0000    O 1             N-C(=O)-C-X
+ 4  CU * C2 - C2 = O2      0.0000     0.7800     0.0000  0000 CU00 N200 0000    A 2             C(sp2)*C(sp2)-C(N)=O, WCS/Nowick
+ 4  CU * C2 - C2 = O2      0.0000     0.6500     0.0000  0000 CU00 0000 0000    A 3             C(sp2)*C(sp2)-C=O, WCS (CU)
+ 4  CU * C2 - C2 - N2      0.0000     0.7800     0.0000  0000 CU00 O200 0000    A 2             C(sp2)*C(sp2)-C(=O)-N, WCS/Nowick
+ 4  CU * C2 - C2 - OM      0.0000     0.6500     0.0000  0000 CU00 O200 0000    A 3             C(sp2)*C(sp2)-C(=O)-OM, WCS (CU)
+ 4  CU * C2 - C2 - O3      0.0000     0.6500     0.0000  0000 CU00 O200 0000    A 3             C(sp2)*C(sp2)-C(=O)-O, WCS (CU)
+ 4  C2 * C2 - C2 * 00      0.0000     0.6500     0.0000  0000 CU00 0000 0000    A 3             C(sp2)*C(sp2)-C(sp2), WCS (CU)
+ 4  CU * CU - CU * 00      0.0000     0.5000     0.0000  0000 CU00 0000 0000    A 3             C(sp2)*C(sp2)-C(sp2), WCS (CU)
+ 4  O2 = C2 - C2 = O2      0.1500     0.1500     0.0000  0000 N200 0000 0000    A 1             O=C(N)-C=O,Babine,Agouron mod. JACS,9483(91)
+ 4  N2 - C2 - C2 = O2     -0.1500     0.1500     0.0000  0000 O200 0000 0000    A 1             N-C(=O)-C=O,Babine,Agouron mod. JACS,9483(91)
+ 4  O2 = C2 - C2 - 00     -0.1500     0.1500     0.0000  0000 N200 O200 0000    A 1             O=C(N)-C(=O)-,Babine,Agouron mod. JACS,9483(91)
+ 4  N2 - C2 - C2 - 00      0.1500     0.1500     0.0000  0000 O200 O200 0000    A 1             N-C(=O)-C(=O)-,Babine,Agouron mod. JACS,9483(91)
+ 4  O2 = C2 - C2 = O2      0.0000     0.2000     0.0000  0000 0000 0000 0000    A 3             O=C-C=O, WCS(CU)
+ 4  O2 = C2 - C2 - 00      0.0000     0.1000     0.0000  0000 0000 O200 0000    A 3             O=C-C(=O)-X, WCS(CU)
+ 4  00 - C2 - C2 - 00      0.0000     0.1000     0.0000  0000 O200 O200 0000    A 3             X-C(=O)-C(=O)-X, WCS(CU)
+ 4  C2 - CT - O3 - 00     -0.6500     0.0000     0.5000  O2O3 0000 0000 0000    A 2             C(OO)-C-O-X, JACS, 5465 (90)
+ 4  C2 - CT - O3 - 00      0.7500     0.0000     0.3833  O200 0000 0000 0000    A 3             C(=O)-C-O-X (X.NE.H)
+ 4  00 - CA - O3 - C2     -0.3750     0.0000     0.3750  0000 0000 0000 O200    A 2             C(=O)-O-CH-X, WCS (CU)
+ 4  00 - CB - O3 - C2     -0.7500     0.0000     0.7500  0000 0000 0000 O200    A 2             C(=O)-O-CH2-X, WCS (CU)
+ 4  H1 - C3 - O3 - C2      0.0000     0.0000     0.0000  0000 0000 0000 O200    A 2             C(=O)-O-C-H, WCS (CU)
+ 4  00 - C3 - O3 - C2     -0.3000     0.0000     0.0000  0000 0000 0000 O200    A 2             C(=O)-O-C-X, WCS (CU)
+ 4  O3 - CB - CB - O3      0.0000    -0.5000     2.0000  0000 0000 0000 0000    O 1             O-CH2-CH2-O
+ 4  O3 - CA - CB - O3      0.0000    -0.5000     1.0000  0000 0000 0000 0000    O 1             O-CH-CH2-O
+ 4  O3 - CA - CA - O3      0.0000    -0.5000     0.5000  0000 0000 0000 0000    O 1             O-CH-CH-O
+ 4  O3 - C3 - C3 - O3      0.0000    -0.5000     0.1440  0000 0000 0000 0000    O 1             O-C-C-O
+ 4  N2 - C2 - N2 - 00      0.0000     1.7000     0.0000  0000 N400 0000 0000    O 1             N-C(=N+)-N-X, Guanidinium
+ 4  N4 = C2 - N2 - 00      0.0000     1.7000     0.0000  0000 N200 0000 0000    O 1             N+=C(-N)-N-X, Guanidinium
+ 4  N2 - C2 = N4 - 00      0.0000     1.7000     0.0000  0000 N200 0000 0000    O 1             N-C(-N)=N+_X, Guanidinium
+ 4  N4 = CU - N2 - 00      0.0000     2.3250     0.0000  0000 0000 0000 0000    O 1             N+=C-N-X, Amidinium
+ 4  N2 - CU = N4 - 00      0.0000     2.3250     0.0000  0000 0000 0000 0000    O 1             N-C=N+-X, Amidinium
+ 4  N2 = CU - N2 - 00      0.0000     2.3250     0.0000  0000 0000 0000 0000    O 1             N=C-N-X, Amidine
+ 4  N2 - CU = N2 - 00      0.0000     2.5000     0.0000  0000 0000 0000 0000    O 1             N-C=N-X, Amidine
+ 4  N2 = C2 - C3 - C0     -0.1500     0.2500    -1.0000  0000 0000 0000 0000    A 2             N=C-C-C, cf JCC 57(92)
+ 4  N2 = CU - CT - C0     -0.8500     0.5000    -1.0000  0000 0000 0000 0000    A 2             N=C-C-C, cf JCC 57(92)
+ 4  N2 = C2 - C2 = C2      1.6000     1.0000     0.0000  0000 0000 0000 0000    A 2             N=C-C=C, cf JCC 57(92)
+ 4  N2 = C2 - CU = CU      1.0000     1.7500     0.0000  0000 0000 0000 0000    A 2             N=C-C=C, cf JCC 57(92)
+ 4  N2 = CU - CU = CU      1.0000     2.7000     0.0000  0000 0000 0000 0000    A 2             N=C-C=C, cf JCC 57(92)
+ 4  CU = N2 - CT - 00      0.0000     0.0000    -0.4000  0000 0000 0000 0000    A 2             C=N-C-, cf JCC 57(92)
+ 4  CT - CA - O3 - CT      0.0000    -0.1000     0.7250  0000 0000 0000 0000    O 1             C-CH-O-C
+ 4  CC - CB - O3 - CB      0.0000    -0.1000     0.7250  0000 0000 0000 0000    O 1             CH3-CH2-O-CH2
+ 4  CT - CB - O3 - CT      0.0000    -0.1000     1.4500  0000 0000 0000 0000    O 1             C-CH2-O-C
+ 4  CT - CB - O3 - CT      0.0000    -0.1000     1.2000  0000 0000 0000 0000    A 1             C-CH2-O-C, HS (Me-O-Et,UA)(CU)
+ 4  C3 - C3 - O3 - C3      0.7674    -0.1097     0.3000  0000 0000 0000 0000    A 1             C-C-O-C, HS (Me-O-Et,AA)(CU)
+ 4  CT - C3 - O3 - CT      0.0000     0.2000     0.3830  0000 0000 0000 0000    O 1             C-C-O-C, AA
+ 4  O3 - CB - O3 - 00     -2.5000     0.0000     1.2000  0000 0000 0000 0000    A 2             O-CH2-O- (anomeric)
+ 4  O3 - CC - O3 - 00     -2.0000     0.0000     0.9000  0000 0000 0000 0000    A 2             O-CH-O- (anomeric)
+ 4  O3 - CT - O3 - 00     -1.6000     0.0000     0.5000  0000 0000 0000 0000    O 2             O-C-O- (anomeric)
+ 4  CU - C3 - O3 - H2      0.0000     0.0000     0.1000  CUCU 0000 0000 0000    M 1             H-O-C-(Aromatic Csp2)
+ 4  CU - CA - O3 - H2      0.0000     0.0000     0.1500  CUCU 0000 0000 0000    M 1             H-O-CH-(Aromatic Csp2)
+ 4  CU - CB - O3 - H2      0.0000     0.0000     0.3000  CUCU 0000 0000 0000    M 1             H-O-CH2-(Aromatic Csp2)
+ 4  CU - C3 - O3 - H2      0.0000     0.0000     0.1667  CUCU 0000 0000 0000    O 1             H-O-C-(Aromatic Csp2)
+ 4  CU - CA - O3 - H2      0.0000     0.0000     0.2500  CUCU 0000 0000 0000    O 1             H-O-CH-(Aromatic Csp2)
+ 4  CU - CB - O3 - H2      0.0000     0.0000     0.5000  CUCU 0000 0000 0000    O 1             H-O-CH2-(Aromatic Csp2)
+ 4  CU - C3 - O3 - 00     -0.1000     0.0000     0.1250  CU00 H100 0000 0000    A 3             X-O-C-Csp2(*Csp2) GC (CU)
+ 4  CU - CA - O3 - 00     -0.1000     0.3000     0.2500  CU00 CT00 0000 0000    A 3             X-O-CH-Csp2(*Csp2) GC (CU)
+ 4  CU - CB - O3 - 00      0.0000     0.0000     0.5000  CU00 0000 0000 0000    A 3             X-O-CH2-Csp2(*Csp2) GC (CU)
+ 4  H1 - C3 - O3 - H2      0.1000    -0.0220     0.4598  0000 CTCT 0000 0000    A 1             H-O-C-H, Sec.alc.(2-PrOH,AA) HS/CU
+ 4  H1 - C3 - O3 - H2      0.0000     0.0000     0.1100  0000 0000 0000 0000    M 1             H-O-C-H, WCS (CU)
+ 4  00 - C3 - O3 - H2      0.1000     0.0000     0.1100  0000 0000 0000 0000    M 1             H-O-C-X, WCS (CU)
+ 4  CT - CA - O3 - H2      0.1500    -0.0451     0.3300  0000 CT00 0000 0000    A 1             H-O-CH-X, Sec alc.(2-PrOH,UA) HS/CU
+ 4  00 - CA - O3 - H2      0.1000     0.0000     0.1500  0000 0000 0000 0000    M 1             H-O-CH-X, WCS (CU)
+ 4  00 - CB - O3 - H2      0.2000     0.0000     0.3000  0000 0000 0000 0000    M 1             H-O-CH2-X, WCS (CU)
+ 4  00 - C3 - O3 - H2      0.0000     0.0000     0.1667  0000 0000 0000 0000    O 1             H-O-C-X
+ 4  00 - CA - O3 - H2      0.0000     0.0000     0.2500  0000 0000 0000 0000    O 1             H-O-CH-X
+ 4  00 - CB - O3 - H2      0.0000     0.0000     0.5000  0000 0000 0000 0000    O 1             H-O-CH2-X
+ 4  00 - C3 - O3 - CT      0.0000     0.0000     0.1667  0000 OM00 0000 0000    O 2             C-O-C(-OM)-X, Tetra. Intermediate
+ 4  N2 - CA - O3 - CA      0.0000     0.0000     0.7250  CUCU 0000 0000 0000    O 1             N(*Csp2)(*Csp2)-CH-O-CH
+ 4  CU * C2 - O3 - C2      0.0000     1.0000     0.0000  0000 CU00 0000 O200    A 2             Ph-O-C(=O), WCS (CU)
+ 4  CU * C2 - O3 - C2      0.0000     0.7500     0.0000  0000 CU00 0000 CUCU    A 1             PhO-Ph, WCS (CU)
+ 4  C2 * C2 - C2 * C2      0.0000     1.0000     0.0000  0000 C200 C200 0000    A 1             *C(ar)-C(ar)* Biphenyl, WCS (CU)
+ 4  00 - C2 = C2 - 00      0.0000     3.2500     0.0000  0000 0000 0000 0000    A 2             -C=C- Alkene, WCS (CU)
+ 4  00 - C2 = CD - 00      0.0000     7.5000     0.0000  0000 0000 0000 0000    A 2             -C=CH- Alkene, WCS (CU)
+ 4  00 - CD = CD - 00      0.0000    15.0000     0.0000  0000 0000 0000 0000    A 2             -CH=CH- Alkene, WCS (CU)
+ 4  O2 = C2 - C2 = C2      0.3000     1.0000     0.0000  0000 N000 0000 0000    A 2             O=C(N)-C(sp2)*X, WCS (CU)
+ 4  O2 = C2 - C2 = C2      0.2000     1.0000     0.0000  0000 O000 0000 0000    A 2             O=C(O)-C(sp2)*X, WCS (CU)
+ 4  O2 = C2 - CD = CU      0.0000     1.8000     0.0000  0000 N000 0000 0000    A 2             O=C(N)-CH=X, WCS (CU)
+ 4  O2 = C2 - CD = CU      0.0000     1.8000     0.0000  0000 O000 0000 0000    A 2             O=C(O)-CH=X, WCS (CU)
+ 4  O2 = C2 - C2 = C2      1.1000     2.2000     0.0000  0000 C000 0000 0000    A 2             O=C(C)-C=C2, WCS (CU)
+ 4  O2 = C2 - CU = CU      0.7000     1.3000     0.0000  0000 C000 0000 0000    A 2             O=C(C)-C=C, WCS (CU)
+ 4  O2 = C2 - C2 = C2      1.6000     2.4000     0.0000  0000 0000 0000 0000    A 2             O=C-C=C2, WCS (CU)
+ 4  O2 = C2 - CU = CU      0.7000     1.3000     0.0000  0000 0000 0000 0000    A 2             O=C-C=C, WCS (CU)
+ 4  CU = C2 - C2 = CU      1.3000     0.8000     0.0000  0000 0000 0000 0000    A 2             C=C-C=C, WCS (CU)
+ 4  CU = C2 - CD = CU      1.1000     1.1000     0.0000  0000 0000 0000 0000    A 2             C=C-CH=C, WCS (CU)
+ 4  CU = CD - CD = CU      1.1000     2.2000     0.0000  0000 0000 0000 0000    A 2             C=CH-CH=C, WCS (CU)
+ 4  00 * C2 - C2 * 00      0.0000     0.7500     0.0000  0000 0000 0000 0000    A 2             X=C-C(sp2)*X, WCS (CU)
+ 4  00 * C2 - CD * 00      0.0000     1.5000     0.0000  0000 0000 0000 0000    A 2             X=C-CH=X, WCS (CU)
+ 4  00 * CD - CD * 00      0.0000     3.0000     0.0000  0000 0000 0000 0000    A 2             X=CH-CH=X, WCS (CU)
+ 4  C0 - O3 - PX - O3      0.0000    -0.7500     0.2500  0000 0000 0000 0000    O 1             C0-O-P-O
+ 4  OM - PX - O3 - 00      0.0000     0.0000     0.2500  0000 0000 0000 0000    O 1             OM-P-O-X
+ 4  O2 = PX - O3 - 00      0.0000     0.0000     0.2500  0000 0000 0000 0000    O 1             O=P-O-X
+ 4  00 - O3 - PX * 00      0.0000    -0.7500     0.2500  0000 0000 0000 0000    O 1             *P-O-
+ 4  C3 - C3 - C2 * C2      0.0000    -0.1200     0.0000  0000 0000 CU00 0000    A 2             Ethylbenzene All-atom DQM(CU)
+ 4  CT - CT - C2 * C2      0.0000     0.1800     0.0000  0000 0000 CU00 0000    A 2             Ethylbenzene, WCS (CU)
+ 4  CT - CT - C2 * CD      0.0000    -0.0500     0.0000  0000 0000 CU00 0000    A 2             Ethylbenzene, WCS (CU)
+ 4  O3 - CT - C2 * C2      0.0000    -0.2500     0.0000  0000 0000 CU00 0000    A 2             Benzylalcohol, WCS (CU)
+ 4  O3 - CT - C2 * CD      0.0000    -0.5000     0.0000  0000 0000 CU00 0000    A 2             Benzylalcohol, WCS (CU)
+ 4  N2 - CT - C2 * C2      0.0000    -0.2500     0.0000  0000 0000 CU00 0000    A 2             Benzylamide, WCS (CU)
+ 4  N2 - CT - C2 * CD      0.0000    -0.5000     0.0000  0000 0000 CU00 0000    A 2             Benzylamide, WCS (CU)
+ 4  N5 - CT - C2 * C2      0.0000    -0.6000     0.0000  0000 0000 CU00 0000    A 2             Benzylammonium, WCS (CU)
+ 4  N5 - CT - C2 * CD      0.0000    -1.2000     0.0000  0000 0000 CU00 0000    A 2             Benzylammonium, WCS (CU)
+ 4  00 - CT - C2 * AA      0.0000     0.0000     0.0000  0000 0000 AA00 0000    O 2             Ar*C(*Ar)-C-X
+ 4  C0 - C3 - CU = CU      0.6100    -0.1000    -0.0500  0000 O300 0000 0000    A 3             C-C-C=C Allylic-OR, GC (CU)
+ 4  C0 - CA - CU = CU      0.0000     0.0000    -0.1000  0000 O300 0000 0000    A 3             C-CH-C=C Allylic-OR, GC (CU)
+ 4  C0 - C3 - CU = CU      0.0000     0.0000    -0.3000  0000 0000 0000 0000    A 3             C-C-C=C Alkene, WCS/GC (CU)
+ 4  C0 - CA - CU = CU     -0.3000     0.0000    -0.3000  0000 0000 0000 0000    A 3             C-CH-C=C Alkene, WCS/GC (CU)
+ 4  C0 - CB - CU = CU     -0.3000     0.0000    -0.8000  0000 0000 0000 0000    A 3             C-CH2-C=C Alkene, WCS/GC (CU)
+ 4  00 - C3 - CU = CU      0.0000     0.0000    -0.3000  0000 0000 0000 0000    A 3             -C-C=C Alkene, WCS (CU)
+ 4  00 - CA - CU = CU      0.0000     0.0000    -0.4000  0000 0000 0000 0000    A 3             -CH-C=C Alkene, WCS (CU)
+ 4  00 - CB - CU = CU      0.0000     0.0000    -0.8000  0000 0000 0000 0000    A 3             -CH2-C=C Alkene, WCS (CU)
+ 4  O3 - C3 - CU = CU      0.0000     0.0000    -0.1250  0000 0000 CU00 CU00    A 3             O-C-C=C Alkene/Aromatic, WCS (CU)
+ 4  O3 - CA - CU = CU      0.0000     0.0000    -0.2500  0000 0000 CU00 CU00    A 3             O-CH-C=C Alkene/Aromatic, WCS (CU)
+ 4  O3 - CB - CU = CU      0.0000     0.0000    -0.5000  0000 0000 CU00 CU00    A 3             O-CH2-C=C Alkene/Aromatic, WCS (CU)
+ 4  O3 - C3 - CU = CU      1.4300     0.4000    -1.0000  0000 H100 0000 0000    A 3             O-C-C=C Allylic-OR, GC (CU)
+ 4  O3 - CA - CU = CU      0.7000     0.6000    -1.1000  0000 CT00 0000 0000    A 3             O-CH-C=C Allylic-OR, GC (CU)
+ 4  O3 - CB - CU = CU      0.8000     0.6000    -1.2000  0000 0000 0000 0000    A 3             O-CH2-C=C Allylic-OR, GC (CU)
+ 4  00 - C3 - CU - CT      0.0000     0.0000     0.1250  0000 0000 0000 0000    A 3             -C-C(sp2)-C Alkene, WCS (CU)
+ 4  00 - CA - CU - CT      0.0000     0.0000     0.2500  0000 0000 0000 0000    A 3             -CH-C(sp2)-C Alkene, WCS (CU)
+ 4  00 - CB - CU - CT      0.0000     0.0000     0.5000  0000 0000 0000 0000    A 3             -CH2-C(sp2)-C Alkene, WCS (CU)
+ 4  00 - CT - C2 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 2             *C(sp2)-C-
+ 4  00 - CA - CA - 00      0.0000     0.0000     0.5000  0000 0000 0000 0000    O 1             -CH-CH-
+ 4  00 - CA - CB - 00      0.0000     0.0000     1.0000  0000 0000 0000 0000    O 1             -CH-CH2-
+ 4  00 - CB - CB - 00     -0.1000     0.3100     1.0500  0000 0000 0000 0000    O 1             -CH2-CH2- DQM(CU) - modified to fit MM3*
+ 4  00 - C3 - C3 - 00      0.0000     0.0000     0.1444  0000 0000 0000 0000    O 1             -C-C-
+ 4  00 - C3 - CA - 00      0.0000     0.0000     0.3333  0000 0000 0000 0000    O 1             -C-CH-
+ 4  00 - C3 - CB - 00      0.0000     0.0000     0.6667  0000 0000 0000 0000    O 1             -C-CH2-
+ 4  00 * C2 - N2 * 00      0.0000     1.3250     0.0000  0000 0000 0000 0000    A 2             *C(sp2)-N(sp2)*, WCS (CU)
+ 4  00 - C2 = N2 - 00      0.0000     7.2000     0.0000  0000 0000 0000 0000    A 2             -C=N-
+ 4  00 * CD - N2 * 00      0.0000     2.6500     0.0000  0000 0000 0000 0000    A 2             *CH(sp2)-N(sp2)*, WCS (CU)
+ 4  00 - CD = N2 - 00      0.0000    14.4000     0.0000  0000 0000 0000 0000    A 2             -CH=N-
+ 4  00 - CT - N2 - 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 1             -C-N(sp2)-C2
+ 4  00 - CA - N3 - 00      0.0000     0.0000     0.2500  0000 0000 0000 0000    O 2             -CH-N(sp3)-
+ 4  00 - CB - N3 - 00      0.0000     0.0000     0.5000  0000 0000 0000 0000    O 2             -CH2-N(sp3)-
+ 4  00 - C3 - N3 - 00      0.0000     0.0000     0.1667  0000 0000 0000 0000    O 2             -C-N(sp3)-
+ 4  00 - CT - N4 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 1             -C-N+(sp2)-
+ 4  00 * CU - N5 - 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    A 3             *C(sp2)-N+(sp3), WCS (CU)
+ 4  C2 - CA - N5 - 00      0.0000     0.0000     0.1667  O200 0000 0000 0000    O 1             C(=O)-CH-N+(sp3)-
+ 4  C2 - CB - N5 - 00      0.0000     0.0000     0.3333  O200 0000 0000 0000    O 1             C(=O)-CH2-N+(sp3)-
+ 4  C2 - C3 - N5 - 00      0.0000     0.0000     0.1111  O200 0000 0000 0000    O 1             C(=O)-C-N+(sp3)-
+ 4  00 - CA - N5 - 00      0.0000     0.0000     0.1667  C200 0000 0000 0000    O 1             -CH(Csp2)-N+(sp3)-
+ 4  00 - CB - N5 - 00      0.0000     0.0000     0.3333  C200 0000 0000 0000    O 1             -CH2(Csp2)-N+(sp3)-
+ 4  00 - C3 - N5 - 00      0.0000     0.0000     0.1111  C200 0000 0000 0000    O 1             -C(Csp2)-N+(sp3)-
+ 4  00 - CA - N5 - 00      0.0000     0.0000     0.2333  0000 0000 0000 0000    O 1             -CH-N+(sp3)-
+ 4  00 - CB - N5 - 00      0.0000     0.0000     0.4667  0000 0000 0000 0000    O 1             -CH2-N+(sp3)-
+ 4  00 - C3 - N5 - 00      0.0000     0.0000     0.1556  0000 0000 0000 0000    O 1             -C-N+(sp3)-
+ 4  C2 * C2 - O3 - C0     -0.3000     1.7000     0.0000  0000 CU00 0000 0000    A 2             C2(sp2)*C(sp2)-O-C, anisole
+ 4  CD * C2 - O3 - C0      0.0000     1.3000     0.0000  0000 CU00 0000 0000    A 2             CD(sp2)*C(sp2)-O-C, anisole
+ 4  C2 * C2 - O3 - 00      0.0000     1.1000     0.0000  0000 0000 0000 0000    M 2             C(sp2)*c(sp2)-O-, WCS (CU)
+ 4  CU * C2 - O3 - 00      0.0000     0.9000     0.0000  0000 0000 0000 0000    O 1             C(sp2)*C(sp2)-O-
+ 4  00 * CU - O3 - 00      0.0000     1.0000     0.0000  0000 0000 0000 0000    A 2             *C(sp2)-O-, WCS (CU)
+ 4  00 - CA - O3 - H2      0.0000     0.0000     0.2500  0000 0000 0000 0000    O 1             -CH-O-H
+ 4  00 - CA - O3 - CU      0.0000     0.0000     0.1250  0000 0000 0000 0000    A 2             -CH-O-C(sp2), WCS (CU)
+ 4  00 - CA - O3 - 00      0.0000     0.0000     0.7250  0000 0000 0000 0000    O 1             -CH-O-X (X.NE.H)
+ 4  00 - CB - O3 - H2      0.0000     0.0000     0.5000  0000 0000 0000 0000    O 1             -CH2-O-H
+ 4  00 - CB - O3 - CU      0.0000     0.0000     0.2500  0000 0000 0000 0000    A 2             -CH2-O-C(sp2), WCS (CU)
+ 4  00 - CB - O3 - 00      0.0000     0.0000     1.4500  0000 0000 0000 0000    O 1             -CH2-O-X (X.NE.H)
+ 4  00 - C3 - O3 - H2      0.0000     0.0000     0.1667  0000 0000 0000 0000    O 1             -C-O-H
+ 4  00 - C3 - O3 - CU      0.0000     0.0000     0.0833  0000 0000 0000 0000    A 2             -C-O-C(sp2), WCS (CU)
+ 4  00 - C3 - O3 - 00      0.0000     0.0000     0.3833  0000 0000 0000 0000    O 1             -C-O-X (X.NE.H)
+ 4  00 * C0 - SX - Lp      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 1             -C-S-Lp
+ 4  00 * CU - SX - H1      0.0000     0.3000     0.0000  0000 0000 0000 0000    A 2             *C(sp2)-S-H, WCS (CU)
+ 4  00 * CU - SX - C3      0.0000     0.4000     0.0000  0000 0000 0000 0000    A 2             *C(sp2)-S-C, WCS (CU)
+ 4  00 * CU - SX - C0      0.0000     0.6000     0.0000  0000 0000 0000 0000    A 2             *C(sp2)-S-C, WCS (CU)
+ 4  00 * CU - SX - 00      0.0000     0.3500     0.0000  0000 0000 0000 0000    A 2             *C(sp2)-S-, WCS (CU)
+ 4  00 - CA - SX - H1      0.0000     0.0000     0.3750  0000 0000 0000 0000    A 2             -CH-S-H, WCS (CU)
+ 4  00 - CA - SX - 00      0.0000     0.0000     0.5000  0000 0000 0000 0000    A 2             -CH-S-, WCS (CU)
+ 4  00 - CB - SX - H1      0.0000     0.0000     0.7500  0000 0000 0000 0000    O 1             -CH2-S-H
+ 4  00 - CB - SX - 00      0.0000     0.0000     1.0000  0000 0000 0000 0000    O 1             -CH2-S-X (X.NE.H)
+ 4  00 - C3 - SX - H1      0.0000     0.0000     0.2500  0000 0000 0000 0000    O 1             -C-S-H
+ 4  00 - C3 - SX - 00      0.0000     0.0000     0.3333  0000 0000 0000 0000    O 1             -C-S-X (X.NE.H)
+ 4  00 - SX - SX - Lp      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 1             -S-S-Lp
+ 4  00 - SX - SX - 00      0.0000    -3.5000     0.6000  0000 0000 0000 0000    O 1             -S-S-
+ 4  00 * SX - O3 - 00      0.0000     0.0000     0.5000  0000 0000 0000 0000    A 3             *S-O*, WCS (CU)
+ 4  00 * SX - C2 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    A 3             *S-C2*, WCS (CU)
+ 4  00 * SX - C0 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    A 3             *S-C0*, WCS (CU)
+ 4  00 * SX - N0 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    A 3             *S-N*, WCS (CU)
+ 4  00 - CU = N2 - 00      0.0000    17.0000     0.0000  0000 0000 0000 0000    A 2             *C(sp2)=N2*, WCS (CU)
+ 4  00 * PX - C0 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    A 3             *P-C*, WCS (CU)
+ 4  00 * PX - N2 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    A 3             *P-N*, WCS (CU)
+ 4  00 * N2 - O3 - 00      0.0000     4.4500     0.0000  0000 0000 0000 0000    A 2             *N(sp2)-O*, WCS (CU)
+ 4  00 - N3 - O3 - 00      2.5000     0.0000     0.0000  0000 0000 0000 0000    A 2             *N(sp2)-O*, WCS (CU)
+ 4  C2 - N2 - N2 - C0      2.0000    -1.2500     0.0000  O200 0000 0000 O200    A 2             C(=O)-N-N-C(=O), WCS/Nowick
+ 4  C2 - N2 - N2 - C2      0.0000    -1.2500     0.0000  O200 0000 0000 0000    A 2             C(=O)-N-N(sp2)-C, WCS/Nowick
+ 4  C2 - N2 - N2 - 00      0.0000    -1.2500     0.0000  O200 0000 0000 0000    A 2             C(=O)-N-N(sp2)-H, WCS/Nowick
+ 4  00 - N2 - N2 - 00      0.0000    -1.2500     0.0000 10000 C200 0000 0000    A 2             *N(sp2)-N(C=O)-*, WCS/Nowick
+                                                         0000 O200 0000 0000
+ 4  00 * N2 - N3 * 00      0.0000     2.0000     0.0000  0000 0000 0000 0000    A 3             *N(sp2)-N(sp3), WCS (CU)
+ 4  00 * N3 - N3 * 00      0.0000     0.0000     1.0000  0000 0000 0000 0000    A 3             *N(sp3)-N(sp3), WCS (CU)
+ 4  00 * C2 - N4 = O2      0.0000     0.6100     0.0000  0000 0000 0000 0000    A 2             *C(sp2)-N+(sp2)=O  PhNO2 WCS
+ 4  00 * C2 - N4 - OM      0.0000     0.6100     0.0000  0000 0000 0000 0000    A 2             *C(sp2)-N+(sp2)-O-  PhNO2 WCS
+ 4  00 * C2 - N4 * 00      0.0000     0.8000     0.0000  0000 0000 0000 0000    A 2             *C(sp2)-N+(sp2)*, WCS (CU)
+ 4  00 * CD - N4 * 00      0.0000     1.6000     0.0000  0000 0000 0000 0000    A 2             *CH(sp2)-N+(sp2)*, WCS (CU)
+ 4  00 * C2 = N4 * 00      0.0000     5.0000     0.0000  0000 0000 0000 0000    A 2             *C(sp2)=N+*, WCS (CU)
+ 4  00 * CD = N4 * 00      0.0000    10.0000     0.0000  0000 0000 0000 0000    A 2             *CH(sp2)=N+*, WCS (CU)
+ 4  00 * 00 * Z0 * 00      0.0000     0.0000     0.0000  0000 0000 0000 0000    A 3             *00*Z*, WCS (CU)
+ 4  00 * N2 * N2 * 00      0.0000     2.5000     0.0000  0000 0000 0000 0000    A 3             *N(sp2)*N(sp2)*, WCS (CU)
+ 4  00 * Si - 00 * 00      0.0000     0.0000     0.1670  0000 0000 0000 0000    A 3             *Si-00*, WCS (CU)
+ C   
+ C        Improper Torsional Interaction (IMP)           Opt. Descriptor
+ C        ____________________________________           _______________
+ C                         V1/2       V2/2       V3/2    Atm1 Atm2 Atm3 Atm4
+ C                      (Constants in Kcal/mol)
+-2 
+ 5  CA * C2 * CB * N5      0.0000     0.0000     7.0000  0000 O200 0000 0000    O 1             CH(C=O)(CH2)(N+sp2)
+ 5  CA * C2 * CC * CC      0.0000     0.0000     7.0000  0000 0000 0000 0000    O 1             CH(Csp2)(CH3)(CH3)
+ 5  CA * C2 * CA * N5      0.0000     0.0000     7.0000  0000 O200 0000 0000    O 1             CH(C=O)(CH)(N+sp2)
+ 5  CA * C2 * CC * N3      0.0000     0.0000    14.0000  0000 O200 0000 0000    O 1             CH(C=O)(CH3)(Nsp3)
+ 5  CA * CT * N2 * C2      0.0000     0.0000    14.0000  0000 0000 0000 O200    O 1             CH(C=O)(CH3)(Nsp2)
+ 5  N2 * C2 * CC * H3      0.0000     0.0000     0.0000  0000 0000 0000 0000    O 1             N(sp2)(C=O,H,Me)
+ 5  N2 * C2 * CA * H3      0.0000     1.0000     0.0000  0000 O200 0000 0000    O 1             N(sp2)(C2,CA,H3) amide
+ 5  N2 * C2 * 00 * 00      0.0000     0.7500     0.0000  0000 N2O2 0000 0000    A 2             Nsp2(C=O,Nsp2), Urea, WCS (CU)
+ 5  N2 * C2 * 00 * 00      0.0000     1.0000     0.0000  0000 O200 0000 0000    O 1             N(sp2)(C=O) amide
+ 5  N2 * C2 * 00 * 00      0.0000     1.0000     0.0000  0000 N200 0000 0000    O 1             N(sp2)(C=O) guan., imid., etc.
+ 5  N2 * C2 * 00 * 00      0.0000     1.0000     0.0000  0000 N400 0000 0000    A 2             N(sp2)(C=O) amidinium, etc.
+ 5  N2 * CU * CU * 00      0.0000     1.0000     0.0000  0000 0000 0000 0000    O 1             N(sp2)(C=O) pyrrole, indole, etc.
+ 5  N2 * C2 * 00 * 00      0.0000     0.0000     2.5000  0000 0000 0000 0000    A 2             N(sp2) aniline, enamine, etc.
+ 5  N2 * 00 * 00 * 00      0.0000     1.0000     0.0000  0000 0000 0000 0000    O 1             N(sp2)
+ 5  N4 * OM * 00 * 00      0.0000    20.0000     0.0000  0000 0000 0000 0000    O 1             N+ Nitro, JACS, 4046 (89)
+ 5  N4 * 00 * 00 * 00      0.0000     1.0000     0.0000  0000 0000 0000 0000    O 1             N+(sp2)
+ 5  CA * 00 * 00 * 00      0.0000     0.0000    14.0000  0000 0000 0000 0000    O 1             CH
+ 5  C2 * CT * N2 * O2      0.0000    10.5000     0.0000  0000 0000 0000 0000    O 1             C(sp2)(CT,N2,O2) amide
+ 5  C2 * H1 * 00 * 00      0.0000     2.0000     0.0000  0000 0000 0000 0000    O 1             Csp2(H)
+ 5  C2 * 00 * 00 * 00      0.0000    10.5000     0.0000  0000 0000 0000 0000    O 1             Csp2
+ C
+ C  
+ C        Van der Waals Interactions (VDW)                       Opt. Descriptor
+ C       _______________________________________                        ---- --
+ C       Radius     Epsilon    Offset     Charge                        Atm1 Lp
+ C       (Ang)    (Kcal/mol)   (Ang)    (Electrons)
+-6
+  C1     1.8000     0.0600                                              0000    O 1             Nitrile, JACS, 4046 (89)
+  C2     1.8500     0.1200                                              0000    O 1
+  C3     1.8000     0.0600                                              0000    O 1
+  CA     1.8500     0.0900                                              0000    O 1
+  CB     1.9250     0.1200                                              0000    O 1
+  CC     2.0000     0.1500                                              0000    O 1
+  CD     1.8500     0.1200                                              0000    O 1
+  CE     1.8500     0.1200                                              0000    A 2             CH2(sp2), WCS (CU)
+  H1     1.0000     0.0200                                              SX00    O 1
+  H1     1.5400     0.0100                                              0000    O 1
+  H2     1.0000     0.0200                                              0000    O 1
+  H3     1.0000     0.0200                                              0000    O 1
+  H4     1.0000     0.0200                                              0000    O 1
+  Lp     1.2000     0.0160                                              0000    O 1
+  N1     1.7500     0.1600                                              0000    O 1             Nitrile, JACS, 4046 (89)
+  N2     1.7500     0.1600                                              0000    O 1
+  N3     1.8500     0.1200                                              0000    A 2             WCS (CU)
+  N4     1.7500     0.1600                1.0000                        0000    O 1
+  N5     1.8500     0.0800                1.0000                        0000    O 1
+  O2     1.6500     0.1500               -0.5000                        N400    O 1             Nitro, JACS, 4046 (89)
+  OM     1.6500     0.1500               -0.5000                        N400    O 1             Nitro, JACS, 4046 (89)
+  O2     1.6000     0.2000                                              0000    O 1
+  O3     1.7680     0.1520                                              H2H2    O 1             H2O, JCompChem, 620 (91)
+  O3     1.6500     0.1500                                              0000    O 1
+  OM     1.6000     0.2000               -1.0000                        0000    O 1
+  PX     2.1000     0.2000               -1.0000                        F0F0    A 3             Hexafluorophosphate P, WCS
+  PX     2.1000     0.2000                                              0000    O 1
+  SX     2.0000     0.2000                                              0000 Lp O 1
+  SM     2.3000     0.4000               -1.0000                        0000    A 3             S- From OPLS
+  Si     2.1000     0.2000                                              0000    A 3             Silicon, WCS (CU)
+  F0     1.7000     0.2000                                              0000    A 2             Fluorine, WCS (CU)
+  Cl     1.9300     0.2300                                              0000    O 2             Chlorine
+  Br     2.1000     0.3400                                              0000    O 2             Bromine
+  I0     2.3000     0.4000                                              0000    O 2             Iodine
+  Du     0.1000     0.0001                                              0000    O 2             Dummy atom
+  Z0     1.5000     0.0500                1.0000                        0000    O 2         2 L Lithium
+  Z0     1.6000     0.0310                1.0000                        0000    O 2         2 N Sodium
+  Z0     2.0000     0.1300                1.0000                        0000    O 2         2 K Potassium
+  Z0     2.2000     0.1500                1.0000                        0000    O 2         2 R Rubidium
+  Z0     2.4000     0.3600                1.0000                        0000    O 2         2 C Cesium
+  Z0     2.0000     0.6300                2.0000                        0000    A 2         2 B Barium
+  Li     1.5000     0.0500                1.0000                        0000    O 2             Lithium
+  Na     1.6000     0.0310                1.0000                        0000    O 2             Sodium
+  K0     2.0000     0.1300                1.0000                        0000    O 2             Potassium
+  Rb     2.2000     0.1500                1.0000                        0000    O 2             Rubidium
+  Cs     2.4000     0.3600                1.0000                        0000    O 2             Cesium
+  Ca     1.7000     0.2300                2.0000                        0000    A 3             Calcium -- guess; improve later
+  Ba     2.0000     0.6300                2.0000                        0000    A 2             Barium
+END OF NONBONDED INTERACTIONS
+ C
+ C Following section contains 6,12-Lennard Jones parameters for alternative representation
+ C of hydrogen bonding (D.M. Ferguson & P.A. Kollman, J.Comp.Chem., 12, 620 (1991)).
+ C
+ C         Special Van der Waals Interactions            Opt. Descriptor
+ C         ------- --- --- ----- ------------            ---- ----------
+ C                         Radius      Eps               Atm1 Atm2
+ C                         (ang)   (kcal/mole)       
+-2
+ 6  O3   H1                2.3758     0.0973             0000 SX00              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  O3   H2                1.9873     0.4464             0000 0000              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  O3   H3                1.9873     0.4464             0000 0000              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  O3   H4                1.9873     0.4464             0000 0000              O 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  O2   H1                2.3758     0.0973             0000 SX00              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  O2   H2                1.8863     0.4440             0000 0000              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  O2   H3                1.8863     0.4440             0000 0000              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  O2   H4                1.8863     0.4440             0000 0000              O 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  OM   H1                2.3758     0.0973             0000 SX00              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  OM   H2                1.8863     0.4440             0000 0000              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  OM   H3                1.8863     0.4440             0000 0000              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  OM   H4                1.8863     0.4440             0000 0000              O 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N1   H1                2.3758     0.0973             0000 SX00              A 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N1   H2                2.0383     0.4462             0000 0000              A 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N1   H3                2.0383     0.4462             0000 0000              A 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N1   H4                2.0383     0.4462             0000 0000              A 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N2   H1                2.3758     0.0973             0000 SX00              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N2   H2                2.0383     0.4462             0000 0000              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N2   H3                2.0383     0.4462             0000 0000              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N2   H4                2.0383     0.4462             0000 0000              O 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N3   H1                2.3758     0.0973             0000 SX00              A 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N3   H2                2.0383     0.4462             0000 0000              A 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N3   H3                2.0383     0.4462             0000 0000              A 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  N3   H4                2.0383     0.4462             0000 0000              A 2         3 L 6,12 HBnd, JCompChem,620,91
+ 6  SX   H1                3.0277     0.0954             0000 SX00              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  SX   H2                3.0277     0.0954             0000 0000              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  SX   H3                3.0277     0.0954             0000 0000              O 1         3 L 6,12 HBnd, JCompChem,620,91
+ 6  SX   H4                3.0277     0.0954             0000 0000              O 2         3 L 6,12 HBnd, JCompChem,620,91
+ C
+ C
+ C        Hydrogen Bond Interactions (HBND)              Opt. Descriptor
+ C         _________________________________              _______________
+ C  Acceptor Donor        "C/100"    "D/100"             Atm1 Atm2
+ C                      (Constants in Kcal/mol)
+-2
+ 7  H1   OM              141.8400    30.8200             SX00 0000
+ 7  H1   O2              141.8400    30.8200             SX00 0000
+ 7  H1   O3              141.8400    30.8200             SX00 0000
+ 7  H1   N2              141.8400    30.8200             SX00 0000
+ 7  H1   N3              141.8400    30.8200             SX00 0000
+ 7  H1   SX             2657.2000   350.2900             0000 0000
+ 7  H2   OM               40.1900    14.0900             0000 0000
+ 7  H2   O2               75.5700    23.8500             0000 0000
+ 7  H2   O3               75.5700    23.8500             0000 0000
+ 7  H2   N2               75.5700    23.8500             0000 0000
+ 7  H2   N3               40.1900    14.0900             0000 0000
+ 7  H2   SX             2657.2000   350.2900             0000 0000
+ 7  H3   OM               40.1900    14.0900             0000 0000
+ 7  H3   O2               75.5700    23.8500             0000 0000
+ 7  H3   O3               75.5700    23.8500             0000 0000
+ 7  H3   N2               75.5700    23.8500             0000 0000
+ 7  H3   N3               40.1900    14.0900             0000 0000
+ 7  H3   SX             2657.2000   350.2900             0000 0000
+ 7  H4   OM               40.1900    14.0900             0000 0000
+ 7  H4   O2               75.5700    23.8500             0000 0000
+ 7  H4   O3               75.5700    23.8500             0000 0000
+ 7  H4   N2               40.1900    14.0900             0000 0000
+ 7  H4   N3               40.1900    14.0900             0000 0000
+ 7  H4   SX             2657.2000   350.2900             0000 0000
+ C
+ C
+ C      Amber Substructure File:  Selected Amino Acids and Bases
+ C      --------------------------------------------------------
+-3
+ C  Cyclopropanoid
+ 9  CT-CT-00-1
+-2
+ 1   1  CT                 1.5200   300.0000
+ 1   1   2                 1.5150   300.0000     
+ 2   1   2  00           120.0000    50.0000
+ 2   3   2  00           120.0000    50.0000
+ 2   1   2   3            60.0000    50.0000
+-3
+ C  Oxirane
+ 9  O3-CT-CT-1
+-2
+ 1   2  CT                 1.5150   300.0000
+ 2   1   2  00           120.0000    50.0000
+ 2   3   2  00           120.0000    50.0000
+ 2   1   2   3            60.0000    50.0000
+ 2   2   1   3            60.0000    50.0000
+-3
+ C  Cyclobutanoid
+ 9  CT-CT-00*00-1
+-2
+ 1   1  CT                 1.5250   300.0000
+ 2   1   2  00           115.0000    50.0000
+ 2   3   2  00           115.0000    50.0000
+ 2   1   2   3           100.0000    50.0000
+ 4   1   2   3   4         0.0000     0.0000     0.8000
+-3
+ C  Cyclobutenoid
+ 9  CU=CU-00*00-1
+-2
+ 2   1   2  00           130.0000    50.0000
+ 2   3   2  00           130.0000    50.0000
+ 2   1   2   3           108.0000    50.0000
+ 2   2   3   4           121.4000    50.0000
+ 4   1   2   3   4        -0.3000     0.1000     0.0000
+ 4   2   3   4   1         0.0000     0.0000     0.8000
+-3
+ C  Oxetane
+ 9  O3-CT-00-CT-1
+-2
+ 2   1   2  00           115.0000    50.0000
+ 2   3   2  00           115.0000    50.0000
+ 2   1   2   3           107.4000    50.0000
+ 2   2   1   4           106.8000    50.0000
+ 4   1   2  CT   4         0.1000     0.0000     0.8000
+ 4   4   1   2   3         0.1000     0.0000     0.8000
+-3
+ C  Gen Benzenoid - Stiffened relative to authentic AMBER
+ 9  CU*CU*AA*AA*AA*AA*1
+-2
+ 1   1   2                 1.4000   469.0000
+ 4  00   1   2  00         0.0000    15.0000     0.0000
+-3
+ C  Gen Pyridinoid
+ 9  N2*CU*AA*AA*AA*AA*1
+-2
+ 1   1   2                 1.3270   450.0000    -1.5616
+ 2   2   1   6           115.0000    80.0000
+ 2   1   2   3           125.0000    80.0000
+ 4  00   1   2  00         0.0000    10.0000     0.0000
+-3
+ C  Gen Pyridinoid cation
+ 9  N4*CU*AA*AA*AA*AA*1
+-2
+ 1   1   2                 1.3400   400.0000    -1.0000
+ 4  00   1   2  00         0.0000    10.0000     0.0000
+-3
+ C  Gen Pyrrolinoid
+ 9  N2-CU*AA*AA*AA-1
+-2
+ 1   1   2                 1.3900   450.0000    -0.5000
+ 2   2   1   5           109.0000    70.0000
+ 2   2   1  00           125.0000    70.0000
+ 2   5   1  00           125.0000    70.0000
+ 4  00   1   2  00         0.0000    10.0000     0.0000
+-3
+ C  Gen Furanoid
+ 9  O3-CU*AA*AA*AA-1
+-2
+ 1   1   2                 1.3750   400.0000    -0.3500
+ 2   2   1   5           106.0000    70.0000
+ 4  00   1   2  00         0.0000    10.0000     0.0000
+-3
+ C  Thiophenoid
+ 9  SX-CU*AA*AA*AA-1
+-2
+ 1   1   2                 1.7140   300.0000    -0.2000
+ 2   2   1   5            92.0000    60.0000
+ 4  00   1   2  00         0.0000    10.0000     0.0000
+-3
+ C 9,10-Disubstituted Anthracene (JACS, 105, 2776 (1983))
+ 9  CU*C2*CU*CU*CU*CU*C2(*2)*CU
+-2
+ 1   3   4                 1.3400   500.0000
+ 1   2   7                 1.4500   400.0000
+-3
+ C  Imidazole (AMBER histidine)
+ 9  CU-N2-CU=N2-CU=1
+-2
+ 1   1   2                 1.3830   424.5000
+ 1   2   3                 1.3430   477.0000
+ 1   3   4                 1.3350   488.0000
+ 1   4   5                 1.3925   412.0000
+ 1   5   1                 1.3730   515.0000
+ 1   1  H1                 1.0800   340.0000    -0.5814
+ 1   2  H3                 1.0100   434.0000    -1.1061
+ 1   3  H1                 1.0800   340.0000    -0.1867
+ 1   5  H1                 1.0800   340.0000    -0.0934
+ 2   1   2   3           107.3000    70.0000
+ 2   1   2  H3           126.3000    35.0000
+ 2   3   2  H3           126.3000    35.0000
+ 2   2   3   4           111.6000    70.0000
+ 2   2   3  H1           120.0000    35.0000
+ 2   4   3  H1           120.0000    35.0000
+ 2   3   4   5           110.5000    70.0000
+ 2   4   5   1           110.9000    70.0000
+ 2   5   1   2           105.9000    70.0000
+ 4  00   1   2  00         0.0000     5.6000     0.0000
+ 4  00   2   3  00         0.0000     9.3000     0.0000
+ 4  00   3   4  00         0.0000    10.0000     0.0000
+ 4  00   4   5  00         0.0000     4.8000     0.0000
+ 4  00   5   1  00         0.0000    14.3000     0.0000
+ 4  C3  C3   2   3        -0.6000    -0.3000     0.0000  
+-4 
+ 8  -0.0700   0.0830   0.2770  -0.5020   0.2120                                              O 1         1 a JCC, 230 (86)
+ 8   0.1220  -0.1240   0.3840  -0.5270   0.1450                                              O 1         1 b JACS, 765 (84)
+-3
+ C  Imidazolium (AMBER HIP)
+ 9  CU-N4=CU-N2-CU=1
+-2
+ 1   1   2                 1.3830   424.5000
+ 1   2   3                 1.3430   477.0000
+ 1   3   4                 1.3430   477.0000
+ 1   4   5                 1.3830   424.5000
+ 1   5   1                 1.3730   515.0000
+ 1   1  H1                 1.0800   340.0000    -0.7937
+ 1   2  H4                 1.0100   434.0000    -1.4844
+ 1   3  H1                 1.0800   340.0000    -0.8196
+ 1   4  H3                 1.0100   434.0000    -1.4844
+ 1   5  H1                 1.0800   340.0000    -0.7937
+ 2   1   2   3           107.3000    70.0000
+ 2   1   2  H4           126.3000    35.0000
+ 2   3   2  H4           126.3000    35.0000
+ 2   2   3   4           110.7000    70.0000
+ 2   3   4   5           107.3000    70.0000
+ 2   3   4  H3           126.3000    35.0000
+ 2   5   4  H3           126.3000    35.0000
+ 2   4   5   1           108.7000    70.0000
+ 2   5   1   2           108.7000    70.0000
+ 4  00   1   2  00         0.0000     5.6000     0.0000
+ 4  00   2   3  00         0.0000     9.3000     0.0000
+ 4  00   3   4  00         0.0000     9.3000     0.0000
+ 4  00   4   5  00         0.0000     5.6000     0.0000
+ 4  00   5   1  00         0.0000    15.9000     0.0000
+-4 
+ 8   0.1160   0.2480   0.2720   0.2480   0.1160                                              O 1         1 a JCC, 230 (86)
+ 8   0.3530  -0.2125   0.7190  -0.2125   0.3530                                              O 1         1 b JACS, 765 (84)
+-3
+ C  Pyrrole (OPLS charges)
+ 9  N2-CU=CU-CU=CU-1
+-2
+ 1   1   2                 1.3700   500.0000
+ 1   2   3                 1.3820   500.0000
+ 1   3   4                 1.4310   400.0000
+ 1   4   5                 1.3820   500.0000
+ 1   1   5                 1.3700   500.0000
+ 2   5   1   2           109.5000    70.0000
+ 2   1   2   3           107.8000    70.0000
+ 2   1   5   4           107.8000    70.0000
+ 2   2   3   4           107.3000    70.0000
+ 2   3   4   5           107.3000    70.0000
+ 4  C3  C3   1   2         0.0000    -0.2500     0.0000  
+ 4  C3  C3   1   5         0.0000    -0.2500     0.0000  
+-4
+ 8  -0.1500   0.1300  -0.0550  -0.0550   0.1300                                              A 1             
+-3
+ C  Indole (AMBER TRP)
+ 9  CU=CU-N2-C2*C2(-1)*CU*CU*CU*CU*4
+-2
+ 1   1   2                 1.3520   546.0000
+ 1   1  H1                 1.0800   340.0000    -0.7777
+ 1   2   3                 1.3810   427.0000
+ 1   2  H1                 1.0800   340.0000    -0.4824
+ 1   3   4                 1.3800   428.0000
+ 1   3  H3                 1.0100   434.0000    -1.3146
+ 1   4   5                 1.4190   447.0000
+ 1   5   1                 1.4590   388.0000
+ 1   5   6                 1.4040   469.0000
+ 1   6  H1                 1.0800   340.0000    -0.4461
+ 1   7  H1                 1.0800   340.0000    -0.2957
+ 1   8  H1                 1.0800   340.0000    -0.3839
+ 1   9  H1                 1.0800   340.0000    -0.4357
+ 2   5   1   2           106.4000    85.0000
+ 2   1   2   3           108.7000    70.0000
+ 2  H1   2   3           120.0000    35.0000
+ 2   2   3   4           111.6000    70.0000
+ 2   2   3  H3           125.3000    35.0000
+ 2   4   3  H3           123.1000    35.0000
+ 2   3   4   5           104.4000    70.0000
+ 2   3   4   9           132.8000    70.0000
+ 2   5   4   9           122.7000    85.0000
+ 2   4   5   1           108.8000    85.0000
+ 2   4   5   6           116.2000    85.0000
+ 2   1   5   6           134.9000    85.0000
+ 4  00   1   2  00         0.0000    23.6000     0.0000
+ 4  00   2   3  00         0.0000     6.0000     0.0000
+ 4  00   3   4  00         0.0000    12.2000     0.0000
+ 4  00   4   5  00         0.0000    20.0000     0.0000
+ 4  00   1   5  00         0.0000     4.8000     0.0000
+ 4  00   5   6  00         0.0000    10.2000     0.0000
+ 4  00   4   9  00         0.0000    10.6000     0.0000
+-4 
+ 8  -0.1730   0.1370  -0.0810   0.1540   0.1460  -0.0870  -0.0090  -0.0030  -0.0840          O 1         1 a JCC, 230 (86)
+ 8   0.0680   0.1170  -0.0360   0.0001  -0.2751   0.1450  -0.0820   0.0340   0.0290          O 1         1 b JACS, 765 (84)
+-3
+ C  Glycine Remote Torsion
+ 9  O2=C2-N2-CB-C2=O2
+-2
+ 4   2   3   5   6         2.5000     0.0000     0.0000                                                  4 M
+-3
+ C  Alanine Remote Torsion
+ 9  O2=C2-N2-CA-C2=O2
+-2
+ 4   2   3   5   6        -0.3000     0.0000     0.0000                                                  4 M
+-3
+ C  AA Peptide Remote Torsion
+ 9  O2=C2-N2-C3-C2=O2
+-2
+ 4   2   3   5   6         1.4000     0.0000     0.0000                                                  4 M
+-3
+ S  Glycine
+ 9  N0-CB-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.1675
+-4
+ 8   0.0000   0.0000   0.0000   0.0000                                                       O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0000   0.0000   0.0000                                                       O 1         1 b JACS, 765 (84)
+-3
+ S  Alanine
+ 9  N0-CA(-CC)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1988
+-4
+ 8   0.0000  -0.0160   0.0160   0.0000   0.0000                                              O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0310   0.0310   0.0000   0.0000                                              O 1         1 b JACS, 765 (84)
+-3
+ S  Leucine
+ 9  N0-CA(-CB-CA(-CC)-CC)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1727
+ 1   4  H1                 1.0900   331.0000    -0.1623
+ 1   5  H1                 1.0900   331.0000    -0.1779
+ 1   6  H1                 1.0900   331.0000    -0.1779
+-4 
+ 8   0.0000  -0.0160   0.0050   0.0210  -0.0050  -0.0050   0.0000   0.0000                   O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0420   0.0160   0.0540  -0.0140  -0.0140   0.0000   0.0000                   O 1         1 b JACS, 765 (84)
+-3
+ S  Isoleucine
+ 9  N0-CA(-CA(-CC)-CB-CC)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1151
+ 1   4  H1                 1.0900   331.0000    -0.1518
+ 1   5  H1                 1.0900   331.0000    -0.1413
+ 1   6  H1                 1.0900   331.0000    -0.1465
+-4 
+ 8   0.0000  -0.0160   0.0100   0.0020   0.0050  -0.0010   0.0000   0.0000                   O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0470   0.0300   0.0010   0.0170  -0.0010   0.0000   0.0000                   O 1         1 b JACS, 765 (84)
+-3
+ S  Valine
+ 9  N0-CA(-CA(-CC)-CC)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1256
+ 1   4  H1                 1.0900   331.0000    -0.1623
+ 1   5  H1                 1.0900   331.0000    -0.1623
+-4 
+ 8   0.0000  -0.0160   0.0120   0.0020   0.0020   0.0000   0.0000                            O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0450   0.0330   0.0060   0.0060   0.0000   0.0000                            O 1         1 b JACS, 765 (84)
+-3
+ S  Tyrosine
+ 9  N0-CA(-CB-C2=CU-CU=C2(-O3)-CU=CU-4)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1988
+ 1   5  H1                 1.0800   340.0000    -0.3318
+ 1   6  H1                 1.0800   340.0000    -0.5289
+ 1   9  H1                 1.0800   340.0000    -0.5289
+ 1  10  H1                 1.0800   340.0000    -0.3318
+-4 
+ 8   0.0000  -0.0160  -0.0220  -0.0300   0.0620  -0.1620   0.4620  -0.1940  -0.1620   0.0620 O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0010   0.0220  -0.0010  -0.0350   0.1000  -0.1210  -0.0290   0.1000  -0.0350 O 1         1 b JACS, 765 (84)
+ 8   0.0000   0.0000                                                                         O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0000                                                                         O 1         1 b JACS, 765 (84)
+-3
+ S  Phenylalanine
+ 9  N0-CA(-CB-C2=CU-CU=CU-CU=CU-4)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.5651
+ 1   5  H1                 1.0800   340.0000    -0.7777
+ 1   6  H1                 1.0800   340.0000    -0.7777
+ 1   7  H1                 1.0800   340.0000    -0.7777
+ 1   8  H1                 1.0800   340.0000    -0.7777
+ 1   9  H1                 1.0800   340.0000    -0.7777
+-4 
+ 8   0.0000  -0.0160   0.1160  -0.1000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000 O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0320   0.0380   0.0110  -0.0110   0.0040  -0.0030   0.0040  -0.0110   0.0000 O 1         1 b JACS, 765 (84)
+ 8   0.0000                                                                                  O 1         1 a JCC, 230 (86)
+ 8   0.0000                                                                                  O 1         1 b JACS, 765 (84)
+-3
+ S  Threonine
+ 9  N0-CA(-CA(-CC)-O3)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.4293
+ 1   4  H1                 1.0900   331.0000    -0.3403
+-4 
+ 8   0.0000  -0.0160   0.2520   0.0040  -0.2400   0.0000   0.0000                            O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0220   0.2110   0.0070  -0.2400   0.0000   0.0000                            O 1         1 b JACS, 765 (84)
+-3
+ S  Serine
+ 9  N0-CA(-CB-O3)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.6230
+-4 
+ 8   0.0000  -0.0160   0.2560  -0.2400   0.0000   0.0000                                     O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0460   0.1940  -0.2400   0.0000   0.0000                                     O 1         1 b JACS, 765 (84)
+-3
+ S  Aspartic acid
+ 9  N0-CA(-CB-C2(-OM)=O2)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.3717
+-4 
+ 8   0.0000  -0.0160  -0.2560   0.7140  -0.7210  -0.7210   0.0000   0.0000                   O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0001  -0.2081   0.6200  -0.7060  -0.7060   0.0000   0.0000                   O 1         1 b JACS, 765 (84)
+-3
+ S  Glutamic acid
+ 9  N0-CA(-CB-CB-C2(-OM)=O2)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.4814
+ 1   4  H1                 1.0900   331.0000    -0.3717
+-4 
+ 8   0.0000  -0.0160   0.0001  -0.2561   0.7140  -0.7210  -0.7210   0.0000   0.0000          O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0001  -0.0001  -0.2080   0.6200  -0.7060  -0.7060   0.0000   0.0000          O 1         1 b JACS, 765 (84)
+-3
+ S  Asparagine
+ 9  N0-CA(-CB-C2(-N2)=O2)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1989
+-4 
+ 8   0.0000  -0.0160  -0.0100   0.6750  -0.1790  -0.4700   0.0000   0.0000                   O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0290   0.0030   0.6750  -0.1790  -0.4700   0.0000   0.0000                   O 1         1 b JACS, 765 (84)
+-3
+ S  Glutamine
+ 9  N0-CA(-CB-CB-C2(-N2)=O2)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1989
+ 1   4  H1                 1.0900   331.0000    -0.2984
+-4 
+ 8   0.0000  -0.0160  -0.0220   0.0120   0.6750  -0.1790  -0.4700   0.0000   0.0000          O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0360   0.0530  -0.0430   0.6750  -0.1790  -0.4700   0.0000   0.0000          O 1         1 b JACS, 765 (84)
+-3
+ S  Cysteine
+ 9  N0-CA(-CB-SX-H1)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1989
+-4 
+ 8   0.0000  -0.0160   0.0160  -0.1350   0.1350   0.0000   0.0000                            O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.1000   0.1001  -0.1351   0.1350   0.0000   0.0000                            O 1         1 b JACS, 765 (84)
+-3
+ S  Cystine
+ 9  N0-CA(-CB-SX)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.2591
+-4 
+ 8   0.0000  -0.0160   0.0010   0.0150   0.0000   0.0000                                     O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.1580   0.1430   0.0150   0.0000   0.0000                                     O 1         1 b JACS, 765 (84)
+-3
+ S  Methionine
+ 9  N0-CA(-CB-CB-SX-CC)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1414
+ 1   4  H1                 1.0900   331.0000    -0.3413
+ 1   6  H1                 1.0900   331.0000    -0.3413
+-4 
+ 8   0.0000  -0.0160  -0.0970   0.0764  -0.0250   0.0616   0.0000   0.0000                   O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.1090   0.0370   0.0900  -0.0250   0.0070   0.0000   0.0000                   O 1         1 b JACS, 765 (84)
+-3
+ S  Lysine
+ 9  N0-CA(-CB-CB-CB-CB-N5)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1989
+ 1   4  H1                 1.0900   331.0000    -0.6073
+ 1   5  H1                 1.0900   331.0000    -0.6387
+ 1   6  H1                 1.0900   331.0000    -0.5131
+ 1   7  H4                 1.0100   434.0000    -1.4262                                      O 1         1 a JCC, 230 (86)
+ 1   7  H4                 1.0100   434.0000    -1.5087                                      O 1         1 b JACS, 765 (84)
+-4 
+ 8   0.0000  -0.0160  -0.0220   0.0720   0.0640   0.1580   0.7440   0.0000   0.0000          O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0190   0.0390   0.0530   0.0480   0.2180   0.6610   0.0000   0.0000          O 1         1 b JACS, 765 (84)
+-3
+ S  Arginine, resonance 1
+ 9  N0-CA(-CB-CB-CB-N2(-HN)-C2(-N2)=N4)-C2=O2
+-2
+ 1   5   6                 1.4630   337.0000
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.2932
+ 1   4  H1                 1.0900   331.0000    -0.3874
+ 1   5  H1                 1.0900   331.0000    -0.6963
+ 1   9  HN                 1.0100   434.0000    -1.7512
+ 1  10  HN                 1.0100   434.0000    -1.7512
+ 2   4   5   6           111.2000    80.0000
+ 2   5   6   7           118.4000    35.0000
+ 2   5   6   8           123.2000    50.0000
+-4 
+ 8   0.0000  -0.0160   0.0320   0.0450   0.0380  -0.3240   0.2690   0.7600   0.0980   0.0980 O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0090   0.0490   0.0580   0.1110  -0.4930   0.2940   0.8130   0.0885   0.0885 O 1         1 b JACS, 765 (84)
+ 8   0.0000   0.0000                                                                         O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0000                                                                         O 1         1 b JACS, 765 (84)
+-3
+ S  Arginine, resonance 2
+ 9  N0-CA(-CB-CB-CB-N4(-HN)=C2(-N2)-N2)-C2=O2
+-2
+ 1   5   6                 1.4630   337.0000
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.2932
+ 1   4  H1                 1.0900   331.0000    -0.3874
+ 1   5  H1                 1.0900   331.0000    -0.6963
+ 1   9  HN                 1.0100   434.0000    -1.7512
+ 1  10  HN                 1.0100   434.0000    -1.7512
+ 2   4   5   6           111.2000    80.0000
+ 2   5   6   7           118.4000    35.0000
+ 2   5   6   8           123.2000    50.0000
+-4 
+ 8   0.0000  -0.0160   0.0320   0.0450   0.0380  -0.3240   0.2690   0.7600   0.0980   0.0980 O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0090   0.0490   0.0580   0.1110  -0.4930   0.2940   0.8130   0.0885   0.0885 O 1         1 b JACS, 765 (84)
+ 8   0.0000   0.0000                                                                         O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0000                                                                         O 1         1 b JACS, 765 (84)
+-3
+ S  Proline, Ionic N-Terminal 
+ 9  N5-CA(-CB-CB-CB-1)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.3194
+ 1   4  H1                 1.0900   331.0000    -0.3293
+ 1   5  H1                 1.0900   331.0000    -0.3141
+-4 
+ 8   0.4630   0.2120   0.0590  -0.0110   0.1910   0.5960  -0.5100                            O 1 
+-3
+ S  Proline, Ionic C-Terminal
+ 9  N2-CA(-CB-CB-CB-1)-C2(-OM)=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.3194
+ 1   4  H1                 1.0900   331.0000    -0.3293
+ 1   5  H1                 1.0900   331.0000    -0.3141
+-4 
+ 8  -0.2570   0.1120  -0.0010   0.0300   0.0840   0.4440  -0.7060  -0.7060                   O 1 
+-3
+ S  Proline All Atom PSI torsion from MP2/6-31+G*//HF/6-31+G* DQM(CU)
+ 9  N2-C3(-C3-C3-C3-1)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.3194
+ 1   4  H1                 1.0900   331.0000    -0.3293
+ 1   5  H1                 1.0900   331.0000    -0.3141
+ 4  C2   1   6   7         0.0000     0.0000     0.0000                                                  4 M
+ 4   1   2   6   7         0.0000     0.0000     0.0000                                                  4 M
+ 4   3   2   6  N2         1.2078    -0.0801     0.0000                                                  4 M
+ 4   3   2   6   7         0.0000     0.0000     0.0000                                                  4 M
+ 4   1   2   6  N2         0.4035     0.4163     0.0000                                                  4 M
+ 4  O2  C2   1   2         0.6000     2.5000     0.0000                                                  4 M
+ 5   1  00  00  00         0.0000     0.0000     1.5000                                                  4 M
+-3
+ S  Proline United Atom PSI torsion from MP2/6-31+G*//HF/6-31+G* DQM(CU)
+ 9  N2-CA(-CB-CB-CB-1)-C2=O2
+-2
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.3194
+ 1   4  H1                 1.0900   331.0000    -0.3293
+ 1   5  H1                 1.0900   331.0000    -0.3141
+ 4  C2   1   6   7         0.0000     0.0000     0.0000                                                  4 M
+ 4   1   2   6   7         0.0000     0.0000     0.0000                                                  4 M
+ 4   3   2   6  N2         1.1920    -0.1600     0.0000                                                  4 M
+ 4   3   2   6   7         0.0000     0.0000     0.0000                                                  4 M
+ 4   1   2   6  N2        -0.7423     0.5237     0.0198                                                  4 M
+ 4  O2  C2   1   2         0.5000     2.5000     0.0000                                                  4 M
+ 5   1  00  00  00         0.0000     0.0000     1.3000                                                  4 M
+-4 
+ 8  -0.2570   0.1380  -0.0010   0.0360   0.0840   0.0000   0.0000                            O 1         1 b JACS, 765 (84)
+-3
+ S  Histidine D
+ 9  N0-CA(-CB-C2-N2(-H3)-CU=N2-CU=4)-C2=O2
+-2
+ 1   3   4                 1.5040   317.0000
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1989
+ 1   7  H1                 1.0800   340.0000    -0.1867
+ 1   9  H1                 1.0800   340.0000    -0.0934
+ 2   2   3   4           113.1000    63.0000
+ 2   3   4   5           122.2000    70.0000
+ 2   3   4   9           131.9000    70.0000
+-4 
+ 8   0.0000  -0.0160  -0.0220  -0.0320  -0.1460   0.2280   0.2770  -0.5020   0.2130   0.0000 O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0270   0.0600   0.0890  -0.4440   0.3200   0.3840  -0.5270   0.1450   0.0000 O 1         1 b JACS, 765 (84)
+ 8   0.0000                                                                                  O 1         1 a JCC, 230 (86)
+ 8   0.0000                                                                                  O 1         1 b JACS, 765 (84)
+-3
+ S  Histidine E
+ 9  N0-CA(-CB-C2-N2=CU-N2(-H3)-CU=4)-C2=O2
+-2
+ 1   3   4                 1.5040   317.0000
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1989
+ 1   6  H1                 1.0800   340.0000    -0.1867
+ 1   9  H1                 1.0800   340.0000    -0.5914
+ 2   2   3   4           113.1000    63.0000
+ 2   3   4   5           121.0000    70.0000
+ 2   3   4   9           129.0000    70.0000
+-4 
+ 8   0.0000  -0.0160  -0.0220   0.2510  -0.5020   0.2770  -0.1460   0.2280  -0.0700   0.0000 O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0270   0.0600   0.1120  -0.5270   0.3840  -0.4440   0.3200   0.1220   0.0000 O 1         1 b JACS, 765 (84)
+ 8   0.0000                                                                                  O 1         1 a JCC, 230 (86)
+ 8   0.0000                                                                                  O 1         1 b JACS, 765 (84)
+-3
+ S  Histidine P, resonance 1
+ 9  N0-CA(-CB-C2-N2(-HN)-CU=N4(-HN)-CU=4)-C2=O2
+-2
+ 1   3   4                 1.5040   317.0000
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.4502
+ 1   7  H1                 1.0800   340.0000    -0.8196
+ 1  10  H1                 1.0800   340.0000    -0.7937
+ 2   2   3   4           113.1000    63.0000
+ 2   3   4   5           122.2000    70.0000
+ 2   3   4  10           129.0000    70.0000
+-4 
+ 8   0.0000  -0.0160   0.0740   0.0580  -0.0580   0.3060   0.2720  -0.0580   0.3060   0.1160 O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0510   0.2110   0.1030  -0.6130   0.4780   0.7190  -0.6860   0.4860   0.3530 O 1         1 b JACS, 765 (84)
+ 8   0.0000   0.0000                                                                         O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0000                                                                         O 1         1 b JACS, 765 (84)
+-3
+ S  Histidine P, resonance 2
+ 9  N0-CA(-CB-C2-N4(-HN)=CU-N2(-HN)-CU=4)-C2=O2
+-2
+ 1   3   4                 1.5040   317.0000
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.4502
+ 1   7  H1                 1.0800   340.0000    -0.8196
+ 1  10  H1                 1.0800   340.0000    -0.7937
+ 2   2   3   4           113.1000    63.0000
+ 2   3   4   5           122.2000    70.0000
+ 2   3   4  10           129.0000    70.0000
+-4 
+ 8   0.0000  -0.0160   0.0740   0.0580  -0.0580   0.3060   0.2720  -0.0580   0.3060   0.1160 O 1         1 a JCC, 230 (86)
+ 8   0.0000  -0.0510   0.2110   0.1030  -0.6130   0.4780   0.7190  -0.6860   0.4860   0.3530 O 1         1 b JACS, 765 (84)
+ 8   0.0000   0.0000                                                                         O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0000                                                                         O 1         1 b JACS, 765 (84)
+-3
+ S  Tryptophan
+ 9  N0-CA(-CB-C2=CU-N2(-H3)-C2*C2(-4)*CU*CU*CU*CU*8)-C2=O2
+-2
+ 1   3   4                 1.4950   317.0000
+ 1   2  H1                 1.0900   331.0000    -0.2512
+ 1   3  H1                 1.0900   331.0000    -0.1989
+ 1   5  H1                 1.0800   340.0000    -0.4824
+ 1  10  H1                 1.0800   340.0000    -0.4461
+ 1  11  H1                 1.0800   340.0000    -0.2957
+ 1  12  H1                 1.0800   340.0000    -0.3839
+ 1  13  H1                 1.0800   340.0000    -0.4357
+ 2   2   3   4           115.6000    63.0000
+ 2   3   4   5           125.0000    70.0000
+ 2   3   4   9           128.6000    70.0000
+-4 
+ 8   0.0000  -0.0160  -0.0220  -0.1350   0.1370  -0.3520   0.2710   0.1540   0.1460  -0.0870 O 1         1 a JCC, 230 (86)
+ 8   0.0000   0.0020   0.0200   0.0460   0.1170  -0.3300   0.2940   0.0001  -0.2751   0.1450 O 1         1 b JACS, 765 (84)
+ 8  -0.0090  -0.0030  -0.0840   0.0000   0.0000                                              O 1         1 a JCC, 230 (86)
+ 8  -0.0820   0.0340   0.0290   0.0000   0.0000                                              O 1         1 b JACS, 765 (84)
+-3
+ S  2-Deoxyribose
+ 9  O3-CA-CB-CA(-O3)-CA(-1)-CB-O3
+-2
+ 1   2  N2                 1.4750   337.000      0.3896                                      O 1         1 a charge transfer to base
+ 1   2  N2                 1.4750   337.0000     1.6719                                      O 1         1 b charge transfer to base
+ 1   2  H1                 1.0900   331.0000    -0.0471
+ 1   3  H1                 1.0900   331.0000    -0.4241
+ 1   4  H1                 1.0900   331.0000    -0.1309
+ 1   5  H2                 0.9600   553.0000    -1.4110                                      O 1         1 a JCC, 230 (86)
+ 1   5  H2                 0.9600   553.0000    -1.4432                                      O 1         1 b JACS, 765 (84)
+ 1   5  PX                 1.6100   230.0000    -2.3740                                      O 1         1 a JCC, 230 (86)
+ 1   5  PX                 1.6100   230.0000    -2.5828                                      O 1         1 b JACS, 765 (84)
+ 1   6  H1                 1.0900   331.0000    -0.2932
+ 1   7  H1                 1.0900   331.0000    -0.1099
+ 1   8  H2                 0.9600   553.0000    -1.2865                                      O 1         1 a JCC, 230 (86)
+ 1   8  H2                 0.9600   553.0000    -1.3141                                      O 1         1 b JACS, 765 (84)
+ 1   8  PX                 1.6100   230.0000    -2.9758                                      O 1         1 a JCC, 230 (86)
+ 1   8  PX                 1.6100   230.0000    -3.0454                                      O 1         1 b JACS, 765 (84)
+-4
+ 8  -0.3680   0.3300  -0.1450   0.2580  -0.2020   0.0920   0.1600  -0.1250                   O 1         1 a JCC, 230 (86); charge transfer via bond dipole for atom 2
+ 8  -0.3860   0.2640  -0.0470   0.1720  -0.2010   0.1850   0.1530  -0.1400                   O 1         1 b JACS, 765 (84); charge transfer via bond dipole for atom 2
+-3
+ S  Ribose
+ 9  O3-CA-CA(-O3)-CA(-O3)-CA(-1)-CB-O3
+-2
+ 1   2  N2                 1.4750   337.0000     0.3896                                      O 1         1 a charge transfer to base
+ 1   2  N2                 1.4750   337.0000     1.6719                                      O 1         1 b charge transfer to base
+ 1   2  H1                 1.0900   331.0000    -0.2827
+ 1   3  H1                 1.0900   331.0000    -0.0419
+ 1   4  H2                 0.9600   553.0000    -1.4939                                      O 1         1 a JCC, 230 (86)
+ 1   4  H2                 0.9600   553.0000    -1.4571                                      O 1         1 b JACS, 765 (84)
+ 1   5  H1                 1.0900   331.0000    -0.0366
+ 1   6  H2                 0.9600   553.0000    -1.4110                                      O 1         1 a JCC, 230 (86)
+ 1   6  H2                 0.9600   553.0000    -1.4432                                      O 1         1 b JACS, 765 (84)
+ 1   6  PX                 1.6100   230.0000    -2.3740                                      O 1         1 a JCC, 230 (86)
+ 1   6  PX                 1.6100   230.0000    -2.5828                                      O 1         1 b JACS, 765 (84)
+ 1   7  H1                 1.0900   331.0000    -0.3194
+ 1   8  H1                 1.0900   331.0000    -0.0419
+ 1   9  H2                 0.9600   553.0000    -1.2865                                      O 1         1 a JCC, 230 (86)
+ 1   9  H2                 0.9600   553.0000    -1.3141                                      O 1         1 b JACS, 765 (84)
+ 1   9  PX                 1.6100   230.0000    -2.9758                                      O 1         1 a JCC, 230 (86)
+ 1   9  PX                 1.6100   230.0000    -3.0454                                      O 1         1 b JACS, 765 (84)
+-4
+ 8  -0.3430   0.1160   0.1090  -0.2220   0.3100  -0.2020   0.1610   0.1960  -0.1250          O 1         1 a JCC, 230 (86); charge transfer via bond dipole for atom 2
+ 8  -0.4130   0.2860   0.0820  -0.1960   0.2100  -0.2010   0.1970   0.1750  -0.1400          O 1         1 b JACS, 765 (84); charge transfer via bond dipole for atom 2
+-3
+ S  Adenine
+ 9  N2-CU=N2-C2*C2(-1)*N2*CU*N2*C2(-N2(-H3)(-H3))*4
+-2
+ 1   1   2                 1.3710   440.0000
+ 1   2   3                 1.3040   529.0000
+ 1   3   4                 1.3910   414.0000
+ 1   4   5                 1.3700   520.0000
+ 1   5   1                 1.3740   436.0000
+ 1   5   6                 1.3540   461.0000
+ 1   6   7                 1.3240   502.0000
+ 1   7   8                 1.3240   502.0000
+ 1   8   9                 1.3390   483.0000
+ 1   9  10                 1.3400   481.0000
+ 1   9   4                 1.4040   469.0000
+ 1   2  H1                 1.0800   340.0000    -0.3216
+ 1   7  H1                 1.0800   340.0000     0.1660
+ 2   1   2   3           113.9000    70.0000
+ 2   1   2  H1           123.0000    35.0000
+ 2   3   2  H1           123.0000    35.0000
+ 2   2   3   4           103.8000    70.0000
+ 2   3   4   5           110.4000    70.0000
+ 2   3   4   9           132.4000    70.0000
+ 2   5   4   9           117.3000    85.0000
+ 2   4   5   1           106.2000    70.0000
+ 2   4   5   6           127.7000    70.0000
+ 2   1   5   6           126.2000    70.0000
+ 2   5   6   7           111.0000    70.0000
+ 2   6   7   8           129.1000    70.0000
+ 2   6   7  H1           115.4000    35.0000
+ 2   8   7  H1           115.4000    35.0000
+ 2   7   8   9           118.6000    70.0000
+ 2   8   9   4           117.3000    70.0000
+ 2   8   9  10           119.3000    70.0000
+ 2   4   9  10           123.5000    70.0000
+ 2   9  10  11           120.0000    35.0000
+ 2   9  10  12           120.0000    35.0000
+ 2   5   1   2           105.4000    70.0000
+ 2   2   1  CT           128.8000    70.0000
+ 2   5   1  CT           125.8000    70.0000
+ 4  00   1   2  00         0.0000     6.7000     0.0000
+ 4  00   2   3  00         0.0000    20.0000     0.0000
+ 4  00   3   4  00         0.0000     5.1000     0.0000
+ 4  00   4   5  00         0.0000    16.3000     0.0000
+ 4  00   5   1  00         0.0000     6.6000     0.0000
+ 4  00   5   6  00         0.0000     8.3000     0.0000
+ 4  00   6   7  00         0.0000    13.5000     0.0000
+ 4  00   7   8  00         0.0000    13.5000     0.0000
+ 4  00   8   9  00         0.0000     9.6000     0.0000
+ 4  00   9  10  00         0.0000     6.8000     0.0000
+ 4  00   9   4  00         0.0000    10.2000     0.0000
+ 7  11  N2                40.1900    14.0900
+ 7  12  N2                40.1900    14.0900
+ 7  11  O3                40.1900    14.0900
+ 7  12  O3                40.1900    14.0900
+ 7  11  O2               102.3800    30.7100
+ 7  12  O2               102.3800    30.7100
+ 7   6  H3               102.3800    30.7100
+ 7   8  H3               102.3800    30.7100  
+-4
+ 8  -0.0180   0.3250  -0.5430  -0.0970   0.5460  -0.7280   0.6290  -0.7740   0.7690  -0.7680 O 1         1 a JCC, 230 (86); charge transfer via bond dipole for atom 1
+ 8  -0.2210   0.4880  -0.5990  -0.1510   0.6950  -0.7170   0.5710  -0.7600   0.8130  -0.7930 O 1         1 b JACS, 765 (84); charge transfer via bond dipole for atom 1
+ 8   0.3295   0.3295                                                                         O 1         1 a JCC, 230 (86)
+ 8   0.3370   0.3370                                                                         O 1         1 b JACS, 765 (84)
+-3
+ S  Guanine
+ 9  N2-CU=N2-C2=C2(-1)-N2=C2(-N2(-H3)(-H3))-N2-C2(=O2)-4
+-2
+ 1   1   2                 1.3710   440.0000
+ 1   2   3                 1.3040   529.0000
+ 1   3   4                 1.3910   414.0000
+ 1   4   5                 1.3700   520.0000
+ 1   5   1                 1.3740   436.0000
+ 1   5   6                 1.3540   461.0000
+ 1   6   7                 1.3390   483.0000
+ 1   7   8                 1.3400   481.0000
+ 1   7  11                 1.3810   427.0000
+ 1  11  12                 1.3880   418.0000
+ 1  12  13                 1.2290   570.0000
+ 1  12   4                 1.4190   447.0000
+ 1   2  H1                 1.0800   340.0000    -0.2386
+ 1  11  H3                 1.0100   434.0000    -1.6300                                      O 1         1 a JCC, 230 (86)
+ 1  11  H3                 1.0100   434.0000    -1.6494                                      O 1         1 b JACS, 765 (84)
+ 2   1   2   3           113.9000    70.0000
+ 2   1   2  H1           123.0000    35.0000
+ 2   3   2  H1           123.0000    35.0000
+ 2   2   3   4           103.8000    70.0000
+ 2   3   4   5           110.4000    70.0000
+ 2   3   4  12           130.0000    70.0000
+ 2   5   4  12           119.2000    85.0000
+ 2   4   5   1           106.2000    70.0000
+ 2   4   5   6           127.7000    70.0000
+ 2   1   5   6           126.2000    70.0000
+ 2   5   6   7           112.2000    70.0000
+ 2   6   7   8           119.3000    70.0000
+ 2   6   7  11           123.3000    70.0000
+ 2   8   7  11           116.0000    70.0000
+ 2   7   8   9           120.0000    35.0000
+ 2   7   8  10           120.0000    35.0000
+ 2   7  11  H3           118.0000    35.0000
+ 2  12  11  H3           116.8000    35.0000
+ 2   7  11  12           125.2000    70.0000
+ 2   4  12  11           111.3000    70.0000
+ 2  11  12  13           120.6000    80.0000
+ 2   4  12  13           128.8000    80.0000
+ 2   5   1   2           105.4000    70.0000
+ 2   2   1  CT           128.8000    70.0000
+ 2   5   1  CT           125.8000    70.0000
+ 4  00   1   2  00         0.0000     6.7000     0.0000
+ 4  00   2   3  00         0.0000    20.0000     0.0000
+ 4  00   3   4  00         0.0000     5.1000     0.0000
+ 4  00   4   5  00         0.0000    16.3000     0.0000
+ 4  00   5   1  00         0.0000     6.6000     0.0000
+ 4  00   5   6  00         0.0000     8.3000     0.0000
+ 4  00   6   7  00         0.0000     9.6000     0.0000
+ 4  00   7   8  00         0.0000     6.8000     0.0000
+ 4  00   7  11  00         0.0000     6.0000     0.0000
+ 4  00  11  12  00         0.0000     5.4000     0.0000
+ 4  00  12   4  00         0.0000     4.4000     0.0000
+ 7   6  H3               102.3800    30.7100
+ 7   9  N2                40.1900    14.0900
+ 7  10  N2                40.1900    14.0900
+ 7   9  O2               102.3800    30.7100
+ 7  10  O2               102.3800    30.7100
+ 7   9  O3                40.1900    14.0900
+ 7  10  O3                40.1900    14.0900
+-4
+ 8   0.0130   0.3120  -0.5430  -0.0600   0.3910  -0.7090   0.8710  -0.7780   0.3320   0.3320 O 1         1 a JCC, 230 (86); charge transfer via bond dipole for atom 1
+ 8  -0.1430   0.4280  -0.5750  -0.0880   0.4900  -0.7020   0.8420  -0.7580   0.3285   0.3285 O 1         1 b JACS, 765 (84); charge transfer via bond dipole for atom 1
+ 8  -0.3930   0.6900  -0.4580                                                                O 1         1 a JCC, 230 (86)
+ 8  -0.4060   0.7140  -0.4590                                                                O 1         1 b JACS, 765 (84)
+-3
+ S  Cytosine
+ 9  N2-C2(=O2)-N2=C2(-N2(-H3)(-H3))-CU=CU-1
+-2
+ 1   1   2                 1.3830   424.0000
+ 1   2   3                 1.2290   570.0000
+ 1   2   4                 1.3580   457.0000
+ 1   4   5                 1.3390   483.0000
+ 1   5   6                 1.3400   481.0000
+ 1   5   9                 1.4330   427.0000
+ 1   9  10                 1.3500   549.0000
+ 1  10   1                 1.3650   448.0000
+ 1   9  H1                 1.0800   340.0000    -0.7937
+ 1  10  H1                 1.0800   340.0000    -0.5084
+ 2   1   2   3           120.9000    80.0000
+ 2   1   2   4           118.6000    70.0000
+ 2   3   2   4           122.5000    80.0000
+ 2   2   4   5           120.5000    70.0000
+ 2   4   5   6           119.3000    70.0000
+ 2   4   5   9           121.5000    70.0000
+ 2   6   5   9           120.1000    70.0000
+ 2   5   6   7           120.0000    35.0000
+ 2   5   6   8           120.0000    35.0000
+ 2   5   9  10           117.0000    85.0000
+ 2   5   9  H1           123.3000    35.0000
+ 2  10   9  H1           119.7000    35.0000
+ 2   9  10   1           121.2000    70.0000
+ 2   9  10  H1           119.7000    35.0000
+ 2   1  10  H1           119.1000    35.0000
+ 2  10   1   2           121.6000    70.0000
+ 2   2   1  CT           117.6000    70.0000
+ 2  10   1  CT           121.2000    70.0000
+ 4  00   1   2  00         0.0000     5.8000     0.0000
+ 4  00   2   4  00         0.0000     8.0000     0.0000
+ 4  00   4   5  00         0.0000     9.6000     0.0000
+ 4  00   5   6  00         0.0000     6.8000     0.0000
+ 4  00   5   9  00         0.0000     3.7000     0.0000
+ 4  00   9  10  00         0.0000    24.4000     0.0000
+ 4  00  10   1  00         0.0000     7.4000     0.0000
+ 7   7  N2                40.1900    14.0900
+ 7   8  N2                40.1900    14.0900
+ 7   7  O3                40.1900    14.0900
+ 7   8  O3                40.1900    14.0900
+ 7   7  O2               102.3800    30.7100
+ 7   8  O2               102.3800    30.7100
+ 7   4  H3               102.3800    30.7100
+-4
+ 8  -0.1320   0.8590  -0.5080  -0.8600   0.9350  -0.8340   0.3400   0.3400  -0.4230   0.2830 O 1         1 a JCC, 230 (86); charge transfer via bond dipole for atom 1
+ 8  -0.3360   0.9380  -0.5180  -0.7910   0.6300  -0.7430   0.3365   0.3365  -0.2300   0.3770 O 1         1 b JACS, 765 (84); charge transfer via bond dipole for atom 1
+-3
+ S  Thymine
+ 9  N2-C2(=O2)-N2-C2(=O2)-C2(-CT)=CU-1
+-2
+ 1   1   2                 1.3830   424.0000
+ 1   2   3                 1.2290   570.0000
+ 1   2   4                 1.3880   418.0000
+ 1   4   5                 1.3880   418.0000
+ 1   5   6                 1.2290   570.0000
+ 1   5   7                 1.4440   410.0000
+ 1   7   8                 1.5100   317.0000
+ 1   7   9                 1.3500   549.0000
+ 1   9   1                 1.3650   448.0000
+ 1   8  H1                 1.0900   331.0000    -0.5968
+ 1   9  H1                 1.0800   340.0000    -0.6951
+ 1   4  H3                 1.0100   434.0000    -1.7221                                      O 1         1 a JCC, 230 (86)
+ 1   4  H3                 1.0100   434.0000    -1.7949                                      O 1         1 b JACS, 765 (84)
+ 2   1   2   3           120.9000    80.0000
+ 2   1   2   4           115.4000    70.0000
+ 2   3   2   4           120.6000    80.0000
+ 2   2   4   5           126.4000    70.0000
+ 2   2   4  H3           116.8000    35.0000
+ 2   5   4  H3           116.8000    35.0000
+ 2   4   5   6           120.6000    80.0000
+ 2   4   5   7           114.1000    70.0000
+ 2   6   5   7           125.3000    80.0000
+ 2   5   7   8           119.7000    85.0000
+ 2   5   7   9           120.7000    85.0000
+ 2   8   7   9           119.7000    85.0000
+ 2   7   9   1           121.2000    70.0000
+ 2   7   9  H1           119.7000    35.0000
+ 2   1   9  H1           119.1000    35.0000
+ 2   9   1   2           121.6000    70.0000
+ 2   2   1  CT           117.6000    70.0000
+ 2   9   1  CT           121.2000    70.0000
+ 4  00   1   2  00         0.0000     5.8000     0.0000
+ 4  00   2   4  00         0.0000     5.4000     0.0000
+ 4  00   4   5  00         0.0000     5.4000     0.0000
+ 4  00   5   7  00         0.0000     3.1000     0.0000
+ 4  00   7   8  00         0.0000     0.0000     0.0000
+ 4  00   7   9  00         0.0000    24.4000     0.0000
+ 4  00   9   1  00         0.0000     7.4000     0.0000
+-4
+ 8  -0.1620   0.8490  -0.4880  -0.4960   0.8090  -0.4640  -0.1760  -0.0400   0.1680          O 1         1 a JCC, 230 (86); charge transfer via bond dipole for atom 1
+ 8  -0.5030   1.1130  -0.5290  -0.6420   0.9800  -0.4720  -0.5950   0.0970   0.5510          O 1         1 b JACS, 765 (84); charge transfer via bond dipole for atom 1
+-3
+ S  Uracil
+ 9  N2-C2(=O2)-N2-C2(=O2)-CU=CU-1
+-2
+ 1   1   2                 1.3830   424.0000
+ 1   2   3                 1.2290   570.0000
+ 1   2   4                 1.3880   418.0000
+ 1   4   5                 1.3880   418.0000
+ 1   5   6                 1.2290   570.0000
+ 1   5   7                 1.4440   410.0000
+ 1   7   8                 1.3500   549.0000
+ 1   8   1                 1.3650   448.0000
+ 1   7  H1                 1.0800   340.0000    -0.7573
+ 1   8  H1                 1.0800   340.0000    -0.5084
+ 1   4  H3                 1.0100   434.0000    -1.6203                                      O 1         1 a JCC, 230 (86)
+ 1   4  H3                 1.0100   434.0000    -1.6833                                      O 1         1 b JACS, 765 (84)
+ 2   1   2   3           120.9000    80.0000
+ 2   1   2   4           115.4000    70.0000
+ 2   3   2   4           120.6000    80.0000
+ 2   2   4   5           126.4000    70.0000
+ 2   2   4  H3           116.8000    35.0000
+ 2   5   4  H3           116.8000    35.0000
+ 2   4   5   6           120.6000    80.0000
+ 2   4   5   7           114.1000    70.0000
+ 2   6   5   7           125.3000    80.0000
+ 2   5   7   8           120.7000    85.0000
+ 2   5   7  H1           119.7000    35.0000
+ 2   8   7  H1           119.7000    35.0000
+ 2   7   8   1           121.2000    70.0000
+ 2   7   8  H1           119.7000    35.0000
+ 2   1   8  H1           119.1000    35.0000
+ 2   8   1   2           121.6000    70.0000
+ 2   2   1  CT           117.6000    70.0000
+ 2   8   1  CT           121.2000    70.0000
+ 4  00   1   2  00         0.0000     5.8000     0.0000
+ 4  00   2   4  00         0.0000     5.4000     0.0000
+ 4  00   4   5  00         0.0000     5.4000     0.0000
+ 4  00   5   7  00         0.0000     3.1000     0.0000
+ 4  00   7   8  00         0.0000    24.4000     0.0000
+ 4  00   8   1  00         0.0000     7.4000     0.0000
+-4
+ 8  -0.1040   0.7750  -0.4720  -0.4340   0.8340  -0.4740  -0.3830   0.2580                   O 1         1 a JCC, 230 (86); charge transfer via bond dipole for atom 1
+ 8  -0.3310   0.8960  -0.4940  -0.4110   0.5720  -0.3940  -0.2040   0.3660                   O 1         1 b JACS, 765 (84); charge transfer via bond dipole for atom 1
+-3
+ S  Cyclic urea (Gaussian 86-optimized, 6-31G, CHELP Charges, TH(CU))
+ 9  O2=C2-N2(-CT)-CT-CT-N2(-CT)-2
+-4
+ 8  -0.5500   0.6960  -0.2545   0.0925   0.0890   0.0890  -0.2545   0.0925                   A 2             G86, WCS (CU)
+-3
+ S  Guanidinium (Modified by HS)
+ 9  N4=C2(-N2)-N2
+-2
+ 1   1   2                 1.3400   481.0000    -1.5672                                      A 2             
+ 1   1   2                 1.3400   481.0000    -2.0982  C000 0000                           A 2             
+ 1   2   3                 1.3400   481.0000     1.5672                                      A 2             
+ 1   2   3                 1.3400   481.0000     2.0982  0000 C000                           A 2             
+ 1   2   4                 1.3400   481.0000     1.5672                                      A 2             
+ 1   2   4                 1.3400   481.0000     2.0982  0000 C000                           A 2             
+ 1   1  H4                 1.0100   434.0000    -1.7563                                      A 2             
+ 1   1  H4                 1.0100   434.0000    -1.4262  C0C0 0000                           A 2             
+ 1   3  H3                 1.0100   434.0000    -1.7563                                      A 2             
+ 1   3  H3                 1.0100   434.0000    -1.4262  C0C0 0000                           A 2             
+ 1   4  H3                 1.0100   434.0000    -1.7563                                      A 2             
+ 1   4  H3                 1.0100   434.0000    -1.4262  C0C0 0000                           A 2             
+ 1   1  C0                 1.4630   337.0000    -1.4475                                      A 2             
+ 1   3  C0                 1.4630   337.0000    -1.4475                                      A 2             
+ 1   4  C0                 1.4630   337.0000    -1.4475                                      A 2             
+ 6   1  H1                 2.3758     0.0973                                                 A 2             
+ 6   3  H1                 2.3758     0.0973                                                 A 2             
+ 6   4  H1                 2.3758     0.0973                                                 A 2             
+ 6   1  H2                 2.0383     0.4462                                                 A 2             
+ 6   3  H2                 2.0383     0.4462                                                 A 2             
+ 6   4  H2                 2.0383     0.4462                                                 A 2             
+ 6   1  H3                 2.0383     0.4462                                                 A 2             
+ 6   3  H3                 2.0383     0.4462                                                 A 2             
+ 6   4  H3                 2.0383     0.4462                                                 A 2             
+ 6   1  H4                 2.0383     0.4462                                                 A 2             
+ 6   3  H4                 2.0383     0.4462                                                 A 2             
+ 6   4  H4                 2.0383     0.4462                                                 A 2             
+-3
+ S  4-Pyridone (Gaussian 86-optimized, 6-31G, CHELP Charges, TH(CU))
+ 9  O2=C2-CU=CU-N2(-H3)-CU=CU-2
+-2
+ 1   1   2                 1.2290   500.0000
+ 1   2   3                 1.4520   400.0000
+ 1   3   4                 1.3300   500.0000
+ 1   4   5                 1.3630   500.0000
+ 1   5   7                 1.3630   500.0000
+ 1   7   8                 1.3300   500.0000
+ 1   8   2                 1.4520   400.0000
+ 2   3   2   8           114.0000    70.0000
+ 2   1   2   3           123.0000    70.0000
+ 2   1   2   8           123.0000    70.0000
+-4
+ 8  -0.5635   0.8712  -0.3549   0.2028  -0.2770   0.2735   0.2028  -0.3549                   A 2             G86, WCS (CU)
+-3
+ S  Pyrimidine (OPLS charges)
+ 9  N2=CU-N2=CU-CU=CU-1
+-2
+ 1   1   2                 1.3170   400.0000
+ 1   1   6                 1.3440   400.0000
+ 1   2   3                 1.3170   400.0000
+ 1   5   6                 1.3440   400.0000
+ 1   3   4                 1.3580   400.0000
+ 1   4   5                 1.3580   400.0000
+ 2   2   1   6           115.0000    70.0000
+ 2   1   2   3           115.0000    70.0000
+-4 
+ 8  -0.4900   0.4100  -0.4900   0.2450   0.0800   0.2450                                     A 1         
+-3
+ S  Pyrazine (OPLS charges)
+ 9  N2=CU-CU=N2-CU=CU-1
+-2
+ 1   1   2                 1.3150   400.0000
+ 1   1   6                 1.3150   400.0000
+ 1   2   3                 1.3580   400.0000
+ 1   5   6                 1.3580   400.0000
+ 1   3   4                 1.3150   400.0000
+ 1   4   5                 1.3150   400.0000
+ 2   2   1   6           114.5000    70.0000
+-4 
+ 8  -0.4900   0.2450   0.2450  -0.4900   0.2450   0.2450                                     A 1         
+-3
+ S  2-Pyridone (JACS, 109, 6283 (1987))
+ 9  N2-C2(=O2)-CU=CU-CU=CU-1
+-2
+ 1   1   2                 1.3830   500.0000
+ 1   1  H3                 1.0000   500.0000    -1.4375
+ 1   2   4                 1.4540   500.0000
+ 1   2   3                 1.2060   500.0000
+ 1   4   5                 1.3420   500.0000
+ 1   4  H1                 1.0730   500.0000    -0.8844
+ 1   5   6                 1.4380   500.0000
+ 1   5  H1                 1.0750   500.0000    -0.5271
+ 1   6   7                 1.3400   500.0000
+ 1   6  H1                 1.0720   500.0000    -0.8552
+ 1   7   1                 1.3630   500.0000
+ 1   7  H1                 1.0730   500.0000    -0.7307
+ 2   7   1   2           124.1000    70.0000
+ 2   1   2   4           109.7000    70.0000
+ 2   3   2   4           125.8000    70.0000
+ 2   2   4   5           119.3000    70.0000           
+ 2   4   5   6           121.5000    70.0000
+ 2   5   6   7           117.6000    70.0000
+ 2   6   7   1           121.0000    70.0000
+-4
+ 8  -0.1253   0.7047  -0.5635  -0.2634   0.2365  -0.1962   0.2072                            A 1             
+-3
+ S  2-Hydroxypyridine (JACS, 109, 6283 (1987))
+ 9  N2*C2(-O3)*CU*CU*CU*CU*1
+-2
+ 1   1   2                 1.3060   500.0000
+ 1   3  H2                 0.9500   500.0000    -1.7632
+ 1   2   4                 1.3950   500.0000
+ 1   2   3                 1.3440   500.0000
+ 1   4   5                 1.3680   500.0000
+ 1   4  H1                 1.0730   500.0000    -1.0540
+ 1   5   6                 1.3910   500.0000
+ 1   5  H1                 1.0750   500.0000    -0.4775
+ 1   6   7                 1.3700   500.0000
+ 1   6  H1                 1.0730   500.0000    -0.8967
+ 1   7   1                 1.3250   500.0000
+ 1   7  H1                 1.0770   500.0000    -0.3491
+ 2   7   1   2           116.7000    70.0000
+ 2   1   2   4           124.1000    70.0000
+ 2   2   3  H2           110.3000    70.0000
+ 2   3   2   4           118.2000    70.0000
+ 2   2   4   5           117.3000    70.0000           
+ 2   4   5   6           119.6000    70.0000
+ 2   5   6   7           117.6000    70.0000
+ 2   6   7   1           123.7000    70.0000
+-4
+ 8  -0.6661   0.8025  -0.2105  -0.3345   0.2941  -0.3070   0.4215                            A 1             
+-3
+ C  C-O-C-C-O-C (Kollman, et al, JACS, 8385 (88))
+ 9  CT-O3-CT-CT-O3-CT
+-2
+ 1   1   2                 1.4250   320.0000     1.3894
+ 1   2   3                 1.4250   320.0000    -1.3894
+ 1   3   4                 1.5260   260.0000     0.0000
+ 1   3  H1                 1.0980   340.0000     0.1107
+ 2   1   2   3           111.8000   100.0000
+ 2   2   3   4           109.5000    80.0000
+ 4  00   3   4  00         0.0000     0.0000     1.8000
+ 4   2   3   4   5        99.9999    -0.2500    99.9999
+ 4  00   2   3  00         0.0000     0.0000     0.5750
+ 4   1   2   3   4        99.9999    -0.1000    99.9999
+ 4  00   1   2  00         0.0000     0.0000     0.5750
+-3
+ C  Alpha-alkoxysulfone (X. Wang to fit ab initio data)
+ 9  SX(=O2)(=O2)(-CT)-CT-O3-CT
+-2
+ 1   1   2                 1.4400   350.0000     4.7032
+ 1   1   3                 1.4400   350.0000     4.7032
+ 1   1   4                 1.7800   222.0000     0.3420
+ 1   1   5                 1.8000   222.0000     0.1729
+ 1   5   6                 1.4150   320.0000     0.9515
+ 1   6   7                 1.4270   320.0000    -1.6450
+ 2   2   1   3           118.0000    75.0000
+ 2   2   1   4           108.5000    65.0000
+ 2   2   1   5           108.5000    65.0000
+ 2   4   1   5            99.5000    62.0000
+ 2   1   5   6           105.0000    63.0000
+ 2   5   6   7           114.0000   100.0000
+ 4   2   1   5   6         4.5000     0.0000     0.5000
+ 4   4   1   5   6        -0.7000     0.7000     0.5000
+-3
+ C  Allene (1,2-Diene)
+ 9  00-C=C1=C-00
+-2
+ 4   1   2   4   5         0.0000    -5.0000     0.0000
+-3
+ C  1,2,3-Triene
+ 9  00-C=C1=C1=C-00
+-2
+ 4   1   2   5   6         0.0000     5.0000     0.0000
+-3
+ C  Pyranose (Homans, Biochem., 29, 9110 (1990))
+ 9  O3-CT-O3-CT-CT[(-O3)]-CT[(-O3)]-CT[(-O3)]-2
+-2
+ 1   1   2                 1.4400   334.3000    -1.7291                                      A 2         5 H
+ 1   1  H2                 0.9720   460.5000    -1.8674                                      A 2         5 H
+ 1   2   3                 1.4005   296.7000     1.3453                                      A 2         5 H
+ 1   2  H1                 1.0990   337.3000    -0.5279                                      A 2         5 H
+ 1   3   4                 1.4270   296.7000    -1.3708                                      A 2         5 H
+ 1   4   5                 1.5230   214.8000     0.0000                                      A 2         5 H
+ 1   4  H1                 1.0990   337.3000    -0.5279                                      A 2         5 H
+ 1   5   6                 1.4110   334.3000     1.6943                                      A 2         5 H
+ 1   6  H2                 0.9720   460.5000    -1.8674                                      A 2         5 H
+ 1   5   7                 1.5230   214.8000     0.0000                                      A 2         5 H
+ 1   5  H1                 1.0990   337.3000    -0.5279                                      A 2         5 H
+ 1   7   8                 1.4110   334.3000     1.6943                                      A 2         5 H
+ 1   8  H2                 0.9720   460.5000    -1.8674                                      A 2         5 H
+ 1   7   9                 1.5230   214.8000     0.0000                                      A 2         5 H
+ 1   7  H1                 1.0990   337.3000    -0.5279                                      A 2         5 H
+ 1   9  10                 1.4110   334.3000     1.6943                                      A 2         5 H
+ 1  10  H2                 0.9720   460.5000    -1.8674                                      A 2         5 H
+ 1   9   2                 1.5230   214.8000     0.0000                                      A 2         5 H
+ 1   9  H1                 1.0990   337.3000    -0.5279                                      A 2         5 H
+ 2   1   2   3           109.4750    92.6000                                                 A 2         5 H
+ 2   1   2   9           110.1000    75.7000                                                 A 2         5 H
+ 2   1   2  H1           109.8900    45.9000                                                 A 2         5 H
+ 2   3   2  H1           107.2400    45.2000                                                 A 2         5 H
+ 2   9   2  H1           108.7200    43.0000                                                 A 2         5 H
+ 2  H2   1   2           109.3500    53.6000                                                 A 2         5 H
+ 2  CT   1   2           115.7000    62.0000                                                 A 2         5 H
+ 2  CT  CT   1           110.1000    75.7000                                                 A 2         5 H
+ 2  H1  CT   1           109.8900    45.9000                                                 A 2         5 H
+ 2   5   6  H2           109.3500    53.6000                                                 A 2         5 H
+ 2   7   8  H2           109.3500    53.6000                                                 A 2         5 H
+ 2   9  10  H2           109.3500    53.6000                                                 A 2         5 H
+ 2   2   3   4           112.8500    90.7000                                                 A 2         5 H
+ 2   3   4   5           109.4000    81.0000                                                 A 2         5 H
+ 2   3   4  H1           107.2400    45.2000                                                 A 2         5 H
+ 2   3   4  CT           109.4000    81.0000                                                 A 2         5 H
+ 2   5   4  CT           110.7000    38.0000                                                 A 2         5 H
+ 2  H1   4  CT           108.7200    43.0000                                                 A 2         5 H
+ 2  H1   4   5           108.7200    43.0000                                                 A 2         5 H
+ 2   4  CT  O3           110.1000    75.7000                                                 A 2         5 H
+ 2   4  CT  H1           108.7200    43.0000                                                 A 2         5 H
+ 2   3   2   9           109.4000    81.0000                                                 A 2         5 H
+ 2   4   5   7           110.7000    38.0000                                                 A 2         5 H
+ 2   4   5   6           110.1000    75.7000                                                 A 2         5 H
+ 2   4   5  H1           108.7200    43.0000                                                 A 2         5 H
+ 2   6   5  H1           109.8900    45.9000                                                 A 2         5 H
+ 2   7   5  H1           108.7200    43.0000                                                 A 2         5 H
+ 2   7   5   6           110.1000    75.7000                                                 A 2         5 H
+ 2   5   7   9           110.7000    38.0000                                                 A 2         5 H
+ 2   5   7   8           110.1000    75.7000                                                 A 2         5 H
+ 2   5   7  H1           108.7200    43.0000                                                 A 2         5 H
+ 2   8   7  H1           109.8900    45.9000                                                 A 2         5 H
+ 2   8   7   9           110.1000    75.7000                                                 A 2         5 H
+ 2  H1   7   9           108.7200    43.0000                                                 A 2         5 H
+ 2   7   9   2           110.7000    38.0000                                                 A 2         5 H
+ 2   7   9  10           110.1000    75.7000                                                 A 2         5 H
+ 2   7   9  H1           108.7200    43.0000                                                 A 2         5 H
+ 2  10   9  H1           109.8900    45.9000                                                 A 2         5 H
+ 2   2   9  10           110.1000    75.7000                                                 A 2         5 H
+ 2   2   9  H1           108.72000   43.0000                                                 A 2         5 H
+ 4  00   2   9  00         0.0000     0.0000     1.0210                                      A 2         5 H
+ 4  00   4   5  00         0.0000     0.0000     1.0210                                      A 2         5 H
+ 4  00   5   6  00         0.0000     0.0000     0.4430                                      A 2         5 H
+ 4  00   5   7  00         0.0000     0.0000     1.0210                                      A 2         5 H
+ 4  00   7   8  00         0.0000     0.0000     0.4430                                      A 2         5 H
+ 4  00   7   9  00         0.0000     0.0000     1.0210                                      A 2         5 H
+ 4  00   9  10  00         0.0000     0.0000     0.4430                                      A 2         5 H
+ 4  00   2   3  00        -1.9000     0.0000     0.9280                                      A 2         5 H
+ 4  00   3   4  00         0.0000     0.0000     0.9280                                      A 2         5 H
+ 4   2   1  CT  00         0.0000     0.0000     0.0000                                      A 2         5 H
+ 4   3   2   1  00         0.0000    -0.5000     0.0000                                      A 2         5 H
+ 4   9   2   1  00         1.0000     0.0000     0.5000                                      A 2         5 H
+-3
+ C  2-OH-THP & aldopentose (HS)
+ 9  HC-O3-CT-O3-CT-CT[(-O3)]-CT[(-O3)]-CT[(-O3)]-3
+-2
+ 1   1   2                 0.9600   553.0000     1.9597                                      A 1         5 S
+ 1   2   3                 1.4250   350.0000    -1.6974                                      A 1         5 S
+ 1   3   4                 1.4250   350.0000     1.7405                                      A 1         5 S
+ 1   3  H1                 1.0900   331.0000     0.0550                                      A 1         5 S
+ 1   4   5                 1.4250   320.0000    -1.6837                                      A 1         5 S
+ 1   5  H1                 1.0900   331.0000     0.0000                                      A 1         5 S
+ 1   6   7                 1.4250   386.0000     1.3415                                      A 1         5 S
+ 1   6  H1                 1.0900   331.0000     0.0000                                      A 1         5 S
+ 1   7  H2                 0.9600   553.0000    -1.4571                                      A 1         5 S
+ 1   8   9                 1.4250   386.0000     1.3415                                      A 1         5 S
+ 1   8  H1                 1.0900   331.0000     0.0000                                      A 1         5 S
+ 1   9  H2                 0.9600   553.0000    -1.4571                                      A 1         5 S
+ 1  10  11                 1.4250   386.0000     1.3415                                      A 1         5 S
+ 1  10  H1                 1.0900   331.0000     0.0000                                      A 1         5 S
+ 1  11  H2                 0.9600   553.0000    -1.4571                                      A 1         5 S
+ 4   1   2   3   4        -0.4879    -0.6883     0.6837                                      A 1         5 S
+ 4   2   3   4   5         0.0000    -0.9500     0.0000                                      A 1         5 S
+ 4  H1   3   4   5         0.2000     0.0000     0.3830  0000 0000 0000 0000                 A 1         5 S
+ 4  H1   3   4   5        -0.1000     0.0000     0.3830  0000 0000 0000 H1H1                 A 1         5 S
+ 4   1   2   3  10         0.2038     0.2465    -0.1087                                      A 1         5 S
+ 4   1   2   3  H1         0.0000     0.0000     0.0600                                      A 1         5 S
+ 4   2   3  10   8        -0.4500     0.0000     0.5000  0000 0000 0000 O300                 A 1         5 S
+ 4   2   3  10   8        -0.6000     0.0000     0.5000  0000 H100 0000 O300                 A 1         5 S
+ 4   2   3  10   8        -0.8000     0.0000     0.5000  0000 0000 N200 0000                 A 1         5 S
+ 4   2   3  10   8        -1.0000     0.0000     0.5000  0000 H100 N200 0000                 A 1         5 S
+ 4   2   3  10  N2         0.4000     0.0000     1.0000                                      A 1         5 S
+ 4   2   3  10  N2        -0.1500     0.0000     1.0000  0000 H100 0000 0000                 A 1         5 S
+ 4   3  10  N2  C2         2.0000     0.1917     0.1085                                      A 1         5 S
+ 4   3  10  N2  C2         1.4000     0.1917     0.6000  H100 0000 0000 0000                 A 1         5 S
+ 4   8  10  N2  C2         0.4000     0.1917     0.1085                                      A 1         5 S
+ 4   2   3  10  11         2.2000     0.0000     0.1000                                      A 1         5 S
+ 4   2   3  10  11         3.5500     0.0000     0.1000  H200 0000 0000 0000                 A 1         5 S
+ 4   2   3  10  11         3.7200     0.0000     0.1000  H200 H100 0000 0000                 A 1         5 S
+-3
+ C  aldohexose modification (HS)
+ 9  HC-O3-CT-O3-CT(-CB-O3)-CT[(-O3)]-CT[(-O3)]-CT[(-O3)]-3
+-2
+ 1   5   6                 1.5260   260.0000    -0.2565                                      A 1         5 S
+ 1   6   7                 1.4250   386.0000     0.9582                                      A 1         5 S
+ 1   7  H2                 0.9600   553.0000    -1.3141                                      A 1         5 S
+ 1   5   8                 1.5260   260.0000     0.2565                                      A 1         5 S
+ 1   6  H1                 1.0900   331.0000     0.0000                                      A 1         5 S
+ 4   4   5   6   7         1.3000     0.0000     1.1000                                      A 1         5 S
+ 4   4   5   6   7         0.5000     0.0000     1.1000  0000 H100 0000 0000                 A 1         5 S
+ 4   8   5   6   7        -0.3000     0.0000     0.9000                                      A 1         5 S
+ 4   8   5   6   7        -0.7000     0.0000    -0.3000  0000 H100 0000 0000                 A 1         5 S
+ 4   5   6   7  H2         1.1000    -0.5000     0.8000                                      A 1         5 S
+ 4   5   6   7  H2         1.1000    -0.5000     0.5000  H100 0000 0000 0000                 A 1         5 S
+ 4   7   6   5  H1        -0.9000     0.0000     0.0000                                      A 1         5 S
+-3
+ C  2-RO-THP & glycoside modification (HS)
+ 9  CT-O3-CT-O3-CT-CT-CT-CT-3
+-2
+ 1   1   2                 1.4250   320.0000     1.2354                                      A 1         5 S
+ 1   1  H1                 1.0900   331.0000     0.0000                                      A 1         5 S
+ 1   2   3                 1.4250   350.0000    -1.5366                                      A 1         5 S
+ 1   3   4                 1.4250   350.0000     1.6273                                      A 1         5 S
+ 1   3   4                 1.4250   350.0000     1.6290  H100 0000                           A 1         5 S
+ 1   3  H1                 1.0900   331.0000    -0.1806                                      A 1         5 S
+ 1   4   5                 1.4250   320.0000    -1.4647                                      A 1         5 S
+ 4   1   2   3   4        -0.7000    -0.5000     1.0000                                      A 1         5 S
+ 4   1   2   3   4        -1.0500    -0.1000     1.1000  0000 0000 H100 0000                 A 1         5 S
+ 4   1   2   3  H1        -0.5000     0.5000    -0.0000                                      A 1         5 S
+ 4   2   3   4   5         0.0000    -0.7500     0.0000                                      A 1         5 S
+ 4   5   4   3  H1         0.0300     0.0000     0.0000  0000 0000 0000 0000                 A 1         5 S
+ 4   5   4   3  H1        -0.3000     0.0000     0.0000  H1H1                                A 1         5 S
+ 4   1   2   3   8         0.5000     0.5000     0.0000                                      A 1         5 S
+ 4   1   2   3   8         0.9000     0.5000     0.0000  0000 0000 H100 0000                 A 1         5 S
+-3
+ C  glycosidic linkage modification (HS)
+ 9  CT-CT(-CT)-O3-CT-O3-CT-CT-CT-CT-5
+-2
+ 2   2   4   5           114.3000    60.0000
+ 4   2   4   5   6        -0.8250    -0.6500     0.9500  H100 0000 0000 0000                 A 1         5 S
+ 4   2   4   5  H1        -0.6000     0.2500     0.0000  0000 0000 0000 0000                 A 1         5 S
+ 4   4   5   6   7         0.0000     1.0000     0.0000  0000 0000 0000 0000                 A 1         5 S
+ 4   4   5   6   7         0.0000    -1.1500     0.0000  0000 H100 0000 0000                 A 1         5 S
+ 4   5   4   2   1         0.0378     0.2500     0.1254                                      A 1         5 S
+ 4   5   4   2   3         0.0378     0.2500     0.1254                                      A 1         5 S
+ 4   5   4   2   1        -0.1500    -0.1000     0.2000  0000 0000 H100 0000                 A 1         5 S
+ 4   5   4   2   3        -0.1500    -0.1000     0.2000  0000 0000 H100 0000                 A 1         5 S
+ 4   5   4   2  H1        -1.1500    -0.0500     0.1000  0000 0000 0000 0000                 A 1         5 S
+-3
+ C  1,5 hexadiene All-atom
+ 9  CH-C2-C3-C3-C2-CH
+-2
+ 4   2   3   4   5         0.1689    -0.0899     0.3044
+-3
+ C  Benzotriazole
+ 9  C2(*N2)*C2*C2*C2*C2*C2(*1)*N2*N2(*2)*C2*C2*C2*C2*C2*C2-O3
+-2
+ 1  16  H2                 0.9600   553.0000    -1.8905
+ 1   7   8                 1.3470   600.0000
+ 1   8   9                 1.3340   500.0000
+ 1   9  10                 1.4300   400.0000
+ 2   7   1   2           107.4000    75.0000
+ 2   3   1   2           131.3000    75.0000
+ 4   2   9  10  11         0.0000     0.4500     0.0000
+ 4   2   9  10  15         0.0000     0.4500     0.0000
+ 4   8   9  10  11         0.0000     0.4500     0.0000
+ 4   8   9  10  15         0.0000     0.4500     0.0000
+ 4   1   2   9  10         0.0000    10.0000     0.0000
+ 4   1   2   9   8         0.0000    10.0000     0.0000
+ 4   7   8   9  10         0.0000    10.0000     0.0000
+ 4   7   8   9   2         0.0000    10.0000     0.0000
+-4
+ 8   0.3000  -0.4750  -0.1100   0.0300   0.0300  -0.1100   0.3000  -0.4750   0.550  -0.2600
+ 8   0.1000  -0.1000   0.0900  -0.1600   0.5000  -0.2100
+-3
+ S  Cyclopropylcarboxamide O-C-C-C torsion from HF/6-31G* CAP(CU)
+ 9  O2=C2(-C0*C0*C0-3)-N2
+-2
+ 1   6   2                 1.335    490.0000    -1.4686
+ 1   2   1                 1.229    570.0000     3.7394
+ 1   2   3                 1.522    335.0000     0.6235
+ 1   3   4                 1.515    300.0000    -0.2510
+ 1   3   5                 1.515    300.0000    -0.2510
+ 4   1   2   3   4        -0.5000     1.4000     0.0000
+ 4   1   2   3   5        -0.5000     1.4000     0.0000
+ 4   4   3   2   6         0.5000     1.4000     0.0000
+ 4   5   3   2   6         0.5000     1.4000     0.0000
+-3
+ S  Isopropylcarboxamide All Atom O-C-C-C torsion from HF/6-31G* CAP(CU)
+ 9  O2=C2(-C3(-C3)-C3)-N2
+-2
+ 1   6   2                 1.3350   490.0000    -1.5540
+ 1   2   1                 1.229    570.0000     3.9210
+ 1   2   3                 1.522    335.0000     0.0146
+ 1   3   4                 1.5260   310.0000     0.5167
+ 1   3   5                 1.5260   310.0000     0.5167
+ 4   1   2   3   4        -0.5000    -0.0500     0.0000
+ 4   1   2   3   5        -0.5000    -0.0500     0.0000
+ 4   4   3   2   6         1.0000    -0.0800     0.0000
+ 4   5   3   2   6         1.0000    -0.0800     0.0000
+-3
+ S  Isopropylcarboxamide United Atom O-C-C-C torsion from HF/6-31G* CAP(CU)
+ 9  O2=C2(-CA(-CC)-CC)-N2
+-2
+ 1   6   2                 1.3350   490.0000    -1.5540
+ 1   2   1                 1.229    570.0000     3.9210
+ 1   2   3                 1.522    335.0000     0.0146
+ 1   3   4                 1.5260   310.0000     0.5167
+ 1   3   5                 1.5260   310.0000     0.5167
+ 4   1   2   3   4        -0.4000     0.3000     0.5000
+ 4   1   2   3   5        -0.4000     0.3000     0.5000
+ 4   4   3   2   6         0.5000     0.3500     0.4000
+ 4   5   3   2   6         0.5000     0.3500     0.4000
+-3
+ C  Phosphonate
+ 9  PX(-CT)(=O2)(-O3-CT)-O3-CT
+-2
+ 1   1   2                 1.8000   450.0000     0.9522
+ 1   1   3                 1.4600   700.0000     5.4813
+ 1   1   4                 1.5950   390.0000     1.8118
+ 1   4   5                 1.4250   320.0000    -1.9170
+ 1   1   6                 1.5950   390.0000     1.8118
+ 1   6   7                 1.4250   320.0000    -1.9170
+ 1   2  H1                 1.0900   331.0000    -0.8188
+ 1   5  H1                 1.0900   331.0000    -0.1728
+ 1   7  H1                 1.0900   331.0000    -0.1728
+ 2   4   1   6           103.0000   180.0000
+ 2   4   1   2           103.0000   180.0000
+ 2   6   1   2           103.0000   180.0000
+ 2   2   1   3           115.0000   100.0000
+ 4   5   4   1   6         0.7000    -0.7000     0.1000
+ 4   7   6   1   4         0.7000    -0.7000     0.1000
+ 4  H1   2   1   3         0.0000     0.0000     0.3500
+ 4  H1   2   1   4         0.0000     0.0000     0.0000
+ 4  H1   2   1   6         0.0000     0.0000     0.0000
