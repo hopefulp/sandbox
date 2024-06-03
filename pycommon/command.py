@@ -194,7 +194,8 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     ncpu =  int(nXn[partition]/2)
     slurm.vas = f"==== Job submission\
             \n\t:: INI\
-            \n\t    $ vas_make_ini.py -s POSCAR.HfSe2sc34mag -j opt -x {partition} -N {nnode} -np {nproc}"
+            \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j opt -x {partition} -N {nnode} -np {nproc}\
+            \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j opt -x {partition} -N {nnode} -np {nproc} -al : all prepared except POSCAR "
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
