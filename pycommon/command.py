@@ -467,7 +467,12 @@ def main():
     else:
         infile = args.infile
 
-    show_command(args.job,args.subjob,args.job_submit,args.qname,infile,args.keyvalues,args.nodename,args.nnode,args.nproc,args.nodelist, args.func_type,args.data_type,args.xpartition,args.poscar, args.hidden_layers, args.idata, args.ndata)
+    if 'POSCAR' in args.qname:
+        qname=args.qname[7:]
+    else:
+        qname=args.qname
+
+    show_command(args.job,args.subjob,args.job_submit,qname,infile,args.keyvalues,args.nodename,args.nnode,args.nproc,args.nodelist, args.func_type,args.data_type,args.xpartition,args.poscar, args.hidden_layers, args.idata, args.ndata)
 
 if __name__ == "__main__":
     main()
