@@ -30,6 +30,12 @@ else
 fi
 
 cd $log_dir/$wdir
+### treat INCAR in wdir: remove NPAR, set NCORE
+st="NNODE = $PBS_NNODES"
+echo $st >> $log_file
+if [[ $(grep -ic NCORE INCAR) -eq 0  &&  $(grep -ic NPAR INCAR) -ne 0 ]]  ; then
+    sed -e "/NPAR/a NCORE = 20" -e "s/NPAR/\#NPAR/" -i INCAR
+fi
 
 echo "mpirun $EXEC" >> $log_file
 
