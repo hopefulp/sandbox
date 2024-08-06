@@ -36,7 +36,7 @@ LSCALAPACK = .FALSE.
 
 
 # functional
-GGA = RP
+GGA = PE
 
 # U-correction
 #LDAU = .TRUE.
@@ -46,7 +46,7 @@ GGA = RP
 #LDAUJ = 1 0 0 0
 
 # D2 correction
-LVDW = .TRUE.
+IVDW = 12
 
 
 # geo-opt

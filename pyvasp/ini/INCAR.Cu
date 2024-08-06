@@ -67,7 +67,7 @@ LDAUU = 6.5 0 0 0
 LDAUJ = 1 0 0 0
 
 # D2 correction
-#LVDW = .TRUE.
+#IVDW = 12
 
 # hse06
 #GGA = PE

@@ -176,9 +176,8 @@ def main():
     parser.add_argument('-s', '--Lshow', action='store_true',  help="just show")
     args = parser.parse_args()
 
-    if re.match('d', args.job):
-        compare_incars(args.files, args.kws, args.Ldiffer)
-    elif args.job == 'kw':
+    file_choice=['d','f','a']
+    if args.job == 'kw':
         if len(args.files) == 1 and args.files[0] in file_choice:
             if not args.kws:
                 print(f"for -j kw -f [d,f,a] includes -kw kws")
@@ -186,6 +185,8 @@ def main():
                 check_kw(args.files[0], args.kws) 
         else:
             print(f"for -j kw select {file_choice}")
+    elif re.match('d', args.job):
+        compare_incars(args.files, args.kws, args.Ldiffer)
 
 if __name__ == "__main__":
     main()
