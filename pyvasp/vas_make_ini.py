@@ -162,18 +162,19 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
 
         ### 3. get INCAR :: use make_incar.py
         incar_repo=f"{ini_dvasp}/INCAR.{job}"
-        if job and os.path.isfile(f"INCAR.{job}"):
+        ### 3.1 Use inserted INCAR by -i
+        if incar and os.path.exists(incar):
+            if os.path.isfile(incar):
+                f_incar = incar
+            elif os.path.isdir(incar):
+                f_incar = incar + '/INCAR'
+        ### 3.2 if job exists, use INCAR.job
+        elif job and os.path.isfile(f"INCAR.{job}"):
             f_incar = f"INCAR.{job}"
-        ### 3.2 if INCAR is prepared in wdir
-        elif allprepared:
+        ### 3.3 if INCAR is prepared in wdir
+        elif allprepared and os.path.isfile("INCAR"):
             print(f"INCAR in cwd will be used")
             f_incar = 'INCAR'
-        ### 3.3 use dir/INCAR
-        elif os.path.isdir(incar):
-            f_incar = incar + '/INCAR'
-        ### 4.3 use directed INCAR file
-        elif os.path.isfile(incar):
-            f_incar = incar
         else:
             print("Error:: cannot find INCAR")
             sys.exit()
