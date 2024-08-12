@@ -1,0 +1,268 @@
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+                     Glass Force Field
+
+                           by
+
+                       Accelrys Inc.
+
+
+   This force field has been developed to facilitate study of
+   ionic systems, and in particular common inorganic glasses.
+   Systems consisting of the following ions are parametrized:
+
+    2-   4+   3+   +   +  +   2+   2+   2+   4+  3+
+   O   Si   Al   Li  Na  K  Mg   Ca   Zn   Ti   B
+
+   The force field is intended to be used in 3D periodic systems.
+
+   Full formal charges will be assigned automatically.
+
+   The two-body and 3-body non-bond potential and associated parameters
+   draw on work presented in the following publications:
+
+ T.F.Soules,  J. Chem. Phys. (1979), Vol 71. [11], pp4570
+
+ T.F.Soules and A.K.Varshneya,  J. Am. Ceram. Soc. (1981), Vol. 64, pp145
+
+ S.H.Garofalini,  J. Am. Ceram. Soc. (1984), vol. 67, pp133
+
+ A.A.Tesar and A.K.Varshneya,  J. Chem. Phys. (1987), Vol. 87[5], pp2986
+
+ A.B.Rosenthal and S.H.Garofalini,  J. Am. Ceram. Soc. (1987), Vol. 70, pp821
+
+ A.B.Rosenthal and S.H.Garofalini,  J. Non-Crys. Solids (1988), Vol. 107, pp65-72
+
+ S.H. Garofalini and D.M. Zirl,  J. Am. Ceram. Soc. (1990), Vol. 73[10], pp2848-56
+
+ A.E. Kohler and S.H. Garofalini, Langmuir, (1994) Vol. 10 pp4664
+
+ D.M. Zirl and S.H. Garofalini, Physics and Chemistry of Glases, (1989) Vol. 30[4] pp155
+
+   NOTE:  This force field does not wholly represent any individual
+          referenced publication.
+
+END
+#
+PREFERENCES
+ BONDS                                 F
+ ANGLES                                F
+ COULOMB                               T
+ INVERSIONS                            F
+ TORSIONS                              F
+ UREY_BRADLEY                          F
+ STRETCH_STRETCH                       F
+ STRETCH_BEND_STRETCH                  F
+ BEND_BEND                             F
+ TORSION_STRETCH                       F
+ TORSION_BEND_BEND                     F
+ BEND_TORSION_BEND                     F
+ STRETCH_TORSION_STRETCH               F
+ HYDROGEN_BONDS                        F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                F
+ NON-BONDED_3-BODY                     T
+ SHRINK_CH_BONDS                       F
+ SHRINK_CH_H_ATOM                      H__C 
+ SHRINK_CH_FACTOR                         0.91500
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      F
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          0.40000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           T
+ H-BOND_DIRECT_RCUT                       4.00000
+ H-BOND_SPLINE_DISTANCE_ON                4.00000
+ H-BOND_SPLINE_DISTANCE_OFF               4.50000
+ H-BOND_SPLINE_ANGLE_ON                  65.00000
+ H-BOND_SPLINE_ANGLE_OFF                 75.00000
+ H-BOND_LIST_DISTANCE_OFF                 6.50000
+ H-BOND_LIST_ANGLE_OFF                   90.00000
+ NON_BOND_LIST                         T
+ NON_BOND_BUFFER_DISTANCE                 1.00000
+ H-BOND_BUFFER_DISTANCE                   1.00000
+ COU_DIELETRIC_CONSTANT                   1.00000
+ COU_INTER_CUT_OFF                        8.50000
+ COU_SPLINE_OFF                           7.50000
+ COU_SPLINE_ON                            5.50000
+ EWALD_SUM_COU_ACCURACY                   0.00100
+ EWALD_SUM_COU_ETA                        2.55000
+ EWALD_SUM_COU_KCUT                       0.00000
+ EWALD_SUM_COU_RCUT                       8.00000
+ EWALD_SUM_COU_AUTO_OPT                F
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            SPLINE    
+ COU_DIRECT_CUT-OFF                       5.50000
+ VDW_RADII_COMBINATION_RULE            ARITHMETIC
+ VDW_INTER_CUT_OFF                        8.50000
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            SPLINE    
+ VDW_SPLINE_ON                            5.50000
+ VDW_SPLINE_OFF                           7.50000
+ EWALD_SUM_VDW_AUTO_OPT                F
+ EWALD_SUM_VDW_ACCURACY                   0.00100
+ EWALD_SUM_VDW_ETA                        2.50000
+ EWALD_SUM_VDW_KCUT                       0.50000
+ EWALD_SUM_VDW_RCUT                       6.00000
+ EWALD_SUM_VDW_REP_CUT                    8.00000
+ FAST_EWALD_SUM_RATIO                    10.00000
+ SLOW_EWALD_SUM_RATIO                     5.00000
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         T
+ ASSIGN_HYBRIDIZATION                  F
+ ATOM_TYPE                             T
+ ATOM_TYPE_ALL                         T
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ Al         Al     26.98154  3.0000   3   0   0
+ B          B      10.81000  3.0000   2   0   0
+ Ca         Ca     40.08000  2.0000   6   0   0
+ K          K      39.09830  1.0000   0   0   0
+ Li         Li      6.94000  1.0000   0   0   0
+ Mg         Mg     24.30500  2.0000   3   0   0
+ Na         Na     22.98977  1.0000   0   0   0
+ O          O      15.99940 -2.0000   2   0   0
+ Si         Si     28.08550  4.0000   3   0   0
+ Ti         Ti     47.90000  4.0000   3   0   0
+ Zn         Zn     65.38000  2.0000   3   0   0
+END
+#
+DIAGONAL_VDW
+ Al          IGNORE       0.0000E+00
+ B           IGNORE       0.0000E+00
+ Ca          IGNORE       0.0000E+00
+ K           IGNORE       0.0000E+00
+ Li          IGNORE       0.0000E+00
+ Mg          IGNORE       0.0000E+00
+ Na          IGNORE       0.0000E+00
+ O           IGNORE       0.0000E+00
+ Si          IGNORE       0.0000E+00
+ Ti          IGNORE       0.0000E+00
+ Zn          IGNORE       0.0000E+00
+END
+#
+ATOM_TYPING_RULES
+END
+#
+#
+OFF_DIAGONAL_VDW
+ Al       Al          REP_EXPO       3.4800  0.3025E+00   12.0000
+ B        Al          REP_EXPO       3.4800  0.8390E-01   12.0000
+ B        B           REP_EXPO       3.4800  0.1970E-01   12.0000
+ Ca       Al          REP_EXPO       3.4800  0.8588E+00   12.0000
+ Ca       B           REP_EXPO       3.4800  0.2453E+00   12.0000
+ Ca       Ca          REP_EXPO       3.4800  0.2423E+01   12.0000
+ K        Al          REP_EXPO       3.4800  0.5296E+00   12.0000
+ K        B           REP_EXPO       3.4800  0.1564E+00   12.0000
+ K        Ca          REP_EXPO       3.4800  0.1484E+01   12.0000
+ K        K           REP_EXPO       3.4800  0.8826E+00   12.0000
+ Li       Al          REP_EXPO       3.4800  0.7110E-01   12.0000
+ Li       B           REP_EXPO       3.4800  0.1920E-01   12.0000
+ Li       Ca          REP_EXPO       3.4800  0.2028E+00   12.0000
+ Li       K           REP_EXPO       3.4800  0.1258E+00   12.0000
+ Li       Li          REP_EXPO       3.4800  0.1660E-01   12.0000
+ Mg       Al          REP_EXPO       3.4800  0.2398E+00   12.0000
+ Mg       B           REP_EXPO       3.4800  0.6850E-01   12.0000
+ Mg       Ca          REP_EXPO       3.4800  0.6765E+00   12.0000
+ Mg       K           REP_EXPO       3.4800  0.4142E+00   12.0000
+ Mg       Li          REP_EXPO       3.4800  0.5660E-01   12.0000
+ Mg       Mg          REP_EXPO       3.4800  0.1889E+00   12.0000
+ Na       Al          REP_EXPO       3.4800  0.1928E+00   12.0000
+ Na       B           REP_EXPO       3.4800  0.5690E-01   12.0000
+ Na       Ca          REP_EXPO       3.4800  0.5402E+00   12.0000
+ Na       K           REP_EXPO       3.4800  0.3280E+00   12.0000
+ Na       Li          REP_EXPO       3.4800  0.4580E-01   12.0000
+ Na       Mg          REP_EXPO       3.4800  0.1508E+00   12.0000
+ Na       Na          REP_EXPO       3.4800  0.1911E+00   12.0000
+ O        Al          REP_EXPO       3.4800  0.2434E+00   12.0000
+ O        B           REP_EXPO       3.4800  0.1300E+00   12.0000
+ O        Ca          REP_EXPO       3.4800  0.9303E+00   12.0000
+ O        K           REP_EXPO       3.4800  0.5382E+00   12.0000
+ O        Li          REP_EXPO       3.4800  0.8480E-01   12.0000
+ O        Mg          REP_EXPO       3.4800  0.2010E+00   12.0000
+ O        Na          REP_EXPO       3.4800  0.2828E+00   12.0000
+ O        O           REP_EXPO       3.4800  0.6410E-01   12.0000
+ Si       Al          REP_EXPO       3.4800  0.2233E+00   12.0000
+ Si       B           REP_EXPO       3.4800  0.6030E-01   12.0000
+ Si       Ca          REP_EXPO       3.4800  0.6373E+00   12.0000
+ Si       K           REP_EXPO       3.4800  0.3912E+00   12.0000
+ Si       Li          REP_EXPO       3.4800  0.5230E-01   12.0000
+ Si       Mg          REP_EXPO       3.4800  0.1779E+00   12.0000
+ Si       Na          REP_EXPO       3.4800  0.1771E+00   12.0000
+ Si       O           REP_EXPO       3.4800  0.2619E+00   12.0000
+ Si       Si          REP_EXPO       3.4800  0.1661E+00   12.0000
+ Ti       Al          REP_EXPO       3.4800  0.3176E+00   12.0000
+ Ti       B           REP_EXPO       3.4800  0.8570E-01   12.0000
+ Ti       Ca          REP_EXPO       3.4800  0.9059E+00   12.0000
+ Ti       K           REP_EXPO       3.4800  0.5619E+00   12.0000
+ Ti       Li          REP_EXPO       3.4800  0.7430E-01   12.0000
+ Ti       Mg          REP_EXPO       3.4800  0.2529E+00   12.0000
+ Ti       Na          REP_EXPO       3.4800  0.2046E+00   12.0000
+ Ti       O           REP_EXPO       3.4800  0.3842E+00   12.0000
+ Ti       Si          REP_EXPO       3.4800  0.2046E+00   12.0000
+ Ti       Ti          REP_EXPO       3.4800  0.2424E+00   12.0000
+ Zn       Al          REP_EXPO       3.4800  0.2118E+00   12.0000
+ Zn       B           REP_EXPO       3.4800  0.6280E-01   12.0000
+ Zn       Ca          REP_EXPO       3.4800  0.5930E+00   12.0000
+ Zn       K           REP_EXPO       3.4800  0.3598E+00   12.0000
+ Zn       Li          REP_EXPO       3.4800  0.5040E-01   12.0000
+ Zn       Mg          REP_EXPO       3.4800  0.1656E+00   12.0000
+ Zn       Na          REP_EXPO       3.4800  0.1292E+00   12.0000
+ Zn       O           REP_EXPO       3.4800  0.2169E+00   12.0000
+ Zn       Si          REP_EXPO       3.4800  0.8851E-01   12.0000
+ Zn       Ti          REP_EXPO       3.4800  0.2250E+00   12.0000
+ Zn       Zn          REP_EXPO       3.4800  0.1453E+00   12.0000
+END
+#
+HYDROGEN_BONDS
+END
+#
+GENERATOR
+END
+#
+NON-BONDED_3-BODY
+ X        X        X           IGNORE    
+ O        Al       O           MSW         3454.3279    2.6000    2.6000    3.0000    3.0000  109.4712
+ Al       O        Al          MSW          143.9303    2.0000    2.0000    2.6000    2.6000  109.4712
+ Si       O        Al          MSW          143.9303    2.0000    2.0000    2.6000    2.6000  109.4712
+ Si       O        Si          MSW          143.9303    2.0000    2.0000    2.6000    2.6000  109.4712
+ O        Si       O           MSW         3454.3279    2.6000    2.6000    3.0000    3.0000  109.4712
+END
+#
+COULOMBIC
+ X        X           ERFC(R)        2.5500
+ Al       Al          ERFC(R)        2.3500
+ K        K           ERFC(R)        2.5380
+ K        O           ERFC(R)        2.5380
+ Na       Al          ERFC(R)        2.3000
+ Na       Na          ERFC(R)        2.3000
+ Na       Zn          ERFC(R)        2.6000
+ O        Al          ERFC(R)        2.3400
+ O        Na          ERFC(R)        2.3400
+ O        O           ERFC(R)        2.3400
+ Si       Al          ERFC(R)        2.3300
+ Si       K           ERFC(R)        2.5380
+ Si       Na          ERFC(R)        2.3000
+ Si       O           ERFC(R)        2.3400
+ Si       Si          ERFC(R)        2.3000
+ Ti       O           ERFC(R)        2.5500
+ Ti       Si          ERFC(R)        2.6000
+ Ti       Ti          ERFC(R)        2.6000
+ Zn       O           ERFC(R)        2.5500
+ Zn       Si          ERFC(R)        2.6000
+ Zn       Zn          ERFC(R)        2.6000
+END

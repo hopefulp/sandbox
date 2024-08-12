@@ -1,6 +1,6 @@
 #!/home/joonho/anaconda3/bin/python
 
-from envvasp import get_hostname
+from mod_vas import get_hostname
 from server_env import nXn
 import sys
 import re
@@ -9,6 +9,7 @@ import subprocess
 from common import yes_or_no
 hostname = get_hostname()
 
+### Now this is being depricated
 def run_vasp(dirname, qx, qN, np, issue=None):
     #print(f'qx {qx} and qN {qN} in run_vasp()')
     if get_hostname()=='pt' and ( not qx or not qN):
@@ -58,8 +59,15 @@ def get_queue_pt(qx=None):
         else:
             return 1, free_node
 
-def qsub_command(ndir, X=3, nnode=4, np=None, issue=None):
+def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None, lkisti=None, Lrun=None):
     if hostname == 'kisti':
+        if vasp_exe:
+            if vasp_exe == 'gamma':
+                str_vasp = "-v exe=gamma"
+            elif vasp_exe == 'xyrelax':
+                str_vasp = "-v crelax=xy"
+        else:
+            str_vasp = ""
         nnode=20
         np=40
         if issue != 'mem' and ( re.search('bd', ndir) or re.search('band', ndir)):
@@ -70,9 +78,14 @@ def qsub_command(ndir, X=3, nnode=4, np=None, issue=None):
             s = f"qsub -N {ndir} -l select={nnode}:ncpus={np}:mpiprocs={hproc}:ompthreads=1  $SB/pypbs/pbs_vasp_kisti_skl.sh"
         elif issue == 'opt':
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
+        ### for quick run: decrease walltime to fast run in kisti
+        elif lkisti == 'kp':
+            s = f"qsub -N {ndir} {str_vasp} -l walltime=1:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
         else:
-            s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_skl.sh"
+            s = f"qsub -N {ndir} {str_vasp} $SB/pypbs/pbs_vasp_kisti_skl.sh"
     elif hostname == 'pt':
+        if not X or not nnode:
+            qx, qN = get_queue_pt(qx=X)
         if np:
             nproc = np
         else:
@@ -80,12 +93,19 @@ def qsub_command(ndir, X=3, nnode=4, np=None, issue=None):
         if issue == 'mem':
             hproc = int(nXn[X]/2)
             s = f"sbatch -J {ndir} -p X{X} -N {nnode} -c {hproc} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+        elif issue == 'opt':
+            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_vaspopt.sh"
+        elif issue == 'sim':
+            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
         else:
             s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     else:
         print(f"No qsub command for {hostname}")
         s=''
-        #sys.exit(1)
+        sys.exit(10)
+    print(s)
+    if Lrun or yes_or_no("Will you run?"):
+        os.system(s)
     return s        
 
 if __name__ == '__main__':

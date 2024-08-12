@@ -23,27 +23,34 @@ from parsing    import convert_2lst2D
 def get_filename(idos, f_pre, arr_atom, eshift, l, m):
     if f_pre == 'TDOS':
         ofile = f_pre
-        if eshift: f_tdos += eshift[0]
     else:
-        alstr = str(arr_atom[0])
-        if 1 < arr_atom.size:
-            atom_imax = arr_atom.max()
-            atom_imin = arr_atom.min()
-            natom_in = arr_atom.size - 2
-            if natom_in == 0:
-                alstr = alstr + '_' + str(arr_atom[-1])
-            else:
-                if arr_atom.size == atom_imax - atom_imax:
-                    alstr = alstr + '-' + str(atom_imax)
-                else:
-                    alstr = alstr + '_N' + str(arr_atom.size) + '_' + str(atom_imax)
-        ofile = f_pre + 'a' + alstr
+        ### atom list string for filename
+        ### make atom list string: atom index Amin_max_Nnum
+        ofile = f'{f_pre}A{str(arr_atom[0])}'
+        if arr_atom.size != 1:
+            ofile += f'_{str(arr_atom[-1])}'
+        ofile += f'_N{arr_atom.size}'
         if l: ofile += f'l{l}'
         if m: ofile += f'm{m}'
-        if eshift: ofile += eshift[:]
+    if eshift:
+        if re.search('f', eshift, re.I):
+            ofile += 'F0'
+        else:
+            ofile += eshift[:]
     ofile += '.dat'
     print(f"{whereami():>15}(): {idos+1}-th output file: {ofile}")
-    return ofile, alstr
+    return ofile
+
+def make_vert_line(fname, Ene, maxdos=10):
+    f0 = open(fname, 'w')
+    dE = 0.001
+    EL = float(Ene-dE)
+    ER = float(Ene+dE)
+    f0.write(f"{EL:10.3f}\t{0.00:10.3f}\n")
+    f0.write(f"{Ene:10.3f}\t{maxdos:10.3f}\n")
+    f0.write(f"{ER:10.3f}\t{0.00:10.3f}\n")
+    f0.close()
+    return 0
 
 def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel, title, colors):
     '''
@@ -60,14 +67,22 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel,
 
     if eshift:
         if re.search('f', eshift, re.I):
-            Eshift = 'E' + f"{Ef:5.3f}"
+            Eshift = f"F{Ef:5.3f}"
+            ### make F0 vertical line at E=0.00
+            make_vert_line("E0.dat", 0.00)      # kw maxdos=10 default
+        elif re.search('v', eshift, re.I):
+            Eshift = f"V{eshift:5.3f}"
         else:
-            Eshift = 'V' + eshift
+            Eshift = f"E{eshift:5.3f}"
     else:
         Eshift = None
+        ### make F0 vertical line at E=F0
+        make_vert_line("EF0.dat", Ef)   # kw maxdos=10 default
+
     ### loop for 2d list
     idos = 0
     x_ene   = []    # x needs always to write to ldosa___.dat
+    dos     = []
     iatom   = 0     # index for total atom count for x_ene=[]
     if Lspin:
         nlm = 18
@@ -86,10 +101,9 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel,
                 f_pre = 'ldos'
             ### make filename
             if not ofile:
-                fname, alstr = get_filename(idos, f_pre, arr_atoms, Eshift, l, m)
+                fname = get_filename(idos, f_pre, arr_atoms, Eshift, l, m)
             else:
                 fname = ofile[idos]
-                alstr = fname
             pdos2d  = []
             for ind_atom in arr_atoms: # ind_atom is atom index in total system
                 istart = nheadline + (1 + nene) * ind_atom
@@ -145,16 +159,12 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel,
                 if f_pre == "TDOS":
                     legend = f_pre
                 else:
-                    legend='a'+alstr
+                    legend=re.split('\.',fname)[0]
                 legends.append(legend)
     ### plot here
     if Lplot:
         mplot_nvector(x_ene, ys, xlabel=xlabel, ylabel=ylabel, title=title, legend=legends, colors=colors, Lsave=True)
     return 0
-
-
-    
-    
 
 def main():
     parser = argparse.ArgumentParser(description='To obtain PLDOS')
@@ -162,14 +172,14 @@ def main():
     parser.add_argument('poscar', nargs='?', default="POSCAR", help="input POSCAR")
     parser.add_argument('-of', '--ofile', help='output filename')
     ldos = parser.add_mutually_exclusive_group()
-    ldos.add_argument('-al','--atom_list0', nargs='+', default=":", help="list atoms with num and '-', index from 0 ")
+    ldos.add_argument('-al','--atom_list0', nargs='+', default=":", help="atom list from 0, use '-', -1 for Tdos ")
     #ldos.add_argument('-al2', '--atom0_2d', type=json.loads, help='list atoms as 2D list')
     ldos.add_argument('-z', '--zintv', nargs='+', type=float, help='atoms between zmax * zmin')
     parser.add_argument('-ash', '--atom_list0_sh', nargs='*', type=int, help='input shape of atom_list0')
     parser.add_argument('-dz', '--delta_z', default=0.1, type=float, help='use zmax or delta_z')
     parser.add_argument('-loc', '--location', default='in', choices=['in', 'out'], help='outside or inside of zmin')
     parser.add_argument('-as', '--atom_species', nargs='+', default=['O'], help='specify atom species')
-    parser.add_argument('-e', '--energy_shift', help='[F|value], F for fermi E shift, V for VBM')
+    parser.add_argument('-e', '--energy_shift', help='[F|value], -eF[f], -e-3.5 for E such as VBM')
     parser.add_argument('-l', '--ql', type=int, help='angular quantum number')
     parser.add_argument('-m', '--qm', type=int, help='magnetic quantum number')
     parser.add_argument('-p', '--plot', action='store_true', help='plot pdos')
@@ -182,31 +192,25 @@ def main():
     args = parser.parse_args()
     
     ### obtain atom 2D list
-    if args.atom_list0:
+    if not args.zintv:
+        ### if there is shape, there must be list
         if args.atom_list0_sh:
             alist0 = convert_2lst2D(args.atom_list0, args.atom_list0_sh)
+        ### No shape
         else:
             alist0=[]
-            ### get atom list from DOSCAR
-            #if args.atom_list == ":":
-            #    alist0 = 
-
-            #else:
-            ### convert 1D to 2D list
-            alist0.append(list(map(int, args.atom_list0)))
+            ### make 1D list if no shape
+            if args.atom_list0:
+                alist0.append(list(map(int, args.atom_list0)))
     else:
-        if not args.zintv:
-            print("Error: input z values for zmin and zmax (or dz y d0.01) ")
-            sys.exit(1)
+        zaxis=[]
+        zaxis.append(args.zintv[0]-args.delta_z)
+        zaxis.append(args.zintv[-1]+args.delta_z)
+        if args.location == 'in':
+            print(f"{whereami():>15}(): use z-axis between {zaxis[0]} and {zaxis[1]}")
         else:
-            zaxis=[]
-            zaxis.append(args.zintv[0]-args.delta_z)
-            zaxis.append(args.zintv[-1]+args.delta_z)
-            if args.location == 'in':
-                print(f"{whereami():>15}(): use z-axis between {zaxis[0]} and {zaxis[1]}")
-            else:
-                print(f"{whereami():>15}(): use z-axis below {zaxis[0]} and upper {zaxis[1]}")
-            alist0 = obtain_atomlist0(zaxis, args.poscar, args.atom_species, args.location)
+            print(f"{whereami():>15}(): use z-axis below {zaxis[0]} and upper {zaxis[1]}")
+        alist0 = obtain_atomlist0(zaxis, args.poscar, args.atom_species, args.location)
     
     extract_doscar(args.doscar, args.ofile, alist0, args.energy_shift,args.ql,args.qm,args.plot,args.xlabel,args.ylabel,args.title,args.colors) 
 

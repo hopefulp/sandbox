@@ -22,7 +22,7 @@ echo start >> $log_file
 date >> $log_file
 
 #EXEC="/home01/g129a89/vasp.5.4.4/bin/vasp"
-EXEC="/home01/x2232a02/bin/vasp_5.4.4_GRP7_NORMAL_20170903.x"
+EXEC="/home01/x2462a02/bin/vasp_5.4.4_GRP7_NORMAL_20170903.x"
 cd $log_dir/$wdir
 
 mpirun $EXEC > $log_dir/$jobname.log

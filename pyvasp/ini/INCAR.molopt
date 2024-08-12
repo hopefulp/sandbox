@@ -1,0 +1,73 @@
+SYSTEM = zzrpx2-afm-rlx-re
+
+# continuation
+ISTART = 0
+ICHARG = 2
+ISPIN = 1
+
+# precision-1
+ENCUT = 500
+PREC = high
+ISMEAR = 0 ; SIGMA = 0.05
+NELMIN = 4 ; NELM = 500
+EDIFF = 1E-5 ; EDIFFG = -0.025
+
+# precision-2
+GGA_COMPAT=.FALSE.
+#VOSKOWN = 1
+ADDGRID = .TRUE.
+
+# mixing
+LMAXMIX = 4
+#IMIX = 4
+#AMIX = 0.2
+#BMIX = 0.0001
+#AMIX_MAG = 0.8
+#BMIX_MAG = 0.0001
+
+# performance
+ALGO = Fast
+#IALGO=48
+NSIM = 4
+NPAR = 4
+LREAL = .FALSE.
+LPLANE = .TRUE.
+LSCALAPACK = .FALSE.
+
+
+# functional
+GGA = PE
+
+# U-correction
+#LDAU = .TRUE.
+#LDAUTYPE = 2
+#LDAUL = 2 -1 -1 -1
+#LDAUU = 6.5 0 0 0
+#LDAUJ = 1 0 0 0
+
+# D2 correction
+IVDW = 12
+
+
+# geo-opt
+NSW = 999 ; ISIF = 2
+IBRION = 2
+POTIM = 0.3
+
+# aimd - nvt
+#NSW = 5000 ; ISIF = 0
+#IBRION = 0
+#POTIM = 2.0
+#TEIN = 300
+#TEBEG = 300
+#TEEND = 300
+#SMASS = 0.05
+#ISYM = 0
+
+
+# log
+LORBIT = 11
+#LAECHG=.TRUE.
+LWAVE = .TRUE.
+LCHARG = .TRUE.
+

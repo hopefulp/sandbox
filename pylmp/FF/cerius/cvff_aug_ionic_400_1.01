@@ -1,0 +1,466 @@
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+ 
+BIOSYM Type II forcefield: cvff_aug converted to OFF format.
+
+This forcefield only contains the ionic atom types contained in the
+cvff_aug forcefield released with InsightII 4.0.0.
+
+Only the nonbonded parameters are supplied from these types.
+
+END
+#
+PREFERENCES
+ BONDS                                 F
+ ANGLES                                F
+ COULOMB                               T
+ INVERSIONS                            F
+ TORSIONS                              F
+ UREY_BRADLEY                          F
+ STRETCH_STRETCH                       F
+ SEPARATED_STRETCH_STRETCH             F
+ STRETCH_BEND_STRETCH                  F
+ BEND_BEND                             F
+ TORSION_STRETCH                       F
+ TORSION_BEND_BEND                     F
+ BEND_TORSION_BEND                     F
+ STRETCH_TORSION_STRETCH               F
+ HYDROGEN_BONDS                        F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                F
+ NON-BONDED_3-BODY                     F
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      F
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          1.00000
+ SINGLE_INVERSION                      F
+ NON_BOND_LIST                         T
+ NON_BOND_BUFFER_DISTANCE                 1.00000
+ H-BOND_BUFFER_DISTANCE                   1.00000
+ EWALD_SUM_COU_ACCURACY                    .00100
+ EWALD_SUM_COU_ETA                        2.50000
+ EWALD_SUM_COU_KCUT                        .50000
+ EWALD_SUM_COU_RCUT                       6.00000
+ EWALD_SUM_COU_AUTO_OPT                T
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            EWALD     
+ COU_DIRECT_CUT-OFF                      14.00000
+ VDW_COMBINATION_RULE                  GEOMETRIC 
+ VDW_INTER_CUT_OFF                       14.00000
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            EWALD     
+ VDW_SPLINE_ON                           11.00000
+ VDW_SPLINE_OFF                          14.00000
+ EWALD_SUM_VDW_AUTO_OPT                T
+ EWALD_SUM_VDW_ACCURACY                    .00100
+ EWALD_SUM_VDW_ETA                        2.50000
+ EWALD_SUM_VDW_KCUT                        .50000
+ EWALD_SUM_VDW_RCUT                       6.00000
+ EWALD_SUM_VDW_REP_CUT                    6.00000
+ FAST_EWALD_SUM_RATIO                    10.00000
+ SLOW_EWALD_SUM_RATIO                     5.00000
+ COU_DIELETRIC_CONSTANT                1.000032223674463             
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           F
+ ASSIGN_CHARGE                         T
+ ASSIGN_HYBRIDIZATION                  F
+ ATOM_TYPE                             T
+ ATOM_TYPE_ALL                         T
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ *          X       0.00000  0.0000   0   0   0
+ Ag         Ag    107.86800  0.0000   0   0   0
+ Au         Au    196.96700  0.0000   0   0   0
+ Cr         Cr     51.99600  0.0000   0   0   0
+ Cu         Cu     63.54600  0.0000   0   0   0
+ Fe         Fe     55.84700  0.0000   0   0   0
+ K          K      39.10200  0.0000   0   0   0
+ Li         Li      6.94000  0.0000   0   0   0
+ Mo         Mo     95.94000  0.0000   0   0   0
+ Na         Na     22.99000  0.0000   0   0   0
+ Ni         Ni     58.71000  0.0000   0   0   0
+ Pb         Pb    207.20000  0.0000   0   0   0
+ Pd         Pd    106.40000  0.0000   0   0   0
+ Pt         Pt    195.09000  0.0000   0   0   0
+ Sn         Sn    118.69000  0.0000   0   0   0
+ W          W     183.85000  0.0000   0   0   0
+ al         Al     26.98200  0.0000   0   0   0
+ ay         Al     26.98154  3.0000   0   0   0
+ ayt        Al     26.98154  3.0000   0   0   0
+ az         Al     26.98154  1.4000   0   0   0
+ ba2+       Ba    137.32700  2.0000   0   0   0
+ br-        Br     79.90400 -1.0000   0   0   0
+ ca2+       Ca     40.07800  2.0000   0   0   0
+ ca2c       Ca     40.07800  2.0000   0   0   0
+ cl-        Cl     35.45270 -1.0000   0   0   0
+ cloh       Cl     35.45270 -1.0000   0   0   0
+ cly-       Cl     35.45270 -1.0000   0   0   0
+ co2c       Co     58.93320  2.0000   0   0   0
+ cs+        Cs    132.90543  1.0000   0   0   0
+ cu2+       Cu     63.54600  2.0000   0   0   0
+ f-         F      18.99840 -1.0000   0   0   0
+ fe2c       Fe     55.84700  2.0000   0   0   0
+ foh        F      18.99840 -1.0000   0   0   0
+ ge         Ge     72.61000  2.4000   0   0   0
+ i-         I     126.90447 -1.0000   0   0   0
+ k+         K      39.09830  1.0000   0   0   0
+ koh        K      39.09830 -1.0000   0   0   0
+ li+        Li      6.94100  1.0000   0   0   0
+ lioh       Li      6.94100  1.0000   0   0   0
+ mg2+       Mg     24.30500  2.0000   0   0   0
+ mg2c       Mg     24.30500  2.0000   0   0   0
+ mn3c       Mn     54.93805  3.0000   0   0   0
+ mn4c       Mn     54.93805  4.0000   0   0   0
+ na+        Na     22.98980  1.0000   0   0   0
+ nac+       Na     22.98980  1.0000   0   0   0
+ naoh       Na     22.98980  1.0000   0   0   0
+ nh4+       N      14.00674  1.0000   0   0   0
+ oy         O      15.99940 -2.0000   0   0   0
+ oz         O      15.99940 -1.2000   0   0   0
+ o*         O      15.99940  0.0000   0   0   0
+ py         P      30.97380  5.0000   0   0   0
+ pz         P      30.97380  3.4000   0   0   0
+ rb+        Rb     85.46780  1.0000   0   0   0
+ si         Si     28.08600  0.0000   0   0   0
+ so4        S      32.06600  2.8000   0   0   0
+ so4y       S      32.06600  6.0000   0   0   0
+ sy         Si     28.08600  4.0000   0   0   0
+ sz         Si     28.08600  2.4000   0   0   0
+ ti4c       Ti     47.88000  4.0000   0   0   0
+ tioc       Ti     47.88000  1.6000   0   0   0
+#
+# Commented out atom types which use unsupported LJ 12 repulsive potential
+#
+# beoh       Be      9.01218  0.0000   0   0   0
+# ga         Ga     69.72300  1.4000   0   0   0
+# hocl       H       1.00800  1.0000   0   0   0
+# lic+       Li      6.94100  1.0000   0   0   0
+# ni2c       Ni     58.69000  2.0000   0   0   0
+# pd2+       Pd    106.42000  2.0000   0   0   0
+# sr2c       Sr     87.62000  2.0000   0   0   0
+# titd       Ti     47.88000  2.4000   0   0   0
+# vy         V      50.94150  4.0000   0   0   0
+END
+#
+EQUIVALENCE_COULOMBIC
+ Ag         ALL         *    
+ Au         ALL         *    
+ Cr         ALL         *    
+ Cu         ALL         *    
+ Fe         ALL         *    
+ K          ALL         *    
+ Li         ALL         *    
+ Mo         ALL         *    
+ Na         ALL         *    
+ Ni         ALL         *    
+ Pb         ALL         *    
+ Pd         ALL         *    
+ Pt         ALL         *    
+ Sn         ALL         *    
+ W          ALL         *    
+ al         ALL         *    
+ ay         ALL         *    
+ ayt        ALL         *    
+ az         ALL         *    
+ ba2+       ALL         *    
+ br-        ALL         *    
+ ca2+       ALL         *    
+ ca2c       ALL         *    
+ cl-        ALL         *    
+ cloh       ALL         *    
+ cly-       ALL         *    
+ co2c       ALL         *    
+ cs+        ALL         *    
+ cu2+       ALL         *    
+ f-         ALL         *    
+ fe2c       ALL         *    
+ foh        ALL         *    
+ ge         ALL         *    
+ i-         ALL         *    
+ k+         ALL         *    
+ koh        ALL         *    
+ li+        ALL         *    
+ lioh       ALL         *    
+ mg2+       ALL         *    
+ mg2c       ALL         *    
+ mn3c       ALL         *    
+ mn4c       ALL         *    
+ na+        ALL         *    
+ nac+       ALL         *    
+ naoh       ALL         *
+ nh4+       ALL         *    
+ oy         ALL         *    
+ oz         ALL         *    
+ o*         ALL         *
+ py         ALL         *    
+ pz         ALL         *    
+ rb+        ALL         *    
+ si         ALL         *    
+ so4        ALL         *    
+ so4y       ALL         *    
+ sy         ALL         *    
+ sz         ALL         *    
+ ti4c       ALL         *    
+ tioc       ALL         *    
+#
+# Commented out atom types which use unsupported LJ 12 repulsive potential
+#
+# beoh       ALL         *    
+# ga         ALL         *    
+# hocl       ALL         *    
+# lic+       ALL         *    
+# ni2c       ALL         *    
+# pd2+       ALL         
+# sr2c       ALL         *    
+# titd       ALL         *    
+# vy         ALL         *    
+END
+#
+STEP_DOWN_COULOMBIC
+  1    1   Q1
+END
+#
+COULOMBIC
+ *        *           CONST-EPS 
+END
+#
+EQUIVALENCE_OFF_DIAGONAL_VDW
+ Ag         ALL         Ag    Ag    *    
+ Au         ALL         Au    Au    *    
+ Cr         ALL         Cr    Cr    *    
+ Cu         ALL         Cu    Cu    *    
+ Fe         ALL         Fe    Fe    *    
+ K          ALL         Pb    Pb    *    
+ Li         ALL         Li    Li    *    
+ Mo         ALL         Mo    Mo    *    
+ Na         ALL         Na    Na    *    
+ Ni         ALL         Ni    Ni    *    
+ Pb         ALL         Pb    Pb    *    
+ Pd         ALL         Pd    Pd    *    
+ Pt         ALL         Pt    Pt    *    
+ Sn         ALL         Na    Sn    *    
+ W          ALL         W     W     *    
+ al         ALL         si    si    *    
+ ay         ALL         ay    ay    *    
+ ayt        ALL         ayt   ayt   *    
+ az         ALL         az    az    *    
+ ba2+       ALL         ba2+  ba2+  *    
+ br-        ALL         br-   br-   *    
+ ca2+       ALL         ca2+  ca2+  *    
+ cl-        ALL         cl-   cl-   *    
+ cloh       ALL         cloh  cloh  *    
+ cly-       ALL         cly-  cly-  *    
+ co2c       ALL         co2c  co2c  *    
+ cs+        ALL         cs+   cs+   *    
+ cu2+       ALL         cu2+  cu2+  *    
+ f-         ALL         f-    f-    *    
+ fe2c       ALL         fe2c  fe2c  *    
+ foh        ALL         foh   foh   *    
+ ge         ALL         ge    ge    *    
+ i-         ALL         i-    i-    *    
+ k+         ALL         k+    k+    *    
+ koh        ALL         koh   koh   *    
+ li+        ALL         li+   li+   *    
+ lioh       ALL         lioh  lioh  *    
+ mg2+       ALL         mg2+  mg2+  *    
+ mg2c       ALL         mg2c  mg2c  *    
+ mn3c       ALL         mn3c  mn3c  *    
+ mn4c       ALL         mn4c  mn4c  *    
+ na+        ALL         na+   na+   *
+ nac+       ALL         nac+  nac+  *    
+ naoh       ALL         naoh  naoh  *
+ nh4+       ALL         nh4+  nh4+  *    
+ oy         ALL         oy    oy    *    
+ oz         ALL         oz    oz    *    
+ o*         ALL         o*    o*    *
+ py         ALL         py    py    *    
+ pz         ALL         pz    pz    *    
+ rb+        ALL         rb+   rb+   *    
+ si         ALL         si    si    *    
+ so4        ALL         so4   so4   *    
+ so4y       ALL         so4y  so4y  *    
+ sy         ALL         sy    sy    *    
+ sz         ALL         sz    sz    *    
+ ti4c       ALL         ti4c  ti4c  *    
+ tioc       ALL         tioc  tioc  *    
+#
+# Commented out atom types which use unsupported LJ 12 repulsive potential
+#
+# beoh       ALL         beoh  beoh  *    
+# ga         ALL         ga    ga    *    
+# hocl       ALL         hocl  hocl  *    
+# lic+       ALL         lic+  lic+  *    
+# ni2c       ALL         ni2c  ni2c  *    
+# pd2+       ALL         pd2+  pd2+  *
+# sr2c       ALL         sr2c  sr2c  *    
+# titd       ALL         titd  titd  *    
+# vy         ALL         vy    vy    *    
+END
+#
+STEP_DOWN_OFF_DIAGONAL_VDW
+  1    1   Q1
+  2    2   Q3
+END
+#
+DIAGONAL_VDW
+ Ag          LJ_6_12        2.9678       7.951
+ Au          LJ_6_12        2.9599       10.18
+ Cr          LJ_6_12        2.6221      11.575
+ Cu          LJ_6_12        2.6243       9.439
+ Fe          LJ_6_12        2.6052      12.138
+ Li          LJ_6_12        3.1867       4.735
+ Mo          LJ_6_12        2.8634      19.321
+ Na          LJ_6_12        2.1298    1.607143
+ Ni          LJ_6_12        2.5615      11.983
+ Pb          LJ_6_12        3.5885       5.451
+ Pd          LJ_6_12        2.8286       9.839
+ Pt          LJ_6_12        2.8533      15.718
+ W           LJ_6_12        2.8757      24.623
+ al          LJ_6_12        4.6421    0.114068
+ ay          LJ_6_12        3.62610.0004501718
+ ayt         LJ_6_12        1.6188   0.5674966
+ az          LJ_6_12       0.83105    2565.282
+ ba2+        LJ_6_12         8.4891.885869e-05
+ br-         LJ_6_12         2.4077.651602e-05
+ ca2+        LJ_6_12        3.3399    0.155911
+ ca2c        LJ_6_12        2.8714    1.369857
+ cl-         LJ_6_12        18.1784.124409e-10
+ cloh        LJ_6_12        4.4687   0.8331083
+ cly-        LJ_6_12        5.0063  0.02149569
+ co2c        LJ_6_12        1.7625    33.28682
+ cs+         LJ_6_12        4.9244  0.03580087
+ cu2+        LJ_6_12            171.470836e-11
+ f-          LJ_6_12        10.0749.053854e-08
+ fe2c        LJ_6_12        1.9047    24.89684
+ foh         LJ_6_12        3.0858   0.5331893
+ ge          LJ_6_12        1.3497    2.266793
+ i-          LJ_6_12        5.46095.610703e-07
+ k+          LJ_6_12        25.6741.571417e-13
+ koh         LJ_6_12        3.5408   0.1103835
+ li+         LJ_6_12        6.46282.358538e-07
+ lioh        LJ_6_12        1.8433   0.1332973
+ mg2+        LJ_6_12         1.615    38.99881
+ mg2c        LJ_6_12        1.6849    51.96237
+ mn3c        LJ_6_12        8.2724 2.15312e-08
+ mn4c        LJ_6_12        1.3058    648.3861
+ na+         LJ_6_12        25.7747.845913e-13
+ nac+        LJ_6_12        2.3953    6.293996
+ naoh        LJ_6_12        2.6234   0.1152889
+ nh4+        LJ_6_12        3.8436   0.3686743
+ o*          LJ_6_12        3.5532   0.1554164
+ oy          LJ_6_12        3.7813   0.1157845
+ oz          LJ_6_12        12.6542.304804e-08
+ py          LJ_6_12        9.05411.007452e-09
+ pz          LJ_6_12       0.25921     1441511
+ rb+         LJ_6_12         3.276    2.814312
+ si          LJ_6_12        4.5498  0.04001842
+ so4         LJ_6_12       0.44632    207296.7
+ so4y        LJ_6_12       0.47096    2041.454
+ sy          LJ_6_12        9.2456 9.44614e-10
+ sz          LJ_6_12        8.18591.146633e-09
+ ti4c        LJ_6_12        25.4394.612559e-13
+ tioc        LJ_6_12        1.2722      384.79
+#
+# These interactions were parameterized to be of the form
+#     E = Aij/(Rij^)
+#
+# This form is not supported in OFF. An approximate interaction
+# defined below using the repulsive exponential form:
+#
+#     E = D0*exp[12*(1-Rvdw/Rij)]
+#
+# Rvdw = van der Waals radius of atom as defined in Cerius2
+#
+# The fit was done by assuming the energies are the same for both
+# functional forms a Rij = Rvdw giving:
+#
+#     Do = A/(Rvdw^12)
+#
+# The original A parameter is above each atom type for reference
+#
+#
+# A(beoh) = 0.00000001
+# beoh        REP_EXPO       1.12002.566751E-09   12.0000
+#
+# A(ga) = 80.9632
+# ga          REP_EXPO       1.87004.427804E-02   12.0000
+#
+# A(hocl) = 0.0046
+# hocl        REP_EXPO       1.20005.159206E-04   12.0000
+#
+# A(lic+) = 1154.3029
+# lic+        REP_EXPO       1.82008.739028E-01   12.0000
+#
+# A(ni2c) = 8579.4845
+# ni2c        REP_EXPO       1.63002.438990E+01   12.0000
+#
+# A(pd2+) = 7748.8541
+# pd2+        REP_EXPO       1.63002.202856E+01   12.0000
+#
+# A(sr2c) = 1097544.2980
+# sr2c        REP_EXPO       2.15001.125021E+02   12.0000
+#
+# A(titd) = 1231.5903
+# titd        REP_EXPO       1.47001.209646E+01   12.0000
+#
+# A(vy) = 5798.1994
+# vy          REP_EXPO       1.35001.582297E+02   12.0000
+END
+#
+#
+ATOM_TYPING_RULES
+ Ag              Ag           0           0           0           1
+ az              Al           0           0           0           1
+ Au              Au           0           0           0           1
+ ba2+            Ba           0           0           0           1
+ br-             Br           0           0           0           1
+ ca2+            Ca           0           0           0           1
+ cl-             Cl           0           0           0           1
+ co2c            Co           0           0           0           1
+ Cr              Cr           0           0           0           1
+ cs+             Cs           0           0           0           1
+ cu2+            Cu           0           0           0           1
+ f-              F            0           0           0           1
+ fe2c            Fe           0           0           0           1
+ ge              Ge           0           0           0           1
+ i-              I            0           0           0           1
+ k+              K            0           0           0           1
+ li+             Li           0           0           0           1
+ mg2+            Mg           0           0           0           1
+ mn4c            Mn           0           0           0           1
+ Mo              Mo           0           0           0           1
+ nh4+            N            0           0           0           1
+ na+             Na           0           0           0           1
+ oz              O            0           0           0           1
+ pz              P            0           0           0           1
+ Pb              Pb           0           0           0           1
+ Pt              Pt           0           0           0           1
+ rb+             Rb           0           0           0           1
+ so4             S            0           0           0           1
+ sz              Si           0           0           0           1
+ Sn              Sn           0           0           0           1
+ W               W            0           0           0           1
+#
+# Commented out atom types which use unsupported LJ 12 repulsive potential
+#
+# beoh            Be           0           0           0           1
+# ga              Ga           0           0           0           1
+# hocl            H            0           0           0           1
+# ni2c            Ni           0           0           0           1
+# pd2+            Pd           0           0           0           1
+# sr2c            Sr           0           0           0           1
+# titd            Ti           0           0           0           1
+# vy              V            0           0           0           1
+END

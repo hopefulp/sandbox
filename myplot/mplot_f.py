@@ -162,7 +162,7 @@ def draw_twinx(fs,icx,x_val,icy,job,title,xt,yt,yl,Lsave,yscale,colors):
         mplot_twinx(x, y, Title=job_title.title, Xtitle=job_title.xtitle, Ytitle=job_title.ytitle, Lsave=Lsave,Ylabels=yl,Colors=colors)
     return 0
 def get_title(name):
-    title = fname_pre(name)
+    title = f_root(name)
     return title.upper()
 
 """
@@ -173,7 +173,8 @@ def get_title(name):
 """    
 def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,colors,Ltwinx,icy_right,ylabel_r):
     '''
-    flist: file list
+    flist   file list
+    icy     list
     '''
     if not x_ext:
         x=[]
@@ -271,7 +272,7 @@ def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
         ### if n y_val
         print(f"size of y: {len(line_label)}")
         ndata = len(y_2d[0])
-        nrow  = ndata/ncol
+        nrow  = ndata/ncol      # ?
         new_array=np.array(y_2d[0]).reshape(-1,len(line_label))
         print(f"shape of y-data {new_array.shape}")
         y = [*zip(*new_array)]
@@ -328,9 +329,9 @@ def draw_v(y_val, job, title, xtitle, ytitle, Lsave,yscale):
 def main():
     parser = argparse.ArgumentParser(description='Drawing files with values/files')
 
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('-v', '--values', nargs='*', help=' input y-values as y')
-    group.add_argument('-f', '--files', nargs='+',help='add all the files')
+    inp = parser.add_mutually_exclusive_group()
+    inp.add_argument('-v', '--values', nargs='*', help=' input y-values as y')
+    inp.add_argument('-f', '--files', nargs='+',help='add all the files')
     #parser.add_argument('-xv', '--xvalues', nargs='*', help='X values')
 
     #g_value=parser.add_argument_group('Values', description="get argument as y-values")
@@ -341,7 +342,7 @@ def main():
     xvalues.add_argument('-x', '--x_ext', help='x-coord is supplied externally')
     g_file=parser.add_argument_group('Files', description="get input files")
     #g_file.add_argument('-nc', '--ncolumn', default=1, type=int, help='number of columns in each file')
-    g_file.add_argument('-icy', '--icolumn_y', nargs="*", type=int, help='column index of Y')
+    g_file.add_argument('-icy', '--icolumn_y', default=[1], nargs="*", type=int, help='column index of Y')
     g_file.add_argument('-ys', '--y_scale', default=['1.0'], nargs="+", help='scale factor for Y -kj2kcal')
     #g_file.add_argument('-ys', '--y_scale', nargs="*", help='scale factor for Y [value|str|str-], use for str- for "-"')
     g_twin = parser.add_argument_group('Twin-X', description='to plot using two y-axes')

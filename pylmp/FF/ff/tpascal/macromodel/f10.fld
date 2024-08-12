@@ -1,0 +1,116 @@
+Process: mmff_setup
+Option: 1 -mmffs
+ MMFF Force Field $Date: 2003/02/11 04:13:50 $ $ $Revision: 1.6 $
+ T. A. Halgren, J. Comput. Chem. (1996) 17:490-519,520-552,553-586,587-615,616-641
+ C -mmffs means use MMFF94s variant of MMFF94; this enforces planarity about
+ C  delocalized sp2 nitrogens; activate "Option: 1" by using ARG4 of the
+ C  FFLD operation code in your *.com file
+ C
+ C add "DEBG 41" to your *.com file to run the BMFF inter-process 
+ C  communication layer with greater verbosity
+ C add "DEBG 42" to your *.com file to run the server process with 
+ C  greater verbosity; this includes printing of information, such 
+ C  as atom connectivity and parameters, which is passed between 
+ C  the MacroModel process (bmin) and the MMFF server process (mmff_setup)
+ C add "DEBG 43" to your *.com file for output from the MacroModel process
+ C  that has to do with BMFF; this includes printing of parameters
+ C  delivered by the server process to the MacroModel process
+ C
+ C
+ C					Copyright Columbia University 1990
+ C					All rights reserved
+ C
+ C   Energy Functions and Conversion Factors in Use              Up to four universal constants
+ C    aaa    nn    nnnnn.nnnnn  a aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa nnnnn.nnnnn nnnnn.nnnnn nnnnn.nnnnn nnnnn.nnnnn
+-1 
+ 0    STR     3      602.21358                                       2.00000     2.33333
+ 0    FIX     1        4.18400
+ 0    BND     4      602.21358                                      -0.40000
+ 0    TOR     1        2.09200
+ 0    IMP     4      602.21358
+ 0    S-B     2      602.21358
+ 0    B-B     0
+ 0    T-S     0
+ 0    VDW     7        4.18400                                       0.07        0.12
+ 0    ELE     3     1389.38757                                       0.05
+ 0    HBD     0      418.40000
+ 0    V14     2        0.75000
+ 0    FIX     1        4.18400
+ 0    BCI     1        1.00000
+ 0    FCH     1        1.00000
+ 0    SEL     1                 O Original MM3 Parameters
+ 0    SEL     1                 M Modified MM3 Parameters
+ 0    SEL     1                 A Added parameters
+ 0    SEL     2                 1 High quality parameters
+ 0    SEL     2                 2 Tentative value parameters
+ 0    SEL     2                 3 Low quality parameters
+ C
+ C  Field 1 (Origin):  O = Original MM2, M = Modified Parameter, A = Additional Parmeter
+ C  Field 2 (Quality): 1 = Final Values, 2 = Tentative Values, 3 = Low Quality Value
+ C  Field 3
+ C  Field 4
+ C  Field 5
+ C
+ C                             Interaction Template:
+ C  XX - XX - XX - XX      0.0000     0.0000     0.0000  0000 0000 0000 0000    1 2 3 4 5 Alt a Comments
+ C                        Substructure Interaction Template:
+ C  XX  XX  XX  XX         0.0000     0.0000     0.0000                                      1 2 3 4 5 Alt a Comments
+ C                        Substructure Charge Template:
+ C        1        2        3        4        5        6        7        8        9       10 1 2 3 4 5 Alt a Comments
+ C
+ C 
+ C New  Defined as                     New Atom Type Equivalencies
+ C  --  -- -- -- -- -- -- -- -- -- 
+-5
+ C 
+ C         Stretching Interactions (STR)                Opt. Descriptor            Parameter Referencing
+ C         ---------- ------------                      ---- ----------         --------- ----- -----------------------
+ C                    Bond Length   Constant  Bond Moment Atm1 Atm2             Select    Altrn 
+ C                         (ang)   (mdyn/ang)   (debye)                         1 2 3 4 5   S A Comment
+-2
+ C
+ C         Bending Interactions (BND)                   Opt. Descriptors
+ C         ------- ------------                         ---- -----------  
+ C                        Angle      Bend FC  Bend-Bend Atm1 Atm2 Atm3
+ C                        (deg)   (mdyn/rad**2)   FC
+-2
+ C
+ C         Stretch Bend Interactions (S-B)              Opt. Descriptor
+ C         ------- ---- ------------                    ---- ----------
+ C                     Str Bend Const                    Atm1 Atm2 Atm3
+-2
+ C
+ C
+ C         Torsional  Interactions (TOR)                  Opt. Descriptor
+ C         ---------  ------------                        ---- ----------
+ C                            V1         V2         V3   Atm1 Atm2 Atm3 Atm4
+ C                           (V1, V2 & V3 in kcal/mole)
+-2
+ C
+ C         Out of Plane Bending                           Opt. Descriptor
+ C         --- -- ----- -------                           ---- ----------
+ C                         Angle      Const.             Atm1 Atm2 Atm3 Atm4
+-2
+ C 
+ C         Van der Waals Interactions                           Opt. Descriptor
+ C         --- --- ----- ------------                                   ---- --
+ C       Radius      Eps       Offset     Charge                        Atm1 Lp   (For BMFF, only formal charge is used from this section.)
+ C        (ang)   (kcal/mole)   (ang)
+ C
+ C
+ C
+ C         Special Van der Waals Interactions            Opt. Descriptor
+ C         ------- --- --- ----- ------------            ---- ----------
+ C                         Radius      Eps               Atm1 Atm2
+ C                         (ang)   (kcal/mole)       
+-2
+ C
+ C      Hydrogen Bond Interactions (function and params from AMBER
+ C              modified for Lp-containing oxygens)
+ C      -----------------------------------------------------------
+ C Acceptor Donor           C/100     D/100              Atm1 Atm2 Atm3 Atm4
+-2
+ C
+ C
+ C                        Special Substructures
+ C                        ------- -------------

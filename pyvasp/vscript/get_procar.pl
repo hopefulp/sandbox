@@ -3,7 +3,7 @@
 # energy overlap between $atom1 $atom1l orbital and $atom2 $atom2l orbital
 # energy is given by center and delta E or Emin and Emax
 
-use lib '/qcfs/joonho/modules';
+use lib '/home/joonho/sandbox/perl_mod';
 use VaspDos;
 
 if($#ARGV<1){

@@ -1,0 +1,100 @@
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+
+       ****************************************************
+       |       A force field for Hydrocarbons             |
+       |                                                  |
+       |                    by                            |
+       |                                                  |
+       |              D. E. Williams                      |
+       |       J. Phys. Chem. 45, p. 3370, (1966)         |
+       ****************************************************
+
+END
+#
+PREFERENCES
+ BONDS                                 F
+ ANGLES                                F
+ COULOMB                               T
+ INVERSIONS                            F
+ TORSIONS                              F
+ UREY_BRADLEY                          F
+ HYDROGEN_BONDS                        T
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                F
+ SHRINK_CH_BONDS                       F
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      F
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          0.40000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           T
+ NON_BOND_LIST                         T
+ DISTANCE_DEPENDENT_DIELETRIC_CONSTANT F
+ EWALD_SUM_COU_AUTO_OPT                F
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            SPLINE    
+ VDW_RADII_COMBINATION_RULE            ARITHMETIC
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            SPLINE    
+ EWALD_SUM_VDW_AUTO_OPT                F
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         F
+ ASSIGN_HYBRIDIZATION                  F
+ ATOM_TYPE                             T
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ C          C      12.01100  0.0000   3   0   0
+ H          H       1.00790  0.0000   0   0   0
+END
+#
+DIAGONAL_VDW
+ C           EXPO_6         3.8508  0.9310E-01   13.8629
+ H           EXPO_6         3.4520  0.1140E-01   12.9106
+END
+#
+ATOM_TYPING_RULES
+ C               C            0           0           0           1
+ H               H            0           0           0           1
+END
+#
+#
+OFF_DIAGONAL_VDW
+ H        C           EXPO_6         3.2806  0.5590E-01   12.0397
+END
+#
+BOND_STRETCH
+END
+#
+ANGLE_BEND
+END
+#
+TORSIONS
+END
+#
+INVERSIONS
+END
+#
+UREY_BRADLEY
+END
+#
+HYDROGEN_BONDS
+ X        X           LJ_12_10     0.9500E+01    2.7500
+END
+#
+GENERATOR
+END

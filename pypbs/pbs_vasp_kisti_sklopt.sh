@@ -29,6 +29,11 @@ echo start >> $log_file
 date >> $log_file
 cd $log_dir/$wdir
 
+### treat INCAR in wdir: remove NPAR, set NCORE
+if [[ $(grep -ic NCORE INCAR) -eq 0  &&  $(grep -ic NPAR INCAR) -ne 0 ]]  ; then
+    sed -e "/NPAR/a NCORE = 20" -e "s/NPAR/\#NPAR/" -i INCAR
+fi
+
 mpirun $EXEC > $log_dir/$jobname.log
 
 mv $log_dir/$jobname.log $log_dir/$jobname.out 

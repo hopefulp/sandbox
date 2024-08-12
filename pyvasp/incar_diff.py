@@ -39,8 +39,8 @@ def get_incar_dict(f):
 def get_incar_dicts(files):
     dic_list = []
     for fname in files:
-        if fname != 'INCAR' and os.path.isdir(fname):
-            fname = fname + '/INCAR'
+        if os.path.isdir(fname) and os.path.isfile(f"{fname}/INCAR"):
+            fname = f"{fname}/INCAR"
         if os.path.isfile(fname):
             dic = get_incar_dict(fname)
             dic_list.append(dic)                            
@@ -169,15 +169,16 @@ def check_kw(ftype, kws):
 def main():
 
     parser = argparse.ArgumentParser(description="Compare two INCAR")
-    parser.add_argument('-j', '--job', default='diff', choices=['diff','kw'], help="show INCAR difference or show keywords")
-    parser.add_argument('-f', '--files', nargs='+',  help="fnames or symbol ['d','f','a']")
+    parser.add_argument( 'files', nargs='+',  help="[fnames|dnames]")
+    parser.add_argument('-j', '--job', default='diff', choices=['d','diff','kw'], help="show INCAR difference or show keywords")
     parser.add_argument('-k', '--kws', nargs='*',  help="check the key and values ")
     parser.add_argument('-d', '--Ldiffer', action='store_true',  help="show only differences")
     parser.add_argument('-s', '--Lshow', action='store_true',  help="just show")
     args = parser.parse_args()
 
-    file_choice=['d','f','a']
-    if args.job == 'kw':
+    if re.match('d', args.job):
+        compare_incars(args.files, args.kws, args.Ldiffer)
+    elif args.job == 'kw':
         if len(args.files) == 1 and args.files[0] in file_choice:
             if not args.kws:
                 print(f"for -j kw -f [d,f,a] includes -kw kws")
@@ -185,8 +186,6 @@ def main():
                 check_kw(args.files[0], args.kws) 
         else:
             print(f"for -j kw select {file_choice}")
-    elif args.job == 'diff':
-        compare_incars(args.files, args.kws, args.Ldiffer)
 
 if __name__ == "__main__":
     main()

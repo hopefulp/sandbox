@@ -1,0 +1,96 @@
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+END
+#
+PREFERENCES
+ BONDS                                 T
+ ANGLES                                T
+ COULOMB                               F
+ INVERSIONS                            T
+ TORSIONS                              T
+ UREY_BRADLEY                          F
+ HYDROGEN_BONDS                        F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                F
+ SHRINK_CH_BONDS                       F
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      F
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          0.40000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           T
+ NON_BOND_LIST                         T
+ DISTANCE_DEPENDENT_DIELETRIC_CONSTANT T
+ EWALD_SUM_COU_AUTO_OPT                F
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            SPLINE    
+ VDW_RADII_COMBINATION_RULE            ARITHMETIC
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            SPLINE    
+ EWALD_SUM_VDW_AUTO_OPT                F
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         F
+ ASSIGN_HYBRIDIZATION                  F
+ ATOM_TYPE                             T
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ C          C      12.01100  0.0000   3   0   0
+ H          H       1.00790  0.0000   0   0   0
+ O          O      15.99940  0.0000   2   0   0
+ Na         Na     22.98977  0.0000   0   0   0
+ Si         Si     28.08550  0.0000   3   0   0
+END
+#
+DIAGONAL_VDW
+ C           IGNORE       0.0000E+00
+ H           IGNORE       0.0000E+00
+ O           IGNORE       0.0000E+00
+ Na          IGNORE       0.0000E+00
+ Si          IGNORE       0.0000E+00
+END
+#
+ATOM_TYPING_RULES
+END
+#
+#
+OFF_DIAGONAL_VDW
+ O        C           LJ_6_12        3.3660  0.2555E+00
+ O        H           LJ_6_12        2.9060  0.1651E+00
+ Na       C           LJ_6_12        3.7360  0.4180E-01
+ Na       H           LJ_6_12        3.1040  0.3150E-01
+END
+#
+BOND_STRETCH
+END
+#
+ANGLE_BEND
+END
+#
+TORSIONS
+END
+#
+INVERSIONS
+END
+#
+UREY_BRADLEY
+END
+#
+HYDROGEN_BONDS
+END
+#
+GENERATOR
+END

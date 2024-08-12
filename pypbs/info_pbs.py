@@ -58,12 +58,15 @@ pbs.pbs_server     = f"QSUB JOB\
                     \n\t\t-n --np  nproc\
                     \n\t\t-no --node specify node\
                     "
-pbs.usage          ="qsub -N jobname -v var=a_variable /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh\
+pbs.usage           ="qsub -N jobname -v var=a_variable /gpfs/home/joonho/sandbox_gl/pypbs/sge_qchem.csh\
                     \n\t\t$var can be used as variable in the script\
                     \n\t\tscript name should be full name\
                     "
-pbs.qdel           ="qdel (from) job-ID (to) job-ID\
+pbs.qdel            ="qdel (from) job-ID (to) job-ID\
                     \n\tto kill process in master node: rt. process.prockill\
+                    "
+pbs.qst             ="qstat -f for long jobname\
+                    \n\tOptions: (default) -o f\
                     "
                     
 process.prockill    ="kill (from) PID (to) PID\
@@ -128,12 +131,18 @@ kisti.pbs_vasp_kisti_knl_2 = "setting: nnode=10, nproc=64 in 68\
 qchem.usage=""
 qsleep.usage=""
 
-slurm.slurm_sbatch      ="link file to slurm_sbatch_vasp.sh"
+slurm.slurm_sbatch      ="\tlink file to slurm_sbatch_vasp.sh"
 slurm.slurm_sbatch_vasp ="to run vasp in slurm\
-                        \n\tUse: command.py slurm -sj vasp\
+                        \n\t\t\t\t    NPAR is changed accorinding to Xpartition\
+                        \n\t\t\t\t    Use: command.py slurm -sj vasp\
+                        "
+slurm.slurm_sbatch_vaspopt ="in case opt stops due to opt error, it will rerun\
+                            "
+slurm.slurm_sbatch_sim  ="simple run vasp\
+                        \n\t\t\t\t    Do not change anything in INCAR\
                         "
 slurm.slurm_sbatch_py   ="to run python in node\
-                        \n\tUse: command.py slurm -sj mldyn\
+                        \n\t\t\t\t    Use: command.py slurm -sj mldyn\
                         "
 
 classobj_dict={'SGE': sge, 'GRMX': grmx, 'AMP':amp, 'USAGE': usage, 'PBS': pbs, 'QChem': qchem, 'Qsleep': qsleep}

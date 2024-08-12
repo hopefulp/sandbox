@@ -6,14 +6,13 @@ import argparse
 import os
 import re
 import sys
-from common import *
-from amp_ini import ampdb
-from mod_vasp import vasf_ini, vasf_default
+from common         import *
+#from nnff.amp_ini   import ampdb
+from mod_vas        import vasf_ini, vasf_out
 
 q_list=[]
 
-def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, Ldefault):
-
+def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, Loutf):
     print(f"{pwd} directory in {whereami()}")
     matches=[]
     f_list_all=[]
@@ -36,11 +35,11 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
         elif work == 'vasp' or work =='nc':
             fkeep = vasf_ini[:]
             f_list=os.listdir(pwd)
-            print(f"total: {f_list}")
-            if Ldefault:    # remove only files in vasf_default
+            print(f"total: {f_list}, {len(f_list)} files")
+            if Loutf:    # remove only files in vasf_default
                 matches = []
                 for f in f_list:
-                    if f in vasf_default:
+                    if f in vasf_out:
                         matches.append(f)
             else:
                 if work == 'nc':
@@ -72,8 +71,11 @@ def dir_clean(pwd,works,subwork,linux_job,prefix, suffix, matches, exclude,excl_
             print(f'{f_list_all}')
         elif work == 'slurm':
             matches=['\.X\d', 'slurm-\d+\.out']
+            pres=['\d']
             f_list = get_files_match(matches, pwd, Lshow=Lshowmatch)
+            f_list2= get_files_prefix(pres, pwd, Lshow=Lshowmatch)
             f_list_all.extend(f_list)
+            f_list_all.extend(f_list2)
         elif work == 'amp':
             if subwork == 'ini':
                 fsuffix = ['ampdb', 'amp-log.txt']
@@ -159,11 +161,11 @@ def main():
     parser.add_argument('-m', '--match', nargs='*', help='remove matching file')
     parser.add_argument('-e', '--exclude', nargs='*', help='remove all files except list') 
     parser.add_argument('-ef', '--excluded_files', nargs='*', help='save this file') 
-    parser.add_argument('-jd', '--new_dir', default='tmp', help='directory where files to move')
+    parser.add_argument('-nd', '-d', '--new_dir', default='tmp', help='directory where files to move')
     parser.add_argument('-ms', '--match_show', action='store_true')
     parser.add_argument('-a', '--all_remove', action='store_true', help='remove all the files')
     parser.add_argument('-y', '--yes', action='store_true', help='execute command')
-    parser.add_argument('-d', '--default', action='store_true', help='remove default files')
+    parser.add_argument('-o', '--outf', action='store_true', help='remove default files')
     args = parser.parse_args()
 
     if args.works==None and args.prefix==None and args.suffix==None and args.match==None:
@@ -172,7 +174,8 @@ def main():
         sys.exit(0)
     #if args.work == 'amp' and not args.excluded_files:
     #    args.excluded
-    dir_clean(args.dir1,args.works,args.subwork,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes, args.default)
+    dir_clean(args.dir1,args.works,args.subwork,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes, args.outf)
+    #dir_clean(args.dir1,args.works,args.subwork,args.job,args.prefix,args.suffix,args.match,args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes)
     return 0
 
 if __name__ == '__main__':

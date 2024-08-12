@@ -11,7 +11,6 @@ filejob = MyClass('filejob')
 linejob = MyClass('linejob')
 convert = MyClass('convert')
 command = MyClass('command')
-string  = MyClass('string')
 server  = MyClass('server')
 
 server.server_env   =   "=== Server-related ===\
@@ -41,13 +40,13 @@ comment.comment_subj=   "\tINFO: SCIENCE JOB \
 comment.info_common=   "\tInformation file for $SB/pycommon"
 
 
-dirjob.dir_clean      =   "=== DIRECTORY JOB ==\
-                        \n\t\tclean one directory\
-                        \n\t\t    by -prefix -suffix -middle match -e excluded -ef 'exclude these files' -work {qchem,ai,amp,pbs} -j rm[mv] -jd new_dir\
+dirjob.dir_clean      =   "=============================== DIRECTORY JOB =====================================\
+                        \n\t\tclean one directory following work-kinds\
+                        \n\t\t    -work {qchem,ai,amp,pbs} -j rm[mv] -jd new_dir ? by -prefix -suffix -middle match -e excluded -ef 'exclude these files' \
                         \n\t\tOptions::\
+                        \n\t\t    -w multiple jobs in [amp|pbs|slurm|vasp|nc|lammps] add more in case extension\
                         \n\t\t    -d input directory: default=pwd\
                         \n\t\t    -y execute command without asking: default-asking\
-                        \n\t\t    -w multiple jobs in [amp|pbs|slurm|vasp|nc|lammps] add more in case extension\
                         \n\t\t    -sw subwork: amp-ini,ag\
                         \n\t\t    -j [rm,mv,cp,ln] default='rm'\
                         \n\t\t    -a: remove all such as 'rm -r'\
@@ -88,16 +87,19 @@ dirjob.diramp       =   "Run multiple job in amp by scanning a value in bash\
                         \n\t\t\tamp_wrapper.py -js qsub -qn \$dirname -k \$n & \
                         \n\t\t    te: run amp_wrapper.py -js qsub -j te\
                         "
-dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp, chmod\
+dirjob.dir_fname    =   "Treat Dir without work-style\
+                        \n\t\tUsage:: dir_fname.py {ls, mv, rm, rename, cp, chmod} -options\
+                        \n\t\t    mv    : mv to dir\
+                        \n\t\t    rename: change filename\
                         \n\t\tOptions::\
                         \n\t\t    -[p|s|m] for matching type\
+                        \n\t\t    -id to include dir in scanning dir\
                         \n\t\t    -v  inverse the matching\
                         \n\t\t    -st style=[ap:append, rp:replace, mo: mode\
                         \n\t\t    -rw replacement word\
-                        \n\t\t    -id to include dir in scanning dir\
-                        \n\t\t    -d  dirname for mv\
+                        \n\t\t    -d, -nd  dirname for mv\
                         \n\t\t    -ip include_parents directory for matching is 'suffix'\
-                        \n\t\t    -e exception list\
+                        \n\t\t    -e exception list using matching\
                         \n\t\t    -eo default=m exception by matching or fullname\
                         \n\t\tUsage::\
                         \n\t\t    dir_fname.py rename -p G4 -st rp -rw G2 -id         ! rename with full replacement\
@@ -105,6 +107,7 @@ dirjob.dir_fname    =   "jobs for ls, mvdir, rm, rename, cp, chmod\
                         \n\t\t    dir_fname.py rename -m sc34c -rp sc34 -id -e sc34ch ! rename dir & file with exception\
                         \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'        ! to remove pbs files \
                         \n\t\t    dir_fname.py mv -s .cont -id -d tmpcont -ip         ! to move include rootname dir\
+                        \n\t\t    dir_fname.py mv -p HfSe2sc34 -nd HFSe2sc34 -id\
                         "
 filejob.fline_edit  =   "Job to treat file:\
                         \n\tfind a line and substitute\
@@ -161,8 +164,9 @@ convert.py_2to3_nb  =   "to convert ipynb files of python2 to python3\
 convert.perl2python  =   " perl script to convert perl to python"
 command.command     = "show Recent Command"
 command.web_load    = "To load in web, copy files to ~/public_html/"
+command.repeat_command = "to repeat cli command"
 
-string.common       =   "module for dir, string\
+dirjob.common       =   "module for directory & string\
                         \n\t    Classes\
                         \n\t\tMyClass_obj: class has its name as class attribute\
                         \n\t\tMyClass(MyClass_obj): inherits MyClass_obj\
@@ -170,10 +174,10 @@ string.common       =   "module for dir, string\
                         \n\t    Functions::\
                         \n\t\tsearch_dirs(dir_prefix, filename)\
                         \n\t\tyes_or_no(string): get y/n from stdio\
-                        \n\t      Get files from directory::\
+                        \n\t    Get files from directory::\
                         \n\t\tget_files_type(filetype, dirname)\
                         \n\t\tget_files_prefix(prefix, dirname, Lshow, Ldir)\
-                        \n\t      Filename::\
+                        \n\t    Filename::\
                         \n\t\tf_ext(fname): returns extension using [-1]\
                         \n\t\tf_root(fname): returns filename without extension\
                         \n\t\tfname_decom(fname): returns (fname, extension)\

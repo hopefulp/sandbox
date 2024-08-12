@@ -3,10 +3,10 @@
 ##SBATCH -p X3               # X2(16), X3(22), X4(4)  
 ##SBATCH -N 6               # total number of nodesmpi tasks requested
 ##SBATCH -n 64               # total number of mpi tasks requested
-##SBATCH --nodelist=n[053-068]
+###SBATCH --nodelist=n[053-068]
 
 ## HPC ENVIRONMENT
-. /etc/profile.d/SLURM.sh
+#. /etc/profile.d/SLURM.sh
 
 #mpiexec.hydra -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/NORMAL/vasp_5.4.4_GRP7_NORMAL_20170903.x
 #mpirun -np $SLURM_NTASKS  /home/starnmj/bin/vasp_5.4.4_GRP7_NORMAL_20170903.x
@@ -72,10 +72,18 @@ vasp_dir="/TGM/Apps/VASP/OLD_BIN/5.4.4/O2/NORMAL"
 vasp_ndir="/TGM/Apps/VASP/5.4.4.pl2"
 vasp_dirv6="/TGM/Apps/VASP/bin/6.3.1"
 
-if [ $hmem ]; then
-    mpirun -np $mpiproc  ${vasp_dir}/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+if [ $exe ]; then
+    EXEC="vasp.5.4.4.pl2.O2.NORMAL.${exe}.x"
 else
-    mpirun -np $SLURM_NTASKS  ${vasp_dir}/vasp.5.4.4.pl2.O2.NORMAL.std.x > $outfile
+    EXEC="vasp.5.4.4.pl2.O2.NORMAL.std.x"
+fi
+
+if [ $hmem ]; then
+    echo "mpirun -np $mpiproc  ${vasp_dir}/${EXEC}" >> $logfile
+    mpirun -np $mpiproc  ${vasp_dir}/${EXEC} > $outfile
+else
+    echo "mpirun -np $SLURM_NTASKS  ${vasp_dir}/${EXEC}" >> $logfile
+    mpirun -np $SLURM_NTASKS  ${vasp_dir}/${EXEC} > $outfile
 fi
 date >> $logfile
 

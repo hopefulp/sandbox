@@ -1,0 +1,87 @@
+#************************************************
+#   Input Script for VASP Calculation
+#
+#   Made by Noh Min Jong
+#   2018 / 11 / 06
+#
+#************************************************
+
+SYSTEM = Optimization_Atomic_Cluster_Catalyst
+
+##################
+# XC-Functional 
+##################
+ 
+ GGA = PE            ! -- Exchange-Correlation Functional --
+                     ! PE= PBE, 
+                     ! RP= Alternative Revision PBE (Chemical Adsorption, Norskov)
+
+#####################
+# Basic Parameters
+#####################
+
+ #NBANDS = 254        ! Highest band, maintain this value all series calculations
+ PREC   = Accurate   ! -- Precision -- (Provide Default Options : 1.ENCUT, 2.FFT grids, 3.Real space projector)
+                     ! Normal, Medium (Recommend)
+                     ! Accurate (Energy, Phonon, Second derivative) / Cost = 2 x Nomal (or Medium)
+                     ! High (Accurate stress tensor, not recommend)
+ ALGO   = Fast       ! -- Electronic Minimization Algorithm) / Select the type of GW
+                     ! Normal         = Blocked Davidson 
+                     ! VeryFast       = Residual Minimization, Direct Inversion in the Iterative Subspace (RMM-DIIS)
+                     ! Fast           = Block Davidson + RMM-DIIS (DAV 5 Steps + RMM / DAV 1 Step + RMM (opt)) 
+                     ! All(Conjucate) = All Band Simultaneous Update of Orbitals
+                     ! Eigenval       = Recalculate one electron energies (and Postprocessing from WAVECAR)
+                     ! None(Nothing)  = Using Current Orbital, Electron Energies (and Postprocessing from WAVECAR)
+ NPAR   = 4          ! -- Number of Cores that are treated in Parallel
+                     ! n001-n030 : 1 per nodes (but use NPAR=2, only one node)
+                     ! n031-n046 : 2 per nodes
+                     ! n047-n068 : 4 per nodes
+ NSIM   = 1          ! -- The Number of Bands that are optimized simultaneously by RMM-DIIS
+                     ! Speed up the calculations (no difference in the Total Energy & Convergence)
+ LPLANE = .TRUE.     ! data distribution over Nodes(effective at FAST, like MD)
+
+#####################################
+# Self-Consistent Field Parameters
+#####################################
+
+ ISTART  = 0         ! Start: (0: new), (1: w/ WAVECAR), (2: w/ samecutoff).
+ ICHARG  = 2         ! Charge from: (0)= WAVECAR, (1)= file, (2)= atomic, (10)= samecutoff
+                     ! (11)= keep CHGCAR const, Continuing job will read CONTCAR.
+# ISPIN   = 2         ! 1 = Spin-Restricted, 2 = Spin-Unrestricted.
+ ENCUT   = 450       ! energy cutoff. (** CellOpt: ENCUT= ENMAX*1.3 **)
+ NELMIN  = 4         ! min SC setps (4:Ionic relaxation, MD= 5~8, DOS>5)
+ NELM    = 500       ! max SC steps
+ EDIFF   = 1E-5      ! tolerance of ground state(1E-4). 
+                     ! For frequency calculation,(<= 1E-6)
+ ISYM    =  -1       ! -- The way VASP treats symmetry --
+                     ! -1 = completely off 
+                     !  0 = off, reduces sampling Brilouin zone (for Molecular Dynamics)
+                     !  1 = on, with USPPs 
+                     !  2 = on, more efficient, memory saving
+                     !  3 = Indirect-symmetrize charge densinty
+ ADDGRID = .TRUE.    ! add grid for charge augmentation. (** Issue on IVDW = 2/20)
+ LREAL   = Auto      ! (Auto) (.TRUE.) for real space projection.
+                     ! (.FALSE.) Phonon calculation, Smaller unit cell.
+ LASPH   = .TRUE.    ! non-spherical contribution. (In particular LDA+U, for f-, 3d- TM-oxdies).
+ LMAXMIX = 4         ! Highest l-component for charge density mixing (4 : d-elements, 6 : f-elements)
+                     ! Accurate values you need at L(S)DA+U 
+ #NELECT = 262           ! Number of valence electrons. Charged= NELECT +/-(e) 
+#MAGMOM = 18*0 27*2 1*1
+
+#########################
+# Smearing Parameters
+#########################
+
+ ISMEAR  = 0         ! (>0, 1: Metals, Phonon), Semi/Insulator(0=Gauss, -1=Fermi, -5=Tetra+Blochl)
+ SIGMA   = 0.05      ! if metal atoms, SIGMA= 0.1 / 0.2(default) (ex. Transition metals)
+                     ! if semi/insulator (SIGMA= 0.05)
+ #AMIX=0.1           ! Specifies the linear mixing parameter
+                     ! default = 0.8 (ISPIN=1) / 0.4 (ISPIN=2, or PAW)
+ #BMIX=0.5           ! cutoff wave vector for Kerker mixing (default = 1.0)
+ #AMIN = 0.01        ! default = 0.1 / minimal mixing...
+ #IWAVPRE = 11       ! if othonormal basis is lost.
+
+########################
+# Running Parameters
+########################
+

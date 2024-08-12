@@ -10,6 +10,7 @@ def get_ntatom(st):
     ntotal = sum(natom_list)
     return ntotal, natom_list
 
+### read_poscar was changed into parse_poscar
 def parse_poscar(pos, opt):
     '''
     extract lattice vectors, pre-part, atom_list, coordinates
@@ -166,13 +167,21 @@ def get_poscar0(poscar):
     return 0
 
 def pos2dirname(poscar):
-   ### obtain dirname from POSCAR.dir
-   if re.match("POSCAR", poscar):
-       dirname = poscar[7:]
-   else:
-       dirname = poscar
-   return dirname
+    ### obtain dirname from POSCAR.dir
+    if re.match("POSCAR", poscar):
+        if len(poscar) == 6:
+            dirname='pos'
+        else:
+            dirname = poscar[7:]
+    else:
+        dirname = poscar
+    return dirname
 
+def get_dnames4pos(poscars):
+    dnames=[]
+    for poscar in poscars:
+        dnames.append(pos2dirname(poscar))
+    return dnames
 
 
 def fixedMD_POSCAR(poscar, atom, atoms=None):

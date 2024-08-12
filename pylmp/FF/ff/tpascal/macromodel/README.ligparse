@@ -1,0 +1,366 @@
+                               ========
+                               Ligparse
+                               ========
+
+
+Introduction
+============
+
+Ligparse is a tool for examining the structural composition of a molecular 
+dataset represented within a maestro or mdl formatted file.  Additionally, 
+ligparse can use this structural information to select subsets of compounds 
+from the original dataset that meet some user defined criteria.  
+
+
+Descriptors and Composite Descriptors
+=====================================
+
+In ligparse, counts of the number of times structural components of interest 
+occur in each molecule to be considered are made by counting the number of
+times SMARTS patterns of structural moieties are identified.  This enables
+the user to determine the number of times any functional group(s) occurs for 
+which a SMARTS string may be written.  A single SMARTS pattern which refers
+to a given structural motif is referred to as a "descriptor".  Linear
+combinations of SMARTS patterns may be generated to represent more
+sophisticated structural ideals such as hydrogen bond donor or metal ligating
+groups.  These sums of "descriptors" are referred to as "composite descriptors".
+
+The combination of a SMARTS pattern with its label is required to form a 
+"descriptor".  Descriptors are stored in the "str_keys.type" file which resides 
+in the $SCHRODINGER/macromodel-v*/data directory.  User modified str_keys.type 
+files may be used in place of the default via the -s command line option.  
+Ligparse checks each molecule in turn against all descriptors.  The algorithm is 
+greedy with each atom or bond matching all applicable SMARTS patterns rather than 
+only the most sophisticated or simple, for instance a carboxylic acid group in a 
+molecule would find one instance of [#6;X3]~([O;X1])~[O;X1], two instances of 
+[#6;X3]~[O;X1], and two instances of [#8].
+
+The str_keys.type file is free format with column descriptions as given below.  
+
+15   H   H  0.00  [n;X2;!H]  nosel  high  -   #  Num heteroaromatic n w.outH
+(1) (2) (3) (4)-  (5)------  (6)--  (7)- (8)  (9)---------------------------
+
+Only information in columns (5), (6), and (9) is important, however, data in
+the format given above must exist for all additional columns.  Of information
+relevant to ligparse, column (5) gives the SMARTS pattern associated with the
+title "Num heteroaromatic n w.outH".  For more information on SMARTS patterns
+the user is referred to www.daylight.com.  Any string may be used as a 
+descriptor label.  The string "nosel" in column 6 is necessary for atomtyping 
+to recognize that this SMARTS pattern is to be used for ligparse.
+
+A total of 16 composite descriptors are defined by default within the 
+"composite.types" file in $SCHRODINGER/macromodel-v*/data.  They are as follows:
+
+Num neutral amines            Num amide hydrogens           
+Num divalent oxygen atoms     Num neutral donor groups      
+Num charged donor groups      Num neutral acceptor groups   
+Num charged acceptor groups   Num reactive groups           
+Num acidic hydrogens          Num donor groups
+Num acceptor groups
+
+Further descriptors may be added to or removed from the composite descriptors 
+at the users discretion.  A user modified "composite.types" file may be used 
+in place of the default via the -c command line option.  The composite 
+descriptors file is free format with a single composite descriptor 
+represented as follows:
+
+Num neutral donor groups
+    +  Num H-N
+    +  Num H-O
+    -  Charged amines
+    -  Charged imines
+    -  Charged pyridine
+    -  Charged N-C=N on -N
+    -  Charged imidazole
+    -  Charged HN-imidazole
+
+Here the "Num neutral donor groups" is a linear combination of the eight 
+descriptors represented by their labels.  The +/- is required and indicates 
+whether the descriptor is to be added or subtracted from the composite 
+descriptor.
+
+In addition to descriptors and composite descriptors, eight hardwired
+descriptors are available which include:
+
+Num rings                     Num heteroaromatic rings
+Num aromatic rings            Num aliphatic rings
+Num rotatable bonds           Num atoms
+Molecular weight              Num chiral centers
+
+
+Molecular Database Structural Analysis 
+======================================
+
+The average structural composition of a given database may be examined using 
+job type 3 via the -j 3 command line option.  Ligparse runs through the user 
+input file molecule by molecule, determining the number of times each SMARTS 
+pattern is recognized per molecule and maintaining a sum of the number of times 
+each SMARTS pattern has been found within all molecules.  Upon reading the last
+molecule in a dataset the mean of the number of times each SMARTS pattern has 
+been found is printed to the output file.  
+
+More detailed structural information is available via the -csv and -pcsv commands.
+When -pcsv is present, a comma separated file giving the counts of all descriptors
+for each molecule is generated.  By default this file is named <input>.csv.
+If -csv <file name> is also given as an argument the comma separated file will 
+be named <file name>.  This file may then be read into a spreadsheet
+program such as OpenOffice, Gnumeric, or Excel for further analysis.
+
+Molecular Database Subset Selection; "Culling"
+==============================================
+
+Ligparse can use five different methods for selecting a subset of molecules, 
+i.e. "culling".  
+
+(1)  Culling to reproduce user criteria for any descriptor(s)
+	(-j 1 command line option)
+
+(2)  Culling to reproduce the mean value of composite descriptors within the 
+	original dataset (-j 2 command line option)
+
+(3)  Filtering to retain only compounds which match user criteria
+	(-j 4 command line option)
+
+(4)  Filtering to remove only compounds which match user criteria
+	(-j 5 command line option)
+
+(5)  Filtering randomly
+	(-j 6 command line option)
+
+The first two techniques involve optimization of an error function through 
+random molecule substitution.  The third and fourth methods allow the use
+of ligparse as a structural filter, removing or retaining molecules that match 
+the user defined criteria.  For job types 4 and 5, if more compounds match the 
+user criteria than is desired to have in the culled subset, molecules are 
+randomly selected from the subset that matched the user criteria.
+
+For a listing of each descriptor and composite descriptor available with the 
+current str_keys.type and composite.types files use the -d command line option.
+
+For job types 1, 4, and 5 the user criteria is input into ligparse via the -i 
+command line option. The file containing the user criteria is referred to as the 
+"cull.info" file.  Any hardwired descriptor or descriptor or composite descriptor 
+from the str_keys.type and composite.types files, respectively, may be used in a 
+"cull.info" file.  The file is free format with each line listing the label and 
+target value for a single descriptor or composite descriptor.  Any line beginning 
+with "##" is treated as a comment and ignored.  Tabs are not recognized and should 
+not be used.  For job type 1 all descriptor and composite descriptor target values
+must be either integer or real values of >=0.0 (cannot have negative values 
+of structural counts!).  
+
+Filtering with job type 4 will cause only molecules that match all
+criteria listed in the cull.info file to be RETAINED.  Filtering with job
+type 5 will cause only molecules that match all criteria listed in the cull.info
+file to be REMOVED.  These behaviors may be modified with the -any option which
+changes the selection behavior from removing or retaining only compounds that 
+match all criteria to only removing or retaining compounds that match any of the
+criteria.
+
+To further enhance the filtering of molecules with job types 4 and 5, 
+three modifiers may be used which enable the user to retain compounds with 
+descriptor values greater than a given value (>X), less than a given value (<X),
+or within some range (X-Y).  Ranges span from X < keep molecule < Y, thus, in the 
+example cull.info file below, 300-400 will only retain molecules with molecular 
+weights greater than 300 and less than 400.  These modifiers are only valid when 
+running -j 4 or -j 5 jobs.
+
+A couple of example cull.info files are presented below.
+
+## Distribution A for job type 1
+Num rings                     2.6000
+Num charged donor groups      0.0000
+Num charged acceptor groups   0 
+Num reactive groups           0.
+Molecular weight              352.247
+Num atoms                     41.800
+
+## Filtering for job types 4 or 5
+Num rings             1.0-3.0
+Neutral Carbonyls     <1.0
+Molecular weight      300.0-400.0
+
+One final note, the input format dictates the file format of the culled 
+structure file.  For example, if a user inputs a maestro file they will obtain 
+a subset of molecules in maestro format.
+
+Command Line Options
+=====================
+
+Ligparse is command line driven with the following options:
+
+-j <int> 	Job type to be run (1, 2, 3, 4, or 5)
+
+-mae <string> 	Input filename for the maestro formatted input file
+
+-sdf <string>	Input filename for the mdl formatted input file
+
+-l <string> 	Label for output with the culled structures
+
+-k <double>  	Percentage of compound in original dataset to keep after 
+		culling (0 to 100).
+
+-n <int>	Number of compounds in original dataset to keep after culling
+		(0 to number of compounds in dataset)
+
+-i <string>	Input filename for the cull.info file to be used
+
+-s <string>	Input filename for a user defined str_keys.type file to be used
+
+-c <string>	Input filename for a user defined composite descriptor file to 
+		be used
+
+-o <string>	File to which data from running ligparse is sent
+
+-csv <string>   Output filename for comma separated file
+
+-pcsv           Output comma separated file
+
+-sort 		Sort the output into descriptors that were present in the dataset
+		and those that were not
+
+-bofix          Correct bond orders and formal charges in structures prior to 
+                SMARTS pattern matching.  
+
+-h 		Prints a help message
+
+-d 		Print out a list of all descriptors and composite descriptors
+                to be used in the current job
+
+-v 		Print out the version of ligparse
+
+-noprop         Do not include calculated properties in the output structure file
+                for job types 4 and 5.  Do not write an output structure file for
+                job type 3.
+
+-seed <int>     Random number seed to be used
+
+
+Running Ligparse
+================
+
+* To run ligparse to analyze structural components in a dataset:
+
+ligparse -j 3 [-mae|-sdf] <input file> 
+	[ -s <str_keys> -c <composite types> -o <output file> -sort 
+	-csv <csv output file> -pcsv -bofix]
+
+
+*  To run ligparse to select a subset of structures that approximately
+reproduce user criteria:
+
+ligparse -j 1 [-mae|-sdf] <input file> -i <criteria file> [-k|-n] <what to keep> 
+	[-s <str_keys> -c <composite types> -o <output file> -l <label> 
+        -csv <csv output file> -pcsv -bofix]
+
+
+*  To run ligparse to select a subset of structure to retain original property 
+distributions in the dataset.
+
+ligparse -j 2 [-mae|-sdf] <input file> [-k|-n] <what to keep>
+        [-s <str_keys> -c <composite types> -o <output file> 
+	-csv <csv output file> -pcsv -l <label> -bofix
+	-seed <random seed>]
+
+
+*  To run ligparse to select a subset of structures which match user 
+criteria
+
+ligparse -j 4 [-mae|-sdf] <input file> -i <criteria file> [-k|-n] <what to keep> 
+	[-s <str_keys> -c <composite types> -o <output file> 
+	-csv <csv output file> -pcsv -l <label> -any -all -bofix]
+
+*  To run ligparse to remove structures which match user criteria
+
+ligparse -j 5 [-mae|-sdf] <input file> -i <criteria file> [-k|-n] <what to keep> 
+	[-s <str_keys> -c <composite types> -o <output file> 
+	-csv <csv output file> -pcsv -l <label> -any -all -bofix]
+
+* To run ligparse to select a subset of molecules randomly
+
+ligparse -j 6 [-mae|-sdf] <input file> [-k|-n] <what to keep>
+        [-o <output file> -csv <csv output file> -pcsv -l <label> 
+	-any -all -bofix -seed <random seed>]
+
+
+Note:   [X|Y] indicates either X or Y must be present
+	[X Y Z]	indicates X, Y, and Z are all optional 
+
+
+Input and Output Files
+======================
+
+Ligparse generates one output file for job type 3.  If given an input filename of
+<input>.mae or <input>.sdf or <input>.sd, by default output is printed to 
+<input>.out.  This behavior may be modified via the -o command line option.  
+
+Ligparse generates three output files for job types 1, 2, 4, and 5.  If given an
+input filename of <input>.mae or <input>.sdf or <input>.sd, by default the 
+averages of descriptors in the input file are output to <input>.out
+This is identical to job type 3 as is the users ability to modify this output 
+filename via the -o option.  Additional output files are named as 
+<input>-<label>.out and <input>-<label>.[mae|sdf].  Here <label> is by default 
+"cull" for job types 4 and 5 and may be modified via the -l option.  For job
+type 3 the calculated structural properties are added to <input>-out.[mae|sdf].
+
+Usage Examples:
+===============
+
+ligparse -sdf database.sdf -j 1 -k 10 -i cull.info -l set1 
+
+       Keeps 10 percent of database.sdf structures selected to 
+       maintain average values of descriptors defined in cull.info
+       Output includes 3 files
+               database.out       -> File listing structural information
+                                     for all molecules in database.sdf
+               database-set1.out  -> File listing average number of
+                                     various structural keys for
+                                         the culled structures
+               database-set1.sdf  -> MDL file of 10 percent of 
+                                     retained structures
+
+ligparse -mae database.mae -j 1 -k 20 -i ../cull.info -o db1.stat -csv db1.csv -pcsv
+
+       Keeps 20 percent of database.mae structures selected to
+       maintain average values of the descriptors listed in 
+       the file, ../cull.info 
+       Output includes 3 files
+               database-cull.out  -> File listing average number of
+                                     various structural keys for
+                                     the culled structures in database-cull.mae
+               database-cull.mae  -> Maestro file of 20 percent of
+                                     retained structures 
+               db1.stat           -> File listing average number of 
+                                     various structural keys for compounds
+                                     in database.mae
+               db1.csv            -> Comma separated file listing the number of
+                                     times each descriptor was identified per
+                                     molecule
+
+ligparse -mae database.mae -j 2 -n 500 -l small 
+
+       Keeps 500 database.mae structures selected to maintain
+       average values of descriptors found in the original dataset
+       Output includes 3 files
+               database.out        -> File listing average number of 
+                                     various structural keys for
+                                     compounds in database.mae
+               database-small.out  -> File listing average number of 
+                                     various structural keys for
+                                     the culled structures
+               database-small.mae  -> Maestro file of 500 retained
+                                     output structures
+
+ligparse -mae database.mae -j 3 -c my_composite.types -s my_str_keys.types
+
+       Determines the average values of a number of descriptors
+       for structure in the Maestro format file, database.mae.  The descriptors
+       are read from the my_str_keys.types file with composite descriptor
+       being read from the my_composite.types file.
+       Output includes two files
+               database.out        -> File listing average number of 
+                                     various structural keys for compounds
+                                     in database.sdf
+               database-out.mae    -> Maestro file with all structures processed
+                                      incorporating counts of structural features
+                                      in the my_str_keys.types and 
+                                      my_composite.types files

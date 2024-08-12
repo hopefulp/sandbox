@@ -290,13 +290,14 @@ def get_dirs_prefix(wdir, prefix, excludes=None, Lshow=True, Ldir=True):
                 print (fname)
     return matched_dirs
 
-def get_files_prefix(prefixes, dirname, Lshow, Ldir):
+def get_files_prefix(prefixes, dirname, Lshow=None, Ldir=None):
     """
         receive list of prefix & directory
         prefixes: list of prefix
     """
     matched_files=[]
     for pref in prefixes:
+        print(f"prefix: {pref} in {whereami()} of module {__name__}")
         for fname in os.listdir(dirname):
             # re.match finds only prefix
             if re.match(pref, fname):

@@ -1,0 +1,141 @@
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+**********************************************************************
+           A force field specifically parametrized for
+      Argon, Oxygen and  Nitrogen adsorption in Zeolite 5A.
+      It contains parameters for Argon, Oxygen, Nitrogen sorbates
+      Ca and Na cations and zeolite framework atoms (Si,Al,O).
+                                                   
+                              by                           
+
+                    K. Watanabe, N. Austin
+                    Molecular Simulations Inc
+
+
+                  PROPRIETARY AND CONFIDENTIAL
+  Copyright (c) 1993, Molecular Simulations Inc. All rights reserved.
+**********************************************************************
+END
+#
+PREFERENCES
+ BONDS                                 F
+ ANGLES                                F
+ COULOMB                               T
+ INVERSIONS                            F
+ TORSIONS                              F
+ UREY_BRADLEY                          F
+ HYDROGEN_BONDS                        F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                T
+ SHRINK_CH_BONDS                       F
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      F
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          0.40000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           T
+ NON_BOND_LIST                         T
+ DISTANCE_DEPENDENT_DIELETRIC_CONSTANT T
+ EWALD_SUM_COU_AUTO_OPT                F
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            SPLINE    
+ VDW_RADII_COMBINATION_RULE            ARITHMETIC
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            SPLINE    
+ EWALD_SUM_VDW_AUTO_OPT                F
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         F
+ ASSIGN_HYBRIDIZATION                  F
+ ATOM_TYPE                             T
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ O_         O      15.99940  0.0000   2   0   0
+ N_         N      14.00670  0.0000   3   0   0
+ Ar         Ar     39.94800  0.0000   3   0   0
+ Si         Si     28.08550  0.0000   3   0   0
+ Al         Al     26.98154  0.0000   3   0   0
+ O_z        O      15.99940  0.0000   2   0   0
+ Ca         Ca     40.08000  0.0000   6   0   0
+ Na         Na     22.98977  0.0000   0   0   0
+ q_         Qe      0.00000  0.0000   0   0   0
+ Am         Am    243.00000  0.0000   6   0   0
+END
+#
+DIAGONAL_VDW
+ O_          IGNORE       0.0000E+00
+ N_          IGNORE       0.0000E+00
+ Ar          IGNORE       0.0000E+00
+ Si          IGNORE       0.0000E+00
+ Al          IGNORE       0.0000E+00
+ O_z         IGNORE       0.0000E+00
+ Ca          IGNORE       0.0000E+00
+ Na          IGNORE       0.0000E+00
+ q_          IGNORE       0.0000E+00
+ Am          IGNORE       0.0000E+00
+END
+#
+ATOM_TYPING_RULES
+ O_z             O            0           0           1           1
+                 Si           0           0           0           1
+END
+#
+#
+OFF_DIAGONAL_VDW
+ O_       O_          LJ_6_12        3.4235  0.9000E-01
+ N_       O_          LJ_6_12        3.5717  0.9000E-01
+ N_       N_          LJ_6_12        3.7198  0.9000E-01
+ Ar       O_          LJ_6_12        3.6228  0.1388E+00
+ Ar       N_          LJ_6_12        3.7709  0.1388E+00
+ Ar       Ar          LJ_6_12        3.8220  0.2140E+00
+ Si       O_          LJ_6_12        2.1135  0.4077E+00
+ Si       N_          LJ_6_12        2.2390  0.2762E+00
+ Si       Ar          LJ_6_12        2.2900  0.5595E+00
+ Al       O_          LJ_6_12        2.3035  0.4074E+00
+ Al       N_          LJ_6_12        2.4290  0.2838E+00
+ Al       Ar          LJ_6_12        2.4800  0.5809E+00
+ O_z      O_          LJ_6_12        3.2535  0.1126E+00
+ O_z      N_          LJ_6_12        3.3790  0.8590E-01
+ O_z      Ar          LJ_6_12        3.4300  0.1822E+00
+ Ca       O_          LJ_6_12        2.7235  0.1048E+01
+ Ca       N_          LJ_6_12        2.8490  0.7663E+00
+ Ca       Ar          LJ_6_12        2.9000  0.1597E+01
+ Na       O_          LJ_6_12        2.7135  0.4097E+00
+ Na       N_          LJ_6_12        2.8390  0.2991E+00
+ Na       Ar          LJ_6_12        2.8900  0.6232E+00
+END
+#
+BOND_STRETCH
+END
+#
+ANGLE_BEND
+END
+#
+TORSIONS
+END
+#
+INVERSIONS
+END
+#
+UREY_BRADLEY
+END
+#
+HYDROGEN_BONDS
+ X        X           LJ_12_10     0.9500E+01    2.7500
+END
+#
+GENERATOR
+END

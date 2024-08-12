@@ -1,0 +1,533 @@
+/****************************************************************************
+ * $RCSfile: xcluster.doc,v $
+ * $Revision: 1.8 $
+ * $Date: 1996/12/06 21:57:57 $
+ ***************************************************************************/
+
+/****** Started by DQM - Feb 01 1993. ***********/
+
+[Topics]
+Using Help:
+
+To see a list of topics available for the XCluster help system click on the
+"List All" button.
+
+To search the entire file enter the text to be searched for in the text area
+labeled "Search Help File For:" and click on the "Search & Show" button. If
+you target string is not unique you will be presented with a list of options
+to select from.  There are two options which can effect the way this search 
+behaves:  
+	If the "Search Title Only" toggle button is enabled then the fragment
+	will only be searched for in the "Title" area of the file - that is the
+	topic headings.
+	If the "Case Sensitive" toggle button is enabled the case of your 
+	target string will be matched exactly during the search.
+This method of searching will only find the first occurrence of each fragment
+in the topic.
+
+To search the current text on display in the help file enter you target 
+fragment into the text area labeled "Search On-screen Text".  Clicking the
+"Find Next" and "Find Previous" buttons will cycle through all the occurrences
+of the target string.
+
+[XCluster]
+XCluster is the "X" interface to the "Cluster" program for the analysis of
+MacroModel files.  XCluster is started from the command line by typing the
+command "xcluster <filename.cmd>", where "filename.cmd" is the name of
+a command file. If no command file is specified then the "Open..." item of
+the File Menu can be used to open an existing file, or the "New..." option
+can be used to create a new command file.
+
+[Features]
+The following is a summary of the features of XCluster Version 1.1:
+
+Generate distance matrices by pair-wise comparison of all structures
+	in a MacroModel file.  The metric for "distance" is user specifiable
+	and can be RMS atomic position between structure with or without rigid
+	body superimposition or RMS difference between a set of torsion angles.
+
+Perform a "cluster" analysis on the resultant distance matrix.  This
+	can also be done on an externally generated distance matrix.
+
+Visualize a number of statistics which arise from the clustering 
+	process.  Analysis of these often allows a "good" clustering to be
+	identified.
+
+Visualize the distance matrix in a "color depth" display. Here the
+	distance matrix is represented as a square plot made up if NxN smaller
+	squares (where N is the number of structures in the input file). The 
+	color of each square is related to the value of the corresponding 
+	distance matrix element. There are ten equally spaced color levels
+	with the purple representing the lowest valued elements and red 
+	representing the largest distances in the matrix.
+	This can be viewed for the distance matrix in the original input order 
+	or the "generic order" produced by the cluster analysis.
+
+Visualize the clustering process in the "Clustering Mosaic". This is
+	a display which records how the clustering analysis was performed.
+	There are N vertical columns which represent the N input conformations.	
+	These are displayed in the "generic" order from left to right. There
+	are also N horizontal columns which represent the N clustering levels.
+	In the first row, each column is in it's own cluster, and is enclosed
+	by a vertical line.  In the next row, two of the conformations come
+	together to form a "cluster" and there are not N-1 clusters.  This
+	process continues as one goes down the plot until the N'th row is
+	reached where there is only one cluster.
+
+Print the membership of any cluster.  The "Cluster Membership" panel allows
+	the user to input any level of clustering (from 1-N) and then by
+	clicking on the "Membership" button the composition of the clusters
+	will be printed to the message window and the .clg file.
+
+Create a file of the distance matrix in the input or the "generic" order.
+
+Create a file of the MacroModel structures arranged in their clusters at any
+specified level. The "Cluster File" item in the Write option of the File menu
+allows the user to create a file containing the MacroModel structures from the
+input file written to a MacroModel file format.  Similar files containing
+"representative" and "average" structures may also be written.
+
+[File Menu]
+The File Menu contains the following items:
+
+	New...
+		Create a new command file.
+
+	Open...
+		Open an existing command file for editing.
+
+	Write...
+		Write a "Cluster File".
+	   or
+		Write a "Representative Structure File"
+	   or
+		Write an "Average Structure File"
+	   or
+		Write a distance matrix file in the original input order.
+	   or
+		Write a distance matrix file in the "generic order".
+
+	Quit
+		Exit the "XCluster" program.
+
+[New...]
+The "New" item in the "File" menu is used to create a new command file.
+When this option is selected, a panel will appear which is used to generate
+the command files.
+[Open...]
+The "Open" item in the "File" menu will present the user with a file selection box
+which has the filter string set to "*.cmd", the default sufix for the
+command file.  Once a a file is selected then it will be read by the
+program and the current settings displayed in a graphical command file
+editor.  The editor panel can be used to change the settings or the job
+can be run without modification to the command file.
+
+[Write...]
+The "Write" item in the "File" brings up a dialog box which contains 
+pop-up menu with the choice of several files types which can be written:
+
+	Choosing "Cluster File" which controls the writing
+	of a MacroModel format cluster file.  To write a cluster file enter the
+	clustering level at which the file is to be written and use
+	the radio buttons to choose whether to write out all or just a 
+	single cluster at the given level.  A default filename
+	will be constructed (jobname-n_m.cls; where n is the clustering level
+	and m is the cluster number; if writing all clusters the filename will
+	be just jobname-n.cls). 
+	This filename can be overridden by editing the filename text area.
+	Clicking the "write" button will begin the writing of the cluster
+	file. This option is not available if the clustering was done on 
+	an external distance matrix file.
+
+	Choosing "Representative Structure File" allows
+	the writing of a MacroModel representative structure file.
+	The representative structure file contains a single representative
+	structure for each cluster at a given clustering level.
+	To write a representative structure file enter the clustering level
+	at which the file is to be written and use the radio buttons to
+	choose whether to write out "all" or just a "single" cluster at the
+	given cluster level.  A default file name will be constructed
+	(jobname-n_m.rep; where n is the clustering level and m is the number of
+	the cluster which is to be written).  This filename can
+	be overridden by editing the filename text area.  Clicking on the "write"
+	button will begin the writing of the representative structure file.
+	This option is not available if the clustering was done on an
+	external distance matrix file.
+
+	Choosing "Average Structure File" allows
+	the writing of a MacroModel average structure file.
+	The representative structure file contains a average representative
+	structure for each cluster at a given clustering level.
+	To write a representative structure file enter the clustering level
+	at which the file is to be written and use the radio buttons to
+	choose whether to write out "all" or just a "single" cluster at the
+	given cluster level.  A default file name will be constructed
+	(jobname-n_m.avg; where n is the clustering level and m is the number of
+	the cluster which is to be written).  This filename can
+	be overridden by editing the filename text area.  Clicking on the "write"
+	button will begin the writing of the representative structure file.
+	This option is not available if the clustering was done on an
+	external distance matrix file.
+
+
+	Choosing "Distance File" allows the user to write out a file 
+	containing all the distance matrix data.
+
+	Choosing "Generic Distance File" allows the user to write out a file 
+	containing all the distance matrix data in the generic order as 
+	produced from the the clustering analysis.
+
+[Quit]
+Choosing the "Quit" command from the file menu will cause the XCluster program
+to exit.  Any procedures which are running will be terminated.
+
+
+[Visualization Menu]
+The "Visualization"  menu contains several options for graphical analysis
+of the results of distance matrix generation and clustering analysis:
+
+	Clustering Statistics - this shows several line-graphs of statistics
+	generated during the clustering analysis.
+
+	Distance Map - a graphical representation of the distance matrix.  This
+	can be viewed in the original input order or the re-ordered "generic" 
+	order which is produced during the cluster analysis.
+
+	Clustering Mosaic - a graphical representation showing how the clusters
+	were formed during the clustering analysis.
+
+	Cluster Membership - a textual representation of the cluster composition
+	at any level of clustering.
+
+[Clustering Statistics]
+The clustering statistics panel is used to view statistics concerning each 
+clustering in a "line graph" format. The plot is controlled by two sets of radio 
+buttons on the left hand side of the panel. The top set controls the variable 
+plotted on the X axis. This can be either clustering level (from 1 to the number 
+of conformers) or clustering value, the critical distance value at which each 
+new clustering is formed.
+
+Another set of radio buttons control which variable is plotted on the Y 
+(vertical) axis. The possible values are : 
+
+            Minimum Separation Level.
+            Maximum Separation Level.
+            Effective Number of Clusters.
+            Cluster Sizes ( The effective and actual number of clusters, and the 
+            minimum, maximum and average cluster sizes at each new clustering).
+
+The range of each axis is initially set to encompass the full range of the data. It 
+may be desirable to "zoom in" on one particular region. This is controlled by 
+the text fields in the left hand side of the panel. After new values are entered 
+for the minimum and maximum values of each axis, the "Set Values" button can 
+be depressed and the plot re drawn. The original scaling can be reinstated by 
+pressing the "Restore Values" button. Axis ranges are also reset to the default 
+values when the axes modes are changed. No checking is done on the values 
+which are set in range fields. Entering a "minimum" value which is larger 
+than the "maximum" will effectively reverse direction of the axis.
+
+Any of the points displayed in a plot can be "picked" by moving the mouse 
+pointer into that point and clicking on the left-most mouse button. When a 
+point has been successfully selected with the mouse a beep will sound. It may 
+be necessary to adjust the range of the axes values in order to be able to select 
+the points clearly. The effect of picking a point is two-fold. First, the 
+clustering level corresponding to that point is entered in the "Clustering 
+Level" field of the "Cluster Membership" dialog. The second effect is described 
+below in the "Distance Map" description.
+
+The "PostScript" button is used to create an encapsulated PostScript 
+representation of the clustering statistics window suitable for printing on a 
+Laser printer. The dialog box which appears when the PostScript button is 
+clicked on has a button which is labeled : "centered on page". By default this is 
+off and the image will be approximately the size it appears on the screen. If 
+the "center on page" toggle button is clicked on then the image will be sized to 
+be centered on and fill most of an 8.5 by 11 inch page.
+
+The "File/Write..." button will bring up the file writing dialog to allow
+writing of a number of different types of output files.
+
+
+[Distance Map]
+This panel displays a pictorial representation of the difference matrix in 
+either the generic or the input conformation ordering. The distance values 
+are represented by a set of arbitrary colors (or grays on a gray scale monitor) 
+representing values at equal increments between the minimum and maximum 
+values in the distance matrix. 
+
+The distance matrix can be viewed in either the originals (input) order or the 
+generic order( see "How it Works" in the manual).  Which mode of viewing is 
+active is controlled by the pair of radio buttons on the left hand side of 
+the panel.
+
+In the distance matrix display black is used to color any elements which are 
+less than or equal to a given clustering value.  This can be a useful aid for 
+highlighting clusterings. There are several methods for controlling the 
+clustering level or value at which elements in the distance matrix display are 
+colored black:
+
+The color bar.
+The color bar to the left of the matrix display indicates the colors which are 
+used to represent the range of values in the distance matrix display.  Clicking 
+in the color bar will set the current value in proportion to the position up the 
+color bar the click is made.
+
+The "value" field.
+To the left of the color bar is a text field which displays the current clustering 
+value.  Elements in the distance matrix which are less than or equal to this 
+value will be colored black.  There are two methods for changing the value in 
+this field.  Firstly as new value can be entered directly into the text field and 
+the return key pressed. The value entered must be a valid real number and 
+must be less than the maximum element in the distance matrix.  To the right of 
+the text field is an upward and downward facing arrow button.  These are used 
+to "step" through the list of unique distance values.  Clicking the "up" arrow 
+button will advance the clustering value to the next unique value in the 
+distance matrix. If an attempt is made to advance past the maximum value of 
+below 0.0 (the minimum) a beep will sound.
+
+The "level" field.
+The clustering level is can be controlled from the "level" text field in a similar 
+way to that described above for the clustering value.  A new value in the range 
+1 to the number of conformers can be entered directly into the field and the 
+return key pressed.  Alternatively the arrow keys to the right of the field can 
+be used to increment or decrement the clustering level. If a plot of the 
+clustering statistics is visible at the same time as the distance map; clicking on 
+a point displaced in a clustering statistic graph will enter the corresponding 
+clustering level into the clustering level text field of the distance map display 
+and the display will be updated to reflect this new level.
+
+It is possible to get further information about any element in the distance map 
+by moving the mouse pointer over the distance matrix element and clicking 
+the left mouse button. A readout of the original and generic conformation 
+numbers and the distance value will appear in the text area on the left of the 
+panel. When the mouse button is released the readout continues and the 
+selected distance matrix element is highlighted by flashing white.  At this 
+stage selected element can be changed by use of the arrow keys on the 
+keyboard.  Pressing any of the arrow keys will move the selected element on 
+square in the position in the appropriate direction. This is useful for querying 
+a complex distance matrix display as it allows "fine-tuning" of the readout.  To 
+clear the flashing element and the readout click the middle mouse button in 
+the distance matrix display.
+
+When a point on the map is selected the dialog box which is accessed from
+the "Write..." option of the "File" menu will be updated with the current
+clustering level and cluster number.  The cluster number is taken as the
+X-axis value of the currently selected point on the map.
+
+The "PostScript" button is used to create an encapsulated PostScript 
+representation of the map display suitable for printing on a Laser printer. The 
+dialog box which appears when the PostScript button is clicked on has a button 
+which is labeled : "centered on page". By default this is off and the image will 
+be approximately the size it appears on the screen. If the "center on page" 
+toggle button is clicked on then the image will be sized to be centered on and 
+fill most of an 8.5 by 11 inch page.
+
+The "File/Write..." button brings up the dialog box which is used to
+write a number of different output files.
+
+[Clustering Mosaic]
+The clustering mosaic is a visual representation of the formation of clusters 
+during the clustering process. Refer to the description in the FIGURES OF 
+MERIT section of the manual, under the Reordering Entropy, of the generically
+ordered conformation list as a list of structures separated by partitions. As the 
+threshold level increases, partitions are removed, and at any level a set of 
+conformations without partitions between them represents a cluster.
+
+Each row of the mosaic display represents the set of partitions at a given 
+clustering level, the levels ascending as we go down the display. Each column 
+of the display represents a conformation in the generic ordering going from 
+left to right. If you place the mouse at any position and depress any button, 
+you will see a display of the conformation number directly under the cursor, 
+and where it stands in the generic ordering; in addition you will see a readout 
+of the threshold level under the cursor. If the mouse button is released the 
+crosshair cursor will remain in at the last mouse pointer position. The 
+crosshairs can be repositioned by the use of the arrow keys on the keyboard 
+which will move the cursor one element in each the appropriate direction. 
+The readout and the mosaic crosshairs can be cleared from the display by 
+clicking on the middle mouse button while the pointer is in the mosaic display 
+or by clicking the mouse button outside the mosaic boundary.
+
+In the first clustering level (first row), each conformation is in its own 
+cluster, so each conformation has partitions on both sides. As one progresses 
+down the plot the individual conformations begin to agglomerate into clusters; 
+these further agglomerate, until finally there is a single cluster which 
+contains all the conformations.
+
+The mosaic can be drawn in three differnet modes, controlled by the
+radio buttons on the left hand part of the panel.  "By Clustering Level" 
+will result in a mosaic where every row in the mosaic is a constant height,
+representing the integer value of each level. "By Clustering Value" will
+result in the mosaic being drawn with the space between rows proportional
+to the threshold value at each clustering level.  "By ln(Clustering Value)"
+is similar but in this case the space between each row is marked by the
+logarithm of the threshold value at each level.  Note that both of the
+representations which use clustering levels may result in mosaics where
+the levels are overlapped - if this is the case a warning area will be
+printed in the read out area to the left of the mosaic display area.
+
+The "PostScript" button allows the production of a PostScript representation 
+as in the "distance map" display.
+
+The "File/Write" button will bring up the file writing dialog box to
+allow writing output files in a number of different formats.
+
+The "MacroModel Read Structure" is active when the crosshairs are active in
+the mosaic area and MacroModel is running.  Clicking on this button will send
+a request to MacroModel to read the structure which corresponds to the currently
+selected column.  The "Delete before Read" toggle button is used to control 
+whether MacroModel will delete the current structure(s) when reading in the
+new one.
+
+
+[Cluster Membership]
+The cluster membership option of the "Visualization" is used for displaying
+the membership of the clusters at any clustering level. When this option is
+picked then a panel appears.  This has a text field for entry of the clustering
+level of interest.  When a valid clustering level is entered (i.e from 1
+to the number of conformations in the file) the "Show Membership" button will
+become active.  If the "Show Membership" button is clicked the clustering 
+membership for the given clustering level will be displayed in the message
+window.
+
+The cluster membership panel will remain active until the "close" button is
+clicked.  There is an interaction between the cluster membership panel and
+the "Clustering Statistics" visualization mode.  When the clustering statistics
+are viewed with the X-axis set to "Clustering Level" then clicking in one
+of the graph points will enter the clustering level corresponding to that point
+into the clustering membership panel.
+
+[Message Area]
+The message area is the scrollable text area underneath the menu bar in the
+main XCluster panel. All the output from the clustering process and most of
+the error messages will appear in this window.  The scroll bar to the right
+of the window can be used to review items which are no longer visible.
+While the text in the message area is "read-only" it can be selected with
+the mouse and pasted into a text editor.
+
+[Progress Area]
+The progress area is used to display the progress of time consuming operations
+such as reading in structure files,  calculating the distance matrices and
+performing the clustering. The extent of the operation is indicated by the
+progress bar, a rectangle which advances across the bottom of the screen
+during the operation.  In the top right of the progress area is a counter
+region which gives a numerical indication of the current extent of the operation.
+
+
+
+[Command Editor Panel]
+Choosing the "New..." or "Open..." options from the "File" menu will bring up 
+the "Command Editor  Panel".
+
+If the command editor panel is accessed from the "New..." command it will be 
+displayed initially with all the values set to defaults. If the command file panel 
+is accessed from the "Open..." command then the values are set on the basis of 
+the command in the command file. There are four areas in the command file 
+editor. At the top there is a region with three button which control the major 
+functions of the command editor panel.
+
+
+The Start Button: 
+	This button will write the current settings to the command file and 
+begin the job. Note that the current command file will be overwritten. The 
+start button will not be enabled while the "structure file" or "data file" text 
+fields are empty or the "atom/torsion" list panels are active.
+
+The Write Button: 
+	The write button will write the current settings shown in the command 
+editor panel out to the command file. None of the operations in the command 
+file are executed. Note that the current command file will be overwritten with 
+the values in the command editor panel. The write button will not be enabled 
+while the "structure file" or "data file" text fields are empty or the 
+"atom/torsion" list panels are active.
+
+
+The Cancel Button: 
+	The cancel button is used to dismiss the command editor panel. No 
+changes will be made to the command file.
+The second section of the command editor panel is used to specify the names if 
+the input files for the program. The command file text field contains the name 
+of the command file which has been read and will be written to or created 
+when the "Start" or "Write" buttons are clicked. Below this is a text field for the 
+name of the input data file. This can be either a MacroModel  structure file or a 
+distance matrix file. Which file is expected is controlled by the set of radio 
+buttons to the left of this field. The "Choose File" button on the right of the 
+input data file field is used to select a new structure or distance file. Clicking 
+on this button will bring up the standard Motif file selection box. The final 
+component of the file selection region is the "MacroModel Read File" button. 
+This will only be active if MacroModel is running when the command editor 
+panel is opened. Clicking in this button will tell MacroModel to read the 
+structure file which is shown in the structure file text field. This button will 
+not be enabled if the "Distance Matrix File" option is enabled.
+
+
+
+The third part of the command file is used to control the method of distance 
+matrix generation and specify which atoms are to be used in the comparison 
+This panel will only be active if the "Structure File" button is enabled; that
+is it has no meaning in the "Distance Matrix" mode. On the left of this region is a 
+set of three radio buttons which allow the user to select one of the three 
+distance matrix methods. These are "Atomic RMS. after superimposition" 
+(Arms:) , "Torsional RMS." (Trms:) and "Atomic RMS. without Superimposition:" 
+(Nrms:). To the right of these controls are another set of radio button which 
+are used to specify comparison atoms for the distance matrix generation 
+method. For each of the atomic RMS. methods the options are "All atoms" , "All 
+heavy atoms" (i.e. all non-hydrogen atoms) or a list of atoms for comparison. 
+When the distance matrix mode is set to the "Torsional RMS." the only option is 
+to use a list of torsions. Below the comparison atoms radio buttons is a push 
+button which opens the atom list or torsion list panel. 
+
+
+[Atom List Panel]
+The atom list panel is used to build a list of comparison atoms. This panel can 
+function in two modes. The atom number to be included in the list can be 
+entered from the keyboard, or the list can be defined by picking atoms on a 
+structure displayed by MacroModel. To add atom numbers from the keyboard, 
+place the mouse pointer in the text entry region at the top of the panel and 
+enter numbers, pressing the "return" key after every entry. The numbers will 
+appear in the scrollable list area on the right of the panel. Selecting atoms by 
+picking from MacroModel is accomplished as follows. First MacroModel must be 
+running when the command editor panel is opened. If MacroModel is not 
+active use the "Cancel" button to close the command editor panel and first start 
+up MacroModel. Once MacroModel is active use the "MacroModel Read File" 
+button to get MacroModel to read the first structure from the file. When the 
+atom list panel is active, any atoms which are picked on the structure which is 
+displayed in the MacroModel window will be added to the list. It is possible to 
+temporarily turn the MacroModel picking off by turning the "Picking from 
+MMOD" button to the "off" mode (i.e. not filled in). Note that this button is "On" 
+by default if MacroModel is running when the panel is opened. The "Get 
+Working Set" button is used to add all the atoms specified in the current 
+MacroModel working set to the atom list. 
+
+In both methods of adding atoms to the list, no duplicates will be entered into 
+the list. If a duplicate atom is specified a beep will sound and a warning 
+message will be placed in the main message area. Note also that no checking is 
+done to ensure that atom numbers entered from the keyboard are permissible 
+for the current structure.
+
+The "Delete" button in the atom list panel is used to delete the currently 
+highlighted entry in the list. The "Clear" button will clear all the entries in 
+the list. The list panel can be dismissed with either the "Cancel" button, which 
+will close the panel  disregarding any changes made since the panel was 
+opened or the "Done" button which will close the panel and add the atoms in 
+the list to the command file list.
+
+
+
+[Torsion List Panel.]
+The operation of the torsion list panel is very similar to that of the atom list 
+panel described above. The main difference is that torsion are specified by 
+either entering four integers in the text area at the top of the panel, or by 
+picking four atoms using MacroModel. 
+
+In both methods of adding torsions to the list, no duplicate torsions will be 
+entered into the list. If a duplicate torsion is specified a beep will sound and a 
+warning message will be placed in the main message area. Note also that no 
+checking is done to ensure that the torsions entered from the keyboard are 
+permissible for the current structure.
+
+The "Delete" button in the torsion list panel is used to delete the currently 
+highlighted entry in the list. The "Clear" button will clear all the entries in 
+the list. The torsion list panel can be dismissed with either the "Cancel" button, 
+which will close the panel  disregarding any changes made since the panel 
+was opened or the "Done" button which will close the panel and add the 
+torsions in the list to the command file list.
+

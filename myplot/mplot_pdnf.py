@@ -82,6 +82,7 @@ def nfplot_pd(fin, icx, icy, ptype, title, mpl_xticks, data_label):
     dfm["N"] = dfm.X.str.replace(r"\D", "").astype(int)
     dfm = dfm.sort_values(by="N")
     print(dfm)
+
     #my_mplot2d.draw_histogram(y1, nbin, Lsave, fig_file)
     ### mpls
     #print(f"xticks spacing: {mpl_xticks['xspacing']}")

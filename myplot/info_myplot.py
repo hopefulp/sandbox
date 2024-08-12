@@ -4,7 +4,7 @@ import argparse
 import os
 import re
 from common import dir_all, MyClass, dir_classify_n, whereami
-from comment_subj import vasp
+#from comment_subj import vasp
 
 my_mpl  = MyClass('my_mpl')
 mplplot = MyClass('mplplot')
@@ -54,6 +54,19 @@ mplplot.myplot2D    =   "several kinds of 2d plot method\
                         \n\tdef barplot2:\
                         \n\tdef barplot_y:\
                         "
+table.mplot_gibbs   =   "plot csv: written by David Park\
+                        \n\tHow to Use\
+                        \n\t    table w. white space without empty (use nan in empty space) works with 'mv a.dat a.csv'\
+                        \n\t    save excel sheet to csv format\
+                        \n\tUsage\
+                        \n\t    $mplot_gibbs.py MXene-4level.csv -l 'G(U=0)' 'G(\$U_{Dc}$=1.03)' 'G(\$U_{Eq}$=2.79)' 'G(\$U_{Ch}$=4.79)' -c k b g r\
+                        \n\t    $mplot_gibbs.py MXene-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.03)' 'G($U_{Eq}$=2.79)' 'G($U_{Ch}$=4.79)' -xl 'O$_2$ Reduction step' -c k b g r\
+                        \n\t    $mplot_gibbs.py apcc.csv -c r r b b k\
+                        \n\tText\
+                        \n\t    hypertext: $_{}$ $^{}$ (in chi) or \\$_{}$ \\$^{}$ (in Pt)\
+                        "
+### this should follow the definition of table.mplot_gibbs
+mplplot.mplot_gibbs = table.mplot_gibbs                        
 table.mplot_table   =   "Plot table: CSV from MS Excel\
                         \n\t    import plot_level.mplot_level\
                         "
@@ -92,7 +105,7 @@ usage.test      = "\t(ascii file) Test for mpl plot\
 #classobj_dict={'MPL': my_mpl, 'MYPLOT': myplot, 'USAGE': musage}
 classobj_dict={'MPL': my_mpl, 'MYPLOT': mplplot, 'USAGE': usage}
 
-def classify(Lclassify, work, job):
+def classify(Lclassify, work, classname, job):
 
     print("List this directory :: ")
     mdir = os.path.dirname(__file__)        # __file__: this file location
@@ -170,10 +183,10 @@ def main():
     parser.add_argument('-c','--classify', action='store_false', help="classify ")
     parser.add_argument('-w','--work', help="explain not-file-related work")
     parser.add_argument('-cn','--classname', help="present class details ")
-    #parser.add_argument('-js','--specify', choices=['qcmo','nbo','eda'], help="present class details ")
+    parser.add_argument('-j','--job', choices=['qcmo','nbo','eda'], help="present class details ")
     args = parser.parse_args()
 
-    classify(args.classify, args.work, args.classname)
+    classify(args.classify, args.work, args.classname, args.job)
 
 if __name__ == "__main__":
     main()

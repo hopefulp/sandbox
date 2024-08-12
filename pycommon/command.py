@@ -15,7 +15,11 @@ nc      =   MyClass('nc')
 dac     =   MyClass('dac')
 slurm   =   MyClass('slurm')
 kisti   =   MyClass('kisti')
-mlet     =   MyClass('mlet')
+pbs     =   MyClass('pbs')
+
+user=os.getenv('USER')
+
+
 ### modify input-detail here
 ### AMP-NODE job
 amp_data_type={'interval': '-nt 4000 -ntr 100 -dtype int -dl 1000 1100 1200',
@@ -37,7 +41,6 @@ amp_qsub_data_type={'interval':  "-v nt=4000 -v ntr=100 -v dtype=int -v dlist='1
 amp_qsub_gaussian_param={'log': "-v des=gs -v pf=log10 -v pmod=del -v pmm='0.05 200.0' -v pn=10",
                         'pow': "-v des=gs -v pf=powNN -v pn=5"
                         }
-amp_qsub_str_suff=" /home/joonho/sandboxg/pypbs/sge_amp.csh"                        
 
 ### AMP-GET-QSUB job
 amp_getqsub_str = { 'noforce': ' -j tr -hl 4 -el 0.001 -fl -0.1', 'force': ' -j tr -hl 4 -el 0.001 -fl 0.1 0.04 -nc 10'}
@@ -73,6 +76,17 @@ ga.dyn          =   "\nGA: Dynamics\
                     \n    ga_dyn_run.py -e 'mllorenz.py' -js node -mi 200000 -nd 160000 -hl 8 -nn 15\
                     \n\tpytorch+gpu coding\
                     \n    GPU: iron, n076\
+                    "
+
+pbs.queue       =   f"\tqs = qstat -u {user} ! alias\
+                    \n\th5 = watch -d -n 300 'ls -alt' ! to protect the connection in cf. KISTI\
+                    \n\thk = watch -d -n 60 'kpy qst.py'\
+                    "
+
+slurm.pbs       =   pbs.queue +  "\n\tpe     to get free processes\
+                    \n\tpef    to get free nodes\
+                    \n\tpestat to see all nodes\
+                    \n\tsq: to check pending jobs in each partition\
                     "
 slurm.amp       =   " AMP in slurm\
                     \n\t1. amp_jobs.sh fp outcar npartition idata | sh\
@@ -127,29 +141,48 @@ dac.build       =   "    Build graphene using nanocore\
                     \n\t\t-mv write to the input file\
                     "
 
-kisti.py  =     "\t(PYTHON) Running script\
-                \n\t    1st: make a cli-command\
-                \n\t\tpython_script.py args\
-                \n\t    2nd: add 'pypath.sh'\
-                \n\t\tpypath.sh cli-command\
-                "
+kisti.shell     =   "\t:: Commands in alias.sh or PYTHONPATH\
+                    \n\t(kpy) to run python\
+                    \n\t    kpy to run default python instead of shebang\
+                    \n\t    $kpy command.py kisti\
+                    \n\t\t: the same as 'python $(which command.py ) kisti\
+                    "
+kisti.pbs       =   f"\tqst.py : runs 'qstat -f' to see long jobnames\
+                    \n\t    $ kpy qst.py\
+                    \n{pbs.queue}\
+                    "
 
-def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode, nproc, sftype, dtype, partition,poscar, nhl,idata,ndata):
+def show_command(work, subwork, job_submit, qname, vjob, inf, keyvalues, nodename, nnode, nproc, nodelist, sftype, dtype, partition,poscar, nhl,idata,ndata):
     
     if keyvalues:
         kw1 = keyvalues[0]
     ###### make command line in advance
     ### KISTI
-    kisti.vas = f"\t(VASP) for (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)"
-    kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
-    kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh "
-    kisti.vas += f"\n\t      for (gamma, ncl)"
-    kisti.vas += f"\n\t      $ qsub -N {qname} -v exe=gamma $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t      (run half process to save memory usage)"
-    kisti.vas += f"\n\t      $ qsub -N {qname} -l select=20:ncpus=40:mpiprocs=20:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t      $ qsub -N {qname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t      $ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
-    kisti.vas += f"\n\t\tpbs_vasp_kisti_skl2 for half use of cpu for memory issue"
+    kisti.vas = f"\t(VASP) :: (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)\
+                \n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -al : all prepared except POSCAR\
+                \n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -j {vjob}\
+                \n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
+    kisti.vas += f"\n\t    :: RERUN Opt for failed opt"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
+    kisti.vas += f"\n\t    :: KPOINTS Sampling"
+    kisti.vas += f"\n\t\t$ python $(which vas_make_ini.py) -j kp -s POSCAR -kd 2 -kps 2 1 4 1 6 1 8 1"
+    kisti.vas += f"\n\t    :: FAST Run using Backfillingn"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -l walltime=1:00:00 $SB/pypbs/pbs_vasp.sh "  
+    kisti.vas += f"\n\t    :: SLAB XY-relax"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -j copt -exe xyrelax"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -v crelax=yes $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t    :: GAMMA, ncl"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -v exe=gamma $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t    :: MEMORY Issue run half process to save memory usage"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -l select=20:ncpus=40:mpiprocs=20:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
+    kisti.vas += f"\n\t\t    pbs_vasp_kisti_skl2 for half use of cpu for memory issue"
+    kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.LiO2 -sj {vjob} -ra -d ntime -nd 5 : more info_vasp.py"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j {vjob} -r on -s POSCAR.s -d dnameid : o-overwrite n-not submit job"
+    kisti.vas += f"\n\t    :: (OORINano)"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -v cat='orr' pbs_vasp_kisti_skl.sh"
     ### IRON(slurm)
     if not nproc:
         nproc = nnode * nXn[partition]
@@ -159,10 +192,16 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     if 'dirname' not in locals():
         dirname = qname
     ncpu =  int(nXn[partition]/2)
-    slurm.vas = " === Job submission"
+    slurm.vas = f"==== Job submission\
+            \n\t:: INI\
+            \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
+            \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc} -al : all prepared except POSCAR "
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
-    slurm.vas +=  "\n        For memory issue"
+    slurm.vas += f"\n\t:: kpoints sampling"
+    slurm.vas += f"\n\t$ vas_make_ini.py -j kp -s POSCAR -kd 2 -kps 2 1 4 1 6 1 8 1 -x {partition} -N {nnode}"
+    slurm.vas +=  "\n\t:: For memory issue"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -c {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} --ntasks-per-node {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     slurm.vas += "\n\toptions::"
@@ -172,22 +211,21 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
     slurm.vas += f"\n\t    -n number of total processes: {nproc} <= {nnode} * {nXn[partition]}, which proceed -c"
     slurm.vas += f"\n\t    -c (--cpus-per-task: ncpu/2 per node for memory {ncpu}"
     slurm.vas += f"\n\t    --ntasks-per-node {nXn[partition]/2} in case doesnot know ncpu/node"
+    slurm.siesta = " === Job submission"
+    slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_siesta.sh"
+    #slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     if nproc != nnode * nXn[partition]:
         print("Warning!! Not using all the processes in the node")
-    ### SGE(mlet)
-    mlet.vas  = f"\t(VASP)   $ qsub -N {qname} -pe numa {nproc} -v np={nproc} -v dir={qname} $SB/pypbs/sge_vasp.csh"
-    mlet.vas += f"\n\t(VASP)   $ qsub -N {qname} -pe numa {nproc} -v np={nproc} -v dir={qname} -v vas=gam $SB/pypbs/sge_vasp_exe.csh"
-    mlet.vas += f"\n\thow to run with multiple nodes?"
 
     ###### JOB start 
-    if job == 'amp':
+    if work == 'amp':
         ### modify setting here
         settings = {'force':'force',
                     'dtype': 'interval',
                     'dtype-te': 'interval-te',
                     'gs'   : 'log'
                     }
-        print(f"{job}:: in {job_submit}: w. {settings['force']} data:{settings['dtype']} gs:{settings['gs']}-scale ")
+        print(f"{work}:: in {job_submit}: w. {settings['force']} data:{settings['dtype']} gs:{settings['gs']}-scale ")
         if job_submit == 'node':
             print("Train:\namp_run.py -f OUTCAR", amp_node_str[settings['force']], amp_data_type[settings['dtype']], amp_gaussian_function_param[settings['gs']], amp_node_str_suff)
             print("Test:\namp_run.py -f OUTCAR -j te -nc 10", amp_data_type[settings['dtype-te']], amp_node_str_suff)
@@ -228,8 +266,6 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print("\t    : queue submit job HL44tr-HL44te consecutively")
 
             print(amp.ga)
-        elif job_submit == 'getqsub':
-            print(f"sge_amp.py -qj {qname} -m 3G", amp_getqsub_str[settings['force']], amp_getqsub_datatype[settings['dtype']], amp_getqsub_symmfuncttype[settings['gs']]) 
         ### this part is for common
         print(amp.clean)
         print(amp.statistics)
@@ -254,7 +290,7 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
         print("\tampplot_stat_dir.py -p NN -le maxres -sd Ndata300 -f f -xl Nparam -t 'Ndata 300 (Gs-pow)' -yl \"F\$_{rmse}\$ (eV/A)\" \"F\$_{maxres}\$ (eV/A)\"")
         print("\tampplot_stat_dir.py -p nd100i -le mse -t 'Energy (ND=100)' -xl \"Data index\"")
         print("\tampplot_stat_dir.py -p nd100i -le maxres -t 'Force (ND=100)' -yl \"F\$_{rmse}\$ (eV/A)\" \"F\$_{maxres}\$ (eV/A)\"  -xl 'Data index'")
-    elif job == 'qchem':
+    elif work == 'qchem':
         if job_submit == 'qsub':
             print("Run Q-Chem")
             print("    N.B.:")
@@ -268,49 +304,71 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print("NBO analysis")
             print("    qcout_nbo.py nbo -f 5-NiFe.out -a C O O Ni P P Fe P P N -g C O O")
 
-    elif job == 'ga':
+    elif work == 'ga':
         print(ga.amp)
         print(ga.dyn)
 
     ### run VASP in SLURM
-    elif job == 'slurm':
-        print(f" nproc {nproc} = nnode {nnode} * nproc/node_partition {nXn[partition]}")    
-        print(f"Usage for {job}")
-        print(f"\t {os.path.basename(__file__)} {job} -sj vasp -qn dirname -p {partition} -N {nnode} -n {nproc}")
+    elif work == 'slurm':
+        print(f"Usage for {work}")
+        print(f"\tnproc {nproc} = nnode {nnode} * nproc/node_partition {nXn[partition]}")    
+        print(f"\t {os.path.basename(__file__)} {work} -j vasp -qn dirname -p {partition} -N {nnode} -n {nproc}")
         print("Run in slurm")
-        if nhl:
-            hlstr1 = list2str(nhl, delimit=" ")
-            hl2str = list2str(nhl)
-            if not qname:
-                qname = 'hl'+hl2str
-        if not qname:
-            qname = 'amptest'
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_vasp.sh")
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_py.sh")
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
-        print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} slurm_sbatch_NanoCore.sh")
-        if not subjob:
-            print("use -sj subjob [vasp|mldyn|nc]")
+        print("\tsleep:")
+        print(f"\t    sbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --nodelist {nodelist} /home/joonho/sandbox/pypbs/slurm_sbatch_sleep.sh")
+        if not subwork:
+            print("use -sw subwork [amp|vasp|mldyn|nc|vasnc|vaspnc]")
 
-        elif subjob == 'amp':
+        elif subwork == 'amp':
+            if nhl:
+                hlstr1 = list2str(nhl, delimit=" ")
+                hl2str = list2str(nhl)
+                if not qname:
+                    qname = 'hl'+hl2str
+            if not qname:
+                qname = 'amptest'
+            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_vasp.sh")
+            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_py.sh")
             print(slurm.amp)
             print(f"\t1. amp_jobs.sh fp {inf} {partition} {idata} {ndata} | sh")
             print(f"\t1.9 amp_jobs.sh db {inf} 2 60 | sh")
             print(f"\t2. amp_jobs.sh db {inf} 1 | sh")
             print(f"\t3. amp_jobs.sh wrapper2 {inf} 2 | sh")
         
-        elif subjob == 'vasp':
-            print(f"=== Usage ===\
-                    \n\t{os.path.basename(__file__)} {job} -s {poscar} -p 3 -N 4 -n total_proc\
-                    \n\tN.B.:: (POSCAR.)name is dirname and qname in qsub") 
-            print("=== Prepare VASP directory in platinum")
-            print(f"    (1) vas_make_ini.py -s {poscar}")
-            print("\tmake POSCAR POTCAR KPOINTS INCAR & directory")
-            print(f"    python -m myvasp -j getmag -p {poscar}")
-            print(f"    sed -i 's/.*MAGMOM.*/ mag_moment/' INCAR")
-            print("\tto modify MAGMON in INCAR from POSCAR in module myvasp.py")
-            print(slurm.vas)
-        elif subjob == 'mldyn':
+        elif re.search('vas', subwork) or re.search('nc', subwork):
+            if re.search('vas', subwork):
+                print(f"=== Usage ===\
+                        \n\t{os.path.basename(__file__)} {work} -s {poscar} -p 3 -N 4 -n total_proc\
+                        \n\tN.B.:: (POSCAR.)name is dirname and qname in qsub") 
+                print("=== Prepare VASP directory in platinum")
+                print(f"    (1) vas_make_ini.py -s {poscar}")
+                print("\tmake POSCAR POTCAR KPOINTS INCAR & directory")
+                print(f"    python -m myvasp -j getmag -p {poscar}")
+                print(f"    sed -i 's/.*MAGMOM.*/ mag_moment/' INCAR")
+                print("\tto modify MAGMON in INCAR from POSCAR in module myvasp.py")
+                print(slurm.vas)
+            if re.search('nc', subwork):
+                print("OORINano/catalysis with SBATCH:")
+                if keyvalues:
+                    kv  = keyvalues[0]
+                else:
+                    kv  =   'orr'
+                
+                #if not qname:
+                #    qname=f'{keyvalues}_test'
+                print(f"\t:: cat=['orr' (default),'her'], pos=['cp' (default: copy), 'any_other_word']")
+                print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc}  slurm_sbatch_nc.sh")
+                print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=cat='{kv}' --export=pos='cp' slurm_sbatch_nc.sh")
+                print(f"\t:: if not 'cp', generate")
+                print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=pos='gen' slurm_sbatch_nc.sh")
+                print("OORINano/qtnegf with SBATCH:")
+                print(f"\t:: Make subdirectory with {qname} - default")
+                print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc}  slm_qtnegf.sh")
+                print(f"\t:: Run in main directory")
+                print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc}  --export=sub=0 slm_qtnegf.sh")
+                print("\nOORINano Package Development:")
+                print(nc.build)
+        elif subwork == 'mldyn':
             print("SBATCH:")
             print(f"\tsbatch -J {qname} -p X2 -N 1 -n 1 --export=hl='{hlstr1}',sf='hl{hl2str}.pt' /home/joonho/sandbox/pypbs/slurm_sbatch_py.sh")
             print("\t    slurm_sbatch_py.sh")
@@ -330,66 +388,66 @@ def show_command(job, subjob, job_submit, qname, inf, keyvalues, nodename, nnode
             print("\t-mi max iteration, default=10^5")
             print("\t-dbp partition [2|3]: data to tr, [val, and] te")
             print(ga.dyn)
-        elif subjob == 'nc':
-            print("SBATCH:")
-            print(f"\tsbatch -J {qname} -p X{partition} -N {nnode} -n {nproc} --export=main={inf} /home/joonho/sandbox/pypbs/slurm_sbatch_NC.sh")
-            print("\nNonoCore Package Development:")
-            print(nc.build)
-        elif subjob == 'crr':
+        elif subwork == 'crr':
             print("    CRR:DAC =========================")
             print(nc.build)
             print(dac.build)
-        print("=== Node check ===")
-        print("\tpe     to get free processes")
-        print("\tpef    to get free nodes")
-        print("\tpestat to see all nodes")
-        print("\tqstat -u joonho     to check my job")
-    elif job == 'sge':
-        if subjob == 'vasp':
-            print(comment_subj.vasp.run)
-            print(comment_sys.server.mlet.vasp)
-        print(comment_sys.server.mlet.system)
-        print(comment_sys.server.mlet.sgescripts)
-        print(comment_sys.server.mlet.sleep)
-        print(comment_sys.server.mlet.sge)
-
-        print(mlet.vas)
-        print(comment_sys.server.mlet.qstat)
-    elif job == 'kisti':
-        if subjob == 'vasp':
+        print(slurm.pbs)
+    elif work == 'kisti' or work == 'pbs':
+        print("=== PBS in KISTI ===")
+        print("    Bash ")
+        print(kisti.shell)
+        print(kisti.pbs)
+        print("=== VASP in KISTI ===")
+        if subwork == 'vasp':
             print(comment_subj.vasp.run)
             print(comment_sys.server.kisti.pbs)
         print(kisti.vas)
+        print("=== NanoCore in KISTI ===")
+        print("qsub")
+        if keyvalues:
+            kv  = keyvalues[0]
+        else:
+            kv  =   'orr'
+        
+        if not qname:
+            qname=f'{keyvalues}_test'
+        print(f"\tqsub -N {qname} pbs_vasp_kisti_skl.sh")
+        print(f"\tqsub -N {qname} -v cat='{kv}' pbs_vasp_kisti_skl.sh")
+        print("\nNonoCore Package Development:")
+        print(nc.build)
 
-    elif job == 'vasp':
+    elif work == 'vasp':
         print("KISTI: vasp")
         print(kisti.vas)
-        print(kisti.py)
+        print(kisti.shell)
+        print(kisti.pbs)
         print("Pt(platinum:slurm): vasp")
         print(slurm.vas)
-        #print("MLET(mlet): vasp")
-        #print(mlet.vas)
-
-
+    elif work == 'siesta':
+        print("Pt(platinum:slurm): siesta")
+        print(slurm.siesta)
     else:
-        print("build more jobs")
+        print("build more works")
     return 0 
     
 
 def main():
 
     parser = argparse.ArgumentParser(description="show command Amp/Qchem/ etc ")
-    parser.add_argument('job', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp'],  help="one of amp, qchem, mldyn for ML dyn")
-    parser.add_argument('-j', '--subjob', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp'], help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('work', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp','pbs','siesta'],  help="one of amp, qchem, mldyn for ML dyn")
+    parser.add_argument('-sw', '--subwork', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp', 'vaspnc', 'vasnc'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
-    parser.add_argument('-qn', '--qname', help="queue name for qsub shown by qstat")
+    parser.add_argument('-qn', '-q', '--qname', default='test', help="queue name for qsub shown by qstat")
+    parser.add_argument('-vj','--vas_job', default='opt', help="vasp job input for vas_make_ini.py")
     parser.add_argument('-kv', '--keyvalues', nargs='*', help='change a keyword in print')
     parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
     ### flowing slurm option
     parser.add_argument('-inf', '--infile', help='input file in case')
     parser.add_argument('-N', '--nnode', default=1, type=int, help='number of nodes: if needed')
     parser.add_argument('-n', '--nproc', type=int, help='number of process: if needed')
-    parser.add_argument('-x', '--xpartition', default=3, type=int, choices=[1,2,3,4,5], help='if needed, specify nodename')
+    parser.add_argument('-nl', '--nodelist',  help='node list to assign nodes')
+    parser.add_argument('-x', '--xpartition', default=3, type=int, choices=[1,2,3,4,5,6], help='if needed, specify nodename')
     parser.add_argument('-s', '--poscar', default='POSCAR.name', help='if needed, specify nodename')
     parser.add_argument('-id', '--idata', default=0, type=int, help='start index of data')
     parser.add_argument('-nd', '--ndata', default=100, type=int, help='amount of data')
@@ -401,16 +459,21 @@ def main():
     args = parser.parse_args()
 
     if not args.infile:
-        if args.subjob == 'amp':
+        if args.subwork == 'amp':
             infile = 'OUTCAR'
-        elif args.subjob == 'nc':
+        elif args.subwork == 'nc':
             infile = 'test_HER.py'
         else:
             infile = 'OUTCAR'
     else:
         infile = args.infile
 
-    show_command(args.job,args.subjob,args.job_submit,args.qname,infile,args.keyvalues,args.nodename,args.nnode,args.nproc, args.func_type,args.data_type,args.xpartition,args.poscar, args.hidden_layers, args.idata, args.ndata)
+    if 'POSCAR' in args.qname:
+        qname=args.qname[7:]
+    else:
+        qname=args.qname
+
+    show_command(args.work,args.subwork,args.job_submit,qname,args.vas_job,infile,args.keyvalues,args.nodename,args.nnode,args.nproc,args.nodelist, args.func_type,args.data_type,args.xpartition,args.poscar, args.hidden_layers, args.idata, args.ndata)
 
 if __name__ == "__main__":
     main()

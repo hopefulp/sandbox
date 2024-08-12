@@ -5,12 +5,11 @@ import argparse
 import re
 import sys
 import numpy as np
-from myplot2D import mplot_levels
-from myplot2D import mplot_nvector as mplot_2d
+from mplot2D import mplot_levels
+from mplot2D import mplot_nvector as mplot_2d
 #from plot_level import mplot_levels
 from plot_job import get_jobtitle
 #from plot_job import Ni_6x
-from my_chem import *
 from common import *
 import csv
 
@@ -37,39 +36,41 @@ def get_yv_scale(yscale):
     return values
 
 def get_title(name):
-    title = fname_pre(name)
+    title = f_root(name)
     return title.upper()
 
-def fwhite2table(f):
+def fwhite2table(inf, icx=1):
     '''
     convert white space to table
+    if column labels, stored in ytitle
     '''
     x=[]
     y2d=[]
-    
+    ytitle = []
     with open(inf,"r") as f:
         lines=f.readlines()
         table_lines = []     # y as 2d [ [y1], [y2], ...] this needs to be transposed
         ### if 1 file, get line-labels here
-        for line in lines:
+        for i, line in enumerate(lines):
             items = line.strip().split()
-            table_lines.append(items)
-    for i, tabline in enumerate(table_lines):
-        if i==0:
-            ylegend = tabline
-        else:
-            #print(f"use icx {icx}")
-            x.append(tabline.pop(0))
-            y2d.append(tabline)
-    return x, y2d
+            if i == 0 and re.search('[a-zA-Z]', line):
+                ytitle.extend(items)
+                continue
+            table_lines.append(items)   # 2D list
 
-def fcsv2table(f):
+    for i, row in enumerate(table_lines):
+        #print(f"use icx {icx}")
+        x.append(row.pop(0))
+        y2d.append(row)
+    return x, y2d, ytitle
+
+def fcsv2table(inf):
     '''
     convert csv to table
     '''
     fields=[]
     rows=[]
-    with open(f, 'r') as f:
+    with open(inf, 'r') as f:
         csvreader = csv.reader(f)
         fields = next(csvreader)
         for row in csvreader:
@@ -84,11 +85,29 @@ def fcsv2table(f):
 
     return fields, rows
 
+def color_legend(yl):
+    '''
+    plot color depending on legend
+    '''
+    ### as for dos plot
+    if yl == 's':
+        return 'r'
+    elif yl == 'p':
+        return 'b'
+    elif yl == 'd':
+        return 'm'
+    elif re.search('t', yl, re.IGNORECASE) :
+        return 'lightgray'
+    ### add more color for legend
+    else:
+        print("legend cannot define color")
+        sys.exit(11)
 
-def draw_table(inf,Llevel,icx,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,colors,Ltwinx,icy_right,ylabel_r):
+def draw_table(inf,Llevel,icx,icy,job,title,xlabel,ylabel,ylegend_in,Lsave,yscale,colors,Ltwinx,icy_right,ylabel_r):
     '''
     inf : table format
     fmt : white space or csv
+    if file has column title, it will be ylabel
     '''
     ### modify get title
     if not title:
@@ -106,7 +125,8 @@ def draw_table(inf,Llevel,icx,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
     ### scan file list
 
     if fmt == 'white':
-        x, y2d = fwhite2table(inf)
+        print(f"fname {inf}")
+        x, y2d, ylegend = fwhite2table(inf)
         y2 = np.array(y2d).T
     elif fmt == 'csv':
         fields, rows = fcsv2table(inf)
@@ -116,28 +136,50 @@ def draw_table(inf,Llevel,icx,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
         y2  = tab[1:,:]
     #sys.exit(1)
     ### change string to value
-    print(f"{y2}")
-    y2value = [ [ None  if y.isalpha() else np.float(y) for y in ys ] for ys in y2 ]
-    print(f"{y2value}")
-    print(f"size: x {len(x)}, y: {len(ylegend)}, shape of data {y2.shape}")
+    #print(f"{y2}")
+
+    ### find x is int/float/string
+    for i in range(10):
+        if re.search('[a-zA-Z]', x[i]):
+            print(f"xvalue {x[i]}")
+            xl = 'string'
+            break
+        elif re.search('\.', x[i]):
+            xl = 'float'
+            break
+        xl = 'int'
+    print(f"xvalue type {xl}")
+    if xl == 'float':
+        x = [ float(i) for i in x ]
+    elif xl == 'int':
+        x = [ int(i) for i in x ]
+
+    ### change y value to float
+    y2value = [ [ float(y) for y in ys ] for ys in y2 ]
+    #print(f"{y2value}")
+    print(f"size: x {len(x)}, y: {len(ylegend)}, shape of data {np.array(y2value).shape}")
 
     ### var: x, y2, ylegend
-    yplot = []
-    y_legend = []
+    ys = []
+    if not ylegend:
+        ylegend=ylegend_in
+    if not colors and ylegend:
+        colors = []
+        for yl in ylegend:
+            colors.append(color_legend(yl))
+
     if not icy:
         icy =  list(range(len(y2value)))
     for i in icy:
-        yplot.append(y2value[i][:])
-        y_legend.append(ylegend[i])
+        ys.append(y2value[i-2][:])
         
-    print(f"title = {title} xlabel = {xlabel}")
-    print(f"x {x}, yplot {yplot}, legend {y_legend}")
-    ### x, yplot, y_legend are lists
+    print(f"title {title} xlabel {xlabel} ylabel {ylabel}")
+    print(f"ylegends {ylegend}")
     ### x will be used for just len(x)
     if Llevel:
-        mplot_levels(x, yplot, title=title, xlabel=xlabel, ylabel=ylabel, legend=y_legend,Colors=colors)
+        mplot_levels(x, ys, title=title, xlabel=xlabel, ylabel=ylabel, legend=ylegend,colors=colors)
     else:
-        mplot_2d(x, yplot, title=title, xlabel=xlabel, ylabel=ylabel, legend=y_legend,Colors=colors)
+        mplot_2d(x, ys, title=title, xlabel=xlabel, ylabel=ylabel, legend=ylegend, colors=colors)
     return 0
 
 def main():
@@ -147,7 +189,7 @@ def main():
     parser.add_argument('-l', '--level', action='store_true', help='turn on to draw energy levels')
     parser.add_argument('-icx', '--icolumn_x', type=int, default=0, help='column index of X')
     g_file=parser.add_argument_group('Files', description="get input files")
-    g_file.add_argument('-icy', '--icolumn_y', type=int, help='column index of Y')
+    g_file.add_argument('-icy', '--icolumn_y', nargs='*', type=int, help='column indices of Y')
     g_file.add_argument('-ys', '--y_scale', default=[1], nargs="+", help='scale factor for Y [value|str|str-], use for str- for "-"')
     #g_file.add_argument('-ys', '--y_scale', nargs="*", help='scale factor for Y [value|str|str-], use for str- for "-"')
     g_twin = parser.add_argument_group('Twin-X', description='to plot using two y-axes')
@@ -155,9 +197,9 @@ def main():
     g_twin.add_argument('-icy2', '--second_iy', default=[2], nargs="+", type=int, help='designate the index of y for 2nd y-axis')
     g_twin.add_argument('-yl2', '--second_yl', default='G (eV)', help='input left y-axis title')
     parser.add_argument('-j', '--job', help='job of qcmo|ai|gromacs')
-    parser.add_argument('-t', '--title', default='H2-diffusion on C54', help='title of figure would be filename')
-    parser.add_argument('-xl', '--xlabel', default='Reaction Coordinate', help='X title, label in mpl')
-    parser.add_argument('-yl', '--ylabel', default='G (eV)', help='Y title, label in mpl')
+    parser.add_argument('-t', '--title', default='PDOS', help='title of figure would be filename')
+    parser.add_argument('-xl', '--xlabel', default=r'E - E\$_F\$ [eV]', help='X title, label in mpl')
+    parser.add_argument('-yl', '--ylabel', default='DOS', help='Y title, label in mpl')
     parser.add_argument('-yls', '--ylabels', nargs='*', help='Y labels for legend')
     parser.add_argument('-c', '--colors', nargs='*', help='Y label for legend')
     parser.add_argument('-s', '--save', action='store_true', help='Save figure')

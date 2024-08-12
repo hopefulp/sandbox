@@ -1,0 +1,222 @@
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+
+ ********************************************************************
+                             cff93
+
+                  A Force Field for Alkane Molecules
+
+                               by
+
+               Hwang M.J., Stockfisch T.P. and Hagler A.T.
+               JACS 1994, 116, 2515-2525
+
+
+ Please note:
+ ------------
+
+ This force field should be used in conjunction with charges obtained
+ from the bond charge increments method. This is currently not available
+ in CERIUS2, and therefore the charges should be assigned manually.
+ This is done very easily as follows:
+   (i)  Assign a charge of 0.053 to each hydrogen,
+   (ii) For each carbon, assign a charge of equal magnitude but opposite
+        sign to the sum of the charges on the hydrogens to which the
+        carbon is bonded.
+
+ ********************************************************************
+
+END
+#
+PREFERENCES
+ BONDS                                 T
+ ANGLES                                T
+ COULOMB                               T
+ INVERSIONS                            F
+ TORSIONS                              T
+ UREY_BRADLEY                          F
+ STRETCH_STRETCH                       T
+ STRETCH_BEND_STRETCH                  T
+ BEND_BEND                             T
+ TORSION_STRETCH                       T
+ TORSION_BEND_BEND                     T
+ BEND_TORSION_BEND                     T
+ STRETCH_TORSION_STRETCH               T
+ HYDROGEN_BONDS                        F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                F
+ SHRINK_CH_BONDS                       F
+ SHRINK_CH_H_ATOM                      H__C 
+ SHRINK_CH_FACTOR                         0.91500
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      F
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          0.40000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           T
+ H-BOND_DIRECT_RCUT                       4.00000
+ H-BOND_SPLINE_DISTANCE_ON                4.00000
+ H-BOND_SPLINE_DISTANCE_OFF               4.50000
+ H-BOND_SPLINE_ANGLE_ON                  65.00000
+ H-BOND_SPLINE_ANGLE_OFF                 75.00000
+ H-BOND_LIST_DISTANCE_OFF                 5.00000
+ H-BOND_LIST_ANGLE_OFF                   90.00000
+ NON_BOND_LIST                         T
+ NON_BOND_LIST_CUT_OFF                   10.50000
+ DISTANCE_DEPENDENT_DIELETRIC_CONSTANT F
+ COU_DIELETRIC_CONSTANT                   1.00000
+ COU_INTER_CUT_OFF                        8.50000
+ COU_SPLINE_OFF                           8.50000
+ COU_SPLINE_ON                            8.00000
+ EWALD_SUM_COU_ACCURACY                   0.00100
+ EWALD_SUM_COU_ETA                        2.50000
+ EWALD_SUM_COU_KCUT                       0.50000
+ EWALD_SUM_COU_RCUT                       6.00000
+ EWALD_SUM_COU_AUTO_OPT                T
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            SPLINE    
+ COU_DIRECT_CUT-OFF                       8.00000
+ VDW_RADII_COMBINATION_RULE            ARITHMETIC
+ VDW_INTER_CUT_OFF                        8.50000
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            SPLINE    
+ VDW_SPLINE_ON                            8.00000
+ VDW_SPLINE_OFF                           8.50000
+ EWALD_SUM_VDW_AUTO_OPT                T
+ EWALD_SUM_VDW_ACCURACY                   0.00100
+ EWALD_SUM_VDW_ETA                        2.50000
+ EWALD_SUM_VDW_KCUT                       0.50000
+ EWALD_SUM_VDW_RCUT                       6.00000
+ EWALD_SUM_VDW_REP_CUT                    6.00000
+ EWALD_SUM_VDW_RATIO                     10.00000
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         F
+ ASSIGN_HYBRIDIZATION                  F
+ ATOM_TYPE                             T
+ ATOM_TYPE_ALL                         T
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ C_         C      12.01100  0.0000   3   0   0
+ H_         H       1.00790  0.0000   0   0   0
+END
+#
+DIAGONAL_VDW
+ C_          LJ_6_9         4.0100  0.5400E-01
+ H_          LJ_6_9         2.9950  0.2000E-01
+END
+#
+ATOM_TYPING_RULES
+ H_              H            0           0           0           1
+ C_              C            0           0           0           1
+END
+#
+#
+OFF_DIAGONAL_VDW
+ H_       C_          LJ_6_9         3.6691  0.2333E-01
+END
+#
+BOND_STRETCH
+ C_       C_          QUARTIC      598.8000    1.5350   -1.7228    2.2281
+ H_       C_          QUARTIC      692.8000    1.1110   -2.0395    2.4919
+END
+#
+ANGLE_BEND
+ C_       C_       C_          THETA_QUAR    84.6000  112.9000   -0.2317   -0.2175
+ H_       C_       C_          THETA_QUAR    85.4000  110.8000   -0.2061   -0.2131
+ H_       C_       H_          THETA_QUAR    83.4000  107.7000   -0.1727   -0.2110
+END
+#
+TORSIONS
+ C_       C_       C_       C_          DIHEDRAL      -1.9360    1.0000    1.0000
+                                                       0.0200    2.0000    1.0000
+                                                      -0.3000    3.0000    1.0000
+ H_       C_       C_       C_          DIHEDRAL      -1.9360    1.0000    1.0000
+                                                       0.0200    2.0000    1.0000
+                                                      -0.3000    3.0000    1.0000
+ H_       C_       C_       H_          DIHEDRAL      -1.9360    1.0000    1.0000
+                                                       0.0200    2.0000    1.0000
+                                                      -0.3000    3.0000    1.0000
+END
+#
+HYDROGEN_BONDS
+END
+#
+GENERATOR
+END
+#
+STRETCH_BEND_STRETCH
+ C_       C_       C_          R-THETA        1.5350    1.5350  112.9000   16.0000   16.0000
+ H_       C_       C_          R-THETA        1.1110    1.5350  110.8000   12.1000   30.0000
+ H_       C_       H_          R-THETA        1.1110    1.1110  107.7000   19.7000   19.7000
+END
+#
+STRETCH_STRETCH
+ C_       C_       C_          R-R            1.5350    1.5350    8.7500
+ H_       C_       C_          R-R            1.1110    1.5350    9.8400
+ H_       C_       H_          R-R            1.1110    1.1110   10.2400
+END
+#
+BEND_BEND
+ C_       C_       C_       C_          THETA2       112.9000  112.9000   -7.8100
+ C_       H_       C_       C_          THETA2       110.8000  112.9000   -4.0200
+ C_       H_       H_       C_          THETA2       110.8000  110.8000   -1.9000
+ C_       C_       C_       H_          THETA2       110.8000  110.8000    2.7100
+ C_       H_       C_       H_          THETA2       107.7000  110.8000    1.3600
+ C_       H_       H_       H_          THETA2       107.7000  107.7000    0.8100
+END
+#
+TORSION_STRETCH
+ C_       C_       C_       C_          R-FOURIER      1.5350    1.0000  -41.1000
+                                                                 2.0000   -4.9100
+                                                                 3.0000    0.2700
+ H_       C_       C_       C_          R-FOURIER      1.5350    1.0000  -42.7000
+                                                                 2.0000   -2.7600
+                                                                 3.0000   -0.3400
+ H_       C_       C_       H_          R-FOURIER      1.5350    1.0000  -45.4000
+                                                                 2.0000   -0.6800
+                                                                 3.0000   -0.7800
+END
+#
+TORSION_BEND_BEND
+ C_       C_       C_       C_          TH2-COSPH    112.9000  112.9000  -31.0000
+ H_       C_       C_       C_          TH2-COSPH    110.8000  112.9000  -16.7000
+ H_       C_       C_       H_          TH2-COSPH    110.8000  110.8000  -12.9000
+END
+#
+BEND_TORSION_BEND
+ C_       C_       C_       C_          THETA-FOUR   112.9000  112.9000    1.0000   -0.0300   -0.0300
+                                                                           2.0000   -0.0100   -0.0100
+                                                                           3.0000    0.0000    0.0000
+ H_       C_       C_       C_          THETA-FOUR   110.8000  112.9000    1.0000    0.2300   -1.6400
+                                                                           2.0000    0.6100    0.0900
+                                                                           3.0000   -0.1400   -0.2600
+ H_       C_       C_       H_          THETA-FOUR   110.8000  110.8000    1.0000   -1.4100   -1.4100
+                                                                           2.0000    0.6400    0.6400
+                                                                           3.0000   -0.3900   -0.3900
+END
+#
+STRETCH_TORSION_STRETCH
+ C_       C_       C_       C_          R-FOURIER      1.5350    1.5350    1.0000    2.0000    2.0000
+                                                                           2.0000    0.6700    0.6700
+                                                                           3.0000    0.3100    0.3100
+ H_       C_       C_       C_          R-FOURIER      1.1110    1.5350    1.0000    0.6800    1.4500
+                                                                           2.0000    0.2500    0.5100
+                                                                           3.0000    0.3500   -0.3000
+ H_       C_       C_       H_          R-FOURIER      1.1110    1.1110    1.0000    0.6800    0.6800
+                                                                           2.0000    0.4100    0.4100
+                                                                           3.0000    0.0700    0.0700
+END

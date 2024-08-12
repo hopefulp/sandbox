@@ -1,0 +1,222 @@
+VERSION
+ CERIUS2     1
+END
+#
+HEADER
+****************************************************************************
+		MSXX: A Specific Force Field for PVDF
+
+				by
+
+		  N. Karasawa and W. A. Goddard III
+		Macromolecules, Vol. 25, No. 26, 7268 (1992)
+
+NOTE : (i) The torsion phase parameter for F-C-C-C has been altered from
+           that reported in the paper, on the advice of W. A. Goddard III.
+      (ii) Bond, angle and torsion parameters have been added for H- cap
+           on carbon type C_3F, in order to allow MSXX calculations for
+           short-chain polymers built with the polymer builder, without
+           the requirement for further editing.
+           All crossterms are ignored for terms involving the H- cap.
+
+           Users are advised to change manually H- cap to F- cap on carbon
+           type C_3F when using MSXX
+****************************************************************************
+
+END
+#
+PREFERENCES
+ BONDS                                 T
+ ANGLES                                T
+ COULOMB                               T
+ INVERSIONS                            F
+ TORSIONS                              T
+ UREY_BRADLEY                          F
+ STRETCH_STRETCH                       T
+ STRETCH_BEND_STRETCH                  T
+ BEND_BEND                             T
+ TORSION_STRETCH                       F
+ TORSION_BEND_BEND                     T
+ BEND_TORSION_BEND                     F
+ STRETCH_TORSION_STRETCH               F
+ HYDROGEN_BONDS                        F
+ DIAGONAL_VAN_DER_WAALS                T
+ OFF_DIAGONAL_VAN_DER_WAALS            T
+ GENERATE_UNDEFINED_TERMS              F
+ IGNORE_UNDEFINED_TERMS                F
+ SHRINK_CH_BONDS                       F
+ SHRINK_CH_H_ATOM                      H__C 
+ SHRINK_CH_FACTOR                         0.91500
+ SINGLE_TORSION                        F
+ SCALE_TORSIONS_ABOUT_COMMON_BOND      T
+ EXOCYCLIC_TORSIONS_SCALE_FACTOR          0.40000
+ SINGLE_INVERSION                      F
+ H-BOND_METHOD                         SPLINE
+ H-BOND_LIST                           T
+ H-BOND_DIRECT_RCUT                       4.00000
+ H-BOND_SPLINE_DISTANCE_ON                4.00000
+ H-BOND_SPLINE_DISTANCE_OFF               4.50000
+ H-BOND_SPLINE_ANGLE_ON                  65.00000
+ H-BOND_SPLINE_ANGLE_OFF                 75.00000
+ H-BOND_LIST_DISTANCE_OFF                 5.00000
+ H-BOND_LIST_ANGLE_OFF                   90.00000
+ NON_BOND_LIST                         T
+ NON_BOND_LIST_CUT_OFF                    8.16737
+ DISTANCE_DEPENDENT_DIELETRIC_CONSTANT F
+ COU_DIELETRIC_CONSTANT                   1.00000
+ COU_INTER_CUT_OFF                        8.50000
+ COU_SPLINE_OFF                           8.50000
+ COU_SPLINE_ON                            8.00000
+ EWALD_SUM_COU_ACCURACY                   0.00100
+ EWALD_SUM_COU_ETA                        1.70000
+ EWALD_SUM_COU_KCUT                       0.70290
+ EWALD_SUM_COU_RCUT                       5.16112
+ EWALD_SUM_COU_AUTO_OPT                T
+ COU_EXCLUDE_1-2                       T
+ COU_EXCLUDE_1-3                       T
+ COU_EXCLUDE_1-4                       F
+ COU_1-4_SCALE_FACTOR                     1.00000
+ COU_METHOD                            EWALD     
+ COU_DIRECT_CUT-OFF                       8.00000
+ VDW_RADII_COMBINATION_RULE            GEOMETRIC 
+ VDW_INTER_CUT_OFF                        8.50000
+ VDW_EXCLUDE_1-2                       T
+ VDW_EXCLUDE_1-3                       T
+ VDW_EXCLUDE_1-4                       F
+ VDW_1-4_SCALE_FACTOR                     1.00000
+ VDW_METHOD                            EWALD     
+ VDW_SPLINE_ON                            8.00000
+ VDW_SPLINE_OFF                           8.50000
+ EWALD_SUM_VDW_AUTO_OPT                T
+ EWALD_SUM_VDW_ACCURACY                   0.00100
+ EWALD_SUM_VDW_ETA                        1.92100
+ EWALD_SUM_VDW_KCUT                       0.61346
+ EWALD_SUM_VDW_RCUT                       5.26777
+ EWALD_SUM_VDW_REP_CUT                    6.16737
+ EWALD_SUM_VDW_RATIO                     10.00000
+ MINIMUM_IMAGE                         F
+ ASSIGN_MASS                           T
+ ASSIGN_CHARGE                         T
+ ASSIGN_HYBRIDIZATION                  F
+ ATOM_TYPE                             T
+ ATOM_TYPE_ALL                         T
+ CALCULATE_BOND_ORDER                  F
+END
+#
+ATOMTYPES
+ C_3        C      12.01100 -0.5400   3   0   0
+ C_3F       C      12.01100  0.7000   3   0   0
+ H          H       1.00790  0.1800   0   0   0
+ F          F      18.99840 -0.2600   0   0   0
+END
+#
+DIAGONAL_VDW
+ C_3         EXPO_6         3.8837  0.8440E-01   12.0000
+ C_3F        EXPO_6         3.8837  0.8440E-01   12.0000
+ H           EXPO_6         3.1975  0.1600E-01   11.8000
+ F           EXPO_6         3.5380  0.2110E-01   16.0000
+END
+#
+ATOM_TYPING_RULES
+ C_3F            C            3           0           2           1
+                 F            0           0           0           1
+                 F            0           0           0           1
+ C_3             C            3           0           2           1
+                 H            0           0           0           1
+                 H            0           0           0           1
+ F               F            0           0           1           1
+                 C            3           0           0           1
+ H               H            0           0           1           1
+                 C            0           0           0           1
+END
+#
+#
+OFF_DIAGONAL_VDW
+END
+#
+BOND_STRETCH
+ C_3F     C_3         MORSE        682.1823    1.5242  101.2000    0.0000
+ H        C_3         MORSE        729.3088    1.0789  106.7000    0.0000
+ H        C_3F        MORSE        729.3088    1.0789  106.7000    0.0000
+ F        C_3F        MORSE        832.0755    1.3457  108.0000    0.0000
+END
+#
+ANGLE_BEND
+ C_3F     C_3      C_3F        COS_HARMON   178.4806  116.3318
+ H        C_3      C_3F        COS_HARMON    64.7621  116.0913
+ H        C_3      H           COS_HARMON    52.7607  116.4161
+ C_3      C_3F     C_3         COS_HARMON   155.5421  119.3277
+ H        C_3F     C_3         COS_HARMON    64.7621  116.0913
+ F        C_3F     C_3         COS_HARMON   139.2072  114.8591
+ F        C_3F     H           COS_HARMON    60.0000  109.4712
+ F        C_3F     F           COS_HARMON   184.7170  109.5665
+END
+#
+TORSIONS
+ C_3      C_3F     C_3      C_3F        DIHEDRAL       8.2966    1.0000    1.0000
+                                                       7.8439    2.0000    1.0000
+                                                      13.7195    3.0000   -1.0000
+                                                       0.6973    4.0000    1.0000
+                                                       2.2890    5.0000    1.0000
+                                                       2.9580    6.0000    1.0000
+ C_3      C_3F     C_3      H           DIHEDRAL       4.4115    3.0000   -1.0000
+ H        C_3F     C_3      C_3F        DIHEDRAL       4.4115    3.0000   -1.0000
+ H        C_3F     C_3      H           DIHEDRAL       5.1688    3.0000   -1.0000
+ F        C_3F     C_3      C_3F        DIHEDRAL       5.3835    3.0000   -1.0000
+ F        C_3F     C_3      H           DIHEDRAL       1.0690    3.0000   -1.0000
+END
+#
+HYDROGEN_BONDS
+END
+#
+GENERATOR
+END
+#
+STRETCH_BEND_STRETCH
+ C_3F     C_3      C_3F        R-COSINE       1.5242    1.5242  116.3318   18.0472   18.0472
+ H        C_3      C_3F        R-COSINE       1.0789    1.5242  116.0913   19.8266   23.4357
+ H        C_3      H           R-COSINE       1.0789    1.0789  116.4161   18.4383   18.4383
+ C_3      C_3F     C_3         R-COSINE       1.5242    1.5242  119.3277   23.6441   23.6441
+ H        C_3F     C_3         IGNORE    
+ F        C_3F     C_3         R-COSINE       1.3457    1.5242  114.8591   57.1205   44.4445
+ F        C_3F     H           IGNORE    
+ F        C_3F     F           R-COSINE       1.3457    1.3457  109.5665   71.5973   71.5973
+END
+#
+STRETCH_STRETCH
+ C_3F     C_3      C_3F        R-R            1.5242    1.5242   18.6314
+ H        C_3      C_3F        R-R            1.0789    1.5242    0.9924
+ H        C_3      H           R-R            1.0789    1.0789    5.3363
+ C_3      C_3F     C_3         R-R            1.5242    1.5242   12.0600
+ H        C_3F     C_3         IGNORE    
+ F        C_3F     C_3         R-R            1.3457    1.5242  111.1305
+ F        C_3F     H           IGNORE    
+ F        C_3F     F           R-R            1.3457    1.3457  145.3960
+END
+#
+BEND_BEND
+ C_3      H        C_3F     C_3F        COSINE2      116.0913  116.3318    1.9876
+ C_3      H        H        C_3F        COSINE2      116.0913  116.0913   -1.3257
+ C_3      C_3F     C_3F     H           COSINE2      116.0913  116.0913   16.7263
+ C_3      H        C_3F     H           COSINE2      116.4161  116.0913    0.6894
+ C_3      H        H        H           IGNORE    
+ C_3F     F        C_3      C_3         COSINE2      114.8591  119.3277    1.9513
+ C_3F     F        H        C_3         IGNORE    
+ C_3F     F        F        C_3         COSINE2      114.8591  114.8591   22.5242
+ C_3F     F        C_3      H           IGNORE    
+ C_3F     F        F        H           IGNORE    
+ C_3F     C_3      C_3      F           COSINE2      114.8591  114.8591    2.0896
+ C_3F     H        C_3      F           IGNORE    
+ C_3F     F        C_3      F           COSINE2      109.5665  114.8591   -4.9905
+ C_3F     F        H        F           IGNORE    
+ C_3F     F        F        F           IGNORE    
+END
+#
+TORSION_BEND_BEND
+ C_3      C_3F     C_3      C_3F        COS2-COSPH   119.3277  116.3318   -8.2975
+ C_3      C_3F     C_3      H           COS2-COSPH   119.3277  116.0913   22.3465
+ H        C_3F     C_3      C_3F        IGNORE    
+ H        C_3F     C_3      H           IGNORE    
+ F        C_3F     C_3      C_3F        COS2-COSPH   114.8591  116.3318   23.8249
+ F        C_3F     C_3      H           COS2-COSPH   114.8591  116.0913    0.1967
+END
