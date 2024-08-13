@@ -1,0 +1,58 @@
+SYSTEM = pwdir
+
+# continuation
+MAGMOM = 18*1.15 9*1 18*1 1*1 
+ISTART = 0
+ICHARG = 2
+ISPIN = 2
+
+# precision
+ENCUT = 500
+PREC = accurate
+ISMEAR = 0 ; SIGMA = 0.05
+GGA = PE
+GGA_COMPAT=.FALSE.
+NELMIN = 4 ; NELM = 200
+EDIFF = 1E-5 ; EDIFFG = -0.1
+SYMPREC = 1E-8
+
+#mixing
+LMAXMIX = 4
+#IMIX = 4
+#AMIX = 0.2
+#BMIX = 0.0001
+#AMIX_MAG = 0.8
+#BMIX_MAG = 0.0001
+
+# parallel
+ALGO = Fast
+#IALGO=48
+NSIM = 8
+NPAR = 1
+LREAL = Auto
+LPLANE = .TRUE.
+LSCALAPACK = .FALSE.
+
+# opt
+NSW = 1999 ; ISIF = 2
+IBRION = 1
+ADDGRID = .TRUE.
+IDIPOL = 3
+POTIM = 0.1
+
+LORBIT = 11
+LAECHG=.FALSE.
+LWAVE = .FALSE.
+LCHARG = .FALSE.
+
+#LDAU = .TRUE.
+#LDAUTYPE = 2
+#LDAUL =  2 -1 -1 -1 
+#LDAUU =  4.9 0 0 0 
+#LDAUJ =  1.0 0 0 0
+
+IVDW = 12
+
+IMAGES = 8
+SPRING = -5
+LCLIMB = .TRUE.
