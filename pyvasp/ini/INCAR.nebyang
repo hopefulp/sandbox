@@ -8,7 +8,7 @@ ISPIN = 2
 
 # precision
 ENCUT = 500
-PREC = accurate
+PREC = Accurate
 ISMEAR = 0 ; SIGMA = 0.05
 GGA = PE
 GGA_COMPAT=.FALSE.
