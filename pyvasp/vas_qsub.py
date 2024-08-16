@@ -17,7 +17,7 @@ def run_vasp(dirname, qx, qN, np, issue=None):
 
     s = qsub_command(dirname,X=qx,nnode=qN,np=np, issue=issue)
     print(s)
-    if yes_or_no("Will you run"):
+    if yes_or_no("Will you run vasp?"):
         os.system(s)
     return 0
 
@@ -103,9 +103,9 @@ def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None, lkisti=
         print(f"No qsub command for {hostname}")
         s=''
         sys.exit(10)
-    print(s)
-    if Lrun or yes_or_no("Will you run?"):
-        os.system(s)
+    #print(s)
+    #if Lrun or yes_or_no("Will you run in qsub?"):
+    #    os.system(s)
     return s        
 
 if __name__ == '__main__':
