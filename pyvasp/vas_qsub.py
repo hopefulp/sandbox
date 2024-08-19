@@ -58,7 +58,7 @@ def get_queue_pt(qx=None):
             return 2, free_node['X2']
         else:
             return 1, free_node
-
+### directly called from vas_make_ini
 def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None, lkisti=None, Lrun=None):
     if hostname == 'kisti':
         if vasp_exe:
@@ -103,9 +103,9 @@ def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None, lkisti=
         print(f"No qsub command for {hostname}")
         s=''
         sys.exit(10)
-    #print(s)
-    #if Lrun or yes_or_no("Will you run in qsub?"):
-    #    os.system(s)
+    print(s)
+    if Lrun or yes_or_no("Will you run in qsub?"):
+        os.system(s)
     return s        
 
 if __name__ == '__main__':
