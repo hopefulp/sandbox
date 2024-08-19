@@ -10,12 +10,12 @@ import shutil
 import re
 from common import *
 from mod_poscar import get_poscar
-from vas_qsub import run_vasp
+from vas_qsub import qsub_command
 from mod_vas  import *
 
 ### vasp input order
 ### inputs = [args.poscar, args.kpoints, args.potcar, args.incar]
-def make_vas_d2d(odir, ndir, job, inputs, files, np,xpart,nnode,hmem):
+def make_vas_d2d(odir, ndir, job, inputs, files, qx, qN, qn,hmem, issue=None, vasp_exe=None, lkisti=None, Lrun=None):
 
     vin_order = ['POSCAR', 'KPOINTS', 'POTCAR', 'INCAR']
     pwd = os.getcwd()
@@ -88,8 +88,11 @@ def make_vas_d2d(odir, ndir, job, inputs, files, np,xpart,nnode,hmem):
             elif re.search('POSCAR', f):
                 os.system(f"cp {odir}/{f} {ndir}")
     ### run?
-    run_vasp(ndir, xpart, nnode, np, hmem)
 
+    #run_vasp(ndir, xpart, nnode, np, hmem)
+    if get_hostname()=='pt' and (not qx or not qN):
+        qx, qN = get_queue_pt(qx=qx)
+    s = qsub_command(ndir,X=qx,nnode=qN, np=qn, issue=issue, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun)
     return 0        
             
                 
