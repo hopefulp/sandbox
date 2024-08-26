@@ -1,7 +1,7 @@
 #!/bin/sh
 #PBS -V
 #PBS -A vasp
-#PBS -q normal
+#PBS -q long
 #PBS -l select=20:ncpus=40:mpiprocs=40:ompthreads=1
 #PBS -l walltime=96:00:00
 
