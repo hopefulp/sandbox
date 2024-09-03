@@ -29,8 +29,8 @@ fi
 echo $STYLE
 
 gnuplot -persist << EOF
-set xlabel 'E(eV)'
-set ylabel 'DOS'
+set xlabel 'Reaction coordinates'
+set ylabel 'E [eV]'
 set title "$TITLE"
 plot $RANGE  $STYLE
 EOF

@@ -5,7 +5,7 @@
 ##SBATCH -n 64               # total number of mpi tasks requested
 
 ## HPC ENVIRONMENT
-. /etc/profile.d/SLURM.sh
+#. /etc/profile.d/SLURM.sh
 
 #mpiexec.hydra -np $SLURM_NTASKS  /TGM/Apps/VASP/bin/5.4.4/NORMAL/vasp_5.4.4_GRP7_NORMAL_20170903.x
 #mpirun -np $SLURM_NTASKS  /home/starnmj/bin/vasp_5.4.4_GRP7_NORMAL_20170903.x

@@ -3,6 +3,7 @@
 import argparse
 from ase.io import read, write
 import numpy as np
+#from 
 
 types = { 'POSCAR': 'vasp'}
 
@@ -18,7 +19,8 @@ def ase_convert(ifile, ofile, movement, amount_m):
             pass        # not ready
 
 
-    write(ofile, sys_bulk, format=types[ofile])
+    #write(ofile, sys_bulk, format=types[ofile])
+    write(ofile, sys_bulk, format='xsf')
 
     return 0
 

@@ -40,6 +40,7 @@ def build_structure(dim, structure, name, size, vac, akind, status=None,  atom=1
     if len(vac) == 1:
         vac0 = vac[0]
         vac  = (vac0, vac0, vac0)
+    print(f"dimension {dim}")
     if dim == 0:
         if re.match('icosa', structure):
             atoms = Icosahedron(akind, size0)
@@ -58,15 +59,17 @@ def build_structure(dim, structure, name, size, vac, akind, status=None,  atom=1
     elif dim == 1:
         pass
     elif dim == 2:
+        print(f"structure {structure}")
         if structure == None:
             print(f"input structure name using -n ")
             sys.exit(1)
-        elif structure == 'graphene':
-            atoms = bd.graphene(size=size, vacuum=vac0)       # does not make z-axis
+        elif re.match('gr', structure) :  # gr finds graphene
+            atoms = bd.graphene(size=size, vacuum=vac0)       # size 
             view(atoms)
+            print("save graphene")
         elif structure == 'slab':
             pass
-    elif dim == 'bulk':
+    elif dim == 'bulk' or dim == 3:
         if name in metals.keys():
             if metals[name] == 'fcc':
                 from ase.lattice.cubic import FaceCenteredCubic
@@ -76,8 +79,11 @@ def build_structure(dim, structure, name, size, vac, akind, status=None,  atom=1
             coord = make_ordered_coordinates(natom, latt)
             #print(coord)
             atoms = Atoms(symbols='Ar256', positions=coord, cell=(latt,latt,latt), pbc=True)
-        
-    return atoms
+    if not "atoms" in locals():
+        print("No atoms are figured")
+        return None
+    else:
+        return atoms
 
 def main():
     parser = argparse.ArgumentParser('ASE builder for structure')
@@ -86,8 +92,8 @@ def main():
     parser.add_argument('-d', '--dim', default=2, type=int, choices=[0,1,2,3], help='basic structure of system')
     parser.add_argument('-s', '--structure', help='structure name following dimension')
     parser.add_argument('-n', '--name', help='structure name')
-    parser.add_argument('-sc', '--supercell', nargs='*', default=[1], type=int, help='size of supercell')
-    parser.add_argument('-v', '--vacuum', nargs='*', default=[10.0], type=float, help='size of vacuum')
+    parser.add_argument('-sc', '--supercell', nargs='*', default=[1,1,1], type=int, help='size of supercell w. 3 indices')
+    parser.add_argument('-v', '--vacuum',  nargs='*', default=[10.0], type=float, help='size of vacuum')
     parser.add_argument('-ak', '--atomkind', default='Pt', help='atom species')
     parser.add_argument('-u', '--usage', action='store_true', help='shows usage and exit')
     args = parser.parse_args()
