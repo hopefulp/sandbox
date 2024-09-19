@@ -3,12 +3,8 @@
 import argparse
 from ase.io import read, write
 import numpy as np
-<<<<<<< HEAD
-#from 
-=======
 from common import f_ext, f_root
 import sys, re
->>>>>>> fb6711f6f651460c8fd75e3579a820fd55c5a3f2
 
 ###        fname : format
 formats = { 'POSCAR': 'vasp'}
@@ -39,12 +35,7 @@ def ase_convert(ifile, ofile, off, movement, amount_m):
             pass        # not ready
 
 
-<<<<<<< HEAD
-    #write(ofile, sys_bulk, format=types[ofile])
-    write(ofile, sys_bulk, format='xsf')
-=======
     write(ofile, atoms, format=outff)
->>>>>>> fb6711f6f651460c8fd75e3579a820fd55c5a3f2
 
     return 0
 
