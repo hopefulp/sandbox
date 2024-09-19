@@ -3,6 +3,7 @@
 import argparse
 from ase import Atoms, Atom, units
 import ase.build as bd
+from ase.build import bulk
 from ase.visualize import view
 from ase.io.formats import read, iread, write, string2index
 from random import uniform
@@ -15,7 +16,7 @@ from common import list2str
 class Usage:
     pass
 
-metals = {'Pt': 'fcc'}
+metals = {'Pt': 'fcc', 'Fe': 'bcc'}
 
 def make_random_coordinates(natoms, alattice):
     atoms_coord=[]
@@ -69,7 +70,7 @@ def build_structure(dim, structure, name, size, vac, akind, status=None,  atom=1
             print("save graphene")
         elif structure == 'slab':
             pass
-    elif dim == 'bulk' or dim == 3:
+    elif dim == 3 or dim == 'bulk':
         if name in metals.keys():
             if metals[name] == 'fcc':
                 from ase.lattice.cubic import FaceCenteredCubic
