@@ -3,11 +3,28 @@
 import argparse
 from ase.io import read, write
 import numpy as np
+from common import f_ext, f_root
+import sys, re
 
-types = { 'POSCAR': 'vasp'}
+###        fname : format
+formats = { 'POSCAR': 'vasp'}
 
-def ase_convert(ifile, ofile, movement, amount_m):
-    sys_bulk = read(ifile)
+def ase_convert(ifile, ofile, off, movement, amount_m):
+    ### Read
+    atoms = read(ifile)
+
+    ###### Output file format
+    ### 1. extension is fformat
+    if off:
+        outff = off
+    elif re.match('\.', ofile):
+        outff = f_ext(ofile)     # output file format
+    ### outfname has format in formats
+    elif ofile in formats.keys():
+        outff = formats[ofile]
+    else:
+        print(f"Can't recognize {ofile} file format")
+        sys.exit(1)
     ### check using view(import from ase.visualize) in ipython
     if movement:
         if movement=='t':
@@ -18,20 +35,21 @@ def ase_convert(ifile, ofile, movement, amount_m):
             pass        # not ready
 
 
-    write(ofile, sys_bulk, format=types[ofile])
+    write(ofile, atoms, format=outff)
 
     return 0
 
 def main():
     parser = argparse.ArgumentParser(description="read extxyz and write POSCAR  ")
-    parser.add_argument('-i','--in_file', help="input file")
-    parser.add_argument('-o','--out_file',  help="output file")
+    parser.add_argument('inf', help="input file")
+    parser.add_argument('outf',  help="output file")
+    parser.add_argument('-of','--outff',  help="output file format")
     manipulate = parser.add_argument_group()
     manipulate.add_argument('-m', '--move', choices={'t','r'},  help="move molecule by translate|rotate")
     manipulate.add_argument('-ma', '--amount_move', default=0.5, help="amount of movement: translate w.r.t. cell size")
     args = parser.parse_args()
 
-    ase_convert(args.in_file, args.out_file, args.move, args.amount_move )
+    ase_convert(args.inf, args.outf, args.outff, args.move, args.amount_move )
 
 if __name__ == "__main__":
     main()
