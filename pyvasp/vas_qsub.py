@@ -59,7 +59,7 @@ def get_queue_pt(qx=None):
         else:
             return 1, free_node
 ### directly called from vas_make_ini
-def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None, lkisti=None, Lrun=None):
+def qsub_command(ndir, X=3, nnode=4, np=None, option=None, vasp_exe=None, lkisti=None, Lrun=None):
     if hostname == 'kisti':
         if vasp_exe:
             if vasp_exe == 'gamma':
@@ -70,13 +70,17 @@ def qsub_command(ndir, X=3, nnode=4, np=None, issue=None, vasp_exe=None, lkisti=
             str_vasp = ""
         nnode=20
         np=40
-        if issue != 'mem' and ( re.search('bd', ndir) or re.search('band', ndir)):
-            print("Use -m for half nproc for memory problem")
-        if issue == 'mem':
+        #if not re.search('mem', option) and ( re.search('bd', ndir) or re.search('band', ndir)):
+        #    print("Use -m for half nproc for memory problem")
+        ### memory lack problem
+        if option == 'mem':
             hproc = int(np/2)
             ### due to memory prob for band calculation of large sc, use hmem = np/2
             s = f"qsub -N {ndir} -l select={nnode}:ncpus={np}:mpiprocs={hproc}:ompthreads=1  $SB/pypbs/pbs_vasp_kisti_skl.sh"
-        elif issue == 'opt':
+        ### long queue
+        elif option == 'long':
+            s = f"qsub -N {ndir} -q long -l walltime=96:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+        elif option == 'opt':
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
         ### for quick run: decrease walltime to fast run in kisti
         elif lkisti == 'kp':
