@@ -105,6 +105,7 @@ def make_vas_d2d(odir, ndir, job, inputs, files, qx, qN, qn, option=None, vasp_e
                 os.system(f"cp {odir}/{f} {ndir}")
         os.chdir(ndir)
         change_incar_byjob('INCAR', 'cont', outf='INCAR')
+        os.chdir(pwd)
     ### run?
 
     #run_vasp(ndir, xpart, nnode, np, option)

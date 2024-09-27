@@ -72,7 +72,7 @@ def make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_remove):
 
 ### O: Use this to comtain all the jobs
 ###            1     2      3       4     5      6           7         8      9    10    11    12 
-def vasp_cont_1dir(job, odir, ndir, kopt, iopt, incar_kws, incar_remove, Lrun, issue, np, xpart, nnode):
+def vasp_cont_1dir(job, odir, ndir, kopt, iopt, incar_kws, incar_remove, Lrun, option, np, xpart, nnode):
     pwd = os.getcwd()
 
     ### 0: make a new dir
@@ -194,7 +194,7 @@ def vasp_cont_1dir(job, odir, ndir, kopt, iopt, incar_kws, incar_remove, Lrun, i
         os.chdir(pwd)
 
     ### 6: Job submit: qsub
-    qsub_command(ndir, X=xpart, nnode=nnode, np=np, issue=issue)
+    qsub_command(ndir, X=xpart, nnode=nnode, np=np, option=option)
     return 0
 
 def main():
@@ -224,7 +224,7 @@ def main():
     #parser.add_argument('-k', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
     parser.add_argument('-pos', '--poscar', help='incar POSCAR.name for job==ini')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
-    parser.add_argument('-err', '--error', choices=['opt','mem','sim'], help="vasp error: converge, memory issue, sim for not to change INCAR")
+    parser.add_argument('-o', '--option', choices=['opt','mem','sim','long'], help="vasp error: converge, memory issue, sim for not to change INCAR")
     qsub = parser.add_argument_group(title='qsub')
     qsub.add_argument('-x', '--partition', type=int,            help='partition number in qsub')
     qsub.add_argument('-N', '--nnode',     type=int,            help='number of nodes in qsub')
@@ -264,7 +264,7 @@ def main():
         print(f'run {odir} to {ndir}')
         ### call single jobs
         ###         1         2         3        4          5          6               7                  8           9           10        11           12
-        vasp_cont_1dir(args.job, odir, ndir, args.kopt, args.incar, args.incar_kws, args.incar_remove, args.run,  args.error, args.nproc, args.partition, args.nnode)
+        vasp_cont_1dir(args.job, odir, ndir, args.kopt, args.incar, args.incar_kws, args.incar_remove, args.run,  args.option, args.nproc, args.partition, args.nnode)
 
     return 0
 

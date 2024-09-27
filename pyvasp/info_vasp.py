@@ -55,7 +55,8 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\tINCAR:\
                     \n\t    need to be prepared in advance\
                     \n\te.g. (KISTI)\
-                    \n\t    python $sbvas/vas_make_ini.py -r -o -al -s POSCAR.pdh2sidetop\
+                    \n\t    kpy vas_make_ini.py -s POSCAR.IntMoS2 -j opt\
+                    \n\t    kpy vas_make_ini.py -s POSCAR.IntHfSe2md -j md -al -o long (queue long option)\
                     \n\te.g. (Pseudo Hydrogen)\
                     \n\t    vas_make_ini.py -s POSCAR.sc11sHHf -j sp -al -hpp .66 1.33\
                     \n\t    kpy vas_make_ini.py -s POSCAR.HfOHSe2MLf1 -j opt -d t1736a -hpp .5 .66 1.5 1.33\
@@ -63,7 +64,7 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\t    vas_make_ini.py -s POSCAR -kdim 2 -kps 4 4 6 4 8 4 -x 2 -N 1 -n 4\
                     \n\te.g. (fake job for kisti)\
                     \n\t    vas_make_ini.py -j fake -sj opt -d dname -nd ndirs\
-                    \n\t===== END OF INI ===================\
+                    \n\t===== D2D w. NEB  ===================\
                     "
 make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
                     \n\tvas_make_d2d.py old_dir new_dir job [options]\
@@ -74,7 +75,7 @@ make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
                     \n\t\tlong: long queue\
                     \n\t\tmem: memory issue - run half cpu to double memory\
                     \n\tNEB::\
-                    \n\t    vas_make_d2d.py HfSe2mO2sglneba HfSe2mO2sglnebacini -j neb[cont] -o long\
+                    \n\t    kpy vas_make_d2d.py HfSe2mO2sglneba HfSe2mO2sglnebacini -j neb[cont] -o long (neb: copy, cont:for time limit)\
                     "
 make.vas_make_incar ="\n\t    If not 'incar.key', make it, check it and modify it before run this again\
                     \n\t    based on 'incar.key', make INCAR\
