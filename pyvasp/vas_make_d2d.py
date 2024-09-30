@@ -93,10 +93,11 @@ def make_vas_d2d(odir, ndir, job, inputs, files, qx, qN, qn, option=None, vasp_e
                 if 'cont' in job:
                     pos = f"{odir}/{f}/CONTCAR"
                     if os.path.exists(pos):
-                        os.chdir(f"{ndir}/{f}")
+                    ### Do not use WAVECAR, CHGCAR
+                        #os.chdir(f"{ndir}/{f}")
                         ### WAVECAR is linked -> change INCAR
-                        os.system(f"ln -s ../../{odir}/{f}/WAVECAR .")
-                        os.chdir(f"{pwd}")
+                        #os.system(f"ln -s ../../{odir}/{f}/WAVECAR .")
+                        #os.chdir(f"{pwd}")
                     else:
                         pos = f"{odir}/{f}/POSCAR"
                     os.system(f"cp {pos} {ndir}/{f}/POSCAR")
