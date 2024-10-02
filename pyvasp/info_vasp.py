@@ -55,7 +55,8 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\tINCAR:\
                     \n\t    need to be prepared in advance\
                     \n\te.g. (KISTI)\
-                    \n\t    python $sbvas/vas_make_ini.py -r -o -al -s POSCAR.pdh2sidetop\
+                    \n\t    kpy vas_make_ini.py -s POSCAR.IntMoS2 -j opt\
+                    \n\t    kpy vas_make_ini.py -s POSCAR.IntHfSe2md -j md -al -o long (queue long option)\
                     \n\te.g. (Pseudo Hydrogen)\
                     \n\t    vas_make_ini.py -s POSCAR.sc11sHHf -j sp -al -hpp .66 1.33\
                     \n\t    kpy vas_make_ini.py -s POSCAR.HfOHSe2MLf1 -j opt -d t1736a -hpp .5 .66 1.5 1.33\
@@ -63,11 +64,18 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\t    vas_make_ini.py -s POSCAR -kdim 2 -kps 4 4 6 4 8 4 -x 2 -N 1 -n 4\
                     \n\te.g. (fake job for kisti)\
                     \n\t    vas_make_ini.py -j fake -sj opt -d dname -nd ndirs\
-                    \n\t===== END OF INI ===================\
+                    \n\t===== D2D w. NEB  ===================\
                     "
 make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
                     \n\tvas_make_d2d.py old_dir new_dir job [options]\
-                    \n\tjob = {cont, md, ... post process}\
+                    \n\tjob = {cont, md, neb,... post process}\
+                    \n\toptions:\
+                    \n\t    -j [ini,cont,neb,nebcont]\
+                    \n\t    -o qsub command options\
+                    \n\t\tlong: long queue\
+                    \n\t\tmem: memory issue - run half cpu to double memory\
+                    \n\tNEB::\
+                    \n\t    kpy vas_make_d2d.py HfSe2mO2sglneba HfSe2mO2sglnebacini -j neb[cont] -o long (neb: copy, cont:for time limit)\
                     "
 make.vas_make_incar ="\n\t    If not 'incar.key', make it, check it and modify it before run this again\
                     \n\t    based on 'incar.key', make INCAR\
@@ -114,10 +122,6 @@ make.mod_vas        = "modules for make vasp directory\
                     \n\t    make_incar\
                     \n\tRun by 'python -m mod_vas -j getmag -s poscar'\
                     \n\t    to get MAGMOM\
-                    "
-make.mod_incar     ="module for INCAR modification\
-                    \n\tdef modify_incar(incar_in, job, dic=None, opt='ac')\
-                    \n\t    incar_in is modified by job_dict\
                     "
 poscar.mod_poscar    ="module for POSCAR modification\
                     \n\tget_atoms_poscar\
@@ -183,7 +187,21 @@ potcar.potcar_kw    = "extract k-w\
                     \n\te.g.:\
                     \n\t    potcar_kw.py k774 [-kw ENMAX]\
                     "
-
+incar.mod_incar     ="module for INCAR modification\
+                    \n\tdef modify_incar(incar_in, job, dic=None, opt='ac')\
+                    \n\t    incar_in is modified by job_dict\
+                    "
+incar.incar_change ="change incar using mod_incar\
+                    \n\tOptions:\
+                    \n\t    -j: by job has priority\
+                    \n\t    -kv: by key-value pair\
+                    \n\t    -o: output filename\
+                    \n\t\tdefault: makes INCAR_n (new)\
+                    \n\t\tif -o INCAR, makes INCAR_o (old)\
+                    \n\tUsage:\
+                    \n\t    incar_change.py HfSe2mO2sglneba -j cont\
+                    \n\t\tcheck outfile of 'incar' by incar_diff.py\
+                    "
 incar.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\tOptions:\
                     \n\t    -j: ['kw','diff'] kw-many files to check kw, diff- compare a few files\

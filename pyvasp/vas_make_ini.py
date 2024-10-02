@@ -57,7 +57,7 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allprepared, dirnames, iofile, atoms, issue, qx,qN,qn,vasp_exe,lkisti,Lrun):
+def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allprepared, dirnames, iofile, atoms, option, qx,qN,qn,vasp_exe,lkisti,Lrun):
     global ini_dvasp, pwd
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -203,7 +203,7 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
         else:
             if get_hostname()=='pt' and (not qx or not qN):
                 qx, qN = get_queue_pt(qx=qx)
-            s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun)
+            s = qsub_command(dirname,X=qx,nnode=qN,np=qn, option=option, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun)
 
     return 0            
 
@@ -237,7 +237,7 @@ def main():
     g_run.add_argument('-ra', '--run_all', action='store_true', help="without asking")
     g_run.add_argument('-r', '--run', choices=['a','o','on','s','k'], help="o:overwrite run,on:overwrite stop,s:just submit,k:test input")
 
-    parser.add_argument('-err', '--error', choices=['opt','mem'], help="vasp error: converge, memory issue")
+    parser.add_argument('-o', '--option', choices=['opt','mem','long'], help="vasp & pbs error: converge, memory issue, queue long")
     ### VASP executable
     g_vasp  = parser.add_argument_group(title='VASP executable')
     g_vasp.add_argument('-exe', '--executable', choices=['gamma','xyrelax'], help='vasp execuatable: gamma, xy-relax')
@@ -331,9 +331,9 @@ def main():
                 kp_in = list(kp)
             print(kp_in)
             kp_str = list(map(str, kp_in))
-            make_vasp_dir(job, poscars, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dnames, args.iofile, args.atoms, args.error, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+            make_vasp_dir(job, poscars, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dnames, args.iofile, args.atoms, args.option, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
     else:
-        make_vasp_dir(job, poscars, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, dirnames, args.iofile, args.atoms, args.error, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+        make_vasp_dir(job, poscars, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, dirnames, args.iofile, args.atoms, args.option, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
     return 0
 
 if __name__ == '__main__':

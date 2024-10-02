@@ -91,21 +91,18 @@ def dict_update(param, dic):
     return paramch
 '''
 ### simple modification using incar_kw and incar_remove
-def smodify_incar(incar, ickw, icout, outf='INCAR.mod'):
+def modify_incar_bydic(incar, ickv, icout=None, outf='INCAR.mod'):
     '''
-    read incar
-    active ickw
+    incar       input file of INCAR
+    ickv        list or dict for INCAR key-value
     deactivate icout
     return lines
     '''
-    if ickw:
-        if len(ickw) % 2 != 0:
-            print("not perfect kw options: put in even numbers for keyword options")
-            sys.exit(11)
-        else:
-            keyup = [ kv.upper()  if kv.isalpha() else kv for kv in ickw]
-            kws = list2dict(keyup)
-            print(f"{kws} in {whereami()} at {__file__}")
+    if isinstance(ickv, list):
+        kws = list2dict(ickv)
+        print(f"{kws} in {whereami()} at {__file__}")
+    elif isinstance(ickv, dict):
+        kws = ickv
     iline=0
     with open(incar) as f:
         lines = f.readlines()
@@ -121,7 +118,7 @@ def smodify_incar(incar, ickw, icout, outf='INCAR.mod'):
         else:
             line_key = lst[0]
         ### if not activated --> activate
-        if ickw:
+        if ickv:
             if '#' in line_key:
                 line_key = line_key.replace('#', '')
             #print(f"{line_key}: {kws.keys()}")

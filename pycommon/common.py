@@ -1,3 +1,4 @@
+import argparse
 import re
 import os
 import sys
@@ -267,27 +268,30 @@ def get_files_type(ftype, dirname):
     print(matched_files)
     return matched_files            
 
-def get_dirs_prefix(wdir, prefix, excludes=None, Lshow=True, Ldir=True):
+### deprecate get_dirs_prefix
+def get_dirfiles(wdir, prefix=None, excludes=None, Lshow=True, Ldir=True):
     """
         receive list of prefix & directory
         prefixes: list of prefix
     """
+    pwd = os.getcwd()
     matched_dirs=[]
+    print(f'{__name__}', os.listdir(wdir))
     for fname in os.listdir(wdir):
         # re.match finds only prefix
-        if os.path.isdir(fname) and re.match(prefix, fname):
-            if excludes:
-                tag=False
-                for ex in excludes:
-                    if re.search(ex, fname):
-                        tag=True
-                        break
-                if not tag :
-                    matched_dirs.append(fname)
-                    print (fname)
-            else:
-                matched_dirs.append(fname)
-                print (fname)
+        #print(f'1: {fname}')
+        if os.path.isdir(f'{pwd}/{wdir}/{fname}'):      # need path for fname
+            print(f'2: {fname}')
+            if prefix:
+                if not re.match(prefix, fname):
+                    break       # to not list
+                if excludes:
+                    for ex in excludes:
+                        if re.search(ex, fname):
+                            break
+            matched_dirs.append(fname)
+            print (fname)
+
     return matched_dirs
 
 def get_files_prefix(prefixes, dirname, Lshow=None, Ldir=None):
@@ -508,3 +512,13 @@ def fname_index(pre, suff, cwd):
             pass
     return 0
 
+def main():
+    parser = argparse.ArgumentParser(description='test functions')
+    parser.add_argument('-d', '--dirs', help='dirname')
+    parser.add_argument('-f', '--funcname', help='function name')
+    args = parser.parse_args()
+
+    get_dirs_prefix(args.dirs)
+
+if __name__ == '__main__':
+    main()
