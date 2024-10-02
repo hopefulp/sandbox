@@ -10,12 +10,12 @@ from common import yes_or_no
 hostname = get_hostname()
 
 ### Now this is being depricated
-def run_vasp(dirname, qx, qN, np, issue=None):
+def run_vasp(dirname, qx, qN, np, option=None):
     #print(f'qx {qx} and qN {qN} in run_vasp()')
     if get_hostname()=='pt' and ( not qx or not qN):
         qx, qN = get_queue_pt(qx=qx)
 
-    s = qsub_command(dirname,X=qx,nnode=qN,np=np, issue=issue)
+    s = qsub_command(dirname,X=qx,nnode=qN,np=np, option=option)
     print(s)
     if yes_or_no("Will you run vasp?"):
         os.system(s)
@@ -48,7 +48,9 @@ def get_queue_pt(qx=None):
         qname = 'X' + str(qx)
         return qx, free_node[qname]
     else:
-        if free_node['X5'] >= 2:
+        if free_node['X6'] >= 2:
+            return 6, free_node['X6'] 
+        elif free_node['X5'] >= 2:
             return 5, free_node['X5'] 
         elif free_node['X4'] >= 3:
             return 4, free_node['X4']
@@ -94,12 +96,12 @@ def qsub_command(ndir, X=3, nnode=4, np=None, option=None, vasp_exe=None, lkisti
             nproc = np
         else:
             nproc = nnode * nXn[X]
-        if issue == 'mem':
+        if option == 'mem':
             hproc = int(nXn[X]/2)
             s = f"sbatch -J {ndir} -p X{X} -N {nnode} -c {hproc} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
-        elif issue == 'opt':
+        elif option == 'opt':
             s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_vaspopt.sh"
-        elif issue == 'sim':
+        elif option == 'sim':
             s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
         else:
             s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
