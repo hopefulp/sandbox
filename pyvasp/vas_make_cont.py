@@ -8,7 +8,7 @@ import json
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 from common     import get_dirfiles, yes_or_no, list2dict
-from mod_incar  import modify_incar, modify_incar_bydic
+from mod_incar  import modify_incar_byjob, modify_incar_bykv
 from mod_poscar import fixedMD_POSCAR, pos2dirname, get_poscar
 from mod_vas    import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_link
 from vas_qsub   import qsub_command
@@ -48,7 +48,7 @@ def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_remove):
                 print("this is not working")
         if incar_opt:
             opt = incar_opt
-        incar = modify_incar(incaro, job, dic=dic, opt=opt)
+        incar = modify_incar_byjob(incaro, job, dic=dic, opt=opt)
         print(f"{incaro} was modified and {incar} was used")
     return incar
 
@@ -146,7 +146,7 @@ def vasp_cont_1dir(job, odir, ndir, kopt, iopt, incar_kws, incar_remove, Lrun, o
 
     ### 4: INCAR
     #if (not ikw_opt or ikw_opt== 'm') and os.path.isfile(f"{odir}/INCAR"):
-    #    incar = modify_incar(f"{odir}/INCAR", job)
+    #    incar = modify_incar_byjob(f"{odir}/INCAR", job)
     ### iopt if incar was designated as 'INCAR' or dir with INCAR
     if iopt:
         if os.path.isfile(f"{iopt}"):
@@ -167,7 +167,7 @@ def vasp_cont_1dir(job, odir, ndir, kopt, iopt, incar_kws, incar_remove, Lrun, o
     if incar_kws or incar_remove:
         ### make incar.new
         incar_o = incar
-        incar = modify_incar_bydic(incar_o, incar_kws, incar_remove)
+        incar = modify_incar_bykv(incar_o, incar_kws, incar_remove)
         print(f"{incar_o} was modified to {incar}")
 
     os.system(f"cp {incar} {ndir}/INCAR")

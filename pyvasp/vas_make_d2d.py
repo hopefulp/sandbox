@@ -98,6 +98,7 @@ def make_vas_d2d(odir, ndir, job, inputs, files, qx, qN, qn, option=None, vasp_e
                         ### WAVECAR is linked -> change INCAR
                         #os.system(f"ln -s ../../{odir}/{f}/WAVECAR .")
                         #os.chdir(f"{pwd}")
+                        pass
                     else:
                         pos = f"{odir}/{f}/POSCAR"
                     os.system(f"cp {pos} {ndir}/{f}/POSCAR")

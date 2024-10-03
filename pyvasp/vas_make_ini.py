@@ -15,6 +15,7 @@ from common     import *
 from vas_qsub   import get_queue_pt, qsub_command
 from mod_vas    import *
 from mod_poscar import get_poscar, get_dnames4pos 
+from mod_incar  import modify_incar_bykv
 
 home = os.environ['HOME']
 hostname = get_hostname()
@@ -57,8 +58,23 @@ def get_incar(ifile):
 
     return 0
 
-def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allprepared, dirnames, iofile, atoms, option, qx,qN,qn,vasp_exe,lkisti,Lrun):
+def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, Lktest,incar, allprepared, dirnames, iofile, option, qx,qN,qn,vasp_exe,lkisti,Lrun):
+    '''
+    jobadds NEB final POSCAR
+            ZPE atom lists
+            ... pseudo potentials for H
+    '''
     global ini_dvasp, pwd
+
+    if job == 'neb':
+        poscar_fin = jobadds[0]
+        if len(jobadds) == 2:
+            nimages = jobadds[1]
+    elif job == 'pseudo':
+        hpp_list = jobadds
+    elif job == 'zpe':
+        atoms = jobadds
+
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
     pwd = os.getcwd()
@@ -178,19 +194,34 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
         else:
             print("Error:: cannot find INCAR")
             sys.exit()
+
         com = f'cp {f_incar} {dirname}/INCAR'
         os.system(f'{com}')
         print(f"{f_incar} was copied to {dirname}/INCAR")
 
-        ### 6. check POTCAR
+        ###### 6. make POTCAR; job=neb: cp POSCAR_fin, extract NIMAGES
+        ### {wdir} NEB: cp POSCAR_fin
+        if job == 'neb':
+            if 'poscar_fin' in locals():
+                s = f'cp {poscar_fin} {dirname}/POSCAR_fin'
+                os.system(s)
+                print(f"{poscar_fin} is added for final POSCAR")
+            else:
+                print(f'final POSCAR is required by -ja POSCAR_fin')
+                sys.exit(99)
+
+        ### {jobdir} NEB: extract nimages from INCAR; Make POTCAR
         os.chdir(dirname)
+        nimages = modify_incar_bykv('INCAR', ['IMAGES'], mode='e')[0]
+        s = f'nebmake.pl POSCAR POSCAR_fin {nimages}'
+        os.system(s)
         #if not os.path.isfile('POTCAR'):   # to make new POTCAR 
         if hostname == 'kisti':
             s = f"python {home}/sandboxg/pyvasp/genpotcar.py -pp pbe"
         else:
             #s = home + "/sandboxg/pyvasp/genpotcar.py -pp pbe"
             s = "genpotcar.py -pp pbe"
-        if hpp_list:
+        if 'hpp_list' in locals():
             s += f" -hpp {' '.join(hpp_list)}"
         print(f"{s} in {dirname}")
         os.system(s)
@@ -209,7 +240,7 @@ def make_vasp_dir(job, poscars, apotcar, hpp_list, kpoints, Lktest,incar, allpre
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', choices=['pchg','chg','md','ini','zpe','mol','wav','opt','copt','sp','noD','kp','fake'], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=['pchg','chg','md','ini','zpe','mol','wav','opt','copt','sp','noD','kp','fake','neb','pseudo'], help='inquire for each file')
     gfakejob = parser.add_argument_group(title='For fake job in kisti: requires -sj for real job name & -n for ndirs')
     gfakejob.add_argument('-sj', '--subjob', default='opt', choices=['opt', 'sp'], help='used for job=="fake"')
     gfakejob.add_argument('-nd', '--ndirs', default=5, type=int, help="number or dirs to make")
@@ -220,15 +251,19 @@ def main():
     ###
     parser.add_argument('-si', '--idposcar', nargs='+', help='in case poscar has index')
     parser.add_argument('-pot', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
-    parser.add_argument('-hpp', '--pseudoH', nargs='*', help='include pseudo H list ')
     parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz, or g for gamma')
+    ### job dependent inputs
+    #jobargs = parser.add_mutually_exclusive_group(title='job dependent arguments')
+    parser.add_argument('-ja', '--jobadds', nargs='+', help='list of job dependent inputs')
+    #jobargs.add_argument('-a', '--atoms', nargs='+', help='list of atoms for what?')
+    #jobargs.add_argument('-sf', '--poscar_final',  help='for job=neb, input additional poscar')
+    #jobargs.add_argument('-hpp', '--pseudoH', nargs='*', help='include pseudo H list ')
     ### KP tests
     g_ktest = parser.add_argument_group(title='KP tests')
     g_ktest.add_argument('-kd', '--kdim', default=3, type=int, choices=[1,2,3], help='input series of k-points [kx, ky, kz]*3')
     g_ktest.add_argument('-kps', '--kpoints_test', nargs='*', type=int, help='input series of k-points [kx, ky, kz]*3')
     ### toggle default: unset in the bare dir, set to j when INCAR.job exists
     parser.add_argument('-i', '--incar', help='[INCAR.job,INCAR,dirname/INCAR]')
-    parser.add_argument('-a', '--atoms', nargs='+', help='list of atoms')
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
     parser.add_argument('-d', '--dnames', nargs='+', help='get directory name')
     parser.add_argument('-al', '--all', action='store_true', help="prepared in job dir if not -s, -p, -k, -i")
@@ -331,9 +366,9 @@ def main():
                 kp_in = list(kp)
             print(kp_in)
             kp_str = list(map(str, kp_in))
-            make_vasp_dir(job, poscars, args.potcar, args.pseudoH, kp_str, True,args.incar, args.all, args.dnames, args.iofile, args.atoms, args.option, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+            make_vasp_dir(job, poscars, args.potcar, args.jobadds, kp_str, True,args.incar, args.all, args.dnames, args.iofile, args.option, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
     else:
-        make_vasp_dir(job, poscars, args.potcar, args.pseudoH, args.kpoints, False,args.incar, args.all, dirnames, args.iofile, args.atoms, args.option, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+        make_vasp_dir(job, poscars, args.potcar, args.jobadds, args.kpoints, False,args.incar, args.all, dirnames, args.iofile, args.option, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
     return 0
 
 if __name__ == '__main__':
