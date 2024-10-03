@@ -1,8 +1,8 @@
 ##!/home/joonho/anaconda3/bin/python
 ### module for INCAR modification
 '''
-    modify_incar
-    smodify_incar   new simple version to modify INCAR
+    modify_incar_byjob
+    modify_incar_bykv   new simple version to modify INCAR
 job zpe
     with CHGCAR: 0 1, without: 0 2
     NSW = 1 : not compatable with ICHRGE 11
@@ -28,7 +28,7 @@ from common import list2dict, whereami
 
 
 ### INCAR ORDER for display
-ordered_incar=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','NSIM','LPLANE','ISTART','ICHARG','ISPIN','ENCUT','NELM','NELMIN','NELMDL','EDIFF','ISYM','ADDGRID','LREAL','LASPH','LMAXMIX','NELECT','MAGMOM','NUPDOWN','ISMEAR','SIGMA','AMIX','BMIX','AMIN','IWAVPRE','ISIF','IBRION','NSW','POTIM','EDIFFG','TEBEG', 'TEEND','SYMPREC', 'SMASS', 'MDALGO', 'NBLOCK', 'NWRITE','LPETIM','LWAVE','LCHARG','LAECHG','LVTOT','LVHAR','LORBIT','NEDOS','EMIN','EMAX','LPARD','NBMOD','EINT','LSEPB','LSEPK','NFREE','LEPSILON','LMONO','IDIPOL','LDIPOL','GGA_COMPAT','LSORBIT','IVDW','LVDWSCS','LDAU','LDAUTYPE','LDAUL','LDAUU','LDAUJ','LDAUPRINT', 'ICORELEVEL', 'CLNT', 'CLN', 'CLL', 'CLZ', 'LSCALAPACK', 'IMAGES', 'SPRING', 'LCLIMB' ]
+ordered_incar_keys=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','NSIM','LPLANE','ISTART','ICHARG','ISPIN','ENCUT','NELM','NELMIN','NELMDL','EDIFF','ISYM','ADDGRID','LREAL','LASPH','LMAXMIX','NELECT','MAGMOM','NUPDOWN','ISMEAR','SIGMA','AMIX','BMIX','AMIN','IWAVPRE','ISIF','IBRION','NSW','POTIM','EDIFFG','TEBEG', 'TEEND','SYMPREC', 'SMASS', 'MDALGO', 'NBLOCK', 'NWRITE','LPETIM','LWAVE','LCHARG','LAECHG','LVTOT','LVHAR','LORBIT','NEDOS','EMIN','EMAX','LPARD','NBMOD','EINT','LSEPB','LSEPK','NFREE','LEPSILON','LMONO','IDIPOL','LDIPOL','GGA_COMPAT','LSORBIT','IVDW','LVDWSCS','LDAU','LDAUTYPE','LDAUL','LDAUU','LDAUJ','LDAUPRINT', 'ICORELEVEL', 'CLNT', 'CLN', 'CLL', 'CLZ', 'LSCALAPACK', 'IMAGES', 'SPRING', 'LCLIMB' ]
 
 ###### DICT for each job
 ### job_mod for the existing value
@@ -90,56 +90,84 @@ def dict_update(param, dic):
         paramch   = eval(f'{job}_change')
     return paramch
 '''
-### simple modification using incar_kw and incar_remove
-def modify_incar_bydic(incar, ickv, icout=None, outf='INCAR.mod'):
+
+def extract_kv_inline(line):
+    '''
+    Return key, value pair in a line
+    return  key-value
+            None
+    '''
+    if not '=' in line:
+        return None, None
+    else:
+        lst = line.strip().split()
+        key = lst[0]
+    ### find key in a line whether active or not 
+    if '#' in key:
+        key = key.replace('#', '')
+    if key.upper() in ordered_incar_keys:
+        return key.upper(), lst[2]
+    else:
+        return None, None
+
+### modifying INCAR by dict or extract value by key
+def modify_incar_bykv(incar, inc_kv, icout=None, outf='INCAR.mod', mode='m'):
     '''
     incar       input file of INCAR
-    ickv        list or dict for INCAR key-value
-    deactivate icout
-    return lines
+    inc_kv      list or dict for INCAR key-value
+    icout       keys to be commented out
+    mode        m for modify INCAR, inc_kv is dict
+                e to extract value, inc_kv is list
+    return      m lines - list of lines
+                e list of values
     '''
-    if isinstance(ickv, list):
-        kws = list2dict(ickv)
-        print(f"{kws} in {whereami()} at {__file__}")
-    elif isinstance(ickv, dict):
-        kws = ickv
+    if mode == 'm':
+    ### inc_kv should be dict or even number of list elements
+        if isinstance(ickv, list):
+            kws = list2dict(inc_kv)
+            print(f"{kws} in {whereami()} at {__file__}")
+        elif isinstance(inc_kv, dict):
+            kws = inc_kv
+    ### to extract, kws is keys
+    else:
+        kws = inc_kv
+    #print(f"beginning: kws {kws}")
     iline=0
     with open(incar) as f:
         lines = f.readlines()
-    ### save to lines and return
-    newline=[]
+    ### save to lines or values in a list
+    newlist=[]
+    ### line analysis for INCAR
     for line in lines:
         iline += 1
-        lst = line.strip().split()
-        ### if no word, continue
-        if len(lst) == 0:
-            newline.append(line)
-            continue
+        #print(f"{line_key}: {kws.keys()}")
+        line_key, line_value = extract_kv_inline(line)
+        if mode == 'm':
+            if line_key:
+                if line_key in kws.keys():
+                    line = f" {line_key}   =  {kws[line_key]}   ! change in mod_incar.py\n"
+                ### if activated and in the list of delete
+                elif line_key in icout:
+                    line = f" #{line.rstrip()}    ! change in modify_incar_bykv\n"
+            newlist.append(line)
         else:
-            line_key = lst[0]
-        ### if not activated --> activate
-        if ickv:
-            if '#' in line_key:
-                line_key = line_key.replace('#', '')
-            #print(f"{line_key}: {kws.keys()}")
-            if line_key.upper() in kws.keys():
-                line = f" {line_key}   =  {kws[line_key]}   ! change in smodify_incar\n"
-        ### if activated and in the list of delete
-        elif icout and line_key in icout:
-            line = f" #{line.rstrip()}    ! change in smodify_incar\n"
-        else:
-            pass
-        newline.append(line)
-    
-    with open(outf, 'w') as f:
-        for line in newline:
-            #print(line)
-            f.write(line)
-
-    return outf           
+            if line_key in kws:
+                print(f"found input key and values {line_key}, {line_value}")
+                newlist.append(line_value)
+            
+    ### write new file
+    if mode == 'm':
+        with open(outf, 'w') as f:
+            for line in newlist:
+                #print(line)
+                f.write(line)
+                return 0
+    else:
+        print(f"returns list of values: {newlist} ")
+        return newlist
 
 
-def modify_incar(incar, job, dic=None, opt='ac', suff=None):
+def modify_incar_byjob(incar, job, dic=None, opt='ac', suff=None):
     #os.system(f"cp {INCAR} INCAR")
     #line_change_dict('INCAR', vasp_job.zpe)
     print(f"running in {whereami()}:{__file__}")
@@ -255,8 +283,9 @@ def modify_incar(incar, job, dic=None, opt='ac', suff=None):
 def main():
     parser = argparse.ArgumentParser(description='test for INCAR change')
     parser.add_argument('inf', help='input incar file or directory')
-    parser.add_argument('job', choices=["dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='job for VASP')
-    #parser.add_argument('-suf', '--suffix', default='test', help='change the input filename')
+    parser.add_argument('-j', '--job', choices=["dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='job for VASP')
+    parser.add_argument('-o', '--option', help='change the input filename')
+    parser.add_argument('-kv', '--inc_dict', nargs='*', help='INCAR dict for modification')
     parser.add_argument('-suf', '--suffix', help='change the input filename')
     args = parser.parse_args()
 
@@ -265,7 +294,10 @@ def main():
     elif os.path.isdir(args.inf):
         f = args.inf + "/INCAR"
 
-    modify_incar(f, args.job, suff=args.suffix)
+    if args.job:
+        modify_incar_byjob(f, args.job, suff=args.suffix)
+    else:
+        modify_incar_bykv(f, args.inc_dict, mode=args.option)
 
 if __name__ == "__main__":
     main()
