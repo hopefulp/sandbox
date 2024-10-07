@@ -47,3 +47,5 @@ def stat_2col(x, y, scale=1):
 
     return p
     #return mse, bias_sq, varx_y, r_pearson, varx, vary, cov
+
+def boltzmann
