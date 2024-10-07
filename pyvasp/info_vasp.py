@@ -64,6 +64,9 @@ make.vas_make_ini   ="==================== Start VASP ==========================
                     \n\t    vas_make_ini.py -s POSCAR -kdim 2 -kps 4 4 6 4 8 4 -x 2 -N 1 -n 4\
                     \n\te.g. (fake job for kisti)\
                     \n\t    vas_make_ini.py -j fake -sj opt -d dname -nd ndirs\
+                    \n\te.g. (NEB)\
+                    \n\t    qsub -N HfSe2mO2sglnebafix -l select=32:ncpus=40:mpiprocs=40:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh\
+                    \n\t    kpy vas_make_ini.py -s POSCAR.HfSe2mO2tplini -j neb -i INCAR.nebmag -al -ja POSCAR.HfSe2mO2tplfin\
                     \n\t===== D2D w. NEB  ===================\
                     "
 make.vas_make_d2d   =" Make Vasp dir from the existing old dir\
