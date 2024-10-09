@@ -1,9 +1,12 @@
 #### to modify vasp input file
-import sys
+import sys, re, os
 import vasp_job
-import re
-import os
+import numpy as np
 from common import whereami
+import fortranformat as ff
+from univ_const import k_B, amu     # k_B (J/K), amu = atomic mass unit (kg) will be multiplied by atomic mass
+from ase.data import atomic_masses, chemical_symbols    # atomic weight, symbol with same order in the lists
+from my_stat import get_MBD_1D
 '''
 def get_ntatom(st):
 def parse_poscar(pos, opt):
@@ -14,7 +17,7 @@ def get_poscar(poscar, job='new', sub=0):
 def get_poscar0(poscar):
 def pos2dirname(poscar):
 def get_dnames4pos(poscars):
-def fixedMD_POSCAR(poscar, atom, atoms=None):
+def modify_POSCAR <- fixedMD_POSCAR(poscar, atom, atoms=None):
 '''
 def get_ntatom(st):
     natom_list = list(map(int, st.strip().split()))
@@ -195,81 +198,159 @@ def get_dnames4pos(poscars):
     return dnames
 
 
-#def fixedMD_POSCAR(poscar, atom, atoms=None?):
-def modify_POSCAR(poscar, job='zpe', option=None, outf='POSCAR'):
+def make_atomfullist(atom_list, natom_list):
     '''
-    poscar  to be modified
-    job     fixedMD or selective MD for selective dynamics for ZPE calculation
-            velocity to bombardment experiment
-    option  atom kind for movable in zpe calculation
-            velocity vel depending on T
+    from atomlist and natomlist in POSCAR
+    make full atom list
+    '''
+    atom_fullist=[]
+    if len(atom_list) == len(natom_list):
+        for natom, symbol in zip(natom_list, atom_list):
+            for j in range(natom):
+                atom_fullist.append(symbol)
+        return atom_fullist
+    else:
+        print(f"Parsing error:: different nspecies {len(atom_list)} != list of natoms {len(natom_list)}")
+        sys.exit(100)
 
-    iatom   atom index
-    atoms   atom list in POSCAR
-    natoms  number of atoms list in POSCAR
+            
+
+def select_atoms_poscar(atom_list, natom_list, sel_atom):
     '''
+    from POSCAR atom and natom list return atom index and natoms for selection
+    atom_list   in POSCAR
+    natom_list  in POSCAR
+    sel_atom    index or atom name with counting number
+    '''
+    if sel_atom.isalpha():          # O, Hf, etc
+        ind         = atom_list.index(sel_atom) # atomlist is atom kind to be moved (T T T for ZPE)
+    elif sel_atom.isdigit():        # 0, 1, ...
+        ind         = sel_atom
+    else:                           # O1, O2, ...
+        atom        = sel_atom[:-1]
+        order       = sel_atom[-1]
+        dicatoms    = { n: rep[n] for rep in [{}] for i, n in enumerate(atom_list) if rep.setdefault(n, []).append(i) or len(rep[n])==2}
+        print(dicatoms)
+        ind         = dicatoms[atom][order]
+    nselatoms   = natom_list[ind]          # natoms to be moved for zpe
+    print(f"{ind} : {nselatoms} selected in {whereami()}()")
+    return ind, nselatoms
         
-    with open(poscar, 'r') as f:
-        lines = f.readlines()
-    with open(outf, 'w') as f:
+
+#def fixedMD_POSCAR(poscar, atom, atoms=None?):
+def modify_POSCAR(poscar, job='zpe', atoms=None, outf='POSCAR', option=None):
+    '''
+    poscar      to be modified
+    job         zpe     fixedMD or selective MD for selective dynamics for ZPE calculation
+                bomb    velocity to bombardment experiment to -z axis
+                addbomb add molecule and velocity to -z axis
+    atoms       aAtomN for add atom, sAtomN for select atom in POSCAR
+                a   find lattice constand and distribute added atoms
+                    append N atoms
+                s   select from atoms, natoms list in POSCAR
+                    Hf, O, Mo, S, O -> O1, O2 
+                    atomlist in POSCAR for movable in zpe calculation
+                velocity vel depending on T
+    option      job = vel, addbomb  T
+    iatom       atom index
+    atoms       atom list in POSCAR
+    natoms      number of atoms list in POSCAR
+    '''
+    print(f"Write to {outf} in {whereami()}()")
+
+    if re.match('a') in atoms:
+        add_atoms = atoms[1:]
+
+        ajob = 'add'
+    elif re.match('s') in atoms:
+        sel_atoms = atoms[1:]
+        ajob = 'select'
+
+    with open(poscar, 'r') as rf, open(outf, 'w') as f :
+        lines = rf.readlines()
         iatom = 0
         for i, line in enumerate(lines):
             ### read poscar line by line
             if i == 0:
                 f.write(line)
+                ### this might be atom list in POSCAR
+                atoms = line.strip().split()
                 continue
             elif i < 5:
                 f.write(line)
             ### atom lines could exist or not
-            elif i==5 and any(j.isalpha() for j in line):
+            elif i==5 and all(x.isalpha() or x.isspace() for x in line.strip()):
+                ### if not here, 1st line is used for atoms
                 atoms = line.strip().split()
+                if 'add' in job:
+                    line = line.rstrip() + f' {add_atoms[:-1]}' + '\n' 
                 f.write(line)
-            elif i <= 6 and any(j.isdigit() for j in line):
+            elif i <= 6 and all(x.isdigit() or x.isspace() for x in line.strip()):
                 natoms = list(map(int, line.strip().split()))
                 if len(atoms) != len(natoms):
-                    sys.exit(0)
+                    print(f"Error:: len(atoms) {len(atoms)} != {len(natoms)} len(natoms)")
+                    sys.exit(100)
+                if 'add' in job:
+                    line = line.rstrip() + f' {
                 f.write(line)
-                ### calculate index for movable atoms
+                ### calculate index for selected atoms: movable in zpe, velocity in bombardment
+                atom_flist = make_atomfullist(atoms, natoms)  # for sigma for MBD (Maxwell-Boltzmann distribution)
                 ntotal = sum(natoms)
-                #if job == 'zpe': # both zpe, vel need this part
-                ind = atoms.index(option)       # option is atom kind to be moved (T T T for ZPE)
-                nzpe = natoms[ind]              # natoms to be moved for zpe
-                isum = 0
+                ind, nselatoms = select_atoms_poscar(atoms, natoms, sel_atom)
+                nselatoms = natoms[ind]              # natoms to be moved for zpe
+                npre_unsel = 0
                 for i, na in enumerate(natoms):
                     if i < ind:
-                        isum += na              # isum = total atoms before movable atoms index
-                f.write("Selective dynamics\n")
-                print(f"ind {ind} pre sum {isum} ")
+                        npre_unsel += na                  # npre_unsel = natoms before selected (movable) atoms
+                if job == 'zpe':
+                    f.write("Selective dynamics\n")
+                print(f"ind {ind}  {npre_unsel} in {whereami()}()")
+            ### for Cartesian or Direct    
             elif i <= 7 and any(i.isalpha() for i in line):
                 f.write(line)
+            ### looping in atomic position block
             else:
                 if job == 'zpe':
-                    if iatom < isum:
+                    if iatom < npre_unsel:
                         new_line = line.rstrip() + " F F F\n"
-                        f.write(new_line)
-                    elif iatom < isum + nzpe:
+                    elif iatom < npre_unsel + nselatoms:
                         new_line = line.rstrip() + " T T T\n"
-                        f.write(new_line)
                     elif iatom < ntotal:
                         new_line = line.rstrip() + " F F F\n"
-                        f.write(new_line)
                     else:
                         break
-                elif 'vel' in job:
+                    f.write(new_line)
+                if 'add' in job:
+                    paxes2D = parse_poscar(poscar, paxes)
+
+                if 'bomb' in job:
                     f.write(line)
-                else:
-                    print(f"job error in POSCAR modification in {whereami()}")
-                    sys.exit(101)
                 iatom += 1
-            if iatom == ntotal:
-                ### might need addatoms
-                #if 'vel' in job:
-                #    ### add atom 
-                break
-        ### addtional velocity block as cartisian coordinate (A/fs)
-        iatom = 0
-        f.write("\n")
-        if 'vel' in job:
-            ### need Boltzmann distribution for template and add Oxygen velocity
-            
+                if iatom == ntotal and 'vel' in job:
+                    ### might need addatoms
+                    ### addtional velocity block as cartisian coordinate (A/fs)
+                    f.write("\n")
+                    T = option
+                    mu = 0.0
+                    amukT = amu/(k_B * T)
+                    ms2angfs = 1.E-5         # from m/s to (1E10/1E15) Ang/fs
+                    lineformat = ff.FortranRecordWriter('3E16.8')
+                    for i, atom in enumerate(atom_flist):
+                        ### mass is required: depending on mass, sigma=1/(m/k_B*T) is changed
+                        atomic_weight = atomic_masses[chemical_symbols.index(atom)]
+                        sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
+                        vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
+                        ### only selected atoms have vel = -z direction for bombardment
+                        if i < npre_unsel:
+                            s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
+                        elif i < npre_unsel + nselatoms:
+                            v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
+                            #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
+                            s = lineformat.write([0.0, 0.0, -v]) + "\n"
+                        elif iatom < ntotal:
+                            s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
+                        else:
+                            break
+                        f.write(s)
+                    break
     return 0

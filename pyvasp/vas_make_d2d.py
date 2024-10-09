@@ -9,7 +9,7 @@ import os, sys
 import shutil
 import re
 from common import *
-from mod_poscar import get_poscar
+from libposcar import get_poscar
 from vas_qsub import qsub_command
 from mod_vas  import *
 from incar_change import change_incar_byjob
