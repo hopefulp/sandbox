@@ -15,7 +15,7 @@ import os
 import sys
 import numpy as np
 from mod_doscar import nheadline, obtain_doscar_head, change_Bheadline
-from mod_poscar import obtain_atomlist0
+from libposcar import obtain_atomlist0
 from common     import list2str, whereami
 from myplot2D   import mplot_nvector, auto_nvector
 from parsing    import convert_2lst_2Dlist

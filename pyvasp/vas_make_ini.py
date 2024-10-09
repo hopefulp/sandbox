@@ -14,7 +14,7 @@ import string
 from common     import *
 from vas_qsub   import get_queue_pt, qsub_command
 from mod_vas    import *
-from mod_poscar import get_poscar, get_dnames4pos 
+from libposcar import get_poscar, get_dnames4pos 
 from mod_incar  import modify_incar_bykv
 
 home = os.environ['HOME']
@@ -212,9 +212,10 @@ def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, Lktest,incar, allprep
 
         ### {jobdir} NEB: extract nimages from INCAR; Make POTCAR
         os.chdir(dirname)
-        nimages = modify_incar_bykv('INCAR', ['IMAGES'], mode='e')[0]
-        s = f'nebmake.pl POSCAR POSCAR_fin {nimages}'
-        os.system(s)
+        if job == 'neb':
+            nimages = modify_incar_bykv('INCAR', ['IMAGES'], mode='e')[0]
+            s = f'nebmake.pl POSCAR POSCAR_fin {nimages}'
+            os.system(s)
         #if not os.path.isfile('POTCAR'):   # to make new POTCAR 
         if hostname == 'kisti':
             s = f"python {home}/sandboxg/pyvasp/genpotcar.py -pp pbe"

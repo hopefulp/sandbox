@@ -48,4 +48,18 @@ def stat_2col(x, y, scale=1):
     return p
     #return mse, bias_sq, varx_y, r_pearson, varx, vary, cov
 
-def boltzmann
+def get_MBD_1D(loc=0, scale=1, size = None):
+    """Generates size samples of maxwell
+    loc = mean
+    scale = sigma
+    normal distribution for v_x, v_y, v_z makes MB distribition of v
+    """
+    vx = np.random.normal(loc=loc, scale=scale, size=size)
+    vy = np.random.normal(loc=loc, scale=scale, size=size)
+    vz = np.random.normal(loc=loc, scale=scale, size=size)
+    return vx, vy, vz
+
+def get_MBD_v(loc=0, scale=1, size = None):
+    vx, vy, vz = get_MBD_1D(loc=0, scale=1, size = None)
+    return np.sqrt(vx*vx + vy*vy + vz*vz)
+ 

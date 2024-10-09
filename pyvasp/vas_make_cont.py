@@ -9,7 +9,7 @@ import subprocess
 from subprocess import Popen, PIPE, STDOUT
 from common     import get_dirfiles, yes_or_no, list2dict
 from mod_incar  import modify_incar_byjob, modify_incar_bykv
-from mod_poscar import fixedMD_POSCAR, pos2dirname, get_poscar
+from libposcar import fixedMD_POSCAR, pos2dirname, get_poscar
 from mod_vas    import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_link
 from vas_qsub   import qsub_command
 

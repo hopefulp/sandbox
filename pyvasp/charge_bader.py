@@ -4,7 +4,7 @@ import argparse
 import re
 import os
 from _extract_line import extract_values
-from mod_poscar import parse_poscar
+from libposcar import parse_poscar
 
 def find_igroup(k, nlist):
     accum = 0

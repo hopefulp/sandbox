@@ -126,7 +126,7 @@ make.mod_vas        = "modules for make vasp directory\
                     \n\tRun by 'python -m mod_vas -j getmag -s poscar'\
                     \n\t    to get MAGMOM\
                     "
-poscar.mod_poscar    ="module for POSCAR modification\
+poscar.libposcar    ="module for POSCAR modification\
                     \n\tget_atoms_poscar\
                     \n\tget_poscar(poscar)\
                     \n\t    : read input POSCAR.job and write to wdir as 'POSCAR'\
