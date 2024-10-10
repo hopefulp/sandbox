@@ -249,7 +249,33 @@ def make_atomfullist(atom_list, natom_list):
         print(f"Parsing error:: different nspecies {len(atom_list)} != list of natoms {len(natom_list)}")
         sys.exit(100)
 
-            
+def distance_pbc(p1, p2, cell_dimensions):
+    """
+    Calculate the Euclidean distance between two particles in a 3D periodic box (PBC).
+    
+    Parameters:
+    p1 (np.ndarray): Coordinates of the first particle [x1, y1, z1].
+    p2 (np.ndarray): Coordinates of the second particle [x2, y2, z2].
+    cell_dimensions (np.ndarray): Dimensions of the periodic cell [Lx, Ly, Lz].
+    
+    Returns:
+    float: Distance between the two particles considering periodic boundary conditions.
+    """
+    delta = np.array(p1) - np.array(p2)  # Vector between the two particles
+    delta -= cell_dimensions * np.round(delta / cell_dimensions)  # Apply minimum image convention
+    return np.linalg.norm(delta)
+
+    # Example of periodic cell dimensions (Lx, Ly, Lz)
+    #cell_dimensions = np.array([10.0, 10.0, 10.0])  # Example dimensions of the box
+
+    # Calculate the interatomic distance considering periodic boundary conditions
+    #distance_pbc = distance_pbc(particle1, particle2, cell_dimensions)
+
+    print(f"Interatomic distance (PBC) between particle 1 and particle 2: {distance_pbc:.4f} units")
+    return delta
+
+
+
 def surf_distribution(natom, axes, radius, cd, z):
     '''For cubic axes
     natom   inserted atoms on vacuum
@@ -265,6 +291,7 @@ def surf_distribution(natom, axes, radius, cd, z):
         lzoffset.append(zoffset*(i+1))
 
     Lprint = 0
+    Lprintimp = 1
     ### principal axes are Ang unit
     a = np.array(axes[0])
     b = np.array(axes[1])
@@ -293,21 +320,21 @@ def surf_distribution(natom, axes, radius, cd, z):
         
         while iatom < natom:
             i += 1
-            #if Lprint: print(f'{i}-th trial')
+            if Lprintimp: print(f'{i}-th trial')
             apos = np.random.uniform(0, a_length, size=1)[0]
             bpos = np.random.uniform(0, b_length, size=1)[0]
             gen = [apos, bpos]
-            #if Lprint: print(f'{iatom+1}-th generation {gen}')
+            if Lprintimp: print(f'{iatom+1}-th generation {gen}')
             if iatom == 0:
                 implant_list.append(gen)
                 iatom += 1
-                if Lprint: print(f"implanted")
+                if Lprintimp: print(f"implanted")
             else:
                 ### compare with other atoms
                 for pivot in implant_list:
                     Limplant = True
-                    dist = np.linalg.norm(np.array(gen) - np.array(pivot))     # numpy vector distance
-                    #if Lprint: print(f"distance cret {dist_cret} < {dist} distance")
+                    dist = distance_pbc(gen, pivot, [axes[0][0], axes[1][1]])     # numpy vector distance)
+                    if Lprintimp: print(f"distance cret {dist_cret} < {dist} distance")
                     if dist < dist_cret:
                         Limplant = False
                         break
@@ -315,7 +342,7 @@ def surf_distribution(natom, axes, radius, cd, z):
                     implant_list.append(gen)
                     iatom += 1
                     #print(f'generated coords {gen}')
-                    #if Lprint: print(f"implanted")
+                    if Lprintimp: print(f"implanted")
         ilevel += 1
         iatom = 0
            
