@@ -250,19 +250,31 @@ def make_atomfullist(atom_list, natom_list):
         sys.exit(100)
 
             
-def surf_distribution(natom, axes, radius, cd, z):
-    '''For cubic axes
-    natom   inserted atoms on vacuum
+# deprecated
+def select_atoms_poscar(atom_list, natom_list, sel_atom, sel_natom):
     '''
-    ### how to divide the inserted atoms
-    ### 2L or 3L
-    nlevel = 2
-    dist_cret = 4
-
-    lzoffset = []
-    zoffset = 5.0               # bombing atoms to z-axis from surface, distance between O atoms
-    for i in range(nlevel):
-        lzoffset.append(zoffset*(i+1))
+    from POSCAR atom and natom list return atom index and natoms for selection
+    atom_list   in POSCAR
+    natom_list  in POSCAR
+    sel_atom    index or atom name with counting number
+    '''
+    if sel_atom.isalpha():          # O, Hf, etc
+        ind         = atom_list.index(sel_atom) # atomlist is atom kind to be moved (T T T for ZPE)
+    elif sel_atom.isdigit():        # 0, 1, ...
+        ind         = sel_atom
+    else:                           # O1, O2, ...
+        atom        = sel_atom[:-1]
+        order       = sel_atom[-1]
+        dicatoms    = { n: rep[n] for rep in [{}] for i, n in enumerate(atom_list) if rep.setdefault(n, []).append(i) or len(rep[n])==2}
+        print(dicatoms)
+        ind         = dicatoms[atom][order]
+    nselatoms   = natom_list[ind]          # natoms to be moved for zpe
+    print(f"{ind} : {nselatoms} selected in {whereami()}()")
+    return ind, nselatoms
+        
+def surf_distribution(natom, axes, radius, cd, z):
+    '''For cubic axes'''
+    zoffset = 5.0    # bombing atoms to z-axis from surface
 
     Lprint = 0
     ### principal axes are Ang unit
@@ -274,10 +286,8 @@ def surf_distribution(natom, axes, radius, cd, z):
     c_length = np.sqrt(c.dot(c))
     if re.match('d', cd, re.I):
         zoffset /= c_length
-    zcoords = []
-    for i in range(nlevel):
-        zcoords.append(z + lzoffset[i])
-    if Lprint: print(f"{cd}: z {z} lzoffset[] {lzoffset} zcoord[] {zcoords} in {whereami()}()")
+    zcoord = z + zoffset
+    if Lprint: print(f"{cd}: z {z} zoffset {zoffset} zcoord {zcoord} in {whereami()}()")
 
     
     ### exclude volume for close atom
@@ -285,54 +295,44 @@ def surf_distribution(natom, axes, radius, cd, z):
     bpos = []
     implant_list = []
     iatom = 0
-    ilevel = 0
     i = 0
-    ntotal = natom
-    natom /= nlevel
-    while ilevel < nlevel:
-        
-        while iatom < natom:
-            i += 1
-            #if Lprint: print(f'{i}-th trial')
-            apos = np.random.uniform(0, a_length, size=1)[0]
-            bpos = np.random.uniform(0, b_length, size=1)[0]
-            gen = [apos, bpos]
-            #if Lprint: print(f'{iatom+1}-th generation {gen}')
-            if iatom == 0:
+    while iatom < natom:
+        i += 1
+        if Lprint: print(f'{i}-th trial')
+        apos = np.random.uniform(0, a_length, size=1)[0]
+        bpos = np.random.uniform(0, b_length, size=1)[0]
+        gen = [apos, bpos]
+        if Lprint: print(f'{iatom+1}-th generation {gen}')
+        if iatom == 0:
+            implant_list.append(gen)
+            iatom += 1
+            if Lprint: print(f"implanted")
+        else:
+            ### compare with other atoms
+            for pivot in implant_list:
+                Limplant = True
+                dist = np.linalg.norm(np.array(gen) - np.array(pivot))     # numpy vector distance
+                if Lprint: print(f"radius {radius} < {dist} distance")
+                if dist < radius:
+                    Limplant = False
+                    break
+            if Limplant:
                 implant_list.append(gen)
                 iatom += 1
+                #print(f'generated coords {gen}')
                 if Lprint: print(f"implanted")
-            else:
-                ### compare with other atoms
-                for pivot in implant_list:
-                    Limplant = True
-                    dist = np.linalg.norm(np.array(gen) - np.array(pivot))     # numpy vector distance
-                    #if Lprint: print(f"distance cret {dist_cret} < {dist} distance")
-                    if dist < dist_cret:
-                        Limplant = False
-                        break
-                if Limplant:
-                    implant_list.append(gen)
-                    iatom += 1
-                    #print(f'generated coords {gen}')
-                    #if Lprint: print(f"implanted")
-        ilevel += 1
-        iatom = 0
            
     ### change coordinate to c/d
-    print(f"implant list {len(implant_list)} in {whereami()}()")
+    #print(f"implant list {implant_list} in {whereami()}()")
     lines = []
     #print(f"cd {cd}")
-    for i, xy in enumerate(implant_list):
+    for x, y in implant_list:
         #lineff = ff.FortranRecordWriter('3E16.8')       #FortranRecordWriter('3E20.16')
         if re.match('d', cd, re.I):
-            xy[0] /= a_length
-            xy[1] /= b_length
+            x /= a_length
+            y /= b_length
         #print(f'x, y, z added {x} {y} {zcoord} in {whereami()}()')
-        if i < len(implant_list)/2:
-            line = f'{xy[0]:20.16}{xy[1]:20.16f}{zcoords[0]:20.16f}' + "\n"
-        else:
-            line = f'{xy[0]:20.16}{xy[1]:20.16f}{zcoords[1]:20.16f}' + "\n"
+        line = f'{x:20.16}{y:20.16f}{zcoord:20.16f}' + "\n"
         if Lprint: print(f'formatted: {line}')
         lines.append(line)
     return lines
@@ -459,15 +459,10 @@ def modify_POSCAR(poscar, job='zpe', matoms=None, outf='POSCAR', option=None):
             atomic_weight = atomic_masses[chemical_symbols.index(atom)]
             sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
             vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
-            
+            v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
             if i < npre_unsel:
                 s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
             elif i < npre_unsel + nselatoms:
-                ### increase temperature
-                amukT = amu/(k_B * 500) # T = 1000 K for fast approach without O-O dimer generation 
-                sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
-                vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
-                v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
                 #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
                 s = lineformat.write([0.0, 0.0, -v]) + "\n"
             else:
