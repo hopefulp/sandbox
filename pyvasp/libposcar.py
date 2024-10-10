@@ -250,8 +250,8 @@ def make_atomfullist(atom_list, natom_list):
         sys.exit(100)
 
             
-
-def select_atoms_poscar(atom_list, natom_list, sel_atom):
+# deprecated
+def select_atoms_poscar(atom_list, natom_list, sel_atom, sel_natom):
     '''
     from POSCAR atom and natom list return atom index and natoms for selection
     atom_list   in POSCAR
@@ -371,39 +371,40 @@ def modify_POSCAR(poscar, job='zpe', matoms=None, outf='POSCAR', option=None):
     if not line:
         line = line1
         atoms = atoms1      # line1 is saved for atom line
+    
+    ### parsing selected (added) atoms 
+    i = startnum(matoms)
+    #print(f"starting number index {i} in {whereami()}() module {__name__}")
+    mod_atom = matoms[:i]
+    mod_natom = int(matoms[i:])
     ### add atom
     if 'add' in job:
         ### split alphabet and numeric: O7, O29, He7
-        i = startnum(matoms)
-        #print(f"starting number index {i} in {whereami()}() module {__name__}")
-        addatom = matoms[:i]
-        naddatom = int(matoms[i:])
-        line = line.rstrip() + f'\t{addatom}' + '\n'
+        line = line.rstrip() + f'\t{mod_atom}' + '\n'
         atomsold = atoms[:]
-        atoms.append(addatom)
+        atoms.append(mod_atom)
     lines.append(line)
     line, natoms = parse_poscar(poscar, block='natoms')
     ntotalold = sum(natoms)
     if 'add' in job:
-        line = line.rstrip() + f'\t{naddatom}' + '\n'
+        line = line.rstrip() + f'\t{mod_natom}' + '\n'
         natomsold = natoms[:]
-        natoms.append(naddatom)
+        natoms.append(mod_natom)
     lines.append(line)
     ### for sigma for MBD (Maxwell-Boltzmann distribution)
-    atom_oldfull_list = make_atomfullist(atomsold, natomsold)       # As for original POSCAR,
     if 'add' in job:
-        atom_fullist = make_atomfullist(atoms, natoms)
-    else:
-        atom_fullist = atom_oldfull_list
+        atom_oldfull_list = make_atomfullist(atomsold, natomsold)       # As for original POSCAR,
+    atom_fullist = make_atomfullist(atoms, natoms)
+        #atom_fullist = atom_oldfull_list
 
     ### define number of unselected atoms (npre_unsel) and selected atoms (z-coord bombard) for selection mode
     if 'add' in job:
         npre_unsel  = ntotalold
-        nselatoms   = naddatom
+        nselatoms   = mod_natom
         ind         = -1            # for print sentence
     else:
         ### calculate index for selected atoms: movable in zpe, velocity in bombardment
-        ind, nselatoms = select_atoms_poscar(atoms, natoms, matoms)
+        ind = atoms.index(mod_atom)
         nselatoms = natoms[ind]              # natoms to be moved for zpe
         npre_unsel = 0
         for i, na in enumerate(natoms):
@@ -437,8 +438,8 @@ def modify_POSCAR(poscar, job='zpe', matoms=None, outf='POSCAR', option=None):
     if 'add' in job:
         ### for Orthorhombic crystal structure
         z_surf = get_zmax(poscar)
-        radius = vdw_radii[chemical_symbols.index(addatom)]
-        add_coords = surf_distribution(naddatom, paxes, radius, cd, z_surf)
+        radius = vdw_radii[chemical_symbols.index(mod_atom)]
+        add_coords = surf_distribution(mod_natom, paxes, radius, cd, z_surf)
         #print(f"{add_coords} in {whereami()}()")
         lines.extend(add_coords)
 

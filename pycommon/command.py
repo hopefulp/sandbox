@@ -173,7 +173,7 @@ def show_command(work, subwork, job_submit, qname, vjob, inf, keyvalues, nodenam
     kisti.vas += f"\n\t\t$ qsub -N {qname} -v crelax=yes $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t    :: long"
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skllong.sh"
-    kisti.vas += f"\n\t\t$ qsub -N {qname} -q long -l walltime=96:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -q long -l walltime=120:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t    :: GAMMA, ncl"
     kisti.vas += f"\n\t\t$ qsub -N {qname} -v exe=gamma $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t    :: MEMORY Issue run half process to save memory usage"

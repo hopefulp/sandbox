@@ -81,7 +81,7 @@ def qsub_command(ndir, X=3, nnode=4, np=None, option=None, vasp_exe=None, lkisti
             s = f"qsub -N {ndir} -l select={nnode}:ncpus={np}:mpiprocs={hproc}:ompthreads=1  $SB/pypbs/pbs_vasp_kisti_skl.sh"
         ### long queue
         elif option == 'long':
-            s = f"qsub -N {ndir} -q long -l walltime=96:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+            s = f"qsub -N {ndir} -q long -l walltime=120:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
         elif option == 'opt':
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
         ### for quick run: decrease walltime to fast run in kisti

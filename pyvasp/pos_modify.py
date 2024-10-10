@@ -13,20 +13,6 @@ import argparse
 #import chem_space as cs
 from libposcar import modify_POSCAR
 
-def pos_addatoms(pos, add_atoms):
-    '''
-    add add_atoms at the end of POSCAR
-    and those are bombardment
-    '''
-
-    
-
-
-
-    return 0
-
-
-
 def pos_bombardment(pos, job, bomb_atoms, temp, outfile):
     '''
     pos         POSCAR
