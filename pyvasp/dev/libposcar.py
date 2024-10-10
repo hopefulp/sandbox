@@ -5,10 +5,8 @@ import numpy as np
 from common import whereami
 import fortranformat as ff
 from univ_const import k_B, amu     # k_B (J/K), amu = atomic mass unit (kg) will be multiplied by atomic mass
-from ase.data import atomic_masses, chemical_symbols, vdw_radii    # atomic weight, symbol with same order in the lists
+from ase.data import atomic_masses, chemical_symbols    # atomic weight, symbol with same order in the lists
 from my_stat import get_MBD_1D
-from parsing import startnum
-
 '''
 def get_ntatom(st):
 def parse_poscar(pos, opt):
@@ -26,85 +24,54 @@ def get_ntatom(st):
     ntotal = sum(natom_list)
     return ntotal, natom_list
 
-
-
 ### read_poscar was changed into parse_poscar
-def parse_poscar(pos, block = None, opt=None):
+def parse_poscar(pos, opt):
     '''
-    old
-        extract lattice vectors, pre-part, atom_list, coordinates
-        opt    pre, coord,
-    new
-        parse by block
+    extract lattice vectors, pre-part, atom_list, coordinates
+    opt    pre, coord,
     '''
     with open(pos, "r") as f:
         lines = f.readlines()
-
-        ### whether atom list line exists
-        Latomline = 0                   # in std, exists -> do not change line index
-        if not all(x.isalpha() or x.isspace() for x in lines[5].strip()):
-            Latomline = -1              # if not, lower index by 1
-
-        ### ntotal is required to extract coord block
-        i = 6 + Latomline
-        natoms = list(map(int, lines[i].strip().split()))
-        ntotal = sum(natoms)
-        ### whether selective MD line exists
-        Lselect = 0                 # normally doesnot exist
-        for i in [6, 7]:
-            if re.match('s', lines[i], re.I):
-                Lselect = 1         # if yes, increase index by 1
-        
-
         p_axes=[]   # principal axis
-        if block == 'title':
+        if opt == 'title':
             atoms = lines[0].strip().split()
             return lines[0], atoms
-        elif block == 'scale':
-            scale = lines[1].strip()
-            return lines[1], scale
-        elif block == 'paxes':
-            nline = []
-            for i in range(2,5):
-                nline.append(lines[i])
-                paxis = list(map(float,lines[i].strip().split()))
-                p_axes.append(paxis)
-            return nline, p_axes 
-        elif block == 'atoms':
-            if Latomline == 0:
-                atoms = lines[5].strip().split()
-                return lines[5], atoms
-            else:
-                return None, None
-        elif block == 'natoms':
-            iline = 6 + Latomline
-            natoms = list(map(int, lines[iline].strip().split()))
-            return lines[iline], natoms
-        elif block == 'cd':
-            iline = 7 + Latomline + Lselect
-            if not re.match('[D|C]', lines[iline], re.I):       # check for logic
-                print(f'line counting error in {whereami()}() in {__name__}.py')
-                sys.exit(100)   
-            cd = lines[iline].strip()
-            return lines[iline], cd
-        elif block == 'coord':
-            istart = 8 + Latomline + Lselect
-            coord = lines[istart:istart+ntotal]     # this is string of line with \n
-            ### return 2D(natom by 3) coordinates
-            if opt:
-                #print(f'change into numbers in {whereami()}()')
-                coordnum = []
-                for line in coord:
-                    lxyz = list(map(float, line.strip().split()))
-                    coordnum.append(lxyz)
-                coord=coordnum
-            return coord, ntotal                    # return lines
         
-def get_zmax(poscar):
-    coords, _ = parse_poscar(poscar, block='coord', opt='number')
-    #print(f'coords {coords} in {whereami()}()')
-    zmax = np.array(coords).max(axis=0)[2]
-    return zmax
+        for i in range(2,5):
+            paxis = list(map(float,lines[i].strip().split()))
+            p_axes.append(paxis)
+
+        if opt == 'paxes':
+            return p_axes
+        else:
+            for i in [5, 0]:
+                if not any(s.isdigit() for s in lines[i]):
+                    atom_list = lines[i].strip().split()
+                    break
+            for i in [5, 6]:
+                if any(s.isdigit() for s in lines[i]):
+                    ntatom, natom_list = get_ntatom(lines[i])
+                    break
+            for i in [8, 9]:
+                if any(s.isdigit() for s in lines[i]):
+                    iend_pre = i-1
+                    break
+            ### if direct, use z-size of paxis_c to scale down the z_coord of cartesian from visual program: ase gui
+            if re.match('D', lines[iend_pre], re.I):
+                p_z = p_axes[2][2]
+            else:
+                p_z = 1.0
+            pre = lines[:iend_pre+1]
+            coord = lines[iend_pre+1:iend_pre+ntatom+1]
+
+            if opt == 'pre':
+                return pre
+            elif opt == 'coord':
+                return coord
+            elif opt == 'atomcoord':
+                return atom_list, natom_list, coord, p_z
+            elif opt == 'alist':
+                return atom_list, natom_list
 
 def get_iatoms_in_group(zmin, zmax, coord, loc):
     ind=[]
@@ -272,70 +239,6 @@ def select_atoms_poscar(atom_list, natom_list, sel_atom):
     print(f"{ind} : {nselatoms} selected in {whereami()}()")
     return ind, nselatoms
         
-def surf_distribution(natom, axes, radius, cd, z):
-    '''For cubic axes'''
-    zoffset = 5.0    # bombing atoms to z-axis from surface
-
-    Lprint = 0
-    ### principal axes are Ang unit
-    a = np.array(axes[0])
-    b = np.array(axes[1])
-    c = np.array(axes[2])
-    a_length = np.sqrt(a.dot(a))
-    b_length = np.sqrt(b.dot(b))
-    c_length = np.sqrt(c.dot(c))
-    if re.match('d', cd, re.I):
-        zoffset /= c_length
-    zcoord = z + zoffset
-    if Lprint: print(f"{cd}: z {z} zoffset {zoffset} zcoord {zcoord} in {whereami()}()")
-
-    
-    ### exclude volume for close atom
-    apos = []
-    bpos = []
-    implant_list = []
-    iatom = 0
-    i = 0
-    while iatom < natom:
-        i += 1
-        if Lprint: print(f'{i}-th trial')
-        apos = np.random.uniform(0, a_length, size=1)[0]
-        bpos = np.random.uniform(0, b_length, size=1)[0]
-        gen = [apos, bpos]
-        if Lprint: print(f'{iatom+1}-th generation {gen}')
-        if iatom == 0:
-            implant_list.append(gen)
-            iatom += 1
-            if Lprint: print(f"implanted")
-        else:
-            ### compare with other atoms
-            for pivot in implant_list:
-                Limplant = True
-                dist = np.linalg.norm(np.array(gen) - np.array(pivot))     # numpy vector distance
-                if Lprint: print(f"radius {radius} < {dist} distance")
-                if dist < radius:
-                    Limplant = False
-                    break
-            if Limplant:
-                implant_list.append(gen)
-                iatom += 1
-                #print(f'generated coords {gen}')
-                if Lprint: print(f"implanted")
-           
-    ### change coordinate to c/d
-    #print(f"implant list {implant_list} in {whereami()}()")
-    lines = []
-    #print(f"cd {cd}")
-    for x, y in implant_list:
-        #lineff = ff.FortranRecordWriter('3E16.8')       #FortranRecordWriter('3E20.16')
-        if re.match('d', cd, re.I):
-            x /= a_length
-            y /= b_length
-        #print(f'x, y, z added {x} {y} {zcoord} in {whereami()}()')
-        line = f'{x:20.16}{y:20.16f}{zcoord:20.16f}' + "\n"
-        if Lprint: print(f'formatted: {line}')
-        lines.append(line)
-    return lines
 
 
 #def fixedMD_POSCAR(poscar, atom, atoms=None?):
@@ -343,10 +246,9 @@ def modify_POSCAR(poscar, job='zpe', matoms=None, outf='POSCAR', option=None):
     '''
     Modularize POSCAR part
     poscar      to be modified
-    job     mode       s/a  select or add (job has 'add')
-                zpe     s   fixedMD or selective MD for selective dynamics for ZPE calculation
-                bomb    s   velocity to bombardment experiment to -z axis
-                addbomb a   add molecule and velocity to -z axis
+    job         zpe     fixedMD or selective MD for selective dynamics for ZPE calculation
+                bomb    velocity to bombardment experiment to -z axis
+                addbomb add molecule and velocity to -z axis
     matoms       aAtomN for add atom, sAtomN for select atom in POSCAR
                 a   find lattice constand and distribute added atoms
                     append N atoms
@@ -354,128 +256,107 @@ def modify_POSCAR(poscar, job='zpe', matoms=None, outf='POSCAR', option=None):
                     Hf, O, Mo, S, O -> O1, O2 
                     atomlist in POSCAR for movable in zpe calculation
                 velocity vel depending on T
-    option      job = bomb addbomb:  T
+    option      job = vel, addbomb  T
     iatom       atom index
     atoms       atom list in POSCAR
     natoms      number of atoms list in POSCAR
     '''
     print(f"Write to {outf} in {whereami()}()")
 
-    lines = []
-    ### obtain each block and write from parse_POSCAR
-    line1, atoms1 = parse_poscar(poscar, block='title'); lines.append(line1) # atoms might appear 1st line
-    line, scale = parse_poscar(poscar, block='scale'); lines.append(line)
-    nline, paxes = parse_poscar(poscar, block='paxes'); lines.extend(nline)
-    line, atoms = parse_poscar(poscar, block='atoms')
-    #print(f'paxes {paxes} in {whereami()}()')
-    if not line:
-        line = line1
-        atoms = atoms1      # line1 is saved for atom line
-    ### add atom
-    if 'add' in job:
-        ### split alphabet and numeric: O7, O29, He7
-        i = startnum(matoms)
-        #print(f"starting number index {i} in {whereami()}() module {__name__}")
-        addatom = matoms[:i]
-        naddatom = int(matoms[i:])
-        line = line.rstrip() + f'\t{addatom}' + '\n'
-        atomsold = atoms[:]
-        atoms.append(addatom)
-    lines.append(line)
-    line, natoms = parse_poscar(poscar, block='natoms')
-    ntotalold = sum(natoms)
-    if 'add' in job:
-        line = line.rstrip() + f'\t{naddatom}' + '\n'
-        natomsold = natoms[:]
-        natoms.append(naddatom)
-    lines.append(line)
-    ### for sigma for MBD (Maxwell-Boltzmann distribution)
-    atom_oldfull_list = make_atomfullist(atomsold, natomsold)       # As for original POSCAR,
-    if 'add' in job:
-        atom_fullist = make_atomfullist(atoms, natoms)
-    else:
-        atom_fullist = atom_oldfull_list
+    if re.match('a') in atoms:
+        add_atoms = matoms[1:]
 
-    ### define number of unselected atoms (npre_unsel) and selected atoms (z-coord bombard) for selection mode
-    if 'add' in job:
-        npre_unsel  = ntotalold
-        nselatoms   = naddatom
-        ind         = -1            # for print sentence
-    else:
-        ### calculate index for selected atoms: movable in zpe, velocity in bombardment
-        ind, nselatoms = select_atoms_poscar(atoms, natoms, matoms)
-        nselatoms = natoms[ind]              # natoms to be moved for zpe
-        npre_unsel = 0
-        for i, na in enumerate(natoms):
-            if i < ind:
-                npre_unsel += na                  # npre_unsel = natoms before selected (movable) atoms
-        if job == 'zpe':
-            lines.append("Selective dynamics\n")
-    print(f"ind {ind}  {npre_unsel} unselected in {whereami()}()")
-    
-    ### for Cartesian or Direct    
-    line, cd = parse_poscar(poscar, block='cd'); lines.append(line)
+        ajob = 'add'
+    elif re.match('s') in atoms:
+        sel_atoms = matoms[1:]
+        ajob = 'select'
 
-    ### looping in atomic position block
-    coords, _ = parse_poscar(poscar, block='coord'); 
-    
-    ## modify selective dynamics for ZPE
-    if job == 'zpe':
-        new_coords=[]
-        for i, line_coord in enumerate(coords):
-            if i < npre_unsel:
-                new_line = line_coord.rstrip() + " F F F\n"
-            elif i < npre_unsel + nselatoms:
-                new_line = line_coord.rstrip() + " T T T\n"
-            elif i < ntotalold:
-                new_line = line_coord.rstrip() + " F F F\n"
-            new_coords.append(new_line)
-        coords = new_coords
-    lines.extend(coords)
-
-    ### Make additional coordinates for added atoms
-    if 'add' in job:
-        ### for Orthorhombic crystal structure
-        z_surf = get_zmax(poscar)
-        radius = vdw_radii[chemical_symbols.index(addatom)]
-        add_coords = surf_distribution(naddatom, paxes, radius, cd, z_surf)
-        #print(f"{add_coords} in {whereami()}()")
-        lines.extend(add_coords)
-
-    ### velocity section will be provided
-    ### unselected atoms have random vx, vy, vz
-    ### selected atom will have -vz only with magnitue of |v|=sqrt(vx**2+vy**2+vz**2)   
-    if 'bomb' in job:
-        ### addtional velocity block as cartisian coordinate (A/fs)
-        lines.append("\n")
-        T = option
-        mu = 0.0
-        amukT = amu/(k_B * T)
-        ms2angfs = 1.E-5         # from m/s to (1E10/1E15) Ang/fs
-        lineformat = ff.FortranRecordWriter('3E16.8')
-        for i, atom in enumerate(atom_fullist):
-            ### mass is required: depending on mass, sigma=1/(m/k_B*T) is changed
-            atomic_weight = atomic_masses[chemical_symbols.index(atom)]
-            sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
-            vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
-            v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
-            if i < npre_unsel:
-                s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
-            elif i < npre_unsel + nselatoms:
-                #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
-                s = lineformat.write([0.0, 0.0, -v]) + "\n"
+    with open(outf, 'w') as f :
+        ### obtain each block and write from parse_POSCAR
+        ### 1st line
+        line, atoms = parse_poscar(poscar, block='title')
+            if i == 0:
+                f.write(line)
+                ### this might be atom list in POSCAR
+                atoms = line.strip().split()
+                continue
+            elif i < 5:
+                f.write(line)
+            ### atom lines could exist or not
+            elif i==5 and all(x.isalpha() or x.isspace() for x in line.strip()):
+                ### if not here, 1st line is used for atoms
+                atoms = line.strip().split()
+                if 'add' in job:
+                    line = line.rstrip() + f' {add_atoms[:-1]}' + '\n' 
+                f.write(line)
+            elif i <= 6 and all(x.isdigit() or x.isspace() for x in line.strip()):
+                natoms = list(map(int, line.strip().split()))
+                if len(atoms) != len(natoms):
+                    print(f"Error:: len(atoms) {len(atoms)} != {len(natoms)} len(natoms)")
+                    sys.exit(100)
+                #if 'add' in job:
+                #    line = line.rstrip() + f' {
+                f.write(line)
+                ### calculate index for selected atoms: movable in zpe, velocity in bombardment
+                atom_flist = make_atomfullist(atoms, natoms)  # for sigma for MBD (Maxwell-Boltzmann distribution)
+                ntotal = sum(natoms)
+                ind, nselatoms = select_atoms_poscar(atoms, natoms, sel_atom)
+                nselatoms = natoms[ind]              # natoms to be moved for zpe
+                npre_unsel = 0
+                for i, na in enumerate(natoms):
+                    if i < ind:
+                        npre_unsel += na                  # npre_unsel = natoms before selected (movable) atoms
+                if job == 'zpe':
+                    f.write("Selective dynamics\n")
+                print(f"ind {ind}  {npre_unsel} in {whereami()}()")
+            ### for Cartesian or Direct    
+            elif i <= 7 and any(i.isalpha() for i in line):
+                f.write(line)
+            ### looping in atomic position block
             else:
-                s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
-            lines.append(s)
-    ### print output
-    filepointer = 1
-    f = open (outf, 'w')
-    for line in lines:
-        if filepointer == 0:
-            sys.stdout.write(line)
-        else:
-            f.write(line)
-    f.close()
+                if job == 'zpe':
+                    if iatom < npre_unsel:
+                        new_line = line.rstrip() + " F F F\n"
+                    elif iatom < npre_unsel + nselatoms:
+                        new_line = line.rstrip() + " T T T\n"
+                    elif iatom < ntotal:
+                        new_line = line.rstrip() + " F F F\n"
+                    else:
+                        break
+                    f.write(new_line)
+                if 'add' in job:
+                    paxes2D = parse_poscar(poscar, paxes)
+
+                if 'bomb' in job:
+                    f.write(line)
+                iatom += 1
+                if iatom == ntotal and 'vel' in job:
+                    ### might need addatoms
+                    ### addtional velocity block as cartisian coordinate (A/fs)
+                    f.write("\n")
+                    T = option
+                    mu = 0.0
+                    amukT = amu/(k_B * T)
+                    ms2angfs = 1.E-5         # from m/s to (1E10/1E15) Ang/fs
+                    lineformat = ff.FortranRecordWriter('3E16.8')
+                    for i, atom in enumerate(atom_flist):
+                        ### mass is required: depending on mass, sigma=1/(m/k_B*T) is changed
+                        atomic_weight = atomic_masses[chemical_symbols.index(atom)]
+                        sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
+                        vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
+                        ### only selected atoms have vel = -z direction for bombardment
+                        if i < npre_unsel:
+                            s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
+                        elif i < npre_unsel + nselatoms:
+                            v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
+                            #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
+                            s = lineformat.write([0.0, 0.0, -v]) + "\n"
+                        elif iatom < ntotal:
+                            s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
+                        else:
+                            break
+                        f.write(s)
+                    break
     return 0
 
 
@@ -483,7 +364,6 @@ def modify_POSCAR(poscar, job='zpe', matoms=None, outf='POSCAR', option=None):
 #def fixedMD_POSCAR(poscar, atom, atoms=None?):
 def modify_POSCAR2(poscar, job='zpe', atoms=None, outf='POSCAR', option=None):
     '''
-    poscar selective bombarding is done -> upgrade to modify_POSCAR
     poscar      to be modified
     job         zpe     fixedMD or selective MD for selective dynamics for ZPE calculation
                 bomb    velocity to bombardment experiment to -z axis

@@ -195,18 +195,26 @@ def get_dnames4pos(poscars):
     return dnames
 
 
-def fixedMD_POSCAR(poscar, atom, atoms=None):
-def fixedMD_POSCAR(poscar, atom, atoms=None):
-
+#def fixedMD_POSCAR(poscar, atom, atoms=None?):
+def modify_POSCAR(poscar, job='zpe', option=None, outf='POSCAR'):
     '''
     poscar  to be modified
-    atom    kind to be moved for zpe calculation
+    job     fixedMD or selective MD for selective dynamics for ZPE calculation
+            velocity to bombardment experiment
+    option  atom kind for movable in zpe calculation
+            velocity vel depending on T
+
+    iatom   atom index
+    atoms   atom list in POSCAR
+    natoms  number of atoms list in POSCAR
     '''
+        
     with open(poscar, 'r') as f:
         lines = f.readlines()
-    with open('POSCAR', 'w') as f:
+    with open(outf, 'w') as f:
         iatom = 0
         for i, line in enumerate(lines):
+            ### read poscar line by line
             if i == 0:
                 f.write(line)
                 continue
@@ -221,29 +229,47 @@ def fixedMD_POSCAR(poscar, atom, atoms=None):
                 if len(atoms) != len(natoms):
                     sys.exit(0)
                 f.write(line)
-                ### calculate
+                ### calculate index for movable atoms
                 ntotal = sum(natoms)
-                ind = atoms.index(atom)
-                nzpe = natoms[ind]
+                #if job == 'zpe': # both zpe, vel need this part
+                ind = atoms.index(option)       # option is atom kind to be moved (T T T for ZPE)
+                nzpe = natoms[ind]              # natoms to be moved for zpe
                 isum = 0
                 for i, na in enumerate(natoms):
                     if i < ind:
-                        isum += na 
+                        isum += na              # isum = total atoms before movable atoms index
                 f.write("Selective dynamics\n")
                 print(f"ind {ind} pre sum {isum} ")
             elif i <= 7 and any(i.isalpha() for i in line):
                 f.write(line)
             else:
-                if iatom < isum:
-                    new_line = line.rstrip() + " F F F\n"
-                    f.write(new_line)
-                elif iatom < isum + nzpe:
-                    new_line = line.rstrip() + " T T T\n"
-                    f.write(new_line)
-                elif iatom < ntotal:
-                    new_line = line.rstrip() + " F F F\n"
-                    f.write(new_line)
+                if job == 'zpe':
+                    if iatom < isum:
+                        new_line = line.rstrip() + " F F F\n"
+                        f.write(new_line)
+                    elif iatom < isum + nzpe:
+                        new_line = line.rstrip() + " T T T\n"
+                        f.write(new_line)
+                    elif iatom < ntotal:
+                        new_line = line.rstrip() + " F F F\n"
+                        f.write(new_line)
+                    else:
+                        break
+                elif 'vel' in job:
+                    f.write(line)
                 else:
-                    break
+                    print(f"job error in POSCAR modification in {whereami()}")
+                    sys.exit(101)
                 iatom += 1
+            if iatom == ntotal:
+                ### might need addatoms
+                #if 'vel' in job:
+                #    ### add atom 
+                break
+        ### addtional velocity block as cartisian coordinate (A/fs)
+        iatom = 0
+        f.write("\n")
+        if 'vel' in job:
+            ### need Boltzmann distribution for template and add Oxygen velocity
+            
     return 0

@@ -25,8 +25,6 @@ cd $wdir
 
 #ml_lorenz.py tr -hl 11 11 11 -mi 300 -ms hl111111.pt
 ### obtain nhl from input
-
-
 ml_lorenz.py tr -hl $hl -ms $sf
 
 

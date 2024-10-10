@@ -1,5 +1,5 @@
 import re
-import sys
+#import sys
 from common import whereami
 '''
 def is_int_el
@@ -49,6 +49,7 @@ def convert_2lst2D(li, lshape):
     print(f"{whereami():>15}(): {l2d}")
     return l2d
     
+### word
 
 def is_int_el(s):
     try:
@@ -77,7 +78,19 @@ def is_there_char(st):
         if char.isalpha():
             return True
     return False
+
+def startnum(word):
+    '''return the index of the first number in word'''
+    m = re.search("\d", word)
+    #print(f'm.start() returns {m.start()}')
+    if m:
+        return m.start()
+    else:
+        return -1
+
+
 ### string 
+
 def str_decom(st, delimiter='.', index=0):
     lstr = st.split(delimiter)
     if len(lstr) < index+1:
