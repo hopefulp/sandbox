@@ -9,7 +9,7 @@ import subprocess
 from subprocess import Popen, PIPE, STDOUT
 from common     import get_dirfiles, yes_or_no, list2dict
 from mod_incar  import modify_incar_byjob, modify_incar_bykv
-from libposcar import fixedMD_POSCAR, pos2dirname, get_poscar
+from libposcar import modify_POSCAR, pos2dirname, get_poscar
 from mod_vas    import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_link
 from vas_qsub   import qsub_command
 
@@ -89,7 +89,7 @@ def vasp_cont_1dir(job, odir, ndir, kopt, iopt, incar_kws, incar_remove, Lrun, o
     if job in jg_poscar:    # use POSCAR
         ### zpe: modify POSCAR
         if job == 'zpe':
-            fixedMD_POSCAR(f"{odir}/CONTCAR", fixatom)
+            modify_POSCAR(f"{odir}/CONTCAR", fixatom)
             print(f"{odir}/CONTCAR was modified to POSCAR")
             poscar = f'{pwd}/POSCAR'
         ### job == 'ini'

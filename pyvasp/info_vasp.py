@@ -132,14 +132,36 @@ poscar.libposcar    ="module for POSCAR modification\
                     \n\t    : read input POSCAR.job and write to wdir as 'POSCAR'\
                     \n\tpos2dirname(poscar)\
                     \n\t    : input POSCAR.job gives dirname of 'job'\
-                    \n\tfixedMD_POSCAR(poscar, atom, atoms=None)\
+                    \n\tmodify_POSCAR(poscar, atom, atoms=None)\
                     \n\t    : poscar is modified\
                     \n\t    : all the atoms except atom will be fixed for ZPE\
                     "
 poscar.pos_lattice  ="[.pl] input POSCAR\
                     \n\t\treturns lattice volume, constants, angles\
                     "
-poscar.posd2c       =".pl: convert direct coord to cartesian coord in POSCAR"                    
+poscar.posd2c       =".pl: convert direct coord to cartesian coord in POSCAR"
+poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
+                    \n\tsort atoms in POSCAR\
+                    \n\treturns POSCARsort\
+                    \n\tOptions:\
+                    \n\t    -al new atom list for sorted POSCAR\
+                    \n\t    -z  True for z-sort in the atom group\
+                    \n\tNB: when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
+                    "
+poscar.pos_modify   ="change POSCAR\
+                    \n\tmain routine in libposcar.modify_POSCAR()\
+                    \n\tOptions:\
+                    \n\t    -j  zpe, bomb, add, addbomb\
+                    \n\t        sel   sel  add    add  : how to add or select atoms\
+                    \n\t        coord vel  coord vel   : only coordinate|add velocity\
+                    \n\t        addbomb: append atoms after POSCAR\
+                    \n\t    -a  add atoms, O12, Fe2, ...\
+                    \n\t    -ot input Temperature for velocity distribution in K\
+                    \n\t    -o  outfile for POSCAR.outname\
+                    \n\t    -suf suffix to be added to POSCAR.name\
+                    \n\tUsage:\
+                    \n\t    pos_modify.py POSCAR.HfSe2sc34 -j addbomb -a O12  -o POSCAR.HfSe2O12L2 -ot 800\
+                    "
 convert.pos2cif      ="vstsscripts/[.pl] convert vasp format(POSCAR, CONTCAR) to cif to be read in MS\
                     \n\tUsage::\
                     \n\t    pos2cif.pl inputfile [outputfile]\
@@ -168,14 +190,7 @@ run.vas_env         = " imported from vasp run, make scripts such as\
                     \n\tvas_make_incar.py\
                     "
 clean.clean         =" "
-poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
-                    \n\tsort atoms in POSCAR\
-                    \n\treturns POSCARsort\
-                    \n\tOptions:\
-                    \n\t    -al new atom list for sorted POSCAR\
-                    \n\t    -z  True for z-sort in the atom group\
-                    \n\tNB: when generate POSCAR via ASE w increasing supercell, atoms in order are replicated\
-                    "
+
 potcar.potcar_gen   =  "potcar_gen.py -pp pseudop\
                     \n\tread POSCAR make POTCAR inside VASP dir\
                     "
