@@ -57,8 +57,8 @@ def get_incar(ifile):
     print('INCAR is made from %s' % ifile)
 
     return 0
-
-def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, Lktest,incar, allprepared, dirnames, iofile, option, qx,qN,qn,vasp_exe,lkisti,Lrun):
+################# 1       2        3       4         5        6     7           8         9        10      11    12 13 14   15      16     17
+def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, Lktest, incar, allprepared, dirnames, iofile, option, qx,qN,qn,vasp_exe,lkisti,Lrun):
     '''
     jobadds NEB final POSCAR
             ZPE atom lists
@@ -241,10 +241,10 @@ def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, Lktest,incar, allprep
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', choices=['pchg','chg','md','ini','zpe','mol','wav','opt','copt','sp','noD','kp','fake','neb','pseudo'], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=['pchg','chg','md','mdnve','ini','zpe','mol','wav','opt','copt','sp','noD','kp','fake','neb','pseudo'], help='inquire for each file')
     gfakejob = parser.add_argument_group(title='For fake job in kisti: requires -sj for real job name & -n for ndirs')
     gfakejob.add_argument('-sj', '--subjob', default='opt', choices=['opt', 'sp'], help='used for job=="fake"')
-    gfakejob.add_argument('-nd', '--ndirs', default=5, type=int, help="number or dirs to make")
+    gfakejob.add_argument('-n', '--ndirs', default=5, type=int, help="number or dirs to make")
     ### POSCARs
     gposcar = parser.add_mutually_exclusive_group()
     gposcar.add_argument('-s', '--poscar', nargs='+', help='poscars in narrative mode')
@@ -273,7 +273,7 @@ def main():
     g_run.add_argument('-ra', '--run_all', action='store_true', help="without asking")
     g_run.add_argument('-r', '--run', choices=['a','o','on','s','k'], help="o:overwrite run,on:overwrite stop,s:just submit,k:test input")
 
-    parser.add_argument('-o', '--option', choices=['opt','mem','long'], help="vasp & pbs error: converge, memory issue, queue long")
+    parser.add_argument('-o', '--option', help="error issue: 'opt':converge, 'mem': lack, 'longnnn':long queue")
     ### VASP executable
     g_vasp  = parser.add_argument_group(title='VASP executable')
     g_vasp.add_argument('-exe', '--executable', choices=['gamma','xyrelax'], help='vasp execuatable: gamma, xy-relax')
@@ -369,7 +369,9 @@ def main():
             kp_str = list(map(str, kp_in))
             make_vasp_dir(job, poscars, args.potcar, args.jobadds, kp_str, True,args.incar, args.all, args.dnames, args.iofile, args.option, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
     else:
-        make_vasp_dir(job, poscars, args.potcar, args.jobadds, args.kpoints, False,args.incar, args.all, dirnames, args.iofile, args.option, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+    ################# 1       2        3       4         5        6     7           8         9        10      11    12 13 14   15      16     17
+    # f make_vasp_dir(job, poscars,  apotcar,      jobadds,       kpoints,  Lktest,  incar,   allprepared, dirnames, iofile, option, qx,qN,qn,vasp_exe,lkisti,Lrun):
+        make_vasp_dir(job, poscars, args.potcar, args.jobadds, args.kpoints, False, args.incar, args.all, dirnames, args.iofile, args.option, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
     return 0
 
 if __name__ == '__main__':

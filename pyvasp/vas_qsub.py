@@ -7,6 +7,7 @@ import re
 import os
 import subprocess
 from common import yes_or_no
+from parsing import startnum
 hostname = get_hostname()
 
 ### Now this is being depricated
@@ -80,8 +81,12 @@ def qsub_command(ndir, X=3, nnode=4, np=None, option=None, vasp_exe=None, lkisti
             ### due to memory prob for band calculation of large sc, use hmem = np/2
             s = f"qsub -N {ndir} -l select={nnode}:ncpus={np}:mpiprocs={hproc}:ompthreads=1  $SB/pypbs/pbs_vasp_kisti_skl.sh"
         ### long queue
-        elif option == 'long':
-            s = f"qsub -N {ndir} -q long -l walltime=120:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+        elif option and 'long' in option:
+            hour = 96       # as defult for 4 days in KISTI
+            if not option.isalpha():
+                i = startnum(option)
+                hour = option[i:]
+            s = f"qsub -N {ndir} -q long -l walltime={hour}:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
         elif option == 'opt':
             s = f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
         ### for quick run: decrease walltime to fast run in kisti

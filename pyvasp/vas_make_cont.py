@@ -200,7 +200,7 @@ def vasp_cont_1dir(job, odir, ndir, kopt, iopt, incar_kws, incar_remove, Lrun, o
 def main():
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job
-    parser.add_argument('-j', '--job', choices=['sp','incar','dos','band','pchg','chg','chgw','md','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
+    parser.add_argument('-j', '--job', choices=['sp','cont','incar','dos','band','pchg','chg','chgw','md','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
     ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()
     gdirectory.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
@@ -209,7 +209,7 @@ def main():
     parser.add_argument('-ex', '--exclude', nargs='*', help='specify excluded dirs if already exist')
     ### job directory naming
     goutput = parser.add_mutually_exclusive_group()
-    goutput.add_argument('-dn', '-nd', '--newdirs', nargs='+', help='specify new dirname in case one job')
+    goutput.add_argument('-n', '--newdirs', nargs='+', help='specify new dirname in case one job')
     goutput.add_argument('-s', '--suffix', help='specify suffix of new directory')
     goutput.add_argument('-a', '--fixed_atom', help='atom symbol to be fixed')      # default='H'
     ### INCAR
@@ -228,7 +228,7 @@ def main():
     qsub = parser.add_argument_group(title='qsub')
     qsub.add_argument('-x', '--partition', type=int,            help='partition number in qsub')
     qsub.add_argument('-N', '--nnode',     type=int,            help='number of nodes in qsub')
-    qsub.add_argument('-n', '--nproc',                          help='nprocess in qsub')
+    qsub.add_argument('-np', '--nproc',                          help='nprocess in qsub')
     parser.add_argument('-u', '--usage',   action='store_true', help='print usage')
     args = parser.parse_args()
 

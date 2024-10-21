@@ -130,7 +130,7 @@ def main():
     qsub = parser.add_argument_group(title='qsub')
     qsub.add_argument('-x', '--partition',  help='partition number in qsub')
     qsub.add_argument('-N', '--nnode',      help='number of nodes in qsub')
-    qsub.add_argument('-n', '--nproc',      help='nprocess in qsub')
+    qsub.add_argument('-np', '--nproc',      help='nprocess in qsub')
     #qsub.add_argument('-m', '--hmem', action='store_true', help='in case large supercell, use half of memory')
     qsub.add_argument('-o', '--option', choices=['long', 'mem'], help='option for qsub command line input')
     parser.add_argument('-u', '--usage',   action='store_true', help='print usage')

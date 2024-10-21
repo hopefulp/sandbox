@@ -37,11 +37,11 @@ def pos_bombardment(pos, job, bomb_atoms, temp, nlevel, outfile):
 def main():
     parser = argparse.ArgumentParser(description="add atoms, vel block")
     parser.add_argument('poscar', help="poscar to be modified")
-    parser.add_argument('-j', '--job', default='bomb', choices=['bomb','add','addbomb','zpe'], help="job of poscar changing")
+    parser.add_argument('-j', '--job', default='addbomb', choices=['bomb','add','addbomb','zpe'], help="job of poscar changing")
     ### select existing atom or add atoms for bomb
     #parser.add_argument('-s', '--sel_atom', help="one atom species or index in POSCAR: Hf O1 Mo S O2 0 1 2 .. etc")
-    parser.add_argument('-a', '--add_atoms',   help="atoms to be added")
-    parser.add_argument('-ot', '--temp', type=float, default='298.15',  help="option of T for atom velocity")
+    parser.add_argument('-a', '--add_atoms',   help="add atoms: O12 Fe3 3-index")
+    parser.add_argument('-ot', '--temp', type=float, default='600',  help="option of T for atom velocity")
     parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in levels")
     gfname =  parser.add_mutually_exclusive_group()
     gfname.add_argument('-suf', '--suffix',     help="add suffix to outfile")

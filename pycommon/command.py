@@ -7,6 +7,7 @@ from common import dir_files, MyClass, list2str
 import comment_subj
 import comment_sys
 from server_env import nXn
+from datetime import datetime
 
 amp     =   MyClass('amp')
 plot    =   MyClass('plot')
@@ -173,7 +174,7 @@ def show_command(work, subwork, job_submit, qname, vjob, inf, keyvalues, nodenam
     kisti.vas += f"\n\t\t$ qsub -N {qname} -v crelax=yes $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t    :: long"
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skllong.sh"
-    kisti.vas += f"\n\t\t$ qsub -N {qname} -q long -l walltime=120:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t\t$ qsub -N {qname} -q long -l walltime=96:00:00 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t    :: GAMMA, ncl"
     kisti.vas += f"\n\t\t$ qsub -N {qname} -v exe=gamma $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t    :: MEMORY Issue run half process to save memory usage"
@@ -182,8 +183,8 @@ def show_command(work, subwork, job_submit, qname, vjob, inf, keyvalues, nodenam
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
     kisti.vas += f"\n\t\t    pbs_vasp_kisti_skl2 for half use of cpu for memory issue"
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.LiO2 -sj {vjob} -ra -d ntime -nd 5 : more info_vasp.py"
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j {vjob} -r on -s POSCAR.s -d dnameid : o-overwrite n-not submit job"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.{qname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%m%d%H')} -n 5 : more info_vasp.py"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j {vjob} -r on -s POSCAR.{qname} -d dnameid : o-overwrite n-not submit job"
     kisti.vas += f"\n\t    :: (OORINano)"
     kisti.vas += f"\n\t\t$ qsub -N {qname} -v cat='orr' pbs_vasp_kisti_skl.sh"
     ### IRON(slurm)
@@ -442,13 +443,13 @@ def main():
     parser.add_argument('-sw', '--subwork', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp', 'vaspnc', 'vasnc'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '-q', '--qname', default='test', help="queue name for qsub shown by qstat")
-    parser.add_argument('-vj','--vas_job', default='opt', help="vasp job input for vas_make_ini.py")
+    parser.add_argument('-vj','--vas_job', default='sp', help="vasp job input for vas_make_ini.py")
     parser.add_argument('-kv', '--keyvalues', nargs='*', help='change a keyword in print')
     parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
     ### flowing slurm option
     parser.add_argument('-inf', '--infile', help='input file in case')
     parser.add_argument('-N', '--nnode', default=1, type=int, help='number of nodes: if needed')
-    parser.add_argument('-n', '--nproc', type=int, help='number of process: if needed')
+    parser.add_argument('-np', '--nproc', type=int, help='number of process: if needed')
     parser.add_argument('-nl', '--nodelist',  help='node list to assign nodes')
     parser.add_argument('-x', '--xpartition', default=3, type=int, choices=[1,2,3,4,5,6], help='if needed, specify nodename')
     parser.add_argument('-s', '--poscar', default='POSCAR.name', help='if needed, specify nodename')
