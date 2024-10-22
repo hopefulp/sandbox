@@ -36,6 +36,15 @@ def parse_poscar(pos, block = None, opt=None):
         opt    pre, coord,
     new
         parse by block
+        block: pre: title - natoms
+            title
+            scale
+            paxes
+            atoms
+            natoms
+            cd      returns 'C' or 'D'
+            coord   natoms line for coord_x, _y, _z
+            vel     natoms line for vel (A/fs) not equipped yet
     '''
     with open(pos, "r") as f:
         lines = f.readlines()
@@ -45,16 +54,20 @@ def parse_poscar(pos, block = None, opt=None):
         if not all(x.isalpha() or x.isspace() for x in lines[5].strip()):
             Latomline = -1              # if not, lower index by 1
 
-        ### ntotal is required to extract coord block
-        i = 6 + Latomline
-        natoms = list(map(int, lines[i].strip().split()))
+        ### ntotal in natom line is required to extract coord block
+        inatom = 6 + Latomline
+        natoms = list(map(int, lines[inatom].strip().split()))
         ntotal = sum(natoms)
+
+        ### for pre-part return here
+        if block == 'pre':
+            return lines[:inatom+1]
+
         ### whether selective MD line exists
         Lselect = 0                 # normally doesnot exist
         for i in [6, 7]:
             if re.match('s', lines[i], re.I):
                 Lselect = 1         # if yes, increase index by 1
-        
 
         p_axes=[]   # principal axis
         if block == 'title':
@@ -85,7 +98,7 @@ def parse_poscar(pos, block = None, opt=None):
             if not re.match('[D|C]', lines[iline], re.I):       # check for logic
                 print(f'line counting error in {whereami()}() in {__name__}.py')
                 sys.exit(100)   
-            cd = lines[iline].strip()
+            cd = lines[iline].strip()[0].capitalize()
             return lines[iline], cd
         elif block == 'coord':
             istart = 8 + Latomline + Lselect
@@ -99,6 +112,8 @@ def parse_poscar(pos, block = None, opt=None):
                     coordnum.append(lxyz)
                 coord=coordnum
             return coord, ntotal                    # return lines
+        ### vel block: empty line followed by natoms line
+        #elif block == 'vel':
         
 def get_zmax(poscar):
     coords, _ = parse_poscar(poscar, block='coord', opt='number')
