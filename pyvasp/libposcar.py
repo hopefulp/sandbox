@@ -103,7 +103,7 @@ def parse_poscar(pos, block = None, opt=None):
         elif block == 'coord':
             istart = 8 + Latomline + Lselect
             coord = lines[istart:istart+ntotal]     # this is string of line with \n
-            ### return 2D(natom by 3) coordinates
+            ### return 2D (natom by 3) coordinates
             if opt:
                 #print(f'change into numbers in {whereami()}()')
                 coordnum = []
@@ -113,7 +113,15 @@ def parse_poscar(pos, block = None, opt=None):
                 coord=coordnum
             return coord, ntotal                    # return lines
         ### vel block: empty line followed by natoms line
-        #elif block == 'vel':
+        elif block == 'vel':
+            istart = 8 + Latomline + Lselect + ntotal + 1
+            try:
+                b_vel = lines[istart:istart+ntotal]
+            except IndexError:
+                return None, None
+            return b_vel, ntotal
+                
+
         
 def get_zmax(poscar):
     coords, _ = parse_poscar(poscar, block='coord', opt='number')
@@ -505,14 +513,18 @@ def modify_POSCAR(poscar, job='zpe', matoms=None, outf='POSCAR', option=None, nl
         amukT = amu/(k_B * T)
         ms2angfs = 1.E-5         # from m/s to (1E10/1E15) Ang/fs
         lineformat = ff.FortranRecordWriter('3E16.8')
+        vel_orig, _ = parse_poscar(poscar, block='vel')
         for i, atom in enumerate(atom_fullist):
             ### mass is required: depending on mass, sigma=1/(m/k_B*T) is changed
             atomic_weight = atomic_masses[chemical_symbols.index(atom)]
             sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
             vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
-            
+            ### if POSCAR has velocity block, read it
             if i < npre_unsel:
-                s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
+                if vel_orig:
+                    s = vel_orig[i]
+                else:
+                    s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
             elif i < npre_unsel + nselatoms:
                 ### Define temperature for bombardment element for fast moving -> ? effective under NVT
                 #amukT = amu/(k_B * 500) # T = 1000 K for fast approach without O-O dimer generation 
@@ -522,7 +534,10 @@ def modify_POSCAR(poscar, job='zpe', matoms=None, outf='POSCAR', option=None, nl
                 #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
                 s = lineformat.write([0.0, 0.0, -v]) + "\n"
             else:
-                s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
+                if vel_orig:
+                    s = vel_orig[i]
+                else:
+                    s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
             lines.append(s)
     ### print output
     filepointer = 1

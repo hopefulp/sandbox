@@ -241,7 +241,7 @@ def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, Lktest, incar, allpre
 
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', choices=['pchg','chg','md','mdnve','ini','zpe','mol','wav','opt','copt','sp','noD','kp','fake','neb','pseudo'], help='inquire for each file')
+    parser.add_argument('-j', '--job', choices=['pchg','chg','md','mdnve','mdcool','ini','zpe','mol','wav','opt','copt','sp','noD','kp','fake','neb','pseudo'], help='inquire for each file')
     gfakejob = parser.add_argument_group(title='For fake job in kisti: requires -sj for real job name & -n for ndirs')
     gfakejob.add_argument('-sj', '--subjob', default='opt', choices=['opt', 'sp'], help='used for job=="fake"')
     gfakejob.add_argument('-n', '--ndirs', default=5, type=int, help="number or dirs to make")
