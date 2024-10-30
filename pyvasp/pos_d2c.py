@@ -51,16 +51,8 @@ def main():
     gfname.add_argument('-o', '--outfile',      help='output POSCAR name')
     args = parser.parse_args()
 
-    ### outfile name need to be passed
-    if args.outfile:
-        outfile = args.outfile
-    elif args.suffix:
-        outfile = args.poscar + args.suffix
-
-
-    #if 'bomb' in args.job:
     ### job = bomb or addbomb
-    pos_d22c(args.poscar, args.job, outfile)
+    pos_d22c(args.poscar, args.job, args.outfile)
 
     return 0
 
