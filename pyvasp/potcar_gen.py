@@ -1,7 +1,7 @@
 #!/home/joonho/anaconda3/bin/python
 
 # Min Jong Noh
-# Update : 2020 / 04 / 12
+# Update by J Park: 2024 / 10
 
 '''
 This script for POTCAR generation.
@@ -10,6 +10,7 @@ Potential directory should be located. (listed below)
 '''
 
 import os, sys, argparse
+from common import whereami
 
 # Potential path
 home = os.environ['HOME']
@@ -26,13 +27,17 @@ d_list  = ["Ga", "Ge", "In", "Sn", "Tl", "Pb", "Bi", "Po", "At"]
 def fileread(fname):
     lineinfo = []
     wordinfo = []
-    with open(fname) as f:
-        for i, l in enumerate(f):
-            line = l
-            word = line.split()
-            lineinfo.append(line)
-            wordinfo.append(word)
-    return lineinfo, wordinfo
+    try:
+        with open(fname) as f:
+            for i, l in enumerate(f):
+                line = l
+                word = line.split()
+                lineinfo.append(line)
+                wordinfo.append(word)
+        return lineinfo, wordinfo
+    except FileNotFoundError:
+        print(f"cannot make POTCAR from {fname}")
+        return None, None
 
 
 def get_potcar(pot_type, hpp_list=None):
@@ -51,6 +56,9 @@ def get_potcar(pot_type, hpp_list=None):
     # Read POSCAR
     pos_line, pos_word = fileread('POSCAR')
 
+    if not pos_line:
+        print(f"Failed to make POTCAR in {whereami()}() in {__name__}")
+        return 0
     # Listing up the element including VASP 4.X, 5.X ver.
     element = pos_word[5]
     element_check = element[0]
