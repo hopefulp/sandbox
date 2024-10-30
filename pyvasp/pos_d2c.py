@@ -1,8 +1,5 @@
 #!/home/joonho/anaconda3/bin/python
-'''
-add atom
-add velocity block
-'''
+
 import argparse
 #import sys
 #import re
@@ -14,6 +11,7 @@ import argparse
 from pymatgen.core import Structure
 from libposcar import parse_poscar
 
+
 def pos_d22c(pos, job, outfile):
     '''
     pos         POSCAR
@@ -21,8 +19,11 @@ def pos_d22c(pos, job, outfile):
                 c2d cartesian to direct
     outfile     POSCAR.name
     '''
+    structure =  Structure.from_file(pos)
+
     line, cd = parse_poscar(pos, block='cd')
-    pre_lines = parse_poscar(pos)
+    pre_lines = parse_poscar(pos, block='pre')
+    coord, natom = parse_poscar(pos, block='coord')
 
     if cd == 'D':
         cdline = 'Cartesian \n'
@@ -33,17 +34,11 @@ def pos_d22c(pos, job, outfile):
         if not outfile:
             outfile = pos + 'drct'
 
-    
-
-    with open(pos, 'r') as fi and open(outfile, 'w') as fo:
-        lines = fi.readlines()
-        for i, line in enumerate(lines):
-            if i < 8:
-                fo.write(line)
-            if i == 8:
-                if 
-    #elif re.match('a', bomb_atoms):
-    #    add_atoms(pos, bomb_atoms[1:])
+    with open(outfile, 'w') as f:
+        f.writelines(pre_lines)
+        f.write(cdline)
+        for i in range(structure.num_sites):
+            f.writelines("{:14f} {:14f} {:14f}\n".format(structure.cart_coords[i][0],structure.cart_coords[i][1],structure.cart_coords[i][2]))  
     
     return 0
 
