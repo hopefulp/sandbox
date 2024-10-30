@@ -19,8 +19,8 @@ LDA_path  = sb + "pyvasp/vasppot/1.POTPAW.LDA.54.RECOMMEND"
 PBE_path  = sb + "pyvasp/vasppot/2.POTPAW.PBE.54.RECOMMEND"
 PW91_path = sb + "pyvasp/vasppot/5.OUTDATED.POTPAW.GGA"
 
-sv_list = ["Li", "K", "Rb", "Cs", "Sr", "Ba", "Sc", "Y", "Zr"]
-pv_list = ["Na", "Ca", "Ti", "V", "Cr", "Mn", "Nb", "Mo", "Tc", "Hf", "Ta", "W", "Os"]
+sv_list = ["Li", "K", "Rb", "Cs", "Sr", "Ba", "Sc", "Y", "Zr", 'W']
+pv_list = ["Na", "Ca", "Ti", "V", "Cr", "Mn", "Nb", "Mo", "Tc", "Hf", "Ta", "Os"]
 d_list  = ["Ga", "Ge", "In", "Sn", "Tl", "Pb", "Bi", "Po", "At"]
 
 def fileread(fname):
