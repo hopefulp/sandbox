@@ -67,15 +67,19 @@ if [ $ucorr -eq 1 ]; then
     sed -i "s/.*LDAUU.*/$ldauu/" INCAR
     sed -i "s/.*LDAUJ.*/$ldauj/" INCAR
 fi
-
-vasp_dir="/TGM/Apps/VASP/OLD_BIN/5.4.4/O2/NORMAL"
-vasp_ndir="/TGM/Apps/VASP/5.4.4.pl2"
-vasp_dirv6="/TGM/Apps/VASP/bin/6.3.1"
-
-if [ $exe ]; then
-    EXEC="vasp.5.4.4.pl2.O2.NORMAL.${exe}.x"
+### if not version, v6
+if [ $v ]; then
+version="5.4.4.pl2"
 else
-    EXEC="vasp.5.4.4.pl2.O2.NORMAL.std.x"
+version="6.3.1"
+fi
+vasp_dir="/TGM/Apps/VASP/bin/${version}"
+
+### exe = [gam|ncl|std] for 5.4.4, 
+if [ $exe ]; then
+    EXEC="vasp.${version}.${exe}.x"
+else
+    EXEC="vasp.${version}.std.x"
 fi
 
 if [ $hmem ]; then
