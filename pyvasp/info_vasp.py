@@ -139,7 +139,7 @@ poscar.libposcar    ="module for POSCAR modification\
 poscar.pos_lattice  ="[.pl] input POSCAR\
                     \n\t\treturns lattice volume, constants, angles\
                     "
-poscar.posd2c       =".pl: convert direct coord to cartesian coord in POSCAR"
+poscar.pos_d2c_ase  =" Read POSCAR/CONTCAR type and write POSCAR in d/c type using ASE"
 poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
                     \n\tsort atoms in POSCAR\
                     \n\treturns POSCARsort\
@@ -329,6 +329,7 @@ charge.vas_anal     =   analysis.vas_anal
 ase.ase_fconvert    =""
 ase.ase_vasp        =""
 ase.ase_zpe         =""
+ase.ase_pos_d2c     = poscar.pos_d2c_ase
 classobj_dict={'MAKE': make, 'RUN': run, 'CLEAN': clean} 
 
 #def classify(Lclassify, work, class_name, job, fname,HL, elimit, nc, Lgraph):
