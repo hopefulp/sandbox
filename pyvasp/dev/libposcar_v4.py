@@ -300,11 +300,10 @@ def distance_pbc(p1, p2, cell_dimensions):
 
 
 
-def surf_distribution(natom, axes, cd, z_surf, z_coord, nlevel):
+def surf_distribution(natom, axes, cd, zmax, nlevel):
     '''For cubic axes
     natom   inserted atoms on vacuum
-    z_surf   max z-coord of surface or fixed z-coord
-    z_coord 'above': make a distance, 'fixed': no distance
+    zmax    max z-coord of substrate
     nlevel  distribute natoms in multiple levels
     '''
     ### how to divide the inserted atoms
@@ -312,10 +311,7 @@ def surf_distribution(natom, axes, cd, z_surf, z_coord, nlevel):
     dist_cret = 5
 
     lzoffset = []
-    if z_coord == 'above':
-        zoffset = 4.0               # bombing atoms to z-axis from surface, distance between O atoms
-    elif z_coord == 'fixed':
-        zoffset = 0.0
+    zoffset = 4.0               # bombing atoms to z-axis from surface, distance between O atoms
     
     Lprint = 1
     Lprintimp = 0
@@ -336,8 +332,8 @@ def surf_distribution(natom, axes, cd, z_surf, z_coord, nlevel):
     zcoords = []
     for i in range(nlevel):
         print(f"{i} with {lzoffset[i]} in zoffset")
-        zcoords.append(z_surf + lzoffset[i])
-    if Lprint: print(f"{cd}: z_surf {z_surf} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
+        zcoords.append(zmax + lzoffset[i])
+    if Lprint: print(f"{cd}: zmax {zmax} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
 
     
     ### exclude volume for close atom
@@ -398,7 +394,7 @@ def surf_distribution(natom, axes, cd, z_surf, z_coord, nlevel):
         lines.append(line)
     return lines
 
-def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nlevel=1, outf='POSCAR'):
+def modify_POSCAR(poscar, job='zpe', matoms=None, outf='POSCAR', temp=300, nlevel=1):
     '''
     Modularize POSCAR part
     poscar      to be modified
@@ -413,7 +409,6 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
                     ?Hf, O, Mo, S, O -> O1, O2 
                     atomlist in POSCAR for movable in zpe calculation
                 velocity vel depending on T
-    zpos        the posotion in z-axis where atoms to be added
     temp        temperature for velocity  T
     iatom       atom index
     atoms       atom list in POSCAR
@@ -421,11 +416,6 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
     '''
     print(f"Write to {outf} in {whereami()}()")
 
-    if re.match('a', mode_atoms):
-        mode = 'add'
-    elif re.match('s', mode_atoms):
-        mode = 'select'
-    matoms = mode_atoms[1:]
     lines = []
     ### obtain each block and write from parse_POSCAR
     line1, atoms1 = parse_poscar(poscar, block='title'); lines.append(line1) # atoms might appear 1st line
@@ -437,17 +427,18 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
         line = line1
         atoms = atoms1      # line1 is saved for atom line
     ### O7 is addatom
-    if mode == 'add': #matoms[0].isalpha():
+    if matoms[0].isalpha():
         i = startnum(matoms)
         #print(f"starting number index {i} in {whereami()}() module {__name__}")
-        add_atom = matoms[:i]           # atom name to be added
-        add_natom = int(matoms[i:])     # natom to be added
-    ### matoms is integer in natom lines of POSCAR at the moment
+        ### 
+        add_atom = matoms[:i]
+        add_natom = int(matoms[i:])
+    ### matoms = 3: index is select from atoms list
     else:
         ind = int(matoms) # index for selection
         
     ### add atom
-    if mode == 'add':
+    if 'add' in job:
         ### split alphabet and numeric: O7, O29, He7
         line = line.rstrip() + f'  {add_atom}' + '\n'       # do not use \t which raise type error in Vasp
         atomsold = atoms[:]
@@ -455,7 +446,7 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
     lines.append(line)
     line, natoms = parse_poscar(poscar, block='natoms')
     ntotalold = sum(natoms)
-    if mode == 'add':
+    if 'add' in job:
         line = line.rstrip() + f'  {add_natom}' + '\n'      # do not use \t which raise type error in Vasp
         natomsold = natoms[:]
         natoms.append(add_natom)
@@ -467,7 +458,7 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
         #atom_fullist = atom_oldfull_list
 
     ### define number of unselected atoms (npre_unsel) and selected atoms (z-coord bombard) for selection mode
-    if mode == 'add':
+    if 'add' in job:
         npre_unsel  = ntotalold
         nselatoms   = add_natom
         ind         = -1            # for print sentence
@@ -504,15 +495,11 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
     lines.extend(coords)
 
     ### Make additional coordinates for added atoms
-    if mode == 'add':
+    if 'add' in job:
         ### for Orthorhombic crystal structure
-        z_coord = 'above'
-        z_line = get_zmax(poscar)
+        z_surf = get_zmax(poscar)
         #radius = vdw_radii[chemical_symbols.indeadd)]
-        if zpos:
-            z_line = zpos
-            z_coord = 'fixed'
-        add_coords = surf_distribution(add_natom, paxes, cd, z_line, z_coord, nlevel)
+        add_coords = surf_distribution(add_natom, paxes, cd, z_surf, nlevel)
         #print(f"{add_coords} in {whereami()}()")
         lines.extend(add_coords)
 
@@ -522,7 +509,7 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
     if 'bomb' in job:
         ### addtional velocity block as cartisian coordinate (A/fs)
         lines.append("\n")
-        T = temp
+        T = option
         mu = 0.0
         amukT = amu/(k_B * T)
         ms2angfs = 1.E-5         # from m/s to (1E10/1E15) Ang/fs

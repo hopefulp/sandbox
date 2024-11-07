@@ -4,31 +4,30 @@ add atom
 add velocity block
 '''
 import argparse
-#import sys
+import sys
 #import re
-#import os
-#import numpy as np
 
 #from common import whereami
 #import chem_space as cs
 from libposcar import modify_POSCAR
 
-def pos_bombardment(pos, job, bomb_atoms, temp, nlevel, outfile):
+def pos_bombardment(pos, job, atoms, zposition, temp, nlevel, outfile):
     '''
     pos         POSCAR
     job         add     -> append atoms to POSCAR
                 no add  -> select atoms in POSCAR
                 
-    bomb_atoms  a..  add atoms then they will be selected for bomb
-                    aO20    add 20 O's
-                s..  select atoms in POSCAR
-                    sO2     select 2nd O group in atom list of POSCAR
+    atoms   a..  add atoms then they will be selected for bomb
+                aO20    add 20 O's
+            s..  select atoms in POSCAR
+                sO2     select 2nd O group in atom list of POSCA
+R
                     sOn     select 1st O group and n atoms
     outfile     POSCAR.name
     '''
     
     #if re.match('s', bomb_atoms):
-    modify_POSCAR(pos, job=job, matoms=bomb_atoms, option=temp, nlevel=nlevel, outf=outfile)
+    modify_POSCAR(pos, job=job, mode_atoms=atoms, zpos=zposition, temp=temp, nlevel=nlevel, outf=outfile)
     #elif re.match('a', bomb_atoms):
     #    add_atoms(pos, bomb_atoms[1:])
     
@@ -37,17 +36,26 @@ def pos_bombardment(pos, job, bomb_atoms, temp, nlevel, outfile):
 def main():
     parser = argparse.ArgumentParser(description="add atoms, vel block")
     parser.add_argument('poscar', help="poscar to be modified")
-    parser.add_argument('-j', '--job', default='addbomb', choices=['bomb','add','addbomb','zpe'], help="job of poscar changing")
+    parser.add_argument('-j', '--job', default='add', choices=['bomb','add','zpe'], help="job of poscar changing")
     ### select existing atom or add atoms for bomb
-    #parser.add_argument('-s', '--sel_atom', help="one atom species or index in POSCAR: Hf O1 Mo S O2 0 1 2 .. etc")
-    parser.add_argument('-a', '--add_atoms',   help="add atoms: O12 Fe3 3-index")
-    parser.add_argument('-ot', '--temp', type=float, default='600',  help="option of T for atom velocity")
+    gatoms =  parser.add_mutually_exclusive_group()
+    gatoms.add_argument('-s', '--sel_atoms', help="one atom species or index in POSCAR: Hf O Mo S O  0 1 2 not yet for 2-5")
+    gatoms.add_argument('-a', '--add_atoms', help="add atoms: O12 Fe3 3-index")
+    parser.add_argument('-p', '--position', type=float, help="define z-coord")
+    parser.add_argument('-t', '--temp', type=float, default='600',  help="T for atom velocity")
     parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in levels")
     gfname =  parser.add_mutually_exclusive_group()
     gfname.add_argument('-suf', '--suffix',     help="add suffix to outfile")
     gfname.add_argument('-o', '--outfile',      help='output POSCAR name')
     args = parser.parse_args()
 
+    if args.sel_atoms:
+        atoms='s' + args.sel_atoms
+    elif args.add_atoms:
+        atoms='a' + args.add_atoms
+    else:
+        print(f"input error: select or add atoms via -s or -a")
+        sys.exit(1)
     ### outfile name need to be passed
     if args.outfile:
         outfile = args.outfile
@@ -58,7 +66,7 @@ def main():
 
     #if 'bomb' in args.job:
     ### job = bomb or addbomb
-    pos_bombardment(args.poscar, args.job, args.add_atoms, args.temp, args.nlevel, outfile)
+    pos_bombardment(args.poscar, args.job, atoms, args.position, args.temp, args.nlevel, outfile)
 
     return 0
 

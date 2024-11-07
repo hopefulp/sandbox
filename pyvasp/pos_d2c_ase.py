@@ -25,13 +25,13 @@ def ase_vasp_d2c(pos, job, outfile):
         else:
             outfile = pos + '_c'
     iovas.write_vasp(outfile, atoms, direct=direct)
-    
+    print(f"POSCAR in cartesian is written to {outfile}")
     return 0
 
 def main():
     parser = argparse.ArgumentParser(description="add atoms, vel block")
     parser.add_argument('poscar', help="poscar to be modified")
-    parser.add_argument('-j', '--job', default='d', choices=['d', 'c'], help="direct to cartesian")
+    parser.add_argument('-j', '--job', default='c', choices=['d', 'c'], help="direct to cartesian")
     gfname =  parser.add_mutually_exclusive_group()
     gfname.add_argument('-suf', '--suffix',     help="add suffix to outfile")
     gfname.add_argument('-o', '--outfile',      help='output POSCAR name')
