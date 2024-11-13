@@ -5,7 +5,7 @@ import os
 import re
 from common import dir_files
 from my_print import print_dict
-from mod_incar import ordered_incar_keys
+from libincar import ordered_incar_keys
 reg='[=\s]+'
 
 def get_kv(strline):
@@ -96,7 +96,7 @@ def compare_incars(files, key, Ldiff=False):
     ordered_keys=[]
     for u in union:
         if not u in ordered_incar_keys:
-            print(f"Err: {u} is not listed in ordered_incar_keys of mod_incar.py")
+            print(f"Err: {u} is not listed in ordered_incar_keys of libincar.py")
     for k in ordered_incar_keys:
         if k in union:
             ordered_keys.append(k)

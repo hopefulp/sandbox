@@ -5,6 +5,15 @@ import argparse
 import re
 import os
 
+
+def inf_print(fname):
+    with open(fname, 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            print(line)
+        return 0
+
+
 def modify_file(fname, jobtype, option):
 
     if jobtype == "python":
@@ -17,7 +26,6 @@ def modify_file(fname, jobtype, option):
         ind = 0
     elif jobtype == "extxyz":
         kw = "energy"
-
 
     with open(fname, "r+") as fp:
         lines = fp.readlines()

@@ -15,7 +15,7 @@ from common     import *
 from vas_qsub   import get_queue_pt, qsub_command
 from mod_vas    import *
 from libposcar import get_poscar, get_dnames4pos 
-from mod_incar  import modify_incar_bykv
+from libincar  import modify_incar_bykv
 
 home = os.environ['HOME']
 hostname = get_hostname()

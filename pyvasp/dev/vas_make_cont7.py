@@ -8,7 +8,7 @@ import json
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 from common     import get_dirfiles, yes_or_no, list2dict
-from libincar  import modify_incar_byjob, modify_incar_bykv
+from mod_incar  import modify_incar_byjob, modify_incar_bykv
 from libposcar import modify_POSCAR, pos2dirname, get_poscar
 from mod_vas    import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_link
 from vas_qsub   import qsub_command
@@ -71,20 +71,8 @@ def make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_remove):
      
 
 ### O: Use this to comtain all the jobs
-###            1     2      3       4          5      6      7       8      9    10 
-def vasp_cont_1dir(job, odir, ndir, incar_kws, kopt, Lrun, option, np, xpart, nnode):
-    '''
-    job     default = 'cont'
-            depending on job, some files will be changed
-    odir
-    ndir
-    kopt
-    incar_kws   dict with keys of 'i'|'a'|'d' for add or delete
-                'i': if INCAR is defined
-                'a': dict of k:w to be add or active
-                'd': delete key list
-
-    '''
+###            1     2      3       4     5      6           7         8      9    10    11    12 
+def vasp_cont_1dir(job, odir, ndir, kopt, iopt, incar_kws, incar_remove, Lrun, option, np, xpart, nnode):
     pwd = os.getcwd()
 
     ### 0: make a new dir
@@ -156,32 +144,31 @@ def vasp_cont_1dir(job, odir, ndir, incar_kws, kopt, Lrun, option, np, xpart, nn
     os.system(f'cp {kpoints} {ndir}/KPOINTS')
     print(f"{kpoints} was copied to {ndir}/KPOINTS")
 
-    ###### 4: INCAR
+    ### 4: INCAR
     #if (not ikw_opt or ikw_opt== 'm') and os.path.isfile(f"{odir}/INCAR"):
     #    incar = modify_incar_byjob(f"{odir}/INCAR", job)
-    ### define INCAR to be used
-    ### 4.1 Use it, if defined
-    if 'i' in incar_kws.keys():
-        if os.path.isfile(f"{incar_kws['i']}"):
-            incar = f"{incar_kws['i']}"
-        elif os.path.isdir(f"{incar_kws['i']}") and os.path.isfile(f"{incar_kws['i']}/INCAR"):
-            incar = f"{incar_kws['i']}/INCAR"
-    ### 4.2 try INCAR.job 
-    elif os.path.isfile(f"INCAR.{job}"):
-        incar = f"INCAR.{job}"
-    ### 4.3 Use odir/INCAR for job = cont, ...
+    ### iopt if incar was designated as 'INCAR' or dir with INCAR
+    if iopt:
+        if os.path.isfile(f"{iopt}"):
+            incar = iopt
+        elif os.path.isdir(f"{iopt}") and os.path.isfile(f"{iopt}/INCAR"):
+            incar = f"{iopt}/INCAR"
+    ### jg_incar for INCAR modify
     elif not job in jg_incar:
         incar = f"{odir}/INCAR"
+    else:
+        if os.path.isfile(f"INCAR.{job}"):
+            incar = f"INCAR.{job}"
+        else:
+            pass
+            ### iopt, ikw_opt is deprecated
+            #incar = make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_remove)
     ### if incar needs to be modified: kw for active, remove for comment out
-    if 'a' in incar_kws:
+    if incar_kws or incar_remove:
         ### make incar.new
         incar_o = incar
-        incar = modify_incar_bykv(incar_o, incar_kws['a'], mode='m')   # return output filename
-    if 'd' in incar_kws:
-        incar_o = incar
-        incar = modify_incar_bykv(incar_o, incar_kws['d'], mode='e')
-
-    print(f"{incar_o} was modified to {incar}")
+        incar = modify_incar_bykv(incar_o, incar_kws, incar_remove)
+        print(f"{incar_o} was modified to {incar}")
 
     os.system(f"cp {incar} {ndir}/INCAR")
     print(f"{incar} was copied to {ndir}/INCAR")
@@ -213,7 +200,7 @@ def vasp_cont_1dir(job, odir, ndir, incar_kws, kopt, Lrun, option, np, xpart, nn
 def main():
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job
-    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','incar','dos','band','pchg','chg','chgw','md','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
+    parser.add_argument('-j', '--job', choices=['sp','cont','incar','dos','band','pchg','chg','chgw','md','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
     ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()
     gdirectory.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
@@ -225,11 +212,13 @@ def main():
     goutput.add_argument('-n', '--newdirs', nargs='+', help='specify new dirname in case one job')
     goutput.add_argument('-s', '--suffix', help='specify suffix of new directory')
     goutput.add_argument('-a', '--fixed_atom', help='atom symbol to be fixed')      # default='H'
-    ### modify 4 files
     ### INCAR
-    parser.add_argument('-i', '--incar', help='specify incar file or dir: m for modify')
-    parser.add_argument('-ia', '--incar_add', nargs='*', help='input key-value pairs in the list from command line')
-    parser.add_argument('-id', '--incar_del', nargs='*', help='input list for comment out')
+    parser.add_argument('-i', '--incar', help='specify incar file or dir')
+    #parser.add_argument('-io', '--ioption', help='in the order: u:use INCAR.job,a:append,c:change,o:out,r:reverse')
+    #parser.add_argument('-ikw', '--incar_kws', nargs='*', help='input key-value pairs in the list from command line')
+    ### depricate original io and io is replaced by ikw
+    parser.add_argument('-io', '--incar_kws', nargs='*', help='input key-value pairs in the list from command line')
+    parser.add_argument('-ir', '--incar_remove', nargs='*', help='input list for comment out')
     #kgroup = parser.add_mutually_exclusive_group('input kpoint option')
     parser.add_argument('-k', '--kopt', help='k option: fname, extension name, 3 values')
     #parser.add_argument('-k', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
@@ -268,23 +257,14 @@ def main():
                 ndir = odir+f'{i}'
             new_dirs.append(ndir)
             i += 1
-    ### treat INCAR
-    incar_kw={}
-    if args.incar:
-        incar_kw['i'] = args.incar          # value = string for input INCAR file
-    if args.incar_add:
-        incar_add = list2dict(args.incar_add)    # value = dict for k-w pair 
-        incar_kw['a'] = incar_add
-    if args.incar_del:
-        incar_kw['d'] = args.incar_del      # value = list
-        
+
     ### check directories
     #print(f'{old_dirs} {new_dirs}')
     for odir, ndir in zip(old_dirs, new_dirs):
         print(f'run {odir} to {ndir}')
         ### call single jobs
-        ###         1         2         3        4          5            6           7              8           9           10 
-        vasp_cont_1dir(args.job, odir, ndir, incar_kw, args.kopt, args.run,  args.option, args.nproc, args.partition, args.nnode)
+        ###         1         2         3        4          5          6               7                  8           9           10        11           12
+        vasp_cont_1dir(args.job, odir, ndir, args.kopt, args.incar, args.incar_kws, args.incar_remove, args.run,  args.option, args.nproc, args.partition, args.nnode)
 
     return 0
 

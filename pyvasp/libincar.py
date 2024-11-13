@@ -24,6 +24,7 @@ import argparse
 import re
 import os
 import sys
+from fline_edit import inf_print
 from common import list2dict, whereami
 
 
@@ -117,13 +118,14 @@ def modify_incar_bykv(incar, inc_kv, icout=None, outf='INCAR.mod', mode='m'):
     inc_kv      list or dict for INCAR key-value
     icout       keys to be commented out
     mode        m for modify INCAR, inc_kv is dict
-                e to extract value, inc_kv is list
-    return      m lines - list of lines
-                e list of values
+                e,d to delete key, inc_kv is list
+    return      m output filename
+                e,d list of values
     '''
+    #inf_print(incar)
     if mode == 'm':
     ### inc_kv should be dict or even number of list elements
-        if isinstance(ickv, list):
+        if isinstance(inc_kv, list):
             kws = list2dict(inc_kv)
             print(f"{kws} in {whereami()} at {__file__}")
         elif isinstance(inc_kv, dict):
@@ -145,23 +147,23 @@ def modify_incar_bykv(incar, inc_kv, icout=None, outf='INCAR.mod', mode='m'):
         if mode == 'm':
             if line_key:
                 if line_key in kws.keys():
-                    line = f" {line_key}   =  {kws[line_key]}   ! change in mod_incar.py\n"
+                    line = f" {line_key}   =  {kws[line_key]}   ! change in libincar.py\n"
                 ### if activated and in the list of delete
-                elif line_key in icout:
-                    line = f" #{line.rstrip()}    ! change in modify_incar_bykv\n"
+                #elif line_key in icout:
+                #    line = f" #{line.rstrip()}    ! change in modify_incar_bykv\n"
             newlist.append(line)
         else:
             if line_key in kws:
                 print(f"found input key and values {line_key}, {line_value}")
                 newlist.append(line_value)
-            
+    print(f"{iline} was saved in newlist {len(newlist)}")
     ### write new file
     if mode == 'm':
         with open(outf, 'w') as f:
             for line in newlist:
                 #print(line)
                 f.write(line)
-                return 0
+            return outf
     else:
         print(f"returns list of values: {newlist} ")
         return newlist

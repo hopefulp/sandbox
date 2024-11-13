@@ -4,7 +4,7 @@ import re
 import os
 import sys
 from common import list2dict, whereami
-from mod_incar import modify_incar_bykv
+from libincar import modify_incar_bykv
 
 def change_incar_bydic(incar, kws, outf='incar'):
     '''keeping file, change line'''
