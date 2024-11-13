@@ -241,12 +241,16 @@ def get_poscar0(poscar):
     return 0
 
 def pos2dirname(poscar):
-    ### obtain dirname from POSCAR.dir
-    if re.match("POSCAR", poscar):
-        if len(poscar) == 6:
+    ''' obtain dirname from POSCAR[CONTCAR].name '''
+    if re.match("POSCAR", poscar) or re.match("CONTCAR", poscar):
+        if len(poscar) <= 7:        # just POSCAR or CONTCAR
             dirname='pos'
+        ### POSCAR.dname, CONTCAR.dname
         else:
-            dirname = poscar[7:]
+            if re.match("P", poscar):
+                dirname = poscar[7:]
+            elif re.match("C", poscar):
+                dirname = poscar[8:]
     else:
         dirname = poscar
     return dirname
