@@ -30,23 +30,24 @@ ase     = MyClass('ase')
 charge  = MyClass('charge')
 convert = MyClass('convert')
 analysis = MyClass('analysis')
-make.vas_make_ini   ="==================== Start VASP =======================================\
+make.vas_make_ini   ="==================== VASP INI START =======================================\
                     \n\t===== Make VASP initial directory ====\
                     \n\t===== Prepare POSCAR, POTCAR, KPOINTS, INCAR\
                     \n\tOPTIONS:\
                     \n\t    -s  poscar\
                     \n\t\tPOSCAR.dirname <- convention\
-                    \n\t    -j [sp,opt,kp,fake,etc]\
+                    \n\t    -j [sp,opt,kp,fake,...]\
                     \n\t\tin case -j: INCAR.job, KPOINTS.job is used if it were\
                     \n\t\tfake:: -sj for -j is required to use INCAR.job, KPOINTS.job\
                     \n\t    -ra == -r a: yes for all\
                     \n\t    -r  on [mkdir,qsub] overwrite/nosub\
                     \n\t\tk kill but show poscars and dirs\
                     \n\t    -o  qopt to use different qscript\
+                    \n\t\t long queue=long in KISTI\
                     \n\t    -al stop questioning except -s poscar\
                     \n\t    -hpp pseudo hydrogen in /TGM/Apps/VASP/POTCAR\
                     \n\t    Group k-sampling\
-                    \n\t\t-kdim [1,2,3], 1 for bulk: k[0]*3, 2 for slab: k[0]*2 k[1], 3 for default\
+                    \n\t\t-kd --kdim [1,2,3], 1: 1 1 k; 2: k[0] k[1] 1;  3: k[0], [1], [2]\
                     \n\t\t-kps 4 4 6 4 8 4 10 4 for -kdim 2\
                     \n\tPOTCAR: \
                     \n\t    will be made by 'genpotcar.py -pp pbe' after cd and reading POSCAR\

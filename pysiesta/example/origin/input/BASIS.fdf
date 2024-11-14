@@ -1,0 +1,24 @@
+#(1) Basis definition
+
+PAO.BasisType     split        # split, splitgauss, nodes, nonodes
+PAO.BasisSize     DZP          # SZ or MINIMAL, DZ, SZP, DZP or STANDARD
+PAO.EnergyShift   30 meV      # default: 0.02 Ry
+PAO.SplitNorm     0.15         # default: 0.15
+
+#%block PAO.Basis                 # Define Basis set
+#Au                    2                    # Species label, number of l-shells
+# n=6   0   2 P   1                   # n, l, Nzeta, Polarization, NzetaPol
+#   6.083      5.644
+#   1.000      1.000
+# n=5   2   2                         # n, l, Nzeta
+#   4.287      2.838
+#   1.000      1.000
+#Au1                2
+# n=6  0    2 P   1
+#   6.083      5.644
+#   1.0        0.00
+# n=5   2   2
+#   4.287      2.838
+#   1.0        1.0
+#%endblock PAO.Basis
+
