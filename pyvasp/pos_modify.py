@@ -11,7 +11,7 @@ import sys
 #import chem_space as cs
 from libposcar import modify_POSCAR
 
-def pos_bombardment(pos, job, atoms, zposition, temp, nlevel, outfile):
+def pos_bombardment(pos, job, atoms, zposition, temp, outfile):
     '''
     pos         POSCAR
     job         add     -> append atoms to POSCAR
@@ -27,7 +27,7 @@ R
     '''
     
     #if re.match('s', bomb_atoms):
-    modify_POSCAR(pos, job=job, mode_atoms=atoms, zpos=zposition, temp=temp, nlevel=nlevel, outf=outfile)
+    modify_POSCAR(pos, job=job, mode_atoms=atoms, zpos=zposition, temp=temp, outf=outfile)
     #elif re.match('a', bomb_atoms):
     #    add_atoms(pos, bomb_atoms[1:])
     
@@ -41,9 +41,9 @@ def main():
     gatoms =  parser.add_mutually_exclusive_group()
     gatoms.add_argument('-s', '--sel_atoms', help="one atom species or index in POSCAR: Hf O Mo S O  0 1 2 not yet for 2-5")
     gatoms.add_argument('-a', '--add_atoms', help="add atoms: O12 Fe3 3-index")
-    parser.add_argument('-p', '--position', type=float, help="define z-coord")
+    parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
     parser.add_argument('-t', '--temp', type=float, default='600',  help="T for atom velocity")
-    parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in levels")
+    #parser.addargument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
     gfname =  parser.add_mutually_exclusive_group()
     gfname.add_argument('-suf', '--suffix',     help="add suffix to outfile")
     gfname.add_argument('-o', '--outfile',      help='output POSCAR name')
@@ -66,7 +66,7 @@ def main():
 
     #if 'bomb' in args.job:
     ### job = bomb or addbomb
-    pos_bombardment(args.poscar, args.job, atoms, args.position, args.temp, args.nlevel, outfile)
+    pos_bombardment(args.poscar, args.job, atoms, args.zcoord, args.temp, outfile)
 
     return 0
 
