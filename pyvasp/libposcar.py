@@ -44,6 +44,8 @@ def parse_poscar(pos, block = None, opt=None):
             natoms
             cd      returns 'C' or 'D'
             coord   natoms line for coord_x, _y, _z
+                opt 1, list    default(cartesian) return n * 3 2D list
+
             vel     natoms line for vel (A/fs) not equipped yet
     '''
     with open(pos, "r") as f:
@@ -69,7 +71,7 @@ def parse_poscar(pos, block = None, opt=None):
             if re.match('s', lines[i], re.I):
                 Lselect = 1         # if yes, increase index by 1
 
-        p_axes=[]   # principal axis
+        p_axes2D=[]   # principal axis
         if block == 'title':
             atoms = lines[0].strip().split()
             return lines[0], atoms
@@ -81,8 +83,20 @@ def parse_poscar(pos, block = None, opt=None):
             for i in range(2,5):
                 nline.append(lines[i])
                 paxis = list(map(float,lines[i].strip().split()))
-                p_axes.append(paxis)
-            return nline, p_axes 
+                p_axes2D.append(paxis)
+                #print(f"p_axes in 2D: {paxis}")
+            if opt: # return length only
+                ### principal axes are Ang unit
+                a = np.array(p_axes2D[0])
+                b = np.array(p_axes2D[1])
+                c = np.array(p_axes2D[2])
+                a_length = np.sqrt(a.dot(a))
+                b_length = np.sqrt(b.dot(b))
+                c_length = np.sqrt(c.dot(c))
+                #print(f"principle axis magnitude: {a_length} {b_length} {c_length} in {whereami()}()")
+                return nline, [a_length, b_length, c_length]
+            else:
+                return nline, p_axes2D 
         elif block == 'atoms':
             if Latomline == 0:
                 atoms = lines[5].strip().split()
@@ -103,12 +117,11 @@ def parse_poscar(pos, block = None, opt=None):
         elif block == 'coord':
             istart = 8 + Latomline + Lselect
             coord = lines[istart:istart+ntotal]     # this is string of line with \n
-            ### return 2D (natom by 3) coordinates
+            ### return 2D coordinates
             if opt:
                 #print(f'change into numbers in {whereami()}()')
                 coordnum = []
                 for line in coord:
-
                     lxyz = list(map(float, line.strip().split()))
                     coordnum.append(lxyz)
                 coord=coordnum
@@ -121,9 +134,24 @@ def parse_poscar(pos, block = None, opt=None):
             except IndexError:
                 return None, None
             return b_vel, ntotal
-                
 
-        
+def coord_d2c(poscar):
+    '''
+    in      POSCAR
+    return  cartesian coordinates
+    '''
+    _, pvalues = parse_poscar(poscar, block='paxes', opt='length')
+    coords, _ = parse_poscar(poscar, block = 'coord', opt='lis') # to 2D list
+    #print(f"paxes {paxes} in function {whereami()}")
+    new_coords=[]
+    for coord in coords:
+        acoord = []
+        for i in range(len(coord)):
+            xyz = coord[i] * pvalues[i]
+            acoord.append(xyz)
+        new_coords.append(acoord)
+    return new_coords
+
 def get_zmax(poscar):
     coords, _ = parse_poscar(poscar, block='coord', opt='number')
     #print(f'coords {coords} in {whereami()}()')
@@ -302,24 +330,38 @@ def distance_pbc(p1, p2, cell_dimensions):
     print(f"Interatomic distance (PBC) between particle 1 and particle 2: {distance_pbc:.4f} units")
     return delta
 
+def min_dist_i(p1, atoms, axes):
+    dist = []
+    for i, atom in enumerate(atoms):
+        dist1 = distance_pbc(p1, atom, axes)
+        dist.append(dist1)
+        #print(f"{i}-th atom: dist = {dist1}")
+        #print(f"{p1}:{atom}")
+    return min(dist)
 
-
-def surf_distribution(natom, axes, cd, z_surf, z_coord, nlevel):
+def implant_2D(pos_coords, natom, axes, cd, zcoord, zmax, nlevel):
     '''For cubic axes
+    pos_coords  original coords of POSCAR in cartesian for pbc comparison
     natom   inserted atoms on vacuum
-    z_surf   max z-coord of surface or fixed z-coord
-    z_coord 'above': make a distance, 'fixed': no distance
+    zcoord  list with elements: 'top' make a distance
+                                one z-values for fixed position
+                                two z-values for inbetween
+    zmax    max for system
     nlevel  distribute natoms in multiple levels
     '''
     ### how to divide the inserted atoms
     ### 2L or 3L
-    dist_cret = 5
-
-    lzoffset = []
-    if z_coord == 'above':
+    if re.match('t', zcoord[0]):
+        ztag = 'top'
+    else:
+        ztag = 'inter'
+    #lzoffset = []
+    if ztag == 'top':
         zoffset = 4.0               # bombing atoms to z-axis from surface, distance between O atoms
-    elif z_coord == 'fixed':
+        interdist = 5               # compare with inserted O
+    else:
         zoffset = 0.0
+        interdist = 3.0               # compare with all atoms
     
     Lprint = 1
     Lprintimp = 0
@@ -333,15 +375,27 @@ def surf_distribution(natom, axes, cd, z_surf, z_coord, nlevel):
     c_length = np.sqrt(c.dot(c))
     if Lprint: print(f"vector dot product: {a_length} {b_length} {c_length}")
     if re.match('d', cd, re.I):
-        zoffset /= c_length
-    for i in range(nlevel):
-        lzoffset.append(zoffset*(i+1))
-    print(f"reset zoffset {zoffset} due to Direct {cd}")
-    zcoords = []
-    for i in range(nlevel):
-        print(f"{i} with {lzoffset[i]} in zoffset")
-        zcoords.append(z_surf + lzoffset[i])
-    if Lprint: print(f"{cd}: z_surf {z_surf} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
+    #    zoffset /= c_length
+        zmax *= c_length
+    #for i in range(nlevel):
+    #    lzoffset.append(zoffset*(i+1))
+    print(f"reset zoffset {zoffset} due to Direct {cd} in function {whereami()}()")
+    ### zcoordinates
+    if ztag == 'top':
+        zcoord = zmax 
+    else:
+        if len(zcoord) == 1:
+            zcoord = float(zcoord[0])
+        else:
+            zcoord = (float(zoord[0]) + float(zcoord[1]))/2.     # inbetween
+        
+    zcoord += zoffset
+
+    #zcoords = []
+    #for i in range(nlevel):
+    #    print(f"{i} with {lzoffset[i]} in zoffset")
+    #    zcoords.append(z_surf + lzoffset[i])
+    #if Lprint: print(f"{cd}: z_surf {z_surf} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
 
     
     ### exclude volume for close atom
@@ -352,57 +406,72 @@ def surf_distribution(natom, axes, cd, z_surf, z_coord, nlevel):
     ilevel = 0
     i = 0
     ntotal = natom
-    natom /= nlevel
-    while ilevel < nlevel:
-        
-        while iatom < natom:
-            i += 1
-            if Lprintimp: print(f'{i}-th trial')
-            apos = np.random.uniform(0, a_length, size=1)[0]
-            bpos = np.random.uniform(0, b_length, size=1)[0]
-            gen = [apos, bpos]
-            if Lprintimp: print(f'{iatom+1}-th generation {gen}')
-            if iatom == 0:
-                implant_list.append(gen)
+    #natom /= nlevel
+    #while ilevel < nlevel:
+    
+    #if ztag == 'inter':
+    #    implant_list.extend(coord)
+    ### calculation using Cartesian
+
+    if ztag == 'top':
+        comp_atoms = []
+    else:
+        comp_atoms = pos_coords
+    natom_orig = len(pos_coords)
+    while iatom < natom:
+        i += 1
+        if Lprintimp: print(f'{i}-th trial')
+        apos = np.random.uniform(0, a_length, size=1)[0]
+        bpos = np.random.uniform(0, b_length, size=1)[0]
+        gen = [apos, bpos, zcoord]          # generation in cartesian
+        if Lprintimp: print(f'{iatom+1}-th generation {gen}')
+        if iatom == 0 and ztag == 'top':
+            comp_atoms.append(gen)
+            iatom += 1
+            if Lprintimp: print(f"implanted")
+        ### compare with O's for top in 2D, all for fixed in 3D
+        else:
+            ### compare with other atoms
+            for pivot in comp_atoms:
+                Limplant = True
+                dist = distance_pbc (gen, pivot, [axes[0][0], axes[1][1], axes[2][2]])
+                if Lprintimp: print(f"distance cret {interdist} < {dist} distance")
+                if dist < interdist:
+                    Limplant = False
+                    break
+            if Limplant:
+                ### check min distance
+                print(f"min dist: {min_dist_i(gen, comp_atoms,[axes[0][0], axes[1][1], axes[2][2]])}")
+                comp_atoms.append(gen)
                 iatom += 1
+                #print(f'generated coords {gen}')
                 if Lprintimp: print(f"implanted")
-            else:
-                ### compare with other atoms
-                for pivot in implant_list:
-                    Limplant = True
-                    dist = distance_pbc(gen, pivot, [axes[0][0], axes[1][1]])     # numpy vector distance)
-                    if Lprintimp: print(f"distance cret {dist_cret} < {dist} distance")
-                    if dist < dist_cret:
-                        Limplant = False
-                        break
-                if Limplant:
-                    implant_list.append(gen)
-                    iatom += 1
-                    #print(f'generated coords {gen}')
-                    if Lprintimp: print(f"implanted")
-        ilevel += 1
-        iatom = 0
+        #ilevel += 1
+        #iatom = 0
            
     ### change coordinate to c/d
-    print(f"implant list {len(implant_list)} in {whereami()}()")
+    print(f"implant list {len(implant_list)-natom_orig} in {whereami()}()")
     lines = []
-    #print(f"cd {cd}")
-    for i, xy in enumerate(implant_list):
+    print(f"cd {cd}, natom {natom}")
+    print(f"{comp_atoms[-6:]}")
+    for i, xy in enumerate(comp_atoms[-natom:]):
         #lineff = ff.FortranRecordWriter('3E16.8')       #FortranRecordWriter('3E20.16')
         if re.match('d', cd, re.I):
             xy[0] /= a_length
             xy[1] /= b_length
+            xy[2] /= c_length
         #print(f'x, y, z added {x} {y} {zcoord} in {whereami()}()')
         ### Now two level system
-        if i < len(implant_list)/nlevel:
-            line = f'{xy[0]:20.16}{xy[1]:20.16f}{zcoords[0]:20.16f}' + "\n"
-        else:
-            line = f'{xy[0]:20.16}{xy[1]:20.16f}{zcoords[1]:20.16f}' + "\n"
+        #if i < len(implant_list)/nlevel:
+        #if i < len(comp_atoms) - natom_orig:
+        line = f'{xy[0]:20.16}{xy[1]:20.16f}{xy[2]:20.16f}' + "\n"
+        #else:
+        #    line = f'{xy[0]:20.16}{xy[1]:20.16f}{zcoords[1]:20.16f}' + "\n"
         if Lprint: print(f'formatted: {line.rstrip()}')
         lines.append(line)
     return lines
 
-def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nlevel=1, outf='POSCAR'):
+def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, outf='POSCAR'):
     '''
     Modularize POSCAR part
     poscar      to be modified
@@ -410,7 +479,7 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
                 zpe     s   fixedMD or selective MD for selective dynamics for ZPE calculation
                 bomb    s   velocity to bombardment experiment to -z axis
                 addbomb a   add molecule and velocity to -z axis
-    matoms      [a|s]atomnameN for 
+    mode_atoms  [a|s]atomnameN for 
                 add find lattice constand and distribute added atoms
                     append N atoms
                 sel select from atoms & natoms list in POSCAR
@@ -418,13 +487,21 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
                     atomlist in POSCAR for movable in zpe calculation
                 velocity vel depending on T
     zpos        the posotion in z-axis where atoms to be added
+                top: above of surface atom 4 A away from top atom
+                z1 [z2]: position of z-value or inbetween two z-values
     temp        temperature for velocity  T
     iatom       atom index
     atoms       atom list in POSCAR
     natoms      number of atoms list in POSCAR
     '''
-    print(f"Write to {outf} in {whereami()}()")
+    ### define constants
+    nlevel = 1      # deprecated for now
+    z_top = 4       # Ang from top surface
+    interdist = 4   # between added O atoms
+    interdist_mid = 3   # at crowded space of interface
 
+    print(f"Write to {outf} in {whereami()}()")
+    ### define mode for atoms: add or select
     if re.match('a', mode_atoms):
         mode = 'add'
     elif re.match('s', mode_atoms):
@@ -490,8 +567,8 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
     ### for Cartesian or Direct    
     line, cd = parse_poscar(poscar, block='cd'); lines.append(line)
 
-    ### looping in atomic position block
-    coords, _ = parse_poscar(poscar, block='coord'); 
+    ### poscar coordinates in line list
+    coords, _ = parse_poscar(poscar, block='coord') 
     
     ## modify selective dynamics for ZPE
     if job == 'zpe':
@@ -510,13 +587,19 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, nleve
     ### Make additional coordinates for added atoms
     if mode == 'add':
         ### for Orthorhombic crystal structure
-        z_coord = 'above'
-        z_line = get_zmax(poscar)
+        #z_coord = 'above'
+        zmax = get_zmax(poscar)
         #radius = vdw_radii[chemical_symbols.indeadd)]
-        if zpos:
-            z_line = zpos
-            z_coord = 'fixed'
-        add_coords = surf_distribution(add_natom, paxes, cd, z_line, z_coord, nlevel)
+        #if zpos:
+        #    z_line = zpos
+        #    z_coord = 'fixed'
+        if re.match('d', cd, re.I):
+            d2coords_cart = coord_d2c(poscar)
+        else:
+            d2coords_cart, _ = parse_poscar(poscar, block='coord', opt='lis')
+
+        print(f"{d2coords_cart[0]} in function {whereami()}()") 
+        add_coords = implant_2D(d2coords_cart, add_natom, paxes, cd, zpos, zmax, nlevel)
         #print(f"{add_coords} in {whereami()}()")
         lines.extend(add_coords)
 

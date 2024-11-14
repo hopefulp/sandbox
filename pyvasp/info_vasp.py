@@ -164,11 +164,15 @@ poscar.pos_modify   ="change POSCAR\
                     \n\t        coord vel  coord vel   : only coordinate|add velocity\
                     \n\t        addbomb: append atoms after POSCAR\
                     \n\t    -a  add atoms, O12, Fe2, ...\
-                    \n\t    -ot input Temperature for velocity distribution in K\
+                    \n\t    -z  location on z-axis: top or float [float]\
+                    \n\t\ttop: 4 Ang away from top of system\
+                    \n\t\t z1: at z1 position\
+                    \n\t\t z2: in the middle of z1 and z2\
+                    \n\t    -t input Temperature for velocity distribution in K\
                     \n\t    -o  outfile for POSCAR.outname\
                     \n\t    -suf suffix to be added to POSCAR.name\
                     \n\tUsage:\
-                    \n\t    pos_modify.py POSCAR.HfSe2sc34 -j addbomb -a O12  -o POSCAR.HfSe2O12L2 -ot 800\
+                    \n\t    pos_modify.py POSCAR.HfSe2sc34 -j bomb -a O6 -z 1.2 2.3 -t 600 -o POSCAR.HfSe2O12L2 \
                     "
 convert.pos2cif      ="vstsscripts/[.pl] convert vasp format(POSCAR, CONTCAR) to cif to be read in MS\
                     \n\tUsage::\
