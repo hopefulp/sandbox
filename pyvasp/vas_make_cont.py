@@ -173,15 +173,14 @@ def vasp_cont_1dir(job, odir, ndir, incar_kws, kopt, Lrun, option, np, xpart, nn
     elif not job in jg_incar:
         incar = f"{odir}/INCAR"
     ### if incar needs to be modified: kw for active, remove for comment out
-    if 'a' in incar_kws:
+    if 'a' in incar_kws or 'd' in incar_kws:
         ### make incar.new
         incar_o = incar
-        incar = modify_incar_bykv(incar_o, incar_kws['a'], mode='m')   # return output filename
-    if 'd' in incar_kws:
-        incar_o = incar
-        incar = modify_incar_bykv(incar_o, incar_kws['d'], mode='e')
-
-    print(f"{incar_o} was modified to {incar}")
+        if 'a' in incar_kws:
+            incar = modify_incar_bykv(incar_o, incar_kws['a'], mode='m')   # return output filename
+        if 'd' in incar_kws:
+            incar = modify_incar_bykv(incar_o, incar_kws['d'], mode='e')
+        print(f"{incar_o} was modified to {incar}")
 
     os.system(f"cp {incar} {ndir}/INCAR")
     print(f"{incar} was copied to {ndir}/INCAR")
@@ -251,23 +250,23 @@ def main():
         old_dirs = get_dirs(pwd, prefix=args.prefix, excludes=args.exclude)
     else:
         print("Usage:: input old job dirs: -d ")
-        #sys.exit(1)
+        sys.exit(1)
 
     ### get new dirnames
     new_dirs=[]
-    i=0
+    #i=0
     if args.newdirs:
         new_dirs.extend(args.newdirs)
-    elif args.suffix or args.fixed_atom:
+    else:
         for odir in old_dirs:
             if args.suffix:
                 ndir = odir+args.suffix
             elif args.fixed_atom:
                 ndir = odir+"fixed"+args.fixed_atom
             else:
-                ndir = odir+f'{i}'
+                ndir = odir+f'{args.job}'
             new_dirs.append(ndir)
-            i += 1
+            #i += 1
     ### treat INCAR
     incar_kw={}
     if args.incar:
@@ -279,7 +278,7 @@ def main():
         incar_kw['d'] = args.incar_del      # value = list
         
     ### check directories
-    #print(f'{old_dirs} {new_dirs}')
+    print(f'{old_dirs} {new_dirs}')
     for odir, ndir in zip(old_dirs, new_dirs):
         print(f'run {odir} to {ndir}')
         ### call single jobs

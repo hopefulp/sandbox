@@ -471,7 +471,7 @@ def implant_2D(pos_coords, natom, axes, cd, zcoord, zmax, nlevel):
         lines.append(line)
     return lines
 
-def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, outf='POSCAR'):
+def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, vel='random', outf='POSCAR'):
     '''
     Modularize POSCAR part
     poscar      to be modified
@@ -490,6 +490,8 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, outf=
                 top: above of surface atom 4 A away from top atom
                 z1 [z2]: position of z-value or inbetween two z-values
     temp        temperature for velocity  T
+    vel         'random' for assign following T
+                'copy' to copy original file
     iatom       atom index
     atoms       atom list in POSCAR
     natoms      number of atoms list in POSCAR
@@ -608,6 +610,7 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, outf=
     ### selected atom will have -vz only with magnitue of |v|=sqrt(vx**2+vy**2+vz**2)   
     if 'bomb' in job:
         ### addtional velocity block as cartisian coordinate (A/fs)
+        print(f"Add velocity at {temp} K for up to {npre_unsel} atom")
         lines.append("\n")
         T = temp
         mu = 0.0
@@ -622,7 +625,7 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, outf=
             vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
             ### if POSCAR has velocity block, read it
             if i < npre_unsel:
-                if vel_orig:
+                if re.match('c', vel):
                     s = vel_orig[i]
                 else:
                     s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
@@ -635,10 +638,11 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, outf=
                 #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
                 s = lineformat.write([0.0, 0.0, -v]) + "\n"
             else:
-                if vel_orig:
+                if re.match('c', vel):
                     s = vel_orig[i]
                 else:
                     s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
+            #print(f"{s} in function {whereami()}()")
             lines.append(s)
     ### print output
     filepointer = 1

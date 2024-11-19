@@ -11,7 +11,7 @@ import sys
 #import chem_space as cs
 from libposcar import modify_POSCAR
 
-def pos_bombardment(pos, job, atoms, zposition, temp, outfile):
+def pos_bombardment(pos, job, atoms, zposition, temp, vel, outfile):
     '''
     pos         POSCAR
     job         add     -> append atoms to POSCAR
@@ -43,6 +43,7 @@ def main():
     gatoms.add_argument('-a', '--add_atoms', help="add atoms: O12 Fe3 3-index")
     parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
     parser.add_argument('-t', '--temp', type=float, default='600',  help="T for atom velocity")
+    parser.add_argument('-v', '--velocity', default='random', choices=['random', 'copy'], help="T for atom velocity")
     #parser.addargument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
     gfname =  parser.add_mutually_exclusive_group()
     gfname.add_argument('-suf', '--suffix',     help="add suffix to outfile")
@@ -66,7 +67,7 @@ def main():
 
     #if 'bomb' in args.job:
     ### job = bomb or addbomb
-    pos_bombardment(args.poscar, args.job, atoms, args.zcoord, args.temp, outfile)
+    pos_bombardment(args.poscar, args.job, atoms, args.zcoord, args.temp, args.velocity, outfile)
 
     return 0
 
