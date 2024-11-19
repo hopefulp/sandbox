@@ -191,7 +191,7 @@ def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, incar, dirnames, opti
 
         ### 3. get INCAR :: use make_incar.py
         incar_repo=f"{ini_dvasp}/INCAR.{job}"
-        ### 3.1 Use inserted INCAR by -i
+        ### 3.1 Use inserted INCAR by -i option
         if incar and os.path.exists(incar):
             if os.path.isfile(incar):
                 f_incar = incar
@@ -277,7 +277,7 @@ def main():
     g_ktest.add_argument('-kd', '--kdim', default=3, type=int, choices=[1,2,3], help='input series of k-points [kx, ky, kz]*3')
     g_ktest.add_argument('-kps', '--kpoints_test', nargs='*', type=int, help='input series of k-points [kx, ky, kz]*3')
     ### toggle default: unset in the bare dir, set to j when INCAR.job exists
-    parser.add_argument('-i', '--incar', help='[INCAR.job,INCAR,dirname/INCAR]')
+    parser.add_argument('-i', '--incar', help='in the order of designated_INCAR, INCAR.job,INCAR, dirname/INCAR]')
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
     parser.add_argument('-d', '--dnames', nargs='+', help='get directory name')
     parser.add_argument('-al', '--all', action='store_true', help="prepared in job dir if not -s, -p, -k, -i")
