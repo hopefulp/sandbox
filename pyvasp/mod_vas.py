@@ -23,7 +23,7 @@ vasf_ini=['POSCAR','KPOINTS','INCAR','POTCAR']
 ### VASP jobs group with file to be modified
 jg_poscar=['ini', 'zpe']      # ini uses, zpe modifies, others use CONTCAR
 jg_kpoints=['dos','band','kp'] # kp for change kp file
-jg_incar=['sp','opt','copt','vdw','chg','chgw','dos','pchg','band','mag','kisti','neb']
+jg_incar=['sp','opt','copt','vdw','chg','chgw','dos','pchg','band','mag','kisti','neb']  # required
 jg_potcar=['lda','gga']
 jg_link=['dos','band','pchg']
 jg_subdir=['neb']
