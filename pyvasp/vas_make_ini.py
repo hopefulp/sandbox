@@ -58,7 +58,7 @@ def get_incar(ifile):
 
     return 0
 ################# 1       2        3       4         5        6     7           8         9        10      11    12 13 14   15   16  
-def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, incar, dirnames, option, allprepared, iofile, qx,qN,qn,vasp_exe,lkisti,Lrun):
+def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, incar, icoption, dirnames, option, allprepared, iofile, qx,qN,qn,vasp_exe,lkisti,Lrun):
     '''
     job
     poscars     list of poscar
@@ -208,6 +208,12 @@ def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, incar, dirnames, opti
             print("Error:: cannot find INCAR")
             sys.exit()
 
+        ### Modify INCAR
+        if icoption:
+            dic = list2dict(icoption)
+            modify_incar_bykv(f_incar, dic, outf='INCAR.new', mode='m')
+        f_incar = 'INCAR.new'
+
         com = f'cp {f_incar} {dirname}/INCAR'
         os.system(f'{com}')
         print(f"{f_incar} was copied to {dirname}/INCAR")
@@ -278,6 +284,7 @@ def main():
     g_ktest.add_argument('-kps', '--kpoints_test', nargs='*', type=int, help='input series of k-points [kx, ky, kz]*3')
     ### toggle default: unset in the bare dir, set to j when INCAR.job exists
     parser.add_argument('-i', '--incar', help='in the order of designated_INCAR, INCAR.job,INCAR, dirname/INCAR]')
+    parser.add_argument('-io', '--incar_option', nargs='*', help='to modify input INCAR]')
     parser.add_argument('-f', '--iofile', default='incar.key', help='only read file is possible')
     parser.add_argument('-d', '--dnames', nargs='+', help='get directory name')
     parser.add_argument('-al', '--all', action='store_true', help="prepared in job dir if not -s, -p, -k, -i")
@@ -365,6 +372,8 @@ def main():
         sys.exit(11)
     #sys.exit(0)
 
+    
+
     ### for kpoints-scan
     #if args.kp_test:
     if args.job == 'kp':
@@ -386,11 +395,11 @@ def main():
             print(f"kp_string {kp_str}, dirname {dirname} in function {whereami()}()")
             dname.append(dirname)  # dname is string
 
-            make_vasp_dir(job, poscars, args.potcar, args.jobadds, kp_str, args.incar, dname, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+            make_vasp_dir(job, poscars, args.potcar, args.jobadds, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
     else:
 ################# 1       2        3       4                   5        6                7           8         9        10      11    12 13 14   15   16  
 #def make_vasp_dir(job, poscars, apotcar, jobadds,           kpoints, incar,            dirnames, option, allprepared, iofile, qx,qN,qn,vasp_exe,lkisti,Lrun):
-        make_vasp_dir(job, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, dirnames, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+        make_vasp_dir(job, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
     return 0
 
 if __name__ == '__main__':

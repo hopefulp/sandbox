@@ -6,13 +6,11 @@ import sys
 from common import list2dict, whereami
 from libincar import modify_incar_bykv
 
-### optional 1: change INCAR by kv-dict
 def change_incar_bydic(incar, kws, outf='incar'):
     '''keeping file, change line'''
-    modify_incar_bykv(incar, kws, outf=outf, mode='m')
+    modify_incar_bydic(incar, kws, outf='incar')
     return 0
 
-### optional 2: change INCAR by jobname
 def change_incar_byjob(incar, job, outf=None):
     if job == 'cont':
         kw = {'ISTART': 1, 'ICHARG': 0}
@@ -30,9 +28,8 @@ def change_incar_byjob(incar, job, outf=None):
 def main():
     parser = argparse.ArgumentParser(description='change INCAR parameter')
     parser.add_argument('inf', help='input incar file or directory')
-    incarmod = parser.add_mutually_exclusive_group()
-    incarmod.add_argument('-j', '--job', choices=["dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='job for VASP')
-    incarmod.add_argument('-kv', '--keyvalue', nargs='*', help='input kw to change') 
+    parser.add_argument('-j', '--job', choices=["dos","band","pchg","chg","md","cont","ini","zpe","mol","wav",'vdw','noD','opt','copt','mag','kisti'], help='job for VASP')
+    parser.add_argument('-kv', '--keyvalue', help='input kw to change') 
     parser.add_argument('-o', '--output',  help='change the output filename')
     args = parser.parse_args()
 

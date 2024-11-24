@@ -11,18 +11,17 @@ import sys
 #import chem_space as cs
 from libposcar import modify_POSCAR
 
-def pos_bombardment(pos, job, atoms, zposition, temp, vel, outfile):
+def pos_bombardment(pos, job, atoms, zposition, temp, vel, nlevel, outfile):
     '''
     pos         POSCAR
-    job         add     -> append atoms to POSCAR
-                no add  -> select atoms in POSCAR
+    job         add   -> just append atoms to POSCAR
+                bomb  -> atoms have velocity
                 
-    atoms   a..  add atoms then they will be selected for bomb
+    atoms   a.. add atoms
                 aO20    add 20 O's
             s..  select atoms in POSCAR
-                sO2     select 2nd O group in atom list of POSCA
-R
-                    sOn     select 1st O group and n atoms
+                sO2     select 2nd O group in atom list of POSCAR
+                sOn     select 1st O group and n atoms
     outfile     POSCAR.name
     '''
     
@@ -44,7 +43,7 @@ def main():
     parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
     parser.add_argument('-t', '--temp', type=float, default='600',  help="T for atom velocity")
     parser.add_argument('-v', '--velocity', default='random', choices=['random', 'copy'], help="T for atom velocity")
-    #parser.addargument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
+    parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
     gfname =  parser.add_mutually_exclusive_group()
     gfname.add_argument('-suf', '--suffix',     help="add suffix to outfile")
     gfname.add_argument('-o', '--outfile',      help='output POSCAR name')
@@ -67,7 +66,9 @@ def main():
 
     #if 'bomb' in args.job:
     ### job = bomb or addbomb
-    pos_bombardment(args.poscar, args.job, atoms, args.zcoord, args.temp, args.velocity, outfile)
+    #pos_bombardment(args.poscar, args.job, atoms, args.zcoord, args.temp, args.velocity, args.nlevel, outfile)
+    modify_POSCAR(args.poscar, job=args.job, mode_atoms=atoms, zpos=args.zcoord, \
+    temp=args.temp, vel=args.velocity, nlevel=args.nlevel, outf=outfile)
 
     return 0
 

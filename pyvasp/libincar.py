@@ -96,18 +96,30 @@ def extract_kv_inline(line):
     '''
     Return key, value pair in a line
     return  key-value
-            None
+            None, None
     '''
-    if not '=' in line:
-        return None, None
+    sline=line.strip()
+    if '=' in line and not re.match('#', sline):
+        if not ';' in line:
+            lst = line.strip().split()   # in case there is no space in both sides of '='
+            if '=' in lst[0]:
+                kstr = re.split('=', lst[0])
+                key = kstr[0]
+                value = kstr[1]
+            else:
+                key = lst[0]
+                value = lst[1]
+        else:
+            print(f"Error:: there might be two k-v in line {line}")
+            sys.exit(100)
     else:
-        lst = line.strip().split()
-        key = lst[0]
+        return None, None
+        
     ### find key in a line whether active or not 
     if '#' in key:
         key = key.replace('#', '')
     if key.upper() in ordered_incar_keys:
-        return key.upper(), lst[2]
+        return key.upper(), value
     else:
         return None, None
 
@@ -115,6 +127,7 @@ def extract_kv_inline(line):
 def modify_incar_bykv(incar, inc_kv, icout=None, outf='INCAR.mod', mode='m'):
     '''
     incar       input file of INCAR
+                INCAR need to have one key in a line
     inc_kv      list or dict for INCAR key-value
     icout       keys to be commented out
     mode        m for modify INCAR, inc_kv is dict
@@ -133,17 +146,19 @@ def modify_incar_bykv(incar, inc_kv, icout=None, outf='INCAR.mod', mode='m'):
     ### to extract, kws is keys
     else:
         kws = inc_kv
-    #print(f"beginning: kws {kws}")
+    print(f"beginning: kws {kws}")
     iline=0
     with open(incar) as f:
         lines = f.readlines()
     ### save to lines or values in a list
     newlist=[]
     ### line analysis for INCAR
+    all_keys=[]
     for line in lines:
         iline += 1
         #print(f"{line_key}: {kws.keys()}")
         line_key, line_value = extract_kv_inline(line)
+        all_keys.append(line_key)
         if mode == 'm':
             if line_key:
                 if line_key in kws.keys():
@@ -163,7 +178,8 @@ def modify_incar_bykv(incar, inc_kv, icout=None, outf='INCAR.mod', mode='m'):
             for line in newlist:
                 #print(line)
                 f.write(line)
-            return outf
+        print(f"{incar} was modified in {outf}")
+        return outf
     else:
         print(f"returns list of values: {newlist} ")
         return newlist

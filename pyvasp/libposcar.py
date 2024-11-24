@@ -355,7 +355,7 @@ def implant_2D(pos_coords, natom, axes, cd, zcoord, zmax, nlevel):
         ztag = 'top'
     else:
         ztag = 'inter'
-    #lzoffset = []
+    lzoffset = []
     if ztag == 'top':
         zoffset = 4.0               # bombing atoms to z-axis from surface, distance between O atoms
         interdist = 5               # compare with inserted O
@@ -363,7 +363,7 @@ def implant_2D(pos_coords, natom, axes, cd, zcoord, zmax, nlevel):
         zoffset = 0.0
         interdist = 3.0               # compare with all atoms
     
-    Lprint = 1
+    Lprint = 0
     Lprintimp = 0
     ### principal axes are Ang unit
     a = np.array(axes[0])
@@ -375,11 +375,13 @@ def implant_2D(pos_coords, natom, axes, cd, zcoord, zmax, nlevel):
     c_length = np.sqrt(c.dot(c))
     if Lprint: print(f"vector dot product: {a_length} {b_length} {c_length}")
     if re.match('d', cd, re.I):
-    #    zoffset /= c_length
+        zoffset /= c_length
         zmax *= c_length
-    #for i in range(nlevel):
-    #    lzoffset.append(zoffset*(i+1))
+    for i in range(nlevel):
+        lzoffset.append(zoffset+(zoffset+1)*i)
     print(f"reset zoffset {zoffset} due to Direct {cd} in function {whereami()}()")
+
+
     ### zcoordinates
     if ztag == 'top':
         zcoord = zmax 
@@ -391,71 +393,71 @@ def implant_2D(pos_coords, natom, axes, cd, zcoord, zmax, nlevel):
         
     zcoord += zoffset
 
-    #zcoords = []
-    #for i in range(nlevel):
-    #    print(f"{i} with {lzoffset[i]} in zoffset")
-    #    zcoords.append(z_surf + lzoffset[i])
-    #if Lprint: print(f"{cd}: z_surf {z_surf} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
-
-    
-    ### exclude volume for close atom
-    apos = []
-    bpos = []
-    implant_list = []
-    iatom = 0
-    ilevel = 0
-    i = 0
-    ntotal = natom
-    #natom /= nlevel
-    #while ilevel < nlevel:
-    
-    #if ztag == 'inter':
-    #    implant_list.extend(coord)
-    ### calculation using Cartesian
+    zcoords = []
+    for i in range(nlevel):
+        print(f"{i} with {lzoffset[i]} in zoffset")
+        zcoords.append(zmax + lzoffset[i])
+    if Lprint: print(f"{cd}: zmax {zmax} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
 
     if ztag == 'top':
         comp_atoms = []
     else:
         comp_atoms = pos_coords
-    natom_orig = len(pos_coords)
-    while iatom < natom:
-        i += 1
-        if Lprintimp: print(f'{i}-th trial')
-        apos = np.random.uniform(0, a_length, size=1)[0]
-        bpos = np.random.uniform(0, b_length, size=1)[0]
-        gen = [apos, bpos, zcoord]          # generation in cartesian
-        if Lprintimp: print(f'{iatom+1}-th generation {gen}')
-        if iatom == 0 and ztag == 'top':
-            comp_atoms.append(gen)
-            iatom += 1
-            if Lprintimp: print(f"implanted")
-        ### compare with O's for top in 2D, all for fixed in 3D
-        else:
-            ### compare with other atoms
-            for pivot in comp_atoms:
-                Limplant = True
-                dist = distance_pbc (gen, pivot, [axes[0][0], axes[1][1], axes[2][2]])
-                if Lprintimp: print(f"distance cret {interdist} < {dist} distance")
-                if dist < interdist:
-                    Limplant = False
-                    break
-            if Limplant:
-                ### check min distance
-                print(f"min dist: {min_dist_i(gen, comp_atoms,[axes[0][0], axes[1][1], axes[2][2]])}")
+
+    ### exclude volume for close atom
+    apos = []
+    bpos = []
+    implant_list = []
+    i_try = 0
+    ntotal = natom
+    natom_level = natom/nlevel                     # natom in a level
+    iatom = 0
+    ilevel = 0
+    while ilevel < nlevel:
+        #if ztag == 'inter':
+        #    implant_list.extend(coord)
+        ### calculation using Cartesian
+        natom_orig = len(pos_coords)
+        while iatom < natom_level:
+            i_try += 1
+            if Lprintimp: print(f'{i}-th trial')
+            apos = np.random.uniform(0, a_length, size=1)[0]
+            bpos = np.random.uniform(0, b_length, size=1)[0]
+            gen = [apos, bpos, zcoords[ilevel]]          # generation in cartesian
+            if Lprintimp: print(f'{iatom+1}-th generation {gen}')
+            ### check distance
+            if iatom == 0 and ztag == 'top' and ilevel == 0:
                 comp_atoms.append(gen)
                 iatom += 1
-                #print(f'generated coords {gen}')
                 if Lprintimp: print(f"implanted")
-        #ilevel += 1
-        #iatom = 0
+            ### compare with O's for top in 2D, all for fixed in 3D
+            else:
+                ### compare with other atoms
+                for pivot in comp_atoms:
+                    Limplant = True
+                    dist = distance_pbc (gen, pivot, [axes[0][0], axes[1][1], axes[2][2]])
+                    if Lprintimp: print(f"distance cret {interdist} < {dist} distance")
+                    if dist < interdist:
+                        Limplant = False
+                        break
+                if Limplant:
+                    ### check min distance
+                    #print(f"min dist: {min_dist_i(gen, comp_atoms,[axes[0][0], axes[1][1], axes[2][2]])}")
+                    comp_atoms.append(gen)
+                    iatom += 1
+                    #print(f'generated coords {gen} in loop: iatom < natom_level')
+                    if Lprintimp: print(f"implanted")
+        iatom = 0
+        ilevel += 1
            
     ### change coordinate to c/d
     print(f"implant list {len(implant_list)-natom_orig} in {whereami()}()")
     lines = []
-    print(f"cd {cd}, natom {natom}")
-    print(f"{comp_atoms[-6:]}")
-    for i, xy in enumerate(comp_atoms[-natom:]):
-        #lineff = ff.FortranRecordWriter('3E16.8')       #FortranRecordWriter('3E20.16')
+    print(f"cd {cd}, total natom {ntotal}")
+    #print(f"{comp_atoms[-ntotal:]}")
+    #print(f"ntotal: {ntotal} size {len(comp_atoms)}")
+    for i, xy in enumerate(comp_atoms[-ntotal:]):
+        lineff = ff.FortranRecordWriter('3E16.8')       #FortranRecordWriter('3E20.16')
         if re.match('d', cd, re.I):
             xy[0] /= a_length
             xy[1] /= b_length
@@ -471,7 +473,7 @@ def implant_2D(pos_coords, natom, axes, cd, zcoord, zmax, nlevel):
         lines.append(line)
     return lines
 
-def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, vel='random', outf='POSCAR'):
+def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, vel='random', nlevel=1, outf='POSCAR'):
     '''
     Modularize POSCAR part
     poscar      to be modified
@@ -492,12 +494,13 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, vel='
     temp        temperature for velocity  T
     vel         'random' for assign following T
                 'copy' to copy original file
+    nlevel      number of levels to add O atoms in multi level
     iatom       atom index
     atoms       atom list in POSCAR
     natoms      number of atoms list in POSCAR
     '''
     ### define constants
-    nlevel = 1      # deprecated for now
+    #nlevel = 1      # deprecated for now
     z_top = 4       # Ang from top surface
     interdist = 4   # between added O atoms
     interdist_mid = 3   # at crowded space of interface

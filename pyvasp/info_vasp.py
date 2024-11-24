@@ -39,6 +39,8 @@ make.vas_make_ini   ="==================== VASP INI START ======================
                     \n\t    -j [sp,opt,kp,fake,...]\
                     \n\t\tin case -j: INCAR.job, KPOINTS.job is used if it were\
                     \n\t\tfake:: -sj for -j is required to use INCAR.job, KPOINTS.job\
+                    \n\t    -i  can designate INCAR file explicitly\
+                    \n\t    -io can modify the INCAR by k-v pairs\
                     \n\t    -ra == -r a: yes for all\
                     \n\t    -r  on [mkdir,qsub] overwrite/nosub\
                     \n\t\tk kill but show poscars and dirs\
@@ -58,6 +60,7 @@ make.vas_make_ini   ="==================== VASP INI START ======================
                     \n\te.g. (KISTI)\
                     \n\t    kpy vas_make_ini.py -s POSCAR.IntMoS2 -j opt\
                     \n\t    kpy vas_make_ini.py -s POSCAR.IntHfSe2md -j md -al -o long (queue long option)\
+                    \n\t    vas_make_ini.py -s POSCAR.MoS2T2Kb -j md -io TEBEG 2000 TEEND 2000 -k g -d MoS2nvtT2K\
                     \n\te.g. (Pseudo Hydrogen)\
                     \n\t    vas_make_ini.py -s POSCAR.sc11sHHf -j sp -al -hpp .66 1.33\
                     \n\t    kpy vas_make_ini.py -s POSCAR.HfOHSe2MLf1 -j opt -d t1736a -hpp .5 .66 1.5 1.33\

@@ -1,23 +1,24 @@
 #!/bin/bash
 
-dir1=/qcfs/joonho/backup/PBE_D2_relax
-base1=cpo27
-base2=_cell_d2_r2
-#base2=_CO2_r1_d2
+cwd=$(pwd)
+dir={cwd:-$cwd}
 
-dir2=~/vaspi/
-#mkdir $dir2
+base1=d201559
+base=${1:-$base1}
 
-for Me in `cat metal.dir`
+i=a
+f=j
+f1="kp.gamma"
+f2=KPOINTS
+a=${2:-$i}
+b=${3:-$f}
+fname1=${2:-$f1}
+fname2=${3:-$f2}
+for x in {a..j}
     do
-####	copy files into new directory
-
-    	cp $dir1/$base1$Me$base2/CONTCAR $dir2/CONTCAR.MOF74.$Me
-#	newdir=~/vaspi/$me
-#	mkdir $newdir
-#	cp $dir1/$base1$me$base2/CONTCAR $newdir
-
-	#./xyz_dist.pl MOF_XYZ/$me.xyz
-#	./xyz_angle.pl MOF_XYZ/$me.xyz
+        dir=$base$x
+        #echo $dir
+    	#echo cp $dir/kp.gamma $dir/KPOINTS
+    	echo cp $dir/${fname1} $dir/${fname2}
     done
 
