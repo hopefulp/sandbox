@@ -212,7 +212,7 @@ def make_vasp_dir(job, poscars, apotcar, jobadds, kpoints, incar, icoption, dirn
         if icoption:
             dic = list2dict(icoption)
             modify_incar_bykv(f_incar, dic, outf='INCAR.new', mode='m')
-        f_incar = 'INCAR.new'
+            f_incar = 'INCAR.new'
 
         com = f'cp {f_incar} {dirname}/INCAR'
         os.system(f'{com}')
