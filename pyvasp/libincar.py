@@ -124,28 +124,28 @@ def extract_kv_inline(line):
         return None, None
 
 ### modifying INCAR by dict or extract value by key
-def modify_incar_bykv(incar, inc_kv, icout=None, outf='INCAR.mod', mode='m'):
+def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
     '''
     incar       input file of INCAR
                 INCAR need to have one key in a line
-    inc_kv      list or dict for INCAR key-value
+    inp_kv      list or dict for INCAR key-value
     icout       keys to be commented out
-    mode        m for modify INCAR, inc_kv is dict
-                e,d to delete key, inc_kv is list
+    mode        m for modify INCAR, inp_kv is dict
+                e,d to delete key, inp_kv is list
     return      m output filename
                 e,d list of values
     '''
     #inf_print(incar)
     if mode == 'm':
-    ### inc_kv should be dict or even number of list elements
-        if isinstance(inc_kv, list):
-            kws = list2dict(inc_kv)
+    ### inp_kv should be dict or even number of list elements
+        if isinstance(inp_kv, list):
+            kws = list2dict(inp_kv)
             print(f"{kws} in {whereami()} at {__file__}")
-        elif isinstance(inc_kv, dict):
-            kws = inc_kv
+        elif isinstance(inp_kv, dict):
+            kws = inp_kv
     ### to extract, kws is keys
     else:
-        kws = inc_kv
+        kws = inp_kv
     print(f"beginning: kws {kws}")
     iline=0
     with open(incar) as f:

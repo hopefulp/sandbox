@@ -339,22 +339,23 @@ def min_dist_i(p1, atoms, axes):
         #print(f"{p1}:{atom}")
     return min(dist)
 
-def implant_2D(pos_coords, natom, axes, cd, zcoord, zmax, nlevel):
+def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, nlevel):
     '''For cubic axes
     pos_coords  original coords of POSCAR in cartesian for pbc comparison
     natom   inserted atoms on vacuum
-    zcoord  list with elements: 'top' make a distance
+    zfix  list with elements: 'top' make a distance
                                 one z-values for fixed position
                                 two z-values for inbetween
-    zmax    max for system
+    zmax    max for system in cartesian
     nlevel  distribute natoms in multiple levels
     '''
     ### how to divide the inserted atoms
     ### 2L or 3L
-    if re.match('t', zcoord[0]):
+    if re.match('t', zfix[0]):
         ztag = 'top'
     else:
         ztag = 'inter'
+        zmax = 0
     lzoffset = []
     if ztag == 'top':
         zoffset = 4.0               # bombing atoms to z-axis from surface, distance between O atoms
@@ -363,7 +364,7 @@ def implant_2D(pos_coords, natom, axes, cd, zcoord, zmax, nlevel):
         zoffset = 0.0
         interdist = 3.0               # compare with all atoms
     
-    Lprint = 0
+    Lprint = 1
     Lprintimp = 0
     ### principal axes are Ang unit
     a = np.array(axes[0])
@@ -382,21 +383,25 @@ def implant_2D(pos_coords, natom, axes, cd, zcoord, zmax, nlevel):
     print(f"reset zoffset {zoffset} due to Direct {cd} in function {whereami()}()")
 
 
-    ### zcoordinates
+    ### zcoordinates: use zmax for top
     if ztag == 'top':
-        zcoord = zmax 
+        zcoord = zmax
+        #zcoord += zoffset
+    ### use zfix for z-coordinates
     else:
-        if len(zcoord) == 1:
-            zcoord = float(zcoord[0])
+        if len(zfix) == 1:
+            zcoord = float(zfix[0])
         else:
-            zcoord = (float(zoord[0]) + float(zcoord[1]))/2.     # inbetween
-        
-    zcoord += zoffset
+            zcoord = (float(zfix[0]) + float(zfix[1]))/2.     # inbetween
 
     zcoords = []
+    ### for inter model no nlevel
     for i in range(nlevel):
         print(f"{i} with {lzoffset[i]} in zoffset")
-        zcoords.append(zmax + lzoffset[i])
+        if ztag == 'top':
+            zcoords.append(zcoord + lzoffset[i])
+        else:
+            zcoords.append(zcoord)
     if Lprint: print(f"{cd}: zmax {zmax} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
 
     if ztag == 'top':
