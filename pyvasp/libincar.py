@@ -185,6 +185,20 @@ def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
         return newlist
 
 
+def add_inckv_bysubjob(job, subjob, incdic):
+    '''
+    job md subjob: change INCAR.md by cool, heat, quenching
+        quenching   NSW 1000
+        cool, heat  default TEBIG, TEEND
+    return INCAR dict to be modified by subjob
+    '''
+    if job == 'md':
+        if subjob == 'quench':
+            if not 'NSW' in incdic.keys():
+                incdic['NSW'] = 1000
+    return incdic
+
+
 def modify_incar_byjob(incar, job, dic=None, opt='ac', suff=None):
     #os.system(f"cp {INCAR} INCAR")
     #line_change_dict('INCAR', vasp_job.zpe)

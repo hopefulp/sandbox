@@ -339,7 +339,7 @@ def min_dist_i(p1, atoms, axes):
         #print(f"{p1}:{atom}")
     return min(dist)
 
-def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, nlevel):
+def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
     '''For cubic axes
     pos_coords  original coords of POSCAR in cartesian for pbc comparison
     natom   inserted atoms on vacuum
@@ -347,6 +347,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, nlevel):
                                 one z-values for fixed position
                                 two z-values for inbetween
     zmax    max for system in cartesian
+    r_crit  implantation criteria for atomic inter-distance
     nlevel  distribute natoms in multiple levels
     '''
     ### how to divide the inserted atoms
@@ -362,7 +363,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, nlevel):
         interdist = 5               # compare with inserted O
     else:
         zoffset = 0.0
-        interdist = 3.0               # compare with all atoms
+        interdist = r_crit               # compare with all atoms
     
     Lprint = 1
     Lprintimp = 0
@@ -441,7 +442,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, nlevel):
                 for pivot in comp_atoms:
                     Limplant = True
                     dist = distance_pbc (gen, pivot, [axes[0][0], axes[1][1], axes[2][2]])
-                    if Lprintimp: print(f"distance cret {interdist} < {dist} distance")
+                    #if Lprintimp: print(f"distance cret {interdist} < {dist} distance")
                     if dist < interdist:
                         Limplant = False
                         break
@@ -478,7 +479,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, nlevel):
         lines.append(line)
     return lines
 
-def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, vel='random', nlevel=1, outf='POSCAR'):
+def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, vel='random', outf='POSCAR', r_crit=None, nlevel=None):
     '''
     Modularize POSCAR part
     poscar      to be modified
@@ -609,7 +610,7 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, vel='
             d2coords_cart, _ = parse_poscar(poscar, block='coord', opt='lis')
 
         print(f"{d2coords_cart[0]} in function {whereami()}()") 
-        add_coords = implant_2D(d2coords_cart, add_natom, paxes, cd, zpos, zmax, nlevel)
+        add_coords = implant_2D(d2coords_cart, add_natom, paxes, cd, zpos, zmax, r_crit, nlevel)
         #print(f"{add_coords} in {whereami()}()")
         lines.extend(add_coords)
 
