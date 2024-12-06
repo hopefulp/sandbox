@@ -376,18 +376,21 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
     b_length = np.sqrt(b.dot(b))
     c_length = np.sqrt(c.dot(c))
     if Lprint: print(f"vector dot product: {a_length} {b_length} {c_length}")
+
+    ### 
     if re.match('d', cd, re.I):
-        zoffset /= c_length
-        zmax *= c_length
+        zoffset /= c_length             # converted to D
+        zmax *= c_length                # converted to C
     for i in range(nlevel):
         lzoffset.append(zoffset+(zoffset+1)*i)
     print(f"reset zoffset {zoffset} due to Direct {cd} in function {whereami()}()")
 
 
     ### zcoordinates: use zmax for top
+    ### convert to cartesian from direct
     if ztag == 'top':
-        zcoord = zmax
-        #zcoord += zoffset
+        zcoord = zmax                   # this is C
+        zcoord += zoffset * c_length    # converted to C
     ### use zfix for z-coordinates
     else:
         if len(zfix) == 1:

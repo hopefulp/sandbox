@@ -41,7 +41,7 @@ def main():
     gatoms.add_argument('-s', '--sel_atoms', help="one atom species or index in POSCAR: Hf O Mo S O  0 1 2 not yet for 2-5")
     gatoms.add_argument('-a', '--add_atoms', help="add atoms: O12 Fe3 3-index")
     parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
-    parser.add_argument('-d', '--distance', default = 3.0, help="interdistance creteria for implantation")
+    parser.add_argument('-d', '--distance', default = 3.0, type=float, help="interdistance creteria for implantation")
     parser.add_argument('-t', '--temp', type=float, default='600',  help="T for atom velocity")
     parser.add_argument('-v', '--velocity', default='random', choices=['random', 'copy'], help="T for atom velocity")
     parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
