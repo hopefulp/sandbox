@@ -117,7 +117,7 @@ def vasp_cont_1dir(job, odir, ndir, incar_kws, kopt, Lrun, option, np, xpart, nn
                 os.system(f'cp {poscar} {ndir}/{subdir}/POSCAR')
         else:
             poscar = f'{odir}/CONTCAR'
-            os.system(f'cp {poscar} {ndir}/POSCAR')
+    os.system(f'cp {poscar} {ndir}/POSCAR')
     print(f"{poscar} was copied to {ndir}/POSCAR in case no subdirectories")
 
     ### 2: POTCAR
