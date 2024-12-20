@@ -77,7 +77,7 @@ vasp_dir="/TGM/Apps/VASP/VASP_BIN/6.4.2/NORMAL"
 
 ### exe = [gam|ncl|std] for 5.4.4, 
 if [ $exe ]; then
-    EXEC="vasp.${version}.${exe}.x"
+    EXEC="vasp.${version}.normal.${exe}.x"
 else
     EXEC="vasp.${version}.normal.std.x"
 fi
