@@ -96,13 +96,14 @@ dirjob.dir_fname    =   "Treat Dir without work-style\
                         \n\t\t    -id to include dir in scanning dir\
                         \n\t\t    -v  inverse the matching\
                         \n\t\t    -st style=[ap:append, rp:replace, mo: mode\
-                        \n\t\t    -rw replacement word\
+                        \n\t\t    -rw replacement word, if None, replace becomes remove\
                         \n\t\t    -d, -nd  dirname for mv\
                         \n\t\t    -ip include_parents directory for matching is 'suffix'\
                         \n\t\t    -e exception list using matching\
                         \n\t\t    -eo default=m exception by matching or fullname\
                         \n\t\tUsage::\
                         \n\t\t    dir_fname.py rename -p G4 -st rp -rw G2 -id         ! rename with full replacement\
+                        \n\t\t    dir_fname.py rename -p ToBeDelete_ -st rp           ! without -rw, -`p is deleted in fname\
                         \n\t\t    dir_fname.py rename -p G4 -st ap -rw vdw -id        ! append new word after dir and fname\
                         \n\t\t    dir_fname.py rename -m sc34c -rp sc34 -id -e sc34ch ! rename dir & file with exception\
                         \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'        ! to remove pbs files \

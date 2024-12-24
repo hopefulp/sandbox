@@ -128,7 +128,7 @@ def main():
     group.add_argument( '-i', '--infiles', nargs='*', help='input file list')
     parser.add_argument( '-v', '--inverse', action='store_true', help='after find matching, inverse the selection')
     parser.add_argument('-st', '--style', default='rp', choices=['ap', 'rp', 'mo'], help='fname changing style: append, replace, mode')
-    parser.add_argument( '-rw', '--replace_word', help='string for replacement')
+    parser.add_argument( '-rw', '--replace_word', help='string for replacement, if not empty')
     #change.add_argument('-a', '--append', help="add suffix by -a to the original filename without extension")
     #change.add_argument('-mo', '--mode', default='755', choices=['755','644'], help="input chmod")
     parser.add_argument( '-id', '--include_dir', action='store_true', help='include dirname to filename')

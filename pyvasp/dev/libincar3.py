@@ -35,7 +35,7 @@ ordered_incar_keys=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','N
 ### job_mod for the existing value
 ### job_comment for comment out
 ### job_uncomment to make it active
-cont_change = {'ISTART': 1, 'ICHARG':0}     # read WAVECAR
+
 ### Band structure: change params and comment out
 band_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'LCHARG': '.F.'}
 band_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
@@ -198,20 +198,8 @@ def add_inckv_bysubjob(job, subjob, incdic):
                 incdic['NSW'] = 1000
     return incdic
 
-def modify_incar_byjob(incar, job, outf='INCAR.new'):
-    '''
-    simply call modify_incar_kv by assigning incar_kv by job
-    '''
-    if job == 'cont':
-       modify_incar_bykv(incar, cont_change, outf=outf, mode = 'm')
-    else:
-        print(f"no {job} defined in {whereami()}")
-        sys.exit(101)
 
-
-    return 0
-
-def modify_incar_byjob2(incar, job, dic=None, opt='ac', suff=None):
+def modify_incar_byjob(incar, job, dic=None, opt='ac', suff=None):
     #os.system(f"cp {INCAR} INCAR")
     #line_change_dict('INCAR', vasp_job.zpe)
     print(f"running in {whereami()}:{__file__}")

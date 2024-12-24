@@ -42,8 +42,9 @@ def main():
     gatoms.add_argument('-a', '--add_atoms', help="add atoms: O12 Fe3 3-index")
     parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
     parser.add_argument('-d', '--distance', default = 3.0, type=float, help="interdistance creteria for implantation")
-    parser.add_argument('-t', '--temp', type=float, default='600',  help="T for atom velocity")
-    parser.add_argument('-v', '--velocity', default='random', choices=['random', 'copy'], help="T for atom velocity")
+    parser.add_argument('-t', '--temp', type=float, default=500,  help="T(K) for atomic velocity")
+    parser.add_argument('-ht', '--hypertherm', type=float, help="T(eV) for atom velocity")
+    parser.add_argument('-vt', '--velocity_type', default='random', choices=['random', 'copy'], help="T for atom velocity")
     parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
     gfname =  parser.add_mutually_exclusive_group()
     gfname.add_argument('-suf', '--suffix',     help="add suffix to outfile")
@@ -69,7 +70,7 @@ def main():
     ### job = bomb or addbomb
     #pos_bombardment(args.poscar, args.job, atoms, args.zcoord, args.temp, args.velocity, args.nlevel, outfile)
     modify_POSCAR(args.poscar, job=args.job, mode_atoms=atoms, zpos=args.zcoord, \
-    temp=args.temp, vel=args.velocity, nlevel=args.nlevel, r_crit=args.distance, outf=outfile)
+    temp=args.temp, htemp=args.hypertherm, vel=args.velocity_type, nlevel=args.nlevel, r_crit=args.distance, outf=outfile)
 
     return 0
 
