@@ -11,7 +11,7 @@ git add . -A
 echo "git commit -m \"$arg1\""
 git commit -m "$arg1"
 echo "git push"
-if [ $@ -eq 2 ]; then
+if [ $# -eq 2 ]; then
     git push hub HEAD:master
 else
     git push
