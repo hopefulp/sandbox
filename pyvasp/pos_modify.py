@@ -70,7 +70,7 @@ def main():
     ### job = bomb or addbomb
     #pos_bombardment(args.poscar, args.job, atoms, args.zcoord, args.temp, args.velocity, args.nlevel, outfile)
     modify_POSCAR(args.poscar, job=args.job, mode_atoms=atoms, zpos=args.zcoord, \
-    temp=args.temp, htemp=args.hypertherm, vel=args.velocity_type, nlevel=args.nlevel, r_crit=args.distance, outf=outfile)
+    temp=args.temp, htemp=args.hypertherm, vel_type=args.velocity_type, nlevel=args.nlevel, r_crit=args.distance, outf=outfile)
 
     return 0
 

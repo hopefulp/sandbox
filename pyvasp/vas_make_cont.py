@@ -208,7 +208,7 @@ def vasp_cont_1dir(job, odir, ndir, incar, incopt, kopt, Lrun, option, np, xpart
 def main():
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job
-    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','incar','dos','band','pchg','chg','chgw','md','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
+    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','incar','dos','band','pchg','chg','chgw','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
     ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()
     gdirectory.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
@@ -229,11 +229,11 @@ def main():
     #parser.add_argument('-k', '--optkpoints', action='store_true', help='make KPOINTS or copy KPOINTS.job')
     parser.add_argument('-pos', '--poscar', help='incar POSCAR.name for job==ini')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
-    parser.add_argument('-o', '--option', choices=['opt','mem','sim','long'], help="vasp error: converge, memory issue, sim for not to change INCAR")
     qsub = parser.add_argument_group(title='qsub')
     qsub.add_argument('-x', '--partition', type=int,            help='partition number in qsub')
     qsub.add_argument('-N', '--nnode',     type=int,            help='number of nodes in qsub')
     qsub.add_argument('-np', '--nproc',                          help='nprocess in qsub')
+    qsub.add_argument('-o', '--option', choices=['opt','mem','sim','long','ml'], help="vasp error: converge, memory issue, sim for not to change INCAR")
     parser.add_argument('-u', '--usage',   action='store_true', help='print usage')
     args = parser.parse_args()
 

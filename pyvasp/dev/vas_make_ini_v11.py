@@ -310,12 +310,12 @@ def main():
     g_vasp  = parser.add_argument_group(title='VASP executable')
     g_vasp.add_argument('-exe', '--executable', choices=['gamma','xyrelax'], help='vasp execuatable: gamma, xy-relax')
     ### PBS arguments
-    qsub = parser.add_argument_group(title='QUEUE')
-    qsub.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
-    qsub.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
-    qsub.add_argument('-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
-    qsub.add_argument('-l', '--lkisti', nargs='*', help="kisti command line input")
-    qsub.add_argument('-o', '--option', choices=['opt','mem','long','g','ml'], help="error,exe; 'opt':converge, 'mem': lack, 'longnnn':long queue, 'g': gamma, 'ml':ML")
+    g_queue = parser.add_argument_group(title='QUEUE')
+    g_queue.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
+    g_queue.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
+    g_queue.add_argument('-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
+    g_queue.add_argument('-l', '--lkisti', nargs='*', help="kisti command line input")
+    g_queue.add_argument('-o', '--option', help="error,exe; 'opt':converge, 'mem': lack, 'longnnn':long queue, 'g': gamma, 'vg':ML")
     args = parser.parse_args()
 
     ### running option
