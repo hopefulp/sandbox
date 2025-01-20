@@ -8,7 +8,7 @@ import json
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 from common     import get_dirfiles, yes_or_no, list2dict
-from libincar  import modify_incar_byjob, modify_incar_bykv
+from libincar  import modify_incar_byjob, modify_incar_bykv, add_inckv_bysubjob
 from libposcar import modify_POSCAR, pos2dirname, get_poscar
 from mod_vas    import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_link
 from vas_qsub   import qsub_command
@@ -72,7 +72,7 @@ def make_incar(iopt, odir, job, ikw_opt, incar_kws, incar_remove):
 
 ### O: Use this to comtain all the jobs
 ###            1     2      3       4          5      6      7       8      9    10 
-def vasp_cont_1dir(job, odir, ndir, incar, incopt, kopt, Lrun, option, np, xpart, nnode):
+def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, np, xpart, nnode):
     '''
     job     default = 'cont'
             depending on job, some files will be changed
@@ -174,6 +174,8 @@ def vasp_cont_1dir(job, odir, ndir, incar, incopt, kopt, Lrun, option, np, xpart
     if job in jg_incar:
         modify_incar_byjob(incar, job, outf='INCAR.new')
         incar = 'INCAR.new'
+    if subjob:
+        add_inckv_bysubjob(job, subjob, incopt)
     if incopt:
         ### make modify the present INCAR file
         modify_incar_bykv(incar, incopt, outf='INCAR.new', mode='m')
@@ -209,7 +211,8 @@ def main():
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job
     parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','incar','dos','band','pchg','chg','chgw','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
-    ### old directory selection
+    parser.add_argument('-sj', '--subjob', default='sp', choices=['sp', 'cool', 'heat','quench'], help='sp for fake and others for md')
+        ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()
     gdirectory.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
     gdirectory.add_argument('-p', '--prefix', help='select directories using prefix')
@@ -269,7 +272,7 @@ def main():
         print(f'run {odir} to {ndir}')
         ### call single jobs
         ###         1         2         3        4          5            6           7              8           9           10 
-        vasp_cont_1dir(args.job, odir, ndir, args.incar, args.incar_option, args.kopt, args.run,  args.option, args.nproc, args.partition, args.nnode)
+        vasp_cont_1dir(args.job, args.subjob, odir, ndir, args.incar, args.incar_option, args.kopt, args.run,  args.option, args.nproc, args.partition, args.nnode)
 
     return 0
 

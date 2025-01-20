@@ -65,10 +65,12 @@ def get_queue_pt(qx=None):
 def qsub_command(ndir, X=3, nnode=4, np=None, option=None, vasp_exe=None, lkisti=None, Lrun=None):
     if hostname == 'kisti':
         if vasp_exe:
-            if vasp_exe == 'gamma':
+            if 'g' in vasp_exe:
                 str_vasp = "-v exe=gamma"
-            elif vasp_exe == 'xyrelax':
-                str_vasp = "-v crelax=xy"
+            elif 'xy' in vasp_exe:
+                str_vasp = "-v exe=xyrelax"
+            elif 'ncl' in vasp_exe:
+                str_vasp = "-v exe=ncl"
         else:
             str_vasp = ""
         nnode=20

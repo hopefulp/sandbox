@@ -100,6 +100,9 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
         #if Lktest:
         #    dirname += 'k' + list2str(kpoints)
         #print(f"dirname {dirname} in function {whereami()}()")
+        if not os.path.isfile(poscar):
+            print(f"ERROR: {poscar} doesnot exist for POSCAR")
+            sys.exit(101)
         if not os.path.isdir(dirname):
             com1 = "mkdir " + dirname
             print(com1)
@@ -210,21 +213,31 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
             print("Error:: cannot find INCAR")
             sys.exit()
 
-        ### Modify INCAR
-        ### subjob for MD: cool, heat, quench
-        if job == 'md' and subjob:
-            print(f"Add more INCAR KW for {subjob} if not specified in incopt {incopt}")
-            if not incopt:
-                incopt = {}
-            else:
-                incopt = list2dict(incopt)
-            add_inckv_bysubjob(job, subjob, incopt)
-            print(f"incopt after add_inckv_bysubjob {incopt}")
-        ### though job != 'md', incopt would work
+        ### Add incopt
         if incopt:
             if type(incopt) != dict: 
                 print(f"1st change of incopt {incopt}")
                 incopt = list2dict(incopt)
+            
+
+        ### subjob for MD: cool, heat, quench
+        if 'md' in job:
+            if subjob:
+                print(f"Add more INCAR KW for {subjob} if not specified in incopt {incopt}")
+                add_inckv_bysubjob(job, subjob, incopt)
+                #print(f"incopt after add_inckv_bysubjob {incopt}")
+            else:
+                if incopt:
+                    if 'TEBEG' in incopt.keys() or 'TEEND' in incopt.keys():
+                        if job == 'mdnve':
+                            print(f"job {job} is not compatable with TEBEG -> try again")
+                            sys.exit(30)
+                        if float(incopt['TEBEG']) > float(incopt['TEEND']):
+                            if not 'NSW' in incopt.keys():
+                                #print(f'if {incopt['TEBEG']} > {incopt['TEEND']}, quench will run in 1 ps')
+                                incopt['NSW'] = 1000
+        ### though job != 'md', incopt would work
+        if incopt:
             modify_incar_bykv(f_incar, incopt, outf='INCAR.new', mode='m')
             f_incar = 'INCAR.new'
 
@@ -275,7 +288,7 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
 def main():
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
     parser.add_argument('-j', '--job', choices=['pchg','chg','md','nnff','mdnve','nnffnve', 'ini','zpe','mol','wav','opt','copt','sp','noD','kp','fake','neb','pseudo'], help='inquire for each file')
-    parser.add_argument('-sj', '--subjob', default='sp', choices=['sp', 'cool', 'heat','quench'], help='sp for fake and others for md')
+    parser.add_argument('-sj', '--subjob', choices=['sp', 'cool', 'heat','quench'], help='sp for fake and others for md')
     parser.add_argument('-n', '--ndirs', default=5, type=int, help="number or dirs to make")
     ### POSCARs
     gposcar = parser.add_mutually_exclusive_group()
@@ -308,14 +321,14 @@ def main():
 
     ### VASP executable
     g_vasp  = parser.add_argument_group(title='VASP executable')
-    g_vasp.add_argument('-exe', '--executable', choices=['gamma','xyrelax'], help='vasp execuatable: gamma, xy-relax')
+    g_vasp.add_argument('-e', '--executable', choices=['gamma','g','xyrelax'], help='vasp execuatable: gamma, xy-relax')
     ### PBS arguments
     qsub = parser.add_argument_group(title='QUEUE')
     qsub.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
     qsub.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
     qsub.add_argument('-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
     qsub.add_argument('-l', '--lkisti', nargs='*', help="kisti command line input")
-    qsub.add_argument('-o', '--option', choices=['opt','mem','long','g','ml'], help="error,exe; 'opt':converge, 'mem': lack, 'longnnn':long queue, 'g': gamma, 'ml':ML")
+    qsub.add_argument('-o', '--option', choices=['opt','mem','long','ml'], help="error,exe; 'opt':converge, 'mem': lack, 'longnnn':long queue, 'ml':ML")
     args = parser.parse_args()
 
     ### running option

@@ -22,28 +22,8 @@ def make_newfname(fname, pattern, style, ch_word):
     return new_fname
 
 
-def ch_fname_recursive(dir1, job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, run):
-    print(f"{dir1}")
-    if not dir1:
-        pwd = os.getcwd()
-        dir1 = pwd
-    print(f"####.... enter {dir1} directory")
-    os.chdir(dir1)
-    ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, run)
-
-    p_files = os.listdir('.')
-    for f in p_files:
-        ### without check not link-directory, this makes error
-        if os.path.isdir(f) and not os.path.islink(f):
-            ch_fname_recursive(f, job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, run)
-    os.chdir('..')
-    print(f"####....... exit {dir1} directory")
-    return 0
-
-
-def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, Lrun):
+def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex_opt, dir_out, Lparents,run):
     pwd = os.getcwd()
-
     # pattern should have 1 element
     print(pattern)
     ### pattern f: specify filename
@@ -132,10 +112,10 @@ def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex
     for com in commands:
         print(com)
     q = "will you run? "
-    if Lrun or yes_or_no(q):
+    if yes_or_no(q):
         for com in commands:
             os.system(com)
-    return 0              
+    return                    
 
 
 def main():
@@ -156,7 +136,6 @@ def main():
     parser.add_argument( '-e', '--excluded', nargs='*', help='filename to be excluded')
     parser.add_argument( '-eo', '--excluded_opt', help='default==m, excluded fname option: matching or fullname')
     parser.add_argument( '-d', '-nd', '--directory', type=str, default='tmppy', help='target directory to move files')
-    parser.add_argument( '-re', '--recursive', action='store_true', help='try subdirectories')
     parser.add_argument( '-r', '--run', action='store_true', help='run or not-False')
     args = parser.parse_args()
 
@@ -178,11 +157,12 @@ def main():
         print("matching should be given")
         return 1
 
-    pwd = os.getcwd()
-    if args.recursive:
-        ch_fname_recursive(pwd, args.job, m_tag, matching, args.inverse, args.style, args.replace_word, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.include_parents,args.recursive, args.run)
-    else:
-        ch_fname(pwd, args.job, m_tag, matching, args.inverse, args.style, args.replace_word, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.include_parents,args.recursive, args.run)
+    #if args.job == "rename":
+    #    if args.append:
+    #        new_name = args.append
+    #        rn_type = 'a'   # for append except extension
+    #cmd(args.job, m_tag, matching, args.excluded, args.directory,args.rename,rn_type,new_name,args.run)
+    ch_fname(args.job, m_tag, matching, args.inverse, args.style, args.replace_word, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.include_parents,args.run)
 
 if __name__ == "__main__":
     main()

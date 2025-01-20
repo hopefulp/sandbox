@@ -153,6 +153,9 @@ def coord_d2c(poscar):
     return new_coords
 
 def get_zmax(poscar):
+    '''
+    zmax in value
+    '''
     coords, _ = parse_poscar(poscar, block='coord', opt='number')
     #print(f'coords {coords} in {whereami()}()')
     zmax = np.array(coords).max(axis=0)[2]
@@ -346,7 +349,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
     zfix  list with elements: 'top' make a distance
                                 one z-values for fixed position
                                 two z-values for inbetween
-    zmax    max for system in cartesian
+    zmax    max in value (C|D)
     r_crit  implantation criteria for atomic inter-distance
     nlevel  distribute natoms in multiple levels
     '''
@@ -365,6 +368,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
         zoffset = 0.0
         interdist = r_crit               # compare with all atoms
     
+    print(f"ztag = {ztag}")
     Lprint = 1
     Lprintimp = 0
     ### principal axes are Ang unit
@@ -377,9 +381,9 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
     c_length = np.sqrt(c.dot(c))
     if Lprint: print(f"vector dot product: {a_length} {b_length} {c_length}")
 
-    ### 
+    ### Convert to C
     if re.match('d', cd, re.I):
-        zoffset /= c_length             # converted to D
+        #zoffset /= c_length             # converted to D
         zmax *= c_length                # converted to C
     for i in range(nlevel):
         lzoffset.append(zoffset+(zoffset+1)*i)
@@ -390,14 +394,13 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
     ### convert to cartesian from direct
     if ztag == 'top':
         zcoord = zmax                   # this is C
-        zcoord += zoffset * c_length    # converted to C
     ### use zfix for z-coordinates
     else:
         if len(zfix) == 1:
             zcoord = float(zfix[0])
         else:
             zcoord = (float(zfix[0]) + float(zfix[1]))/2.     # inbetween
-
+    print(f"zcoord {zcoord}")
     zcoords = []
     ### for inter model no nlevel
     for i in range(nlevel):
@@ -510,9 +513,9 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp
     natoms      number of atoms list in POSCAR
     '''
     ### define constants
-    #nlevel = 1      # deprecated for now
-    z_top = 4       # Ang from top surface
-    interdist = 4   # between added O atoms
+    #nlevel = 1         # deprecated for now
+    z_top = 4           # Ang from top surface
+    interdist = 4       # between added O atoms
     interdist_mid = 3   # at crowded space of interface
 
     print(f"Write to {outf} in {whereami()}()")
@@ -626,7 +629,7 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp
         print(f"Add velocity at {temp} K for up to {npre_unsel} atom")
         lines.append("\n")
         T = temp
-        mu = 0.0
+        mu = 0.0                # mean value for M-B distribution
         amukT = amu/(k_B * T)
         ms2angfs = 1.E-5         # from m/s to (1E10/1E15) Ang/fs
         lineformat = ff.FortranRecordWriter('3E16.8')
@@ -648,13 +651,18 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp
                 #sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
                 #vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
                 ### in case hyperthermal species, convert eV to T and assign to selected atoms
-                if htemp:
+                if htemp and htemp < 100.:
+                    # use eV in velocity units
                     pass
-                    
-                else:
-                    v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
-                    #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
-                    s = lineformat.write([0.0, 0.0, -v]) + "\n"
+                elif htemp: # use high T as velocity units
+                    T = htemp
+                    amukT = amu/(k_B * T)
+                    sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs
+                    vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)
+                #else: # use the same T as substrate
+                v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
+                #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
+                s = lineformat.write([0.0, 0.0, -v]) + "\n"
             else:
                 if re.match('c', vel_type):
                     s = vel_orig[i]

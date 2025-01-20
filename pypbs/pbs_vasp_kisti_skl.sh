@@ -21,15 +21,12 @@ echo "NPROC = $NPROC" >> $log_file
 echo start >> $log_file
 date >> $log_file
 
-#if [ $exe == 'ml' ]; then
-#    EXEC="$HOME/bin/vasp.6.4.2.normal.std.x"
-#elif [ $exe == 'mlg' ]; then
-#    EXEC="$HOME/bin/vasp.6.4.2.normal.gam.x"
-#elif [ $exe == 'g' ]; 
-if [ $exe ]; then
+if [ $exe == 'gamma' ]; then
     EXEC="$HOME/bin/vasp_gam"
-elif [ $crelax ]; then
+elif [ $exe == 'xyrelax' ]; then
     EXEC="$HOME/bin/vasp_std-xy"
+elif [ $exe == 'ncl' ]; then
+    EXEC="$HOME/bin/vasp_ncl"
 else
     EXEC="$HOME/bin/vasp_std"
 fi

@@ -43,7 +43,7 @@ def main():
     parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
     parser.add_argument('-d', '--distance', default = 3.0, type=float, help="interdistance creteria for implantation")
     parser.add_argument('-t', '--temp', type=float, default=500,  help="T(K) for atomic velocity")
-    parser.add_argument('-ht', '--hypertherm', type=float, help="T(eV) for atom velocity")
+    parser.add_argument('-ht', '--hypertherm', type=float, help="T(eV), for atom velocity")
     parser.add_argument('-vt', '--velocity_type', default='random', choices=['random', 'copy'], help="T for atom velocity")
     parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
     gfname =  parser.add_mutually_exclusive_group()
