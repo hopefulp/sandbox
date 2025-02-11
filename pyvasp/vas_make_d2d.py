@@ -122,10 +122,11 @@ def main():
     parser.add_argument('odir', help='copy from old dir')
     parser.add_argument('ndir', help='mkdir and cp')
     parser.add_argument('-j', '--job', choices=['lda','hybrid','md','mol','kp','ini','cont','neb','nebcont'], help='inquire for each file')
-    parser.add_argument('-s', '--poscar', help='copy POSCAR')
-    parser.add_argument('-p', '--potcar', help='copy odir/potcaruse or make POTCAR')
-    parser.add_argument('-i', '--incar',  help='use the same INCAR in d2d')
-    parser.add_argument('-k', '--kpoints', help='copy odir/KPOINTS or make')
+    parser.add_argument('-s', '--poscar', help='designate POSCAR')
+    parser.add_argument('-p', '--potcar', help='designate POTCAR')
+    parser.add_argument('-i', '--incar',  help='designate INCAR')
+    parser.add_argument('-io', '--incar_option', nargs='*', help='to modify input INCAR]')
+    parser.add_argument('-k', '--kpoints', help='designate KPOINTS')
     parser.add_argument('-f', '--files', nargs='*', help='copy more files')
     qsub = parser.add_argument_group(title='qsub')
     qsub.add_argument('-x', '--partition',  help='partition number in qsub')
@@ -136,7 +137,7 @@ def main():
     parser.add_argument('-u', '--usage',   action='store_true', help='print usage')
 
     args = parser.parse_args()
-    inputs = [args.poscar, args.kpoints, args.potcar, args.incar]
+    inputs = [args.poscar, args.kpoints, args.potcar, args.incar, args.incar_option]
 
     if args.usage:
         print(f"neb::\

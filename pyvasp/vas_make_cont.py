@@ -210,7 +210,7 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
 def main():
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job
-    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','incar','dos','band','pchg','chg','chgw','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
+    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','pchg','chg','chgw','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
     parser.add_argument('-sj', '--subjob', default='sp', choices=['sp', 'cool', 'heat','quench'], help='sp for fake and others for md')
         ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()

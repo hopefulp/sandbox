@@ -95,18 +95,18 @@ make.vas_make_cont = "===================== VASP CONTINUE ======================
                     \n\t    -d old dir list\
                     \n\t    -n new dir list, (default=olddircont)\
                     \n\t    -j default='cont' \
-                    \n\t    -j [incar,sp,chg,opt,copt,vdw,noD,mag,kisti] changes only INCAR vasp_job_incar()\
+                    \n\t    -j [sp,chg,opt,copt,vdw,noD,mag,kisti] changes only INCAR vasp_job_incar()\
                     \n\t    -j [band,dos,zpe] changes INCAR, KPOINTS,POSCAR in vasp_jobs()\
                     \n\t    -i to modify INCAR\
                     \n\t    -k to modify KPOINTS\
-                    \n\t**  INCAR modification by job: vdw,noD, opt,copt, mag, kisti,incar\
+                    \n\t    -io INCAR option with [key, value] list: INCAR modifi\
+                    \n\t**  INCAR modification by job: vdw,noD, opt,copt, mag, kisti\
                     \n\t\t    incar: no preexist values, given from cli\
                     \n\t**  INCAR: import libincar for modify\
                     \n\t    -i designate explicit INCAR\
-                    \n\t    -ia add or modify k-v INCAR (default) write to INCAR.mod then copy\
-                    \n\t    -id delet or comment out INCAR keys\
                     \n\t    Usage:\
                     \n\t\tvas_make_cont.py -d IntHfSe2sc34AmC -n IntHfSe2sc34AmCcont -ia EDIFF 1E-5 -x 5 -N 6\
+                    \n\t\tkpy vas_make_cont.py -d HfO12md -n HfO12md2 -j ini -io TEBEG 500 TEEND 2000 NSW 2000 -k g\
                     \n\tJobs Detail:\
                     \n\t    ini, cont: (def ini)\
                     \n\t\tcopy odir [INCAR, KPOINTS, POTCAR] w. given -s POSCAR\
@@ -176,6 +176,12 @@ poscar.pos_modify   ="change POSCAR\
                     \n\t    -suf suffix to be added to POSCAR.name\
                     \n\tUsage:\
                     \n\t    pos_modify.py POSCAR.HfSe2sc34 -j bomb -a O6 -z 1.2 2.3 -t 600 -o POSCAR.HfSe2O12L2 \
+                    \n\t    pos_modify.py POSCAR.HfSe2L1O36Hfsub -j sort -s 1-10 -as Se O\
+                    "
+poscar.libposcar    ="library for pos_modify\
+                    \n\tAttributes:\
+                    \n\t    def modify_POSCAR(poscar, job, mode_atoms, zpos, temp, htemp, vel_type, outf, r_crit, asort, nlevel\
+                    \n\t\tcalled by pos_modify\
                     "
 convert.pos2cif      ="vstsscripts/[.pl] convert vasp format(POSCAR, CONTCAR) to cif to be read in MS\
                     \n\tUsage::\

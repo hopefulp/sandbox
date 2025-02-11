@@ -485,32 +485,39 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
         lines.append(line)
     return lines
 
-def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp=None, vel_type='random', outf='POSCAR', r_crit=None, nlevel=None):
+def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp=None,\
+            vel_type='random', outf='POSCAR', r_crit=None, asort=None, nlevel=None):
     '''
     Modularize POSCAR part
-    poscar      to be modified
-    job     mode       s/a  select or add (job has 'add')
-                zpe     s   fixedMD or selective MD for selective dynamics for ZPE calculation
-                bomb    s   velocity to bombardment experiment to -z axis
-                addbomb a   add molecule and velocity to -z axis
-    mode_atoms  [a|s]atomnameN for 
-                add find lattice constand and distribute added atoms
-                    append N atoms
-                sel select from atoms & natoms list in POSCAR
-                    ?Hf, O, Mo, S, O -> O1, O2 
-                    atomlist in POSCAR for movable in zpe calculation
-                velocity vel depending on T
-    zpos        the posotion in z-axis where atoms to be added
-                top: above of surface atom 4 A away from top atom
-                z1 [z2]: position of z-value or inbetween two z-values
-    temp        temperature for velocity  T
-    htemp       hyper_temperature for hyperthermal species in plasma
-    vel_type    'random' for assign following T
-                'copy' to copy original file
-    nlevel      number of levels to add O atoms in multi level
-    iatom       atom index
-    atoms       atom list in POSCAR
-    natoms      number of atoms list in POSCAR
+    inputs:
+        poscar      to be modified
+        job         zpe     s   fixedMD or selective MD for selective dynamics for ZPE calculation
+                    bomb    s   velocity to bombardment experiment to -z axis
+                    addbomb a   add molecule and velocity to -z axis
+                    vel      N/A assign velocity in the given configuration
+                    sort        change latomnames, lnatoms
+        mode_atoms  [a|s]atomnameN for 
+                    add find lattice constand and distribute added atoms
+                        append N atoms
+                    sel select from atoms & natoms list in POSCAR
+                        ?Hf, O, Mo, S, O -> O1, O2 
+                        atomlist in POSCAR for movable in zpe calculation
+                    vel assign velocity to all the atoms depending on T
+        zpos        the posotion in z-axis where atoms to be added
+                    top: above of surface atom 4 A away from top atom
+                    z1 [z2]: position of z-value or inbetween two z-values
+        temp        temperature for velocity  T
+        htemp       hyper_temperature for hyperthermal species in plasma
+        vel_type    'random' for assign following T
+                    'copy' to copy original file
+        nlevel      number of levels to add O atoms in multi level
+    variables:
+        iatom       atom index
+        atoms       atom list in POSCAR
+        natoms      number of atoms list in POSCAR
+        matoms      a   atom species followed by natom
+                    s   integer in atom species line
+                        two integers linked by '-' to be contract in atom list
     '''
     ### define constants
     #nlevel = 1         # deprecated for now
@@ -523,46 +530,93 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp
     if re.match('a', mode_atoms):
         mode = 'add'
     elif re.match('s', mode_atoms):
-        mode = 'select'
+        mode = 'sel'
+    elif re.match('v', mode_atoms):     # no selection just modify velocity
+        mode = 'vel'
     matoms = mode_atoms[1:]
     lines = []
     ### obtain each block and write from parse_POSCAR
     line1, atoms1 = parse_poscar(poscar, block='title'); lines.append(line1) # atoms might appear 1st line
     line, scale = parse_poscar(poscar, block='scale'); lines.append(line)
     nline, paxes = parse_poscar(poscar, block='paxes'); lines.extend(nline)
-    line, atoms = parse_poscar(poscar, block='atoms')
+
+    ### deal with atomname line
+    line, latoms = parse_poscar(poscar, block='atoms')
     print(f'paxes {paxes} in {whereami()}()')
     if not line:
         line = line1
-        atoms = atoms1      # line1 is saved for atom line
+        latoms = atoms1      # line1 is saved for atom line
     ### O7 is addatom
     if mode == 'add': #matoms[0].isalpha():
         i = startnum(matoms)
         #print(f"starting number index {i} in {whereami()}() module {__name__}")
         add_atom = matoms[:i]           # atom name to be added
         add_natom = int(matoms[i:])     # natom to be added
-    ### matoms is integer in natom lines of POSCAR at the moment
-    else:
-        ind = int(matoms) # index for selection
-        
-    ### add atom
-    if mode == 'add':
         ### split alphabet and numeric: O7, O29, He7
         line = line.rstrip() + f'  {add_atom}' + '\n'       # do not use \t which raise type error in Vasp
-        atomsold = atoms[:]
-        atoms.append(add_atom)
+        latomsold = latoms[:]
+        latoms.append(add_atom)
+
+    ### matoms is integer in natom lines of POSCAR at the moment
+    elif mode == 'sel':
+        if matoms.isdigit():
+            ind = int(matoms)               # index for atom selection in POSCAR atom line
+        elif job == 'sort' and re.search('-',matoms):
+            indices = re.split('-', matoms)
+            ind = int(indices[0])
+            indf = int (indices[-1])
+            ### contract atom line
+            atom_kinds_tobesorted = latoms[ind:indf+1]
+            if asort:
+                atom_sort = asort
+            else:
+                print(f"input atoms to be sorted: -as ")
+                atom_sort = get_atom_kinds(atom_kinds_tobesorted)
+            #print(f"atom_sort {atom_sort}")
+            latom_indices_tobesorted=[ atom_sort.index(a) for a in atom_kinds_tobesorted]
+            new_latoms = latoms[:ind]
+            new_latoms.extend(atom_sort)
+            new_latoms.extend(latoms[indf+1:])
+            print(f"{new_latoms}")
+            line = "  ".join(new_latoms) + "\n"
+            #print(line); print(f"latom line {latom_indices_tobesorted}")
+
+    elif mode == 'vel':
+        ind = -1                        # all the atoms in atom index
+    ### add atom
     lines.append(line)
-    line, natoms = parse_poscar(poscar, block='natoms')
-    ntotalold = sum(natoms)
-    if mode == 'add':
+    #sys.exit(11)
+    
+    ### deal with natom line
+    line, lnatoms = parse_poscar(poscar, block='natoms')
+    ntotalold = sum(lnatoms)
+    if job == 'sort':               # change natoms list
+        ### sum natomslist following latom_indices_tobesorted
+        lnatom_tobesorted = lnatoms[ind: indf+1]
+        nselatoms = sum(lnatom_tobesorted)
+        new_natoms_tobesored = np.zeros(len(atom_sort)).astype(int)
+        for i, inatom in enumerate(lnatom_tobesorted):
+            #print(f"{i}: {inatom}")
+            new_natoms_tobesored[latom_indices_tobesorted[i]] += inatom
+        new_natoms = lnatoms[:ind]
+        new_natoms.extend(list(new_natoms_tobesored))
+        new_natoms.extend(lnatoms[indf+1:])
+        #print(f"new natoms: {new_natoms}")
+        line = "  ".join(map(str, new_natoms)) + "\n"
+        #print(f"natom line: {new_natoms_tobesored}"); # sys.exit(12)
+        #print(f"lnatom_tobesorted: {lnatom_tobesorted}")
+
+    elif mode == 'add':
         line = line.rstrip() + f'  {add_natom}' + '\n'      # do not use \t which raise type error in Vasp
-        natomsold = natoms[:]
-        natoms.append(add_natom)
+        natomsold = lnatoms[:]
+        lnatoms.append(add_natom)
     lines.append(line)
+    print(line); 
+
     ### for sigma for MBD (Maxwell-Boltzmann distribution)
     if 'add' in job:
         atom_oldfull_list = make_atomfullist(atomsold, natomsold)       # As for original POSCAR,
-    atom_fullist = make_atomfullist(atoms, natoms)
+    atom_fullist = make_atomfullist(latoms, lnatoms)
         #atom_fullist = atom_oldfull_list
 
     ### define number of unselected atoms (npre_unsel) and selected atoms (z-coord bombard) for selection mode
@@ -570,27 +624,34 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp
         npre_unsel  = ntotalold
         nselatoms   = add_natom
         ind         = -1            # for print sentence
-    else:
+    elif mode == 'sel':
         ### calculate index for selected atoms: movable in zpe, velocity in bombardment
         #ind = atoms.indeadd) -> not to try find using atom name
-        nselatoms = natoms[ind]              # natoms to be moved for zpe
+        nselatoms = lnatoms[ind]              # natoms to be moved for zpe
         npre_unsel = 0
-        for i, na in enumerate(natoms):
+        for i, na in enumerate(lnatoms):
             if i < ind:
                 npre_unsel += na                  # npre_unsel = natoms before selected (movable) atoms
         if job == 'zpe':
             lines.append("Selective dynamics\n")
+    elif mode == 'vel':
+        npre_unsel  = ntotalold
+        nselatoms = 0
+        
+
     print(f"ind {ind}  {npre_unsel} unselected in {whereami()}()")
     
     ### for Cartesian or Direct    
     line, cd = parse_poscar(poscar, block='cd'); lines.append(line)
 
-    ### poscar coordinates in line list
+    ### Deal with COORDINATEs in line list
     coords, _ = parse_poscar(poscar, block='coord') 
     
     ## modify selective dynamics for ZPE
+    new_coords=[]
+    new_coords_rem=[]
     if job == 'zpe':
-        new_coords=[]
+        ### coords -> new_coords in ZPE
         for i, line_coord in enumerate(coords):
             if i < npre_unsel:
                 new_line = line_coord.rstrip() + " F F F\n"
@@ -600,76 +661,100 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp
                 new_line = line_coord.rstrip() + " F F F\n"
             new_coords.append(new_line)
         coords = new_coords
-    lines.extend(coords)
-
-    ### Make additional coordinates for added atoms
-    if mode == 'add':
-        ### for Orthorhombic crystal structure
-        #z_coord = 'above'
-        zmax = get_zmax(poscar)
-        #radius = vdw_radii[chemical_symbols.indeadd)]
-        #if zpos:
-        #    z_line = zpos
-        #    z_coord = 'fixed'
-        if re.match('d', cd, re.I):
-            d2coords_cart = coord_d2c(poscar)
-        else:
-            d2coords_cart, _ = parse_poscar(poscar, block='coord', opt='lis')
-
-        print(f"{d2coords_cart[0]} in function {whereami()}()") 
-        add_coords = implant_2D(d2coords_cart, add_natom, paxes, cd, zpos, zmax, r_crit, nlevel)
-        #print(f"{add_coords} in {whereami()}()")
-        lines.extend(add_coords)
-
-    ### velocity section will be provided
-    ### unselected atoms have random vx, vy, vz
-    ### selected atom will have -vz only with magnitue of |v|=sqrt(vx**2+vy**2+vz**2)   
-    if 'bomb' in job:
-        ### addtional velocity block as cartisian coordinate (A/fs)
-        print(f"Add velocity at {temp} K for up to {npre_unsel} atom")
-        lines.append("\n")
-        T = temp
-        mu = 0.0                # mean value for M-B distribution
-        amukT = amu/(k_B * T)
-        ms2angfs = 1.E-5         # from m/s to (1E10/1E15) Ang/fs
-        lineformat = ff.FortranRecordWriter('3E16.8')
-        vel_orig, _ = parse_poscar(poscar, block='vel')
-        for i, atom in enumerate(atom_fullist):
-            ### mass is required: depending on mass, sigma=1/(m/k_B*T) is changed
-            atomic_weight = atomic_masses[chemical_symbols.index(atom)]
-            sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
-            vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
-            ### if POSCAR has velocity block, read it
-            if i < npre_unsel:
-                if re.match('c', vel_type):
-                    s = vel_orig[i]
-                else:
-                    s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
-            elif i < npre_unsel + nselatoms:
-                ### Define temperature for bombardment element for fast moving -> ? effective under NVT
-                #amukT = amu/(k_B * 500) # T = 1000 K for fast approach without O-O dimer generation 
-                #sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
-                #vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
-                ### in case hyperthermal species, convert eV to T and assign to selected atoms
-                if htemp and htemp < 100.:
-                    # use eV in velocity units
-                    pass
-                elif htemp: # use high T as velocity units
-                    T = htemp
-                    amukT = amu/(k_B * T)
-                    sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs
-                    vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)
-                #else: # use the same T as substrate
-                v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
-                #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
-                s = lineformat.write([0.0, 0.0, -v]) + "\n"
+    elif job == 'sort':
+        ### directly divide coords by indices
+        new_sort_2Dcoords = [ [ ] for i in range(len(atom_sort))]
+        #for i in range(len(atom_sort)):
+        #    new_coords_sort[i] = []
+        jsort = 0
+        iatom = 0
+        for i, natom in enumerate(lnatoms):
+            if i < ind:
+                new_coords.extend(coords[iatom:iatom+natom])
+            elif i < indf:
+                new_sort_2Dcoords[latom_indices_tobesorted[i-ind]].extend(coords[iatom:iatom+natom])
             else:
-                if re.match('c', vel_type):
-                    s = vel_orig[i]
+                ### treat sorted coordinates and add the remainder
+                new_coords_rem.extend(coords[iatom:iatom+natom])
+            iatom += natom
+        ### combind coords here
+        for i in range(len(atom_sort)):
+            new_coords.extend(new_sort_2Dcoords[i])
+        new_coords.extend(new_coords_rem)
+        lines.extend(new_coords)
+    ### job == 'bomb'
+    else:
+        lines.extend(coords)                            # copy original coords
+        ### Make additional coordinates for added atoms
+        if mode == 'add':
+            ### for Orthorhombic crystal structure
+            #z_coord = 'above'
+            zmax = get_zmax(poscar)
+            #radius = vdw_radii[chemical_symbols.indeadd)]
+            #if zpos:
+            #    z_line = zpos
+            #    z_coord = 'fixed'
+            if re.match('d', cd, re.I):
+                d2coords_cart = coord_d2c(poscar)
+            else:
+                d2coords_cart, _ = parse_poscar(poscar, block='coord', opt='lis')
+
+            print(f"{d2coords_cart[0]} in function {whereami()}()") 
+            add_coords = implant_2D(d2coords_cart, add_natom, paxes, cd, zpos, zmax, r_crit, nlevel)
+            #print(f"{add_coords} in {whereami()}()")
+            lines.extend(add_coords)
+
+        ### velocity section will be provided
+        ### unselected atoms have random vx, vy, vz
+        ### selected atom will have -vz only with magnitue of |v|=sqrt(vx**2+vy**2+vz**2)   
+        if 'bomb' in job or 'md' in job:
+            ### addtional velocity block as cartisian coordinate (A/fs)
+            print(f"Add velocity at {temp} K for up to {npre_unsel} atom")
+            lines.append("\n")
+            T = temp
+            mu = 0.0                # mean value for M-B distribution
+            amukT = amu/(k_B * T)
+            ms2angfs = 1.E-5         # from m/s to (1E10/1E15) Ang/fs
+            lineformat = ff.FortranRecordWriter('3E16.8')
+            vel_orig, _ = parse_poscar(poscar, block='vel')
+            for i, atom in enumerate(atom_fullist):
+                ### mass is required: depending on mass, sigma=1/(m/k_B*T) is changed
+                atomic_weight = atomic_masses[chemical_symbols.index(atom)]
+                sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
+                vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
+                ### if POSCAR has velocity block, read it
+                if i < npre_unsel:
+                    if re.match('c', vel_type):
+                        s = vel_orig[i]
+                    else:
+                        s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
+                elif i < npre_unsel + nselatoms:
+                    ### Define temperature for bombardment element for fast moving -> ? effective under NVT
+                    #amukT = amu/(k_B * 500) # T = 1000 K for fast approach without O-O dimer generation 
+                    #sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
+                    #vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
+                    ### in case hyperthermal species, convert eV to T and assign to selected atoms
+                    if htemp and htemp < 100.:
+                        # use eV in velocity units
+                        pass
+                    elif htemp: # use high T as velocity units
+                        T = htemp
+                        amukT = amu/(k_B * T)
+                        sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs
+                        vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)
+                    #else: # use the same T as substrate
+                    v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
+                    #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
+                    s = lineformat.write([0.0, 0.0, -v]) + "\n"
                 else:
-                    s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
-            #print(f"{s} in function {whereami()}()")
-            lines.append(s)
+                    if re.match('c', vel_type):
+                        s = vel_orig[i]
+                    else:
+                        s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
+                #print(f"{s} in function {whereami()}()")
+                lines.append(s)
+
+
     ### print output
     filepointer = 1
     f = open (outf, 'w')
