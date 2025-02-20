@@ -60,6 +60,7 @@ def main():
     parser.add_argument('-t', '--temp', type=float, default=500,  help="T(K) for atomic velocity")
     parser.add_argument('-ht', '--hypertherm', type=float, help="T(eV), for atom velocity")
     parser.add_argument('-vt', '--velocity_type', default='random', choices=['random', 'copy'], help="T for atom velocity")
+    parser.add_argument('-vr', '--vel_reverse', action='store_true', help="make bombing to upside")
     parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
     parser.add_argument('-as', '--sort', nargs='*', help="order of atoms in sorting")
     parser.add_argument('-u', '--usage', action='store_true', help = 'print usage')
@@ -96,7 +97,7 @@ def main():
     ### job = bomb or addbomb
     #pos_bombardment(args.poscar, args.job, atoms, args.zcoord, args.temp, args.velocity, args.nlevel, outfile)
     modify_POSCAR(args.poscar, job=args.job, mode_atoms=atoms, zpos=args.zcoord, \
-    temp=args.temp, htemp=args.hypertherm, vel_type=args.velocity_type, nlevel=args.nlevel,\
+    temp=args.temp, htemp=args.hypertherm, vel_type=args.velocity_type, v_reverse=args.vel_reverse, nlevel=args.nlevel,\
     asort=args.sort, r_crit=args.distance, outf=outfile)
 
     return 0

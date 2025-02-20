@@ -351,6 +351,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
                                 two z-values for inbetween
     zmax    max in value (C|D)
     r_crit  implantation criteria for atomic inter-distance
+            donot apply for added atoms in case smaller value for planar implant
     nlevel  distribute natoms in multiple levels
     '''
     ### how to divide the inserted atoms
@@ -367,6 +368,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
     else:
         zoffset = 0.0
         interdist = r_crit               # compare with all atoms
+        interdist_addatom = 4
     
     print(f"ztag = {ztag}")
     Lprint = 1
@@ -412,9 +414,9 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
     if Lprint: print(f"{cd}: zmax {zmax} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
 
     if ztag == 'top':
-        comp_atoms = []
+        comp_atoms = []             # no need to compare with existing atoms
     else:
-        comp_atoms = pos_coords
+        comp_atoms = pos_coords     # compare with existing atoms
 
     ### exclude volume for close atom
     apos = []
@@ -425,11 +427,15 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
     natom_level = natom/nlevel                     # natom in a level
     iatom = 0
     ilevel = 0
+
+    ### ilevel loop in case added atoms in multilevel in z-coord
     while ilevel < nlevel:
         #if ztag == 'inter':
         #    implant_list.extend(coord)
         ### calculation using Cartesian
         natom_orig = len(pos_coords)
+        added_atom_coords=[]
+        ### natom loop
         while iatom < natom_level:
             i_try += 1
             if Lprintimp: print(f'{i}-th trial')
@@ -445,17 +451,28 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
             ### compare with O's for top in 2D, all for fixed in 3D
             else:
                 ### compare with other atoms
-                for pivot in comp_atoms:
+                ### use different crit for other atoms and adding atoms
+                for i, pivot in enumerate(comp_atoms):
                     Limplant = True
                     dist = distance_pbc (gen, pivot, [axes[0][0], axes[1][1], axes[2][2]])
                     #if Lprintimp: print(f"distance cret {interdist} < {dist} distance")
-                    if dist < interdist:
-                        Limplant = False
-                        break
+                    if ztag == 'top':
+                        if dist < interdist:
+                            Limplant = False
+                            break
+                    else:
+                        if i < natom_orig:
+                            dist_cret = interdist
+                        else:
+                            dist_cret = interdist_addatom
+                        if dist < dist_cret:
+                            Limplant = False
+                            break
                 if Limplant:
                     ### check min distance
                     #print(f"min dist: {min_dist_i(gen, comp_atoms,[axes[0][0], axes[1][1], axes[2][2]])}")
                     comp_atoms.append(gen)
+                    #added_atom_coords.append(gen)
                     iatom += 1
                     #print(f'generated coords {gen} in loop: iatom < natom_level')
                     if Lprintimp: print(f"implanted")
@@ -486,7 +503,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
     return lines
 
 def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp=None,\
-            vel_type='random', outf='POSCAR', r_crit=None, asort=None, nlevel=None):
+            vel_type='random',v_reverse=False, outf='POSCAR', r_crit=None, asort=None, nlevel=None):
     '''
     Modularize POSCAR part
     inputs:
@@ -510,7 +527,9 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp
         htemp       hyper_temperature for hyperthermal species in plasma
         vel_type    'random' for assign following T
                     'copy' to copy original file
+        v_reverse   boolean for bombing to +z direction
         nlevel      number of levels to add O atoms in multi level
+        r_crit      reference distance between atoms: as for existing atoms not generating atoms
     variables:
         iatom       atom index
         atoms       atom list in POSCAR
@@ -745,7 +764,9 @@ def modify_POSCAR(poscar, job='zpe', mode_atoms=None, zpos=None, temp=300, htemp
                     #else: # use the same T as substrate
                     v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
                     #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
-                    s = lineformat.write([0.0, 0.0, -v]) + "\n"
+                    if not v_reverse:
+                        v *= -1
+                    s = lineformat.write([0.0, 0.0, v]) + "\n"
                 else:
                     if re.match('c', vel_type):
                         s = vel_orig[i]
