@@ -36,8 +36,8 @@ make.vas_make_ini   ="==================== VASP INI START ======================
                     \n\tOPTIONS:\
                     \n\t    -s  poscar\
                     \n\t\tPOSCAR.dirname <- convention\
-                    \n\t    -j [sp,opt,kp,fake,...]\
-                    \n\t\tin case -j: INCAR.job, KPOINTS.job is used if it were\
+                    \n\t    -j/sj [sp,opt,kp,fake,md,mdnve,nnff,...]/[sp,kp,cool,heat,quench]\
+                    \n\t\tkp moved to subjob: kp/sp(default) -> sp/kp\
                     \n\t\tfake:: -sj for -j is required to use INCAR.job, KPOINTS.job\
                     \n\t    -i  can designate INCAR file explicitly\
                     \n\t    -io can modify the INCAR by k-v pairs\
