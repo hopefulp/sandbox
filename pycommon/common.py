@@ -6,6 +6,7 @@ import inspect
 import numpy as np
 import weakref
 import glob
+from mystr import get_char_series_by_two
 #from varname import nameof
 
 """
@@ -294,12 +295,23 @@ def get_dirfiles(wdir, prefix=None, excludes=None, Lshow=True, Ldir=True):
 
     return matched_dirs
 
-def get_files_prefix(prefixes, dirname, Lshow=None, Ldir=None):
+def get_files_prefix(prefixes, dirname, Lshow=None, Ldir=None, sub_match=None):
     """
         receive list of prefix & directory
         prefixes: list of prefix
+            sub_match   extract interval between a-g
+        Ldir    T/F to include dir
     """
     matched_files=[]
+    ### if sub_match, change prifixes list
+    if sub_match:   # get two alphabet
+        chars = get_char_series_by_two(sub_match)
+        new_prefixes = []
+        for pref in prefixes:
+            for ch in chars:
+                new_prefixes.append(pref + ch)
+        prefixes = new_prefixes 
+
     for pref in prefixes:
         print(f"prefix: {pref} in {whereami()} of module {__name__}")
         for fname in os.listdir(dirname):
@@ -308,7 +320,7 @@ def get_files_prefix(prefixes, dirname, Lshow=None, Ldir=None):
                 if not Ldir and os.path.isdir(fname):
                     continue
                 matched_files.append(fname)
-                #print (pref, fname)
+                if Lshow: print (pref, fname)
     return matched_files
 
 def dir_files(dir_):

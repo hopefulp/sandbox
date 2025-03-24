@@ -41,7 +41,7 @@ def ch_fname_recursive(dir1, job, m_tag, pattern, Linverse, style, ch_word, L_di
     return 0
 
 
-def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, Lrun):
+def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions, ex_opt, dir_out, Lparents,Lrecur, Lrun):
     pwd = os.getcwd()
 
     # pattern should have 1 element
@@ -182,7 +182,7 @@ def main():
     if args.recursive:
         ch_fname_recursive(pwd, args.job, m_tag, matching, args.inverse, args.style, args.replace_word, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.include_parents,args.recursive, args.run)
     else:
-        ch_fname(pwd, args.job, m_tag, matching, args.inverse, args.style, args.replace_word, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.include_parents,args.recursive, args.run)
+        ch_fname(args.job, m_tag, matching, args.inverse, args.style, args.replace_word, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.include_parents,args.recursive, args.run)
 
 if __name__ == "__main__":
     main()

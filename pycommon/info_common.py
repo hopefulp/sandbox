@@ -41,14 +41,19 @@ comment.info_common=   "\tInformation file for $SB/pycommon"
 
 
 dirjob.dir_clean      =   "=============================== DIRECTORY JOB =====================================\
-                        \n\t\tclean one directory following work-kinds\
+                        \n\t\tclean one directory by one option: works, prefixes, suffixes, matches\
                         \n\t\t    -work {qchem,ai,amp,pbs} -j rm[mv] -jd new_dir ? by -prefix -suffix -middle match -e excluded -ef 'exclude these files' \
                         \n\t\tOptions::\
-                        \n\t\t    -w multiple jobs in [amp|pbs|slurm|vasp|nc|lammps] add more in case extension\
-                        \n\t\t    -d input directory: default=pwd\
+                        \n\t\t    exclusive:\
+                        \n\t\t\t-w multiple works in [amp|pbs|slurm|vasp|nc|lammps] add more in case extension\
+                        \n\t\t\t-p multiple prefixes\
+                        \n\t\t\t-s multiple sufixes\
+                        \n\t\t\t-m multiple matches\
+                        \n\t\t    -j [rm,mv,cp,ln] default='rm'\
+                        \n\t\t    -id include dir such as 'rm -r'\
+                        \n\t\t    -nd input directory: default=pwd\
                         \n\t\t    -y execute command without asking: default-asking\
                         \n\t\t    -sw subwork: amp-ini,ag\
-                        \n\t\t    -j [rm,mv,cp,ln] default='rm'\
                         \n\t\t    -a: remove all such as 'rm -r'\
                         \n\t\t    -ef: excluded files\
                         \n\t\t\tln: in case the change of dirname, link files are broken\
@@ -56,6 +61,7 @@ dirjob.dir_clean      =   "=============================== DIRECTORY JOB =======
                         \n\t\t    dir_clean.py [dir] -w amp -sw ini\
                         \n\t\t    dir_clean.py -d NN20 -w amp -j ln -y\
                         \n\t\t    dir_clean.py -w vasp -ef CHGCAR\
+                        \n\t\t    dir_clean.py -p d2709 -id\
                         \n\t\t    (?) clean1d.py -s out -ef 6-CC-NiFe-A-relax.out 5-FePNP-CO2.out -j mv -jd j631gs_v3.2\
                         \n\t\t    dir_clean.py -w vasp -d\
                         \n\t\t    : remove only vasp output files\
@@ -95,6 +101,7 @@ dirjob.dir_fname    =   "Treat Dir without work-style\
                         \n\t\t    -[p|s|m] for matching type\
                         \n\t\t    -id to include dir in scanning dir\
                         \n\t\t    -v  inverse the matching\
+                        \n\t\t    -r  recursive for subdirectroies\
                         \n\t\t    -st style=[ap:append, rp:replace, mo: mode\
                         \n\t\t    -rw replacement word, if None, replace becomes remove\
                         \n\t\t    -d, -nd  dirname for mv\
@@ -103,7 +110,7 @@ dirjob.dir_fname    =   "Treat Dir without work-style\
                         \n\t\t    -eo default=m exception by matching or fullname\
                         \n\t\tUsage::\
                         \n\t\t    dir_fname.py rename -p G4 -st rp -rw G2 -id         ! rename with full replacement\
-                        \n\t\t    dir_fname.py rename -p ToBeDelete_ -st rp           ! without -rw, -`p is deleted in fname\
+                        \n\t\t    dir_fname.py rename -p ToBeDelete_ -st rp -r        ! without -rw, -p is deleted in fname\
                         \n\t\t    dir_fname.py rename -p G4 -st ap -rw vdw -id        ! append new word after dir and fname\
                         \n\t\t    dir_fname.py rename -m sc34c -rp sc34 -id -e sc34ch ! rename dir & file with exception\
                         \n\t\t    dir_fname.py rm -m '\.e' '\.o' '\.pe' '\.po'        ! to remove pbs files \

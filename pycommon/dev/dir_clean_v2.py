@@ -2,7 +2,6 @@
 '''
     modified at 02/27/2025
     change one dir and by one option for work [...] -prefix, -suffix, -match
-    prefix + serial match e.g. HfSe2[a-j]*
 '''    
 import argparse
 import os
@@ -13,24 +12,18 @@ from common         import *
 from mod_vas        import vasf_ini, vasf_out
 
 q_list=[]
-def dir_clean(pwd, selection, slist, subw,  linux_job, Linc_dir, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, Loutf):
-    '''
-    selection   p: prefix, s: suffix, m: match, w: work
-    slist       matches list or works list
-    subw        psm: modify matching list
-                work: subwork
-    '''
+def dir_clean(   pwd,      selection, works, subwork,  linux_job, Linc_dir, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, Loutf):
     print(f"{pwd} directory in {whereami()}")
     matches=[]
     f_list_all=[]
     if selection == 'p':
-        f_list=get_files_prefix(slist, pwd, Lshow=Lshowmatch, Ldir=Linc_dir, sub_match=subw )
+        f_list=get_files_prefix(works, pwd, Lshow=Lshowmatch, Ldir=Linc_dir)
     elif selection == 's':
-        f_list=get_files_suffix(slist, pwd, Lshow=Lshowmatch, Ldir=Linc_dir, sub_match=subw)
+        f_list=get_files_suffix(works, pwd, Lshow=Lshowmatch, Ldir=Linc_dir)
     elif selection == 'm':
-        f_list=get_files_match(slist, pwd, Lshow=Lshowmatch, Ldir=Linc_dir,  sub_match=subw)
+        f_list=get_files_match(works, pwd,  Lshow=Lshowmatch, Ldir=Linc_dir)
     elif selection == 'w':
-        for work in slist:
+        for work in works:
             if work == 'qchem':
                 pass
             elif work == 'vasp' or work =='nc':
@@ -79,9 +72,7 @@ def dir_clean(pwd, selection, slist, subw,  linux_job, Linc_dir, exclude,excl_fn
                 f_list_all.extend(f_list)
                 f_list_all.extend(f_list2)
             elif work == 'amp':
-                if not subw:
-                    subw = 'ini'
-                if subw == 'ini':  # ini to None
+                if subwork == 'ini':
                     fsuffix = ['ampdb', 'amp-log.txt']
                     f_list = get_files_suffix(fsuffix, pwd, Lshow=Lshowmatch, Ldir=True)
                     f_list_all.extend(f_list)
@@ -137,7 +128,7 @@ def dir_clean(pwd, selection, slist, subw,  linux_job, Linc_dir, exclude,excl_fn
             comm += "%s -s ../%s %s" % (linux_job, f, f)
         else:
             comm = "%s %s" % (linux_job, f)
-        if Linc_dir and os.path.isdir(f):
+        if Linc_dir:
             comm += " -r"
         ### extra job for save files
         if linux_job == 'mv' or linux_job == 'cp':
@@ -172,11 +163,11 @@ def main():
     parser = argparse.ArgumentParser(description='to clean directory in qchem')
     parser.add_argument('dir1', nargs='?', default=os.getcwd(), help='input one directory')
     gselect = parser.add_mutually_exclusive_group()
-    gselect.add_argument('-w', '--slist', nargs='*', choices=['qchem','amp','vasp','pbs','slurm','lmp','nc'],help='remove depending on job')
+    gselect.add_argument('-w', '--works', nargs='*', choices=['qchem','amp','vasp','pbs','slurm','lmp','nc'],help='remove depending on job')
     gselect.add_argument('-p', '--prefix', nargs='*', help='remove with prefix')
     gselect.add_argument('-s', '--suffix', nargs='*', help='remove with suffix')
     gselect.add_argument('-m', '--match', nargs='*', help='remove matching file')
-    parser.add_argument('-sub', '--subw', help='sub w: ini, ga, psm: a-b')
+    parser.add_argument('-sw', '--subwork', choices=['ini','ga'], default='ini', help='subwork condition for works')
     parser.add_argument('-j', '--job', default='rm', choices=['rm','mv','cp','ln'], help='how to treat files [rm|cp|mv]')
     parser.add_argument('-e', '--exclude', nargs='*', help='remove all files except list') 
     parser.add_argument('-ef', '--excluded_files', nargs='*', help='save this file') 
@@ -188,9 +179,9 @@ def main():
     parser.add_argument('-o', '--outf', action='store_true', help='remove default files')
     args = parser.parse_args()
 
-    if args.slist:
+    if args.works:
         selection = 'w'
-        slist = args.slist
+        slist = args.works
     elif args.prefix:
         selection = 'p'
         slist = args.prefix
@@ -206,7 +197,7 @@ def main():
         sys.exit(0)
     #if args.work == 'amp' and not args.excluded_files:
     #    args.excluded
-    dir_clean(args.dir1, selection, slist, args.subw, args.job, args.include_dir, args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes, args.outf)
+    dir_clean(args.dir1, selection, slist, args.subwork, args.job, args.include_dir, args.exclude,args.excluded_files,args.new_dir,args.match_show,args.all_remove, args.yes, args.outf)
     return 0
 
 if __name__ == '__main__':

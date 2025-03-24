@@ -218,7 +218,7 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
         ### Add incopt
         if incopt:
             if type(incopt) != dict: 
-                print(f"1st change of incopt {incopt}")
+                print(f"1st change of incopt by -io {incopt}")
                 incopt = list2dict(incopt)
             
 
@@ -288,9 +288,13 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
     return 0            
 
 def main():
+    '''
+    subjob default = None for MDnev
+            job = kp: 
+    '''
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
     parser.add_argument('-j', '--job', choices=['pchg','chg','md','nnff','mdnve','nnffnve', 'ini','zpe','mol','wav','opt','copt','sp','noD','fake','kp','neb','pseudo'], help='inquire for each file')
-    parser.add_argument('-sj', '--subjob', default='sp', choices=['sp', 'cool', 'heat','quench', 'kp'], help='sp for fake and others for md')
+    parser.add_argument('-sj', '--subjob', choices=['sp', 'cool', 'heat','quench', 'kp'], help='sp for fake and others for md')
     parser.add_argument('-n', '--ndirs', default=5, type=int, help="number or dirs to make")
     ### POSCARs
     gposcar = parser.add_mutually_exclusive_group()
