@@ -26,6 +26,7 @@ potcar  = MyClass('potcar')
 dosband = MyClass('dosband')
 procar  = MyClass('procar')
 outcar  = MyClass('outcar')
+md      = MyClass('md')
 ase     = MyClass('ase')
 charge  = MyClass('charge')
 convert = MyClass('convert')
@@ -333,6 +334,14 @@ outcar.outcar_zpe_ts    = "Read OUTCAR: calculate T*S energy\
                         \n\t\t    outcar_zpe_ts.py OUTCAR_test_1_catO2_vib -na 2\
                         "
 outcar.outcar_zpe_ts_mj = "original version of zpe from mjstar"
+md.oszicar              = "MD is stored in OSZICAR and analysis\
+                        \n\t\tOptions: \
+                        \n\t\t    -y    keys lined by '+' for Etot Efree E0pot Ekin Skin Spot\
+                        \n\t\t          Etot = Efree(E0pot)+Ekin+Skin+Spot\
+                        \n\t\tUsage: \
+                        \n\t\t    oszicar.py mdPtbT0300t115s1-last -y Etot Skin Spot+Skin \
+                        \n\t\t    oszicar.py mdPtbT0300t115s1-last -y Etot Efree+Ekin Spot+Skin -iy 2 \
+                        "
 analysis.vas_anal    =   "(.sh) Charge analysis of Bader\
                         \n\tjobs: bader bader2(spin) convasp dos bchg end\
                         \n\tUsage: Run just above vasp directory\

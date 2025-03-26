@@ -310,7 +310,7 @@ def xtitle_font(tit):
 
 
 ### twinx1: used for md.ene, normal data file
-def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel='E [eV]', legend=None, Lsave=False, Colors=None):
+def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=None, Lsave=False, colors=None):
     '''
     called from "amp_plot_stat.py"
     call with x=[] and y=[ [...
@@ -339,33 +339,40 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel='E [eV]', legend
         ylabel2 = ylabel[1]
     ### try autocolor
     #plt.ylabel(ylabel1, fontsize=25, color='r')
-    plt.ylabel(ylabel1, fontsize=25)
     #ax.tick_params(axis='y', colors='r')
+    ax.set_ylabel(ylabel1, fontsize=25)
     ax.tick_params(axis='y')
+    ax.set_xlabel(xlabel, fontsize=25)
     #ax.set_ylim(-2,2)
     #ax.xaxis.set_major_locator(plt.NullLocator())
     #print(f"x, y shape:: {np.array(x).shape} {np.array(y).shape} and ylabel {ylabel} in {whereami()}")
     #ax2.set_ylabel(ylabel2, fontsize=25, color='g')
     ax2.set_ylabel(ylabel2, fontsize=25)
-    ax2.set_ylim(-2,2)
+    #ax2.set_ylim(-2,2)
     pls=[]
-    print(f"{iy_right} {len(ys)} {whereami()}")
+    print(f"y-right axis: index {iy_right} {len(ys)} {whereami()}")
     for i in range(len(ys)):
         if i in iy_right: 
             #if Colors:  color = Colors.pop(i)       #'tab:' + Colors.pop(0)
             #else:       color='tab:green'
             #plt.yticks(color='g')
             #p2, = ax2.plot(x, ys[i,:], '-', color='g', label=legend[i])
-            p2, = ax2.plot(x, ys[i,:], '-', label=legend[i])
+            print(f"{legend[i]} in y-right axis with color")
+            if colors:
+                p2, = ax2.plot(x, ys[i,:], '-',  label=legend[i], color=colors[i])
+            else:
+                p2, = ax2.plot(x, ys[i,:], '-',  label=legend[i])
             pls.append(p2)
         else:
             #ax2.tick_params(axis='y')
             #if Colors:  color = Colors.pop(i)       #color = 'tab:' + Colors.pop(0)
             #else:       color = 'tab:red'
-            #print(f"shape of x, ys[i] = {np.array(x).shape} {ys[i,:].shape}")
             #plt.yticks(color='r')
             #p1, = ax.plot(x, ys[i,:], '-', color='r',  label=legend[i])
-            p1, = ax.plot(x, ys[i,:], '-', label=legend[i])
+            if colors:
+                p1, = ax.plot(x, ys[i,:], '-', label=legend[i], color=colors[i])
+            else:
+                p1, = ax.plot(x, ys[i,:], '-', label=legend[i])
             pls.append(p1)
     #plt.legend(pls, Ylabels, loc=2)
     ax.legend(loc=2)            # 2
@@ -465,25 +472,27 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
         x=range(xsize)
     print(f"x={len(x)} y={ys.shape} in {whereami()}()")
     plt.title(title)
-    xlabel = 'E - E$_F$ [eV]'
+    #xlabel = 'E - E$_F$ [eV]'
     plt.xlabel(xlabel, fontsize=12)
     plt.ylabel(ylabel, fontsize=12)
-    print(f"xlabel: {xlabel} ")
-    if ys.ndim == 1:
-        plt.plot(x, y, '-')
-        #plt.scatter(x, y)
-    elif ys.ndim == 2:
-        for i in range(len(ys)):
-            if re.search('t', legend[i]):
-                d = scipy.zeros(len(ys[i,:]))
-                print(f"shape d {np.array(d).shape}")
-                ax.fill_between(x, ys[i,:], where=ys[i,:]>=d, color=colors[i])
+    print(f"xlabel: {xlabel}, ys.ndim {ys.ndim} ")
+    for i in range(len(ys)):
+        ### is this for TDOS
+        if re.match('t', legend[i]): # for what? for Tdos?
+            d = scipy.zeros(len(ys[i,:]))
+            print(f"shape d {np.array(d).shape}, legend ")
+            #ax.fill_between(x, ys[i,:], where=ys[i,:]>=d, color=colors[i])
+            plt.plot(x,ys[i,:],  label=legend[i] , color=colors[i])
+        else:
+            print(f"x dim {len(x)}, y dim {ys[i,:].shape} label {legend[i]}")
+            if colors:
                 plt.plot(x,ys[i,:],  label=legend[i] , color=colors[i])
             else:
-                plt.plot(x,ys[i,:],  label=legend[i] , color=colors[i])
+                plt.plot(x,ys[i,:],  label=legend[i] )
 
-    else:
-        print(f"Error:: obscure in y-dim {ys.ndim}")
+
+    #else:
+    #    print(f"Error:: obscure in y-dim {ys.ndim}")
     ### ADD LEGEND
     plt.legend(loc=1)                # locate after plot
     #plt.xlim([-20.0, 15.0])
