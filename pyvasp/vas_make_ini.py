@@ -60,8 +60,10 @@ def get_incar(ifile):
 ################# 1       2        3       4         5        6     7           8         9        10      11    12 13 14   15   16  
 def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt, dirnames, option, allprepared, iofile, qx,qN,qn,vasp_exe,lkisti,Lrun):
     '''
-    job
-    subjob  in case of md, nve, NVT: heat, cool 
+    job/subjob  sp
+                    kp,
+                md
+                    nve, NVT: heat, cool 
     poscars     list of poscar
     apotcar
     jobadds NEB final POSCAR
@@ -210,13 +212,13 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
             print(f"INCAR in cwd will be used")
             f_incar = 'INCAR'
         else:
-            print("Error:: cannot find INCAR")
+            print("Error:: cannot find INCAR in job {job} and subjob {subjot}")
             sys.exit()
 
         ### Add incopt
         if incopt:
             if type(incopt) != dict: 
-                print(f"1st change of incopt {incopt}")
+                print(f"1st change of incopt by -io {incopt}")
                 incopt = list2dict(incopt)
             
 
@@ -286,9 +288,13 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
     return 0            
 
 def main():
+    '''
+    subjob default = None for MDnev
+            job = kp: 
+    '''
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', choices=['pchg','chg','md','nnff','mdnve','nnffnve', 'ini','zpe','mol','wav','opt','copt','sp','noD','kp','fake','neb','pseudo'], help='inquire for each file')
-    parser.add_argument('-sj', '--subjob', choices=['sp', 'cool', 'heat','quench'], help='sp for fake and others for md')
+    parser.add_argument('-j', '--job', choices=['pchg','chg','md','nnff','mdnve','nnffnve', 'ini','zpe','mol','wav','opt','copt','sp','noD','fake','kp','neb','pseudo'], help='inquire for each file')
+    parser.add_argument('-sj', '--subjob', choices=['sp', 'cool', 'heat','quench', 'kp'], help='sp for fake and others for md')
     parser.add_argument('-n', '--ndirs', default=5, type=int, help="number or dirs to make")
     ### POSCARs
     gposcar = parser.add_mutually_exclusive_group()
@@ -343,9 +349,14 @@ def main():
     ### POSCARs and DIRECTORYs are abtained here and passed to make_vasp_dir()
     ### Apply dirnames to run fake job in KISTI
     job = args.job              # to pass job to function
+    subjob = args.subjob
+    if job == 'kp':
+        job = 'sp'
+        subjob = 'kp'
+        
     ### JOB = FAKE
-    if args.job == 'fake':
-        job = args.subjob
+    if job == 'fake':
+        job = subjob
         ### not perfect
         if args.poscar:
             inposcar = args.poscar[0]
@@ -402,7 +413,7 @@ def main():
 
     ### for kpoints-scan
     #if args.kp_test:
-    if args.job == 'kp':
+    if subjob == 'kp':
         if not args.lkisti:
             args.lkisti = 'kp'  # lkisti is changed to string from list
         kparray = np.array(args.kpoints_test)
@@ -420,12 +431,11 @@ def main():
             dirname = dirnames[0]+'k'+list2str(kp_in)
             print(f"kp_string {kp_str}, dirname {dirname} in function {whereami()}()")
             dname.append(dirname)  # dname is string
-
-            make_vasp_dir(job, poscars, args.potcar, args.jobadds, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+            ##########     1      2        3         4            5         6            7             8          9        10           11          12            13               14        15              16          17         18
+            make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
     else:
-################# 1       2        3       4                   5        6                7           8         9        10      11    12 13 14   15   16  
-#def make_vasp_dir(job, subjob, poscars, apotcar, jobadds,           kpoints, incar,            dirnames, option, allprepared, iofile, qx,qN,qn,vasp_exe,lkisti,Lrun):
-        make_vasp_dir(job, args.subjob, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+        ##########     1      2        3         4              5            6            7             8               9        10           11          12            13               14        15              16            17         18
+        make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
     return 0
 
 if __name__ == '__main__':

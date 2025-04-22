@@ -183,7 +183,7 @@ def show_command(work, subwork, job_submit, qname, vjob, inf, keyvalues, nodenam
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
     kisti.vas += f"\n\t\t    pbs_vasp_kisti_skl2 for half use of cpu for memory issue"
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.{qname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 5 : more info_vasp.py"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.{qname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 -e g : more info_vasp.py"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j {vjob} -r on -s POSCAR.{qname} -d dnameid : o-overwrite n-not submit job"
     kisti.vas += f"\n\t    :: (OORINano)"
     kisti.vas += f"\n\t\t$ qsub -N {qname} -v cat='orr' pbs_vasp_kisti_skl.sh"
