@@ -339,8 +339,11 @@ md.oszicar              = "MD is stored in OSZICAR and analysis\
                         \n\t\t    -y    keys lined by '+' for Etot Efree E0pot Ekin Skin Spot\
                         \n\t\t          Etot = Efree(E0pot)+Ekin+Skin+Spot\
                         \n\t\tUsage: \
+                        \n\t\t    (NVT)\
                         \n\t\t    oszicar.py mdPtbT0300t115s1-last -y Etot Skin Spot+Skin \
                         \n\t\t    oszicar.py mdPtbT0300t115s1-last -y Etot Efree+Ekin Spot+Skin -iy 2 \
+                        \n\t\t    (NVE)\
+                        \n\t\t    oszicar.py HfSe2L1O12O6 -y E0pot Ekin  -iy2 1\
                         "
 analysis.vas_anal    =   "(.sh) Charge analysis of Bader\
                         \n\tjobs: bader bader2(spin) convasp dos bchg end\
