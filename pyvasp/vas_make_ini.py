@@ -293,7 +293,7 @@ def main():
             job = kp: 
     '''
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', choices=['pchg','chg','md','nnff','mdnve','nnffnve', 'ini','zpe','mol','wav','opt','copt','sp','noD','fake','kp','neb','pseudo'], help='inquire for each file')
+    parser.add_argument('-j', '--job', default='opt', choices=['pchg','chg','md','nnff','mdnve','nnffnve', 'ini','zpe','mol','wav','opt','copt','sp','noD','fake','kp','neb','pseudo'], help='inquire for each file')
     parser.add_argument('-sj', '--subjob', choices=['sp', 'cool', 'heat','quench', 'kp'], help='sp for fake and others for md')
     parser.add_argument('-n', '--ndirs', default=5, type=int, help="number or dirs to make")
     ### POSCARs
