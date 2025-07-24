@@ -67,27 +67,32 @@ if [ $ucorr -eq 1 ]; then
     sed -i "s/.*LDAUU.*/$ldauu/" INCAR
     sed -i "s/.*LDAUJ.*/$ldauj/" INCAR
 fi
-### if not version, v6
-if [ $v ]; then
-version="5.4.4.pl2"
+### if not version, v6; passed via --export=v=5
+if [[ -v v ]]; then
+    version="5.4.4.pl2"
+    vasp_bin="20241206_OLD_BIN/5.4.4.pl2/"
 else
-version="6.4.2"
+    version="6.4.2"
+    vasp_bin="6.4.2/NORMAL/"
 fi
-vasp_dir="/TGM/Apps/VASP/VASP_BIN/6.4.2/NORMAL"
 
-### exe = [gam|ncl|std] for 5.4.4, 
-if [ $exe ]; then
-    EXEC="vasp.${version}.normal.${exe}.x"
+vasp_dir="/TGM/Apps/VASP/VASP_BIN/${vasp_bin}"
+
+### Default to "std" if exe is unset: exe = [gam|ncl|std] for 5.4.4, 
+exe=${exe:-std}
+
+if [[ $version == "5.4.4.pl2" ]]; then
+    EXEC="vasp.${version}.${exe}.x"
 else
-    EXEC="vasp.${version}.normal.std.x"
+    EXEC="vasp.${version}.normal.${exe}.x"
 fi
 
 if [ $hmem ]; then
-    echo "mpirun -np $mpiproc  ${vasp_dir}/${EXEC}" >> $logfile
-    mpirun -np $mpiproc  ${vasp_dir}/${EXEC} > $outfile
+    echo "mpirun -np $mpiproc  ${vasp_dir}${EXEC}" >> $logfile
+    mpirun -np $mpiproc  ${vasp_dir}${EXEC} > $outfile
 else
-    echo "mpirun -np $SLURM_NTASKS  ${vasp_dir}/${EXEC}" >> $logfile
-    mpirun -np $SLURM_NTASKS  ${vasp_dir}/${EXEC} > $outfile
+    echo "mpirun -np $SLURM_NTASKS  ${vasp_dir}${EXEC}" >> $logfile
+    mpirun -np $SLURM_NTASKS  ${vasp_dir}${EXEC} > $outfile
 fi
 date >> $logfile
 
