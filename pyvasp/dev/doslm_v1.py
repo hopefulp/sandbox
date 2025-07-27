@@ -52,14 +52,12 @@ def make_vert_line(fname, Ene, maxdos=10):
     f0.close()
     return 0
 
-def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, plot_dict):
+def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel, title, colors):
     '''
-
     works for one list
     alist0      start from 0
     arr_atoms   start from 1
     list        [-1] for TDOS
-    plot_dict   keys    xlabel, ylabel, xlim, title, colors
     '''
     natom, Emax, Emin, nene, Ef, bheadline, Ldoserr, Lspin = obtain_doscar_head(doscar)
     
@@ -163,11 +161,9 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, plot_dict):
                 else:
                     legend=re.split('\.',fname)[0]
                 legends.append(legend)
-    if not 'legend' in plot_dict.keys():
-        plot_dict['legend'] = legends
     ### plot here
     if Lplot:
-        mplot_nvector(x_ene, ys, plot_dict=plot_dict, Lsave=True)
+        mplot_nvector(x_ene, ys, xlabel=xlabel, ylabel=ylabel, title=title, legend=legends, colors=colors, Lsave=True)
     return 0
 
 def main():
@@ -189,11 +185,9 @@ def main():
     parser.add_argument('-p', '--plot', action='store_true', help='plot pdos')
     plot = parser.add_argument_group(title='PLOT')
     plot.add_argument('-xl', '--xlabel', default='E (eV)', help='xlabel for DOS (eV)')
-    plot.add_argument('-xi', '--xlim', nargs=2, type=float, help='xrange xmin, xmax')
     plot.add_argument('-yl', '--ylabel', default='DOS', help='ylabel for DOS (eV)')
-    plot.add_argument('-t', '--title', default='TEA$_{2}$SnI$_{4}$', help='title for plot')
+    plot.add_argument('-t', '--title', default='SnO2', help='title for plot')
     plot.add_argument('-c', '--colors', nargs='*', default=['r','g','b','k'], help='colors')
-    plot.add_argument('-lg', '--legends', nargs='*', help='input the same number of legends with plot')
 
     args = parser.parse_args()
     
@@ -217,16 +211,8 @@ def main():
         else:
             print(f"{whereami():>15}(): use z-axis below {zaxis[0]} and upper {zaxis[1]}")
         alist0 = obtain_atomlist0(zaxis, args.poscar, args.atom_species, args.location)
-    ### gather plot dict
-    plot_dict={}
-    if args.xlabel: plot_dict['xlabel'] = args.xlabel
-    if args.ylabel: plot_dict['ylabel'] = args.ylabel
-    if args.xlim:   plot_dict['xlim']   = args.xlim
-    if args.title:  plot_dict['title']  = args.title
-    if args.colors: plot_dict['colors'] = args.colors
-    if args.legends:plot_dict['legend'] = args.legends
-    ####                  1            2        3             4           5         6      7         8   
-    extract_doscar(args.doscar, args.ofile, alist0, args.energy_shift,args.ql,args.qm,args.plot,plot_dict) 
+    
+    extract_doscar(args.doscar, args.ofile, alist0, args.energy_shift,args.ql,args.qm,args.plot,args.xlabel,args.ylabel,args.title,args.colors) 
 
 if __name__ == '__main__':
     main()

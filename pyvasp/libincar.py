@@ -204,6 +204,8 @@ def modify_incar_byjob(incar, job, outf='INCAR.new'):
     '''
     if job == 'cont':
        modify_incar_bykv(incar, cont_change, outf=outf, mode = 'm')
+    #elif job == 'dos':
+    #    
     else:
         print(f"no {job} defined in {whereami()}")
         sys.exit(101)

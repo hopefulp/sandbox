@@ -10,7 +10,7 @@ SystemLabel      TMDC     # Short name for naming files
 
 #(4) DFT, Grid, SCF
 
-XC.functional         LDA            # LDA or GGA (default = LDA)
+XC.functional         GGA            # LDA or GGA (default = LDA)
 XC.authors            CA          # CA (Ceperley-Aldr) = PZ
                                     #    (Perdew-Zunger) - LDA - Default
                                     # PW92 (Perdew-Wang-92) - LDA

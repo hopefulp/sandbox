@@ -158,12 +158,18 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
 
     ###### 4: INCAR
     ### 4.1 Use it, if defined
+    if job:
+        jobname = job
+        if subjob:
+            jobname += subjob
     if incar: 
         if os.path.isfile(f"{incar}"):
             pass
         elif os.path.isdir(f"{incar}") and os.path.isfile(f"{incar}/INCAR"):
             incar = f"{incar}/INCAR"
     ### 4.2 try INCAR.job 
+    elif os.path.isfile(f"INCAR.{jobname}"):
+        incar = f"INCAR.{jobname}"
     elif os.path.isfile(f"INCAR.{job}"):
         incar = f"INCAR.{job}"
     ### 4.3 Use odir/INCAR for job = cont, ...
@@ -210,8 +216,8 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
 def main():
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job
-    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','pchg','chg','chgw','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
-    parser.add_argument('-sj', '--subjob', default='sp', choices=['sp', 'cool', 'heat','quench'], help='sp for fake and others for md')
+    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','pchg','chg','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
+    parser.add_argument('-sj', '--subjob', default='sp', choices=['w','sp', 'cool', 'heat','quench'], help='sp for fake and others for md')
         ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()
     gdirectory.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
@@ -222,7 +228,7 @@ def main():
     goutput = parser.add_mutually_exclusive_group()
     goutput.add_argument('-n', '--newdirs', nargs='+', help='specify new dirname in case one job')
     goutput.add_argument('-s', '--suffix', help='specify suffix of new directory')
-    goutput.add_argument('-a', '--fixed_atom', help='atom symbol to be fixed')      # default='H'
+    goutput.add_argument('-fa', '--fixed_atom', help='atom symbol to be fixed')      # default='H'
     ### modify 4 files
     ### INCAR
     parser.add_argument('-i', '--incar', help='specify incar file or dir: m for modify')
@@ -241,6 +247,9 @@ def main():
     args = parser.parse_args()
 
     pwd = os.getcwd()
+
+    #print(f"after parse_args: fixed atoms {args.fixed_atom}") # error: -al conceived by -a l
+
     ### get old dirnames list
     if args.dirs:
         old_dirs = args.dirs
@@ -260,6 +269,7 @@ def main():
             if args.suffix:
                 ndir = odir+args.suffix
             elif args.fixed_atom:
+                print(f"fixed atoms {args.fixed_atom}")
                 ndir = odir+"fixed"+args.fixed_atom
             else:
                 ndir = odir+f'{args.job}'
