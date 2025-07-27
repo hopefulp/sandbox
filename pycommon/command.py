@@ -162,6 +162,7 @@ def show_command(work, subwork, job_submit, qname, vjob, vsjob, inf, keyvalues, 
     kisti.vas = f"\t(VASP) :: (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)\
                 \n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -al : all prepared except POSCAR\
                 \n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -j {vjob}\
+                \n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -j {vjob} -al\
                 \n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
     kisti.vas += f"\n\t    :: RERUN Opt for failed opt"
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
@@ -183,7 +184,8 @@ def show_command(work, subwork, job_submit, qname, vjob, vsjob, inf, keyvalues, 
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
     kisti.vas += f"\n\t\t    pbs_vasp_kisti_skl2 for half use of cpu for memory issue"
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.{qname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 -e g : more info_vasp.py"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.{qname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 : more info_vasp.py"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.{qname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 -e g :gamma"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j {vjob} -r on -s POSCAR.{qname} -d dnameid : o-overwrite n-not submit job"
     kisti.vas += f"\n\t    :: (OORINano)"
     kisti.vas += f"\n\t\t$ qsub -N {qname} -v cat='orr' pbs_vasp_kisti_skl.sh"
@@ -200,7 +202,7 @@ def show_command(work, subwork, job_submit, qname, vjob, vsjob, inf, keyvalues, 
             \n\t:: INI\
             \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
             \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc} -al : all prepared except POSCAR\
-            \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -sj {vsjob} -x {partition} -N {nnode} -np {nproc} -al : all prepared except POSCAR\
+            \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -sj {vsjob} -x {partition} -N {nnode} -np {nproc} -al : in case subjob\
             \n\t    : if qsub fails but dir exists\
             \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
             \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
