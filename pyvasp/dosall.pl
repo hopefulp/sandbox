@@ -1,1 +1,0 @@
-vscript/dosall.pl

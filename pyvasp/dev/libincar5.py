@@ -36,13 +36,14 @@ ordered_incar_keys=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','N
 ### job_comment for comment out
 ### job_uncomment to make it active
 cont_change = {'ISTART': 1, 'ICHARG':0}     # read WAVECAR
-### Band structure & DOS: change params and comment out
+### Band structure: change params and comment out
 band_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'LCHARG': '.F.'}
-dosband_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
+band_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
 band_active = {'LORBIT': 11}
+### DOS
 dos_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'ALGO':'Normal', 'EDIFF':1E-5, 'LCHARG': '.F.'}
-#dosband_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
-dos_active = {'LORBIT': 11, 'NEDOS': 4001, 'EMIN':-10, 'EMAX':4}
+dos_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
+dos_active = {'LORBIT': 11, 'NEDOS': 4001, 'EMIN':-8, 'EMAX':6}
 ### VDW
 vdw_active  = {'IVDW': 12}
 noD_out     = ['IVDW']
@@ -95,8 +96,6 @@ def dict_update(param, dic):
     return paramch
 '''
 
-comment = '!'
-
 def extract_kv_inline(line):
     '''
     Return key, value, status
@@ -107,29 +106,14 @@ def extract_kv_inline(line):
     linestrip=line.strip()
     status = 1  # key is active
 
-    if not '=' in linestrip:
-        return None, None, 0
-
-    ### If '=' in line, cut '!'-after
-
-    if comment in linestrip:
-        keystring = linestrip.split(comment)[0]
-    else:
-        keystring = linestrip
-    ### delete '#'
-    if re.match('#', keystring):
-        kvstring = keystring[1:].strip()
+    if re.match('#', linestrip):
+        linestrip = linestrip[1:].strip()
         status = 0
-    else:
-        kvstring = keystring
-        status = 1
-    #print(f"kvstring {kvstring}")
 
-    ### Case '=', cut line before '!'
-    ncount = kvstring.count('=')
+    ncount = linestrip.count('=')
     if ncount == 1:
         #if not ';' in line:
-        lst = kvstring.split()   
+        lst = linestrip.split()   
         ### Case: key=value
         if '=' in lst[0]:
             kstr = re.split('=', lst[0])
@@ -144,7 +128,6 @@ def extract_kv_inline(line):
         if key.upper() in ordered_incar_keys:
             return key.upper(), value, status
         else:
-            print(f"{key} is not registered in ordered_incar_keys: line {line}")
             return None, None, 0
     else:
         if ncount == 2:
@@ -161,7 +144,7 @@ def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
     incar       input file of INCAR
                 INCAR need to have one key in a line
     inp_kv      list or dict for INCAR key-value
-    icout       keys list to be commented out
+    icout       keys to be commented out
     mode        m for modify INCAR, inp_kv is dict
                 e,d to delete key, inp_kv is list
                 if # key, remove #
@@ -197,11 +180,8 @@ def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
             if line_key:
                 #print(f"line key {line_key}")
                 if line_key in kws.keys():
-                    print(f"line mod: {line_key} = {kws[line_key]}")
+                    #print(f"line mod: {line_key} = {kws[line_key]}")
                     line = f" {line_key}   =  {kws[line_key]}   ! change in libincar.py\n"
-                if icout:
-                    if line_key in icout:
-                        line = '#' + line
             ### Case: line has kws.keys(), it is modified
             newlist.append(line)
         else:
@@ -243,36 +223,19 @@ def modify_incar_byjob(incar, job, outf='INCAR.new'):
         spw     write WAVECAR, CHGCAR, 
     simply call modify_incar_kv by assigning incar_kv by job
     '''
-
-    #Lcomment = 0
-    icout = None        # to treat comment out key-list
-
     if job == 'cont':
-        dict_change = cont_change
+        modify_incar_bykv(incar, cont_change, outf=outf, mode = 'm')
     elif job == 'spw':
-        dict_change = spw_change
-    elif job == 'mag':
-        dict_change = mag_change
-    elif job == 'dos' or job == 'band':
-        if job == 'dos':
-            dict_change = dos_change
-            dict_change.update(dos_active)
-        else:
-            dict_change = band_change
-            dict_change.update(band_active)
-        icout = dosband_out
-        #Lcomment = 1
+        modify_incar_bykv(incar, spw_change, outf=outf, mode = 'm')
+    #elif job == 'spw2':
+    #    modify_incar_bykv(incar, spw2_change, outf=outf, mode = 'm')
+    #elif job == 'dos':
+    #    
     else:
         print(f"no {job} defined in {whereami()}")
         sys.exit(101)
 
-    modify_incar_bykv(incar, dict_change, icout=icout, outf=outf, mode = 'm')
-    '''
-    if Lcomment == 1:
-        if job == 'dos':
-            dict_out    = dos_out
-        modify_incar_bykv(outf, dict_out, outf=outf, mode = 'c')
-    '''
+
     return 0
 
 def modify_incar_byjob2(incar, job, dic=None, opt='ac', suff=None):

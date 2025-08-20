@@ -124,7 +124,7 @@ make.vas_make_cont = "===================== VASP CONTINUE ======================
                     \n\t    pypath.sh vas_make_cont.py -d SnO2sc22FH -j band -i i\
                     \n\t    python $sbvas/vas_make_cont.py -d sc34 -nd sc34E5 -j incar -id '{\"ENCUT\": \"500\"}' -io c\
                     "
-make.mod_vas        = "modules for make vasp directory\
+make.libvas        = "modules for make vasp directory\
                     \n\tcalled by 'vas_make_ini.py'\
                     \n\tfunctions:\
                     \n\t    get_vasp_repository\
@@ -135,7 +135,7 @@ make.mod_vas        = "modules for make vasp directory\
                     \n\t\tcall get_atoms_4pos\
                     \n\t\treturn MAGMOM\
                     \n\t    make_incar\
-                    \n\tRun by 'python -m mod_vas -j getmag -s poscar'\
+                    \n\tRun by 'python -m libvas -j getmag -s poscar'\
                     \n\t    to get MAGMOM\
                     "
 poscar.libposcar    ="module for POSCAR modification\
@@ -253,7 +253,6 @@ incar.incar_diff   ="diff_incar.py INCAR1 [INCAR2] -k keys -a -s\
                     \n\t    incar_diff.py FPtb2H2 FPtb2H2hb --- old style\
                     \n\t    incar_diff.py -a -k ENCUT ISTART --- old style\
                     "
-dosband.dosall      =   "perl script to decompose lm-decomposded DOSCAR"
 dosband.doslm       =   "extact ldos then plot\
                         \n\tOptions:\
                         \n\t    (exclusive)\
@@ -263,14 +262,22 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\t\t    -1 for Tdos, such as -1, 0, 3-9 w. -ash 1 4 4\
                         \n\t\t-ash atom list shape\
                         \n\t\t    len(atomlist) == sum(atomlist_shape)\
+                        \n\t\t    len(ash) is number of plots\
+                        \n\t    -c colors: r b k etc & decimal number + f\
+                        \n\t\tfloatf: float for thickness and f for filling space\
                         \n\t    -e [f|float_value]: f for Fermi level, value for VBM shift\
                         \n\t    -p store_true for plot\
+                        \n\t    -v add vertical line of EF in plot\
+                        \n\t    -xi, -yi: x and y range\
+                        \n\t    -lg legend list which should be match with plot number and ash\
                         \n\t\tcalls myplot2D.mplot_nvector\
                         \n\tUsage:\
                         \n\t    doslm.py -z 3.69 -p\
                         \n\t    doslm.py -z 3.69 -p -eV-2.33 for VBM\
                         \n\t    doslm.py -al 8 23 9 10 21 22 -ash 2 4 -p\
                         \n\t    doslm.py -al -1 10-19 -ash 1 10 -eF\
+                        \n\t    doslm.py -p -xi -10 3 -yi 0 2 -al 85  3 3 -ash 1 1 1 -lg O-2p Sn-5s Sn-5p -t EtO -l p s p -c 0.5f r b\
+                        \n\t    doslm.py -al -1 -ash 1 -p -xi -6 2 -yi 0 150  -t 'MoS2-NH' -lg TDOS -v -eF\
                         \n\t    (Pt-C60-x): doslm.py -al -1 2 54 55 -ash 1 1 1 1\
                         \n\t(3) to plot ldos of slab w.r.t. VBM: obtain VBM in slab (1)\
                         \n\t    doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -e -1.169\
@@ -303,20 +310,20 @@ dosband.doscar_modi  =   "remove the first line of each energy loop for removing
                         "
 analysis.vas_anal_dos=  "get pdos for every atoms"
 
-procar.procar_kb    =   "[procar_kb.pl] renamed from 'get_Procar.pl'\
+procar.procar_kb    =   "converted to python from procar_kb.pl <- get_Procar.pl\
                         \n\t\tTo extract k,b sets for the related peak in dos plot\
                         \n\t\tcontrol inside script:\
                         \n\t\t    ldos or pdos\
                         \n\t\t    dos amplitude criteria for each dos and pldos\
                         \n\t\tinput: energy range <- find energy in LDOS of the atom\
                         \n\t\tUsage:\
-                        \n\t\t    procar_kb.pl [d=dirname] [e=]E1[:Emax] \"atom indices\"\
-                        \n\t\t\td=dirname: optional\
-                        \n\t\t\tE1: center of DOS\
-                        \n\t\t\tEmin:Emax for energy range\
-                        \n\t\t\t\'indices': atom index which starts from 1\
+                        \n\t\t    procar_kb.py dirname -e E1 [Emax] -al 4 82\
+                        \n\t\t\tdirname: optional\
+                        \n\t\t\t-e: len=1: center of DOS; len=2 Emin, Emax\
+                        \n\t\t\t-al atom index which starts from 1\
                         \n\t\tE.g.:\
-                        \n\t\t    procar_kb.pl e=-6:-5 '3 58'\
+                        \n\t\t    procar_kb.pl e=-6:-5 '3 58' -> /Bak\
+                        \n\t\t    procar_kb.py TEA2SnI4pEtOsp -e -4 -2 -ia 4 86\
                         "
 procar.get_procar       =   "[.pl] similar to procar_kb.pl"
 procar.get_procar_kband = "[.pl] similar to get_procar.pl"

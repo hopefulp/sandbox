@@ -8,10 +8,9 @@ import json
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 from common     import get_dirfiles, yes_or_no, list2dict
-from libincar   import modify_incar_byjob, modify_incar_bykv, add_inckv_bysubjob
-from libposcar  import modify_POSCAR, pos2dirname, get_poscar
-from libvas     import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_linkw, jg_linkc
-from libkpoints import mod_kpoints
+from libincar  import modify_incar_byjob, modify_incar_bykv, add_inckv_bysubjob
+from libposcar import modify_POSCAR, pos2dirname, get_poscar
+from libvas    import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_linkw, jg_linkc
 from vas_qsub   import qsub_command
 
 def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_remove):
@@ -132,37 +131,31 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
 
     ### 3: KPOINTS
     old_kpoints = odir + '/KPOINTS'
-    
+    if not job in jg_kpoints:
+        kpoints = f'{odir}/KPOINTS'
+    else:
     #if vgroup == 1 or vgroup == 2:
-    if kopt:
-        ### if kpoints file
-        kfname = kopt
-        kfsuff = f'KPOINTS.{kopt}'
-        if os.path.isfile(kfname):
-            kpoints = kfname
-        ### if kpoints suffix
-        elif os.path.isfile(kfsuff):
-            kpoints = kfsuff
+        if kopt:
+            ### if kpoints file
+            kfname = kopt
+            kfsuff = f'KPOINTS.{kopt}'
+            if os.path.isfile(kfname):
+                kpoints = kfname
+            ### if kpoints suffix
+            elif os.path.isfile(kfsuff):
+                kpoints = kfsuff
     ### use -j job
     #elif vgroup == 3:
-    elif job == 'zpe' or job == 'wav':
-        kpoints = odir + '/KPOINTS'
-    elif os.path.isfile(f'KPOINTS.{job}'):
-        kpoints = 'KPOINTS.'+job
-    elif os.path.isfile('KPOINTS'):
-        kpoints = 'KPOINTS'
-    else:
-        kpoints = old_kpoints
-    
-    print(f"{old_kpoints} is modified to KPOINTS.new")
-    if job in jg_kpoints:
-        new_kpoints = 'KPOINTS.new'
-        mod_kpoints(old_kpoints, outf=new_kpoints, kmulti=3)
-    else:
-        new_kpoints = kpoints
-    os.system(f'cp {new_kpoints} {ndir}/KPOINTS')
-
-    print(f"{new_kpoints} was copied to {ndir}/KPOINTS")
+        elif job == 'zpe' or job == 'wav':
+            kpoints = odir + '/KPOINTS'
+        elif os.path.isfile(f'KPOINTS.{job}'):
+            kpoints = 'KPOINTS.'+job
+        elif os.path.isfile('KPOINTS'):
+            kpoints = 'KPOINTS'
+        else:
+            kpoints = odir + "/KPOINTS"
+    os.system(f'cp {kpoints} {ndir}/KPOINTS')
+    print(f"{kpoints} was copied to {ndir}/KPOINTS")
 
     ###### 4: INCAR
     ### 4.1 Use it, if defined

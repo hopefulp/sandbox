@@ -13,7 +13,7 @@ import re
 import string
 from common     import *
 from vas_qsub   import get_queue_pt, qsub_command
-from mod_vas    import *
+from libvas    import *
 from libposcar import get_poscar, get_dnames4pos 
 from libincar  import modify_incar_bykv, add_inckv_bysubjob
 

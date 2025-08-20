@@ -21,13 +21,15 @@ vasf_out=['CHG','CHGCAR','CONTCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCA
 vasf_ini=['POSCAR','KPOINTS','INCAR','POTCAR']
 
 ### VASP jobs group with file to be modified
-jg_poscar=['ini', 'zpe']      # ini uses, zpe modifies, others use CONTCAR
-jg_kpoints=['dos','band','kp'] # kp for change kp file
+jg_poscar=['ini', 'zpe']        # ini uses, zpe modifies, others use CONTCAR
+jg_kpoints=['dos','kp']         # band: file is required for each symmetry, kp for change kp file
 ### sp for write CHGCAR, WAVCAR
 #jg_incar=['sp','cont','opt','copt','vdw','chg','chgw','dos','pchg','band','mag','kisti','neb']  # required
-jg_incar=['cont']
+jg_incar=['cont','spw','mag','dos','band']
 jg_potcar=['lda','gga']
-jg_link=['cont','dos','band','pchg']
+jg_linkw=['cont','dos','band','pchg']
+jg_linkc=['cont','dos','band','pchg']
+
 jg_subdir=['neb']
 
 eps_H2O = 78.3

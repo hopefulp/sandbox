@@ -16,6 +16,7 @@ import sys
 import numpy as np
 from mod_doscar import nheadline, obtain_doscar_head, change_Bheadline
 from libposcar import obtain_atomlist0
+from libdoscar import *
 from common     import list2str, whereami
 from mplot2D   import mplot_nvector #, auto_nvector
 from parsing    import convert_2lst2D
@@ -52,12 +53,19 @@ def make_vert_line(fname, Ene, maxdos=10):
     f0.close()
     return 0
 
-def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel, title, colors):
+
+
+def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, plot_dict):
     '''
+    alist02d    2D list: groups of atom list, [[3,4,5],[10,11]]
+    l           list with the same size of alist02d: [s, p]
+    m
+
     works for one list
     alist0      start from 0
     arr_atoms   start from 1
     list        [-1] for TDOS
+    plot_dict   keys    xlabel, ylabel, xlim, title, colors
     '''
     natom, Emax, Emin, nene, Ef, bheadline, Ldoserr, Lspin = obtain_doscar_head(doscar)
     
@@ -91,12 +99,16 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel,
     with open(doscar, 'r') as f:
         # nlines = 5 + (1 + nene) * (natom+1) 
         lines = f.readlines()
+
+        ### As for one atomlist for sum
         for alist0 in alist02d:
-            ### change atom index which start from 0
+            ### change atom index which starts from 0
             arr_atoms = np.array(alist0) + 1
             ### Make filename: prefix 
             if arr_atoms[0] == 0:
                 f_pre = 'TDOS'
+            elif l:
+                f_pre = 'pdos'
             else:
                 f_pre = 'ldos'
             ### make filename
@@ -161,9 +173,11 @@ def extract_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, xlabel, ylabel,
                 else:
                     legend=re.split('\.',fname)[0]
                 legends.append(legend)
+    if Lplot and not plot_dict.get('legend'):
+        plot_dict['legend'] = legends
     ### plot here
     if Lplot:
-        mplot_nvector(x_ene, ys, xlabel=xlabel, ylabel=ylabel, title=title, legend=legends, colors=colors, Lsave=True)
+        mplot_nvector(x_ene, ys, plot_dict=plot_dict, Lsave=True)
     return 0
 
 def main():
@@ -180,17 +194,27 @@ def main():
     parser.add_argument('-loc', '--location', default='in', choices=['in', 'out'], help='outside or inside of zmin')
     parser.add_argument('-as', '--atom_species', nargs='+', default=['O'], help='specify atom species')
     parser.add_argument('-e', '--energy_shift', help='[F|value], -eF[f], -e-3.5 for E such as VBM')
-    parser.add_argument('-l', '--ql', type=int, help='angular quantum number')
-    parser.add_argument('-m', '--qm', type=int, help='magnetic quantum number')
+    parser.add_argument('-l', '--ql', type=int, nargs='*', help='angular quantum number')
+    parser.add_argument('-m', '--qm', type=int, nargs='*', help='magnetic quantum number')
     parser.add_argument('-p', '--plot', action='store_true', help='plot pdos')
     plot = parser.add_argument_group(title='PLOT')
     plot.add_argument('-xl', '--xlabel', default='E (eV)', help='xlabel for DOS (eV)')
     plot.add_argument('-yl', '--ylabel', default='DOS', help='ylabel for DOS (eV)')
-    plot.add_argument('-t', '--title', default='SnO2', help='title for plot')
+    plot.add_argument('-xi', '--xlim', nargs=2, type=float, help='xrange xmin, xmax')
+    plot.add_argument('-yi', '--ylim', nargs=2, type=float, help='yrange ymin, ymax')
+    plot.add_argument('-t', '--title', default='TEA$_{2}$SnI$_{4}$', help='title for plot')
     plot.add_argument('-c', '--colors', nargs='*', default=['r','g','b','k'], help='colors')
-
+    plot.add_argument('-lg', '--legends', nargs='*', help='input the same number of legends with plot')
+    parser.add_argument('-u', '--usage', action='store_true', help='prints usage and exit')
     args = parser.parse_args()
-    
+
+    if args.usage:
+        print("Plot DOSCAR::\
+              \n\tdoslm.py -p -eF -xi -3.0 3.0 -al 136-150 159-162 -ash 15 4 -lg I Sn -t 'TEA$_{2}$SnI$_{4}$-V${_I}$’\
+              \n\t\
+              ")
+        sys.exit(0)
+
     ### obtain atom 2D list
     if not args.zintv:
         ### if there is shape, there must be list
@@ -211,8 +235,17 @@ def main():
         else:
             print(f"{whereami():>15}(): use z-axis below {zaxis[0]} and upper {zaxis[1]}")
         alist0 = obtain_atomlist0(zaxis, args.poscar, args.atom_species, args.location)
-    
-    extract_doscar(args.doscar, args.ofile, alist0, args.energy_shift,args.ql,args.qm,args.plot,args.xlabel,args.ylabel,args.title,args.colors) 
+    ### gather plot dict
+    plot_dict={}
+    if args.xlabel: plot_dict['xlabel'] = args.xlabel
+    if args.ylabel: plot_dict['ylabel'] = args.ylabel
+    if args.xlim:   plot_dict['xlim']   = args.xlim
+    if args.ylim:   plot_dict['ylim']   = args.ylim
+    if args.title:  plot_dict['title']  = args.title
+    if args.colors: plot_dict['colors'] = args.colors
+    if args.legends:plot_dict['legend'] = args.legends
+    ####                  1            2        3             4           5         6      7         8   
+    extract_doscar(args.doscar, args.ofile, alist0, args.energy_shift,args.ql,args.qm,args.plot,plot_dict) 
 
 if __name__ == '__main__':
     main()
