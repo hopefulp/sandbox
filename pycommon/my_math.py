@@ -24,3 +24,5 @@ def minmax(value, _min, _max):
     elif _max < value:
         _max = value
     return _min, _max
+
+

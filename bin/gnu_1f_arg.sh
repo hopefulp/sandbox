@@ -9,7 +9,7 @@ yrange=$3
 #term='postscript' 
 #eps
 #extens='png'
-RANGE="[-15:10] [:$yrange]"
+RANGE="[0:1] [:$yrange]"
 #STYLE1=" u ((\$1-$asymp)*$hkj)  w lp lt 1 lw 3 "
 STYLE1=" u (\$1):(\$2)  w l lt 1 lw 1 "
 STYLE2=" u 1 w lp lt 29 lw 3 "

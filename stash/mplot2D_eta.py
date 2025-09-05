@@ -457,6 +457,8 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     y:: [size] or [[size],[size],...[size]]
     '''
     if not colors:
+        if not legend:
+            legend="add legend"
         fig, ax = common_figure(ncolor = len(legend))
         print("no color input")
     else:
@@ -464,11 +466,12 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
         print("colors")
 
     #plt.locator_params(axis='x', nbins=10)
+    ### ys in row
     ys = np.array(y)
-    if len(x) != 0:
+    if x and len(x) != 0:
         xsize = len(x)
     else:
-        xsize = ys.shape[0]
+        xsize = ys.shape[1]
         x=range(xsize)
     print(f"x={len(x)} y={ys.shape} in {whereami()}()")
     plt.title(title)
@@ -476,14 +479,17 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     plt.xlabel(xlabel, fontsize=12)
     plt.ylabel(ylabel, fontsize=12)
     print(f"xlabel: {xlabel}, ys.ndim {ys.ndim} ")
+    #if ys.ndim ==1:
+    #    ys = ys[np.newaxis, :]
     for i in range(len(ys)):
         ### is this for TDOS
-        if re.match('t', legend[i]): # for what? for Tdos?
+        if re.match('tdos', legend[i]):                    # for TDOS
             d = scipy.zeros(len(ys[i,:]))
             print(f"shape d {np.array(d).shape}, legend ")
             #ax.fill_between(x, ys[i,:], where=ys[i,:]>=d, color=colors[i])
             plt.plot(x,ys[i,:],  label=legend[i] , color=colors[i])
         else:
+            ### plot each rows
             print(f"x dim {len(x)}, y dim {ys[i,:].shape} label {legend[i]}")
             if colors:
                 plt.plot(x,ys[i,:],  label=legend[i] , color=colors[i])

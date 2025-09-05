@@ -5,6 +5,56 @@ from common import whereami
 def is_int_el
 def is_int      
 '''
+
+### parsing file
+def f_parsing(inf, regexi, regexf, nskip=0):
+    '''
+    input   inf     input file
+            regexi  regular expression for starting line
+            regexf  regular expression for final line
+            nskip   nline to skip before start parsing
+
+    1. read file
+    2. extract from regexi to refexf
+    3. 
+    '''
+    
+    with open(inf, 'r') as f:
+        lines = f.readlines()
+    
+    Lparse = False
+    icount = 0
+    skip_lines = []
+
+    ### define end parsing rule
+    ### if 'lowercase': search lowercase in a line
+    if regexf == 'lowercase':
+        Lend_parsing = anylower
+
+    for i, line in enumerate(lines):
+        ### find 1st line
+        if not Lparse and regexi in line:
+            i_start = i
+            Lparse = True
+        ### start parse
+        elif Lparse:
+            if icount < nskip:
+                skip_lines.append(line)
+                icount += 1
+                continue
+            ### check end of parsing
+            elif anylower(line):
+                i_end = i - 1
+                Lparse = False
+                break
+    print(f"{inf} block from {i_start} to {i_end} in {whereami()}")
+
+    ### arrange parsing part: skip_lines, lines[i_start:i_end+1]
+    return lines[i_start+nskip+1:i_end+1], skip_lines
+
+
+
+
 ### list
 
 def find_letter(ch, lst):
@@ -50,6 +100,22 @@ def convert_2lst2D(li, lshape):
     return l2d
     
 ### word
+def anylower(w):
+    p=re.compile("[a-z]")
+    sobj = re.search(p, w)
+    
+    #print(f"in anyword {sobj}")
+    return sobj
+
+def anyword(w):
+    '''
+    No match re.search returns None
+    '''
+    p=re.compile("[a-zA-Z]")
+    sobj = re.search(p, w)
+    
+    #print(f"in anyword {sobj}")
+    return sobj
 
 def is_int_el(s):
     try:
@@ -123,3 +189,18 @@ def get_atomlist4str(st):
             list0.append(newch)
     return list0
     
+def print_list2col(lis, x=None, fname='pot_list.txt', Lfwrite=False):
+    if Lfwrite:
+        f = open(fname, 'w')
+    if x:
+        for x, y in zip(x, lis):
+            print(f"{x:10.5f} {y:>15.10g}")
+    else:
+        for item in lis:
+            print(item)
+            if Lfwrite:
+                f.write(f"{item:13.5f}")
+                f.write("\n")
+    if Lfwrite:
+        f.close()
+    return 0

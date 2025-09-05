@@ -12,6 +12,13 @@ linejob = MyClass('linejob')
 convert = MyClass('convert')
 command = MyClass('command')
 server  = MyClass('server')
+web     = MyClass('web')
+
+web.mkdocs_port     ="=== Web-related ===\
+                        \n\t\trun 'mkdocs serve' with avaliable port\
+                        \n\t\tUsage::\
+                        \n\t\t    $mkdocs_port.py   (inside mkdocs folder)\
+                        "
 
 server.server_env   =   "=== Server-related ===\
                         \n\t\tobtain server hostname, home etc\
