@@ -36,14 +36,13 @@ ordered_incar_keys=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','N
 ### job_comment for comment out
 ### job_uncomment to make it active
 cont_change = {'ISTART': 1, 'ICHARG':0}     # read WAVECAR
-### Band structure: change params and comment out
+### Band structure & DOS: change params and comment out
 band_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'LCHARG': '.F.'}
-band_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
+dosband_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
 band_active = {'LORBIT': 11}
-### DOS
 dos_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'ALGO':'Normal', 'EDIFF':1E-5, 'LCHARG': '.F.'}
-dos_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
-dos_active = {'LORBIT': 11, 'NEDOS': 4001, 'EMIN':-8, 'EMAX':6}
+#dosband_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
+dos_active = {'LORBIT': 11, 'NEDOS': 4001, 'EMIN':-10, 'EMAX':4}
 ### VDW
 vdw_active  = {'IVDW': 12}
 noD_out     = ['IVDW']
@@ -55,6 +54,10 @@ chg_out     = ['ISIF', 'IBRION', 'EDIFFG', 'POTIM']
 chg_change  = {'LCHARG': '.T.'}
 sp_out      = chg_out
 sp_change   = {'LCHARG': '.F.'}
+### spw to write PROCAR for matching kpoints in WAVCAR and PROCAR for pchg calculation
+spw_change  = {'ISTART': 0, 'ICHARG': 2, 'LWAVE':'.TRUE.', 'LCHARG': '.TRUE.', 'LORBIT': 11}
+#spw2_change = {'ISTART': 0, 'ICHARG': 2, 'LWAVE':'.TRUE.', 'LCHARG': '.TRUE.'}
+
 ### Cell OPT
 copt_change = {'NSW': 1000}
 copt_active = {'ISIF': 3, 'IBRION': 2, 'POTIM': 0.3}
@@ -92,36 +95,65 @@ def dict_update(param, dic):
     return paramch
 '''
 
+comment = '!'
+
 def extract_kv_inline(line):
     '''
-    Return key, value pair in a line
-    return  key-value
-            None, None
+    Return key, value, status
+        if # commented, status returns 0, if not return 1
+        if key not in ordered_incar_keys: return None
     '''
-    sline=line.strip()
-    if '=' in line and not re.match('#', sline):
-        if not ';' in line:
-            lst = line.strip().split()   # in case there is no space in both sides of '='
-            if '=' in lst[0]:
-                kstr = re.split('=', lst[0])
-                key = kstr[0]
-                value = kstr[1]
-            else:
-                key = lst[0]
-                value = lst[1]
+
+    linestrip=line.strip()
+    status = 1  # key is active
+
+    if not '=' in linestrip:
+        return None, None, 0
+
+    ### If '=' in line, cut '!'-after
+
+    if comment in linestrip:
+        keystring = linestrip.split(comment)[0]
+    else:
+        keystring = linestrip
+    ### delete '#'
+    if re.match('#', keystring):
+        kvstring = keystring[1:].strip()
+        status = 0
+    else:
+        kvstring = keystring
+        status = 1
+    #print(f"kvstring {kvstring}")
+
+    ### Case '=', cut line before '!'
+    ncount = kvstring.count('=')
+    if ncount == 1:
+        #if not ';' in line:
+        lst = kvstring.split()   
+        ### Case: key=value
+        if '=' in lst[0]:
+            kstr = re.split('=', lst[0])
+            key = kstr[0]
+            value = kstr[1]
+        ### Case: key = value; 
         else:
-            print(f"Error:: there might be two k-v in line {line}")
-            sys.exit(100)
+            key = lst[0]
+            value = lst[2]
+
+        ### Case: only reserved keys are changed
+        if key.upper() in ordered_incar_keys:
+            return key.upper(), value, status
+        else:
+            print(f"{key} is not registered in ordered_incar_keys: line {line}")
+            return None, None, 0
     else:
-        return None, None
+        if ncount == 2:
+            print(f"Warning:: there are two k-v's in a line - {line}")
+            pass
+            #sys.exit(100)
+            #print(f"two ='s in {linestrip}")
+        return None, None, 0
         
-    ### find key in a line whether active or not 
-    if '#' in key:
-        key = key.replace('#', '')
-    if key.upper() in ordered_incar_keys:
-        return key.upper(), value
-    else:
-        return None, None
 
 ### modifying INCAR by dict or extract value by key
 def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
@@ -129,9 +161,10 @@ def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
     incar       input file of INCAR
                 INCAR need to have one key in a line
     inp_kv      list or dict for INCAR key-value
-    icout       keys to be commented out
+    icout       keys list to be commented out
     mode        m for modify INCAR, inp_kv is dict
                 e,d to delete key, inp_kv is list
+                if # key, remove #
     return      m output filename
                 e,d list of values
     '''
@@ -156,20 +189,24 @@ def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
     all_keys=[]
     for line in lines:
         iline += 1
+        ### if key is commented, activate
         #print(f"{line_key}: {kws.keys()}")
-        line_key, line_value = extract_kv_inline(line)
+        line_key, line_value, status = extract_kv_inline(line)
         all_keys.append(line_key)
         if mode == 'm':
             if line_key:
+                #print(f"line key {line_key}")
                 if line_key in kws.keys():
+                    print(f"line mod: {line_key} = {kws[line_key]}")
                     line = f" {line_key}   =  {kws[line_key]}   ! change in libincar.py\n"
-                ### if activated and in the list of delete
-                #elif line_key in icout:
-                #    line = f" #{line.rstrip()}    ! change in modify_incar_bykv\n"
+                if icout:
+                    if line_key in icout:
+                        line = '#' + line
+            ### Case: line has kws.keys(), it is modified
             newlist.append(line)
         else:
             if line_key in kws:
-                print(f"found input key and values {line_key}, {line_value}")
+                #print(f"found input key and values {line_key}, {line_value}")
                 newlist.append(line_value)
     print(f"{iline} was saved in newlist {len(newlist)}")
     ### write new file
@@ -196,19 +233,46 @@ def add_inckv_bysubjob(job, subjob, incdic):
         if subjob == 'quench':
             if not 'NSW' in incdic.keys():
                 incdic['NSW'] = 1000
+    
     return incdic
 
 def modify_incar_byjob(incar, job, outf='INCAR.new'):
     '''
+    pass job with job + subjob
+    job = cont, spw, spw2
+        spw     write WAVECAR, CHGCAR, 
     simply call modify_incar_kv by assigning incar_kv by job
     '''
+
+    #Lcomment = 0
+    icout = None        # to treat comment out key-list
+
     if job == 'cont':
-       modify_incar_bykv(incar, cont_change, outf=outf, mode = 'm')
+        dict_change = cont_change
+    elif job == 'spw':
+        dict_change = spw_change
+    elif job == 'mag':
+        dict_change = mag_change
+    elif job == 'dos' or job == 'band':
+        if job == 'dos':
+            dict_change = dos_change
+            dict_change.update(dos_active)
+        else:
+            dict_change = band_change
+            dict_change.update(band_active)
+        icout = dosband_out
+        #Lcomment = 1
     else:
         print(f"no {job} defined in {whereami()}")
         sys.exit(101)
 
-
+    modify_incar_bykv(incar, dict_change, icout=icout, outf=outf, mode = 'm')
+    '''
+    if Lcomment == 1:
+        if job == 'dos':
+            dict_out    = dos_out
+        modify_incar_bykv(outf, dict_out, outf=outf, mode = 'c')
+    '''
     return 0
 
 def modify_incar_byjob2(incar, job, dic=None, opt='ac', suff=None):

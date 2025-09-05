@@ -8,9 +8,10 @@ import json
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 from common     import get_dirfiles, yes_or_no, list2dict
-from libincar  import modify_incar_byjob, modify_incar_bykv, add_inckv_bysubjob
-from libposcar import modify_POSCAR, pos2dirname, get_poscar
-from mod_vas    import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_link
+from libincar   import modify_incar_byjob, modify_incar_bykv, add_inckv_bysubjob
+from libposcar  import modify_POSCAR, pos2dirname, get_poscar
+from libvas     import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_linkw, jg_linkc
+from libkpoints import mod_kpoints
 from vas_qsub   import qsub_command
 
 def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_remove):
@@ -130,31 +131,38 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
     print(f"{potcar} was copied to {ndir}")
 
     ### 3: KPOINTS
-    if not job in jg_kpoints:
-        kpoints = f'{odir}/KPOINTS'
-    else:
+    old_kpoints = odir + '/KPOINTS'
+    
     #if vgroup == 1 or vgroup == 2:
-        if kopt:
-            ### if kpoints file
-            kfname = kopt
-            kfsuff = f'KPOINTS.{kopt}'
-            if os.path.isfile(kfname):
-                kpoints = kfname
-            ### if kpoints suffix
-            elif os.path.isfile(kfsuff):
-                kpoints = kfsuff
+    if kopt:
+        ### if kpoints file
+        kfname = kopt
+        kfsuff = f'KPOINTS.{kopt}'
+        if os.path.isfile(kfname):
+            kpoints = kfname
+        ### if kpoints suffix
+        elif os.path.isfile(kfsuff):
+            kpoints = kfsuff
     ### use -j job
     #elif vgroup == 3:
-        elif job == 'zpe' or job == 'wav':
-            kpoints = odir + '/KPOINTS'
-        elif os.path.isfile(f'KPOINTS.{job}'):
-            kpoints = 'KPOINTS.'+job
-        elif os.path.isfile('KPOINTS'):
-            kpoints = 'KPOINTS'
-        else:
-            kpoints = odir + "/KPOINTS"
-    os.system(f'cp {kpoints} {ndir}/KPOINTS')
-    print(f"{kpoints} was copied to {ndir}/KPOINTS")
+    elif job == 'zpe' or job == 'wav':
+        kpoints = odir + '/KPOINTS'
+    elif os.path.isfile(f'KPOINTS.{job}'):
+        kpoints = 'KPOINTS.'+job
+    elif os.path.isfile('KPOINTS'):
+        kpoints = 'KPOINTS'
+    else:
+        kpoints = old_kpoints
+    
+    print(f"{old_kpoints} is modified to KPOINTS.new")
+    if job in jg_kpoints:
+        new_kpoints = 'KPOINTS.new'
+        mod_kpoints(old_kpoints, outf=new_kpoints, kmulti=3)
+    else:
+        new_kpoints = kpoints
+    os.system(f'cp {new_kpoints} {ndir}/KPOINTS')
+
+    print(f"{new_kpoints} was copied to {ndir}/KPOINTS")
 
     ###### 4: INCAR
     ### 4.1 Use it, if defined
@@ -164,6 +172,8 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
         elif os.path.isdir(f"{incar}") and os.path.isfile(f"{incar}/INCAR"):
             incar = f"{incar}/INCAR"
     ### 4.2 try INCAR.job 
+    elif os.path.isfile(f"INCAR.{job}{subjob}"):
+        incar = f"INCAR.{job}{subjob}"
     elif os.path.isfile(f"INCAR.{job}"):
         incar = f"INCAR.{job}"
     ### 4.3 Use odir/INCAR for job = cont, ...
@@ -171,36 +181,51 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
     else:
         incar = f"{odir}/INCAR"
     ### if incar needs to be modified: kw for active, remove for comment out
-    if job in jg_incar:
-        modify_incar_byjob(incar, job, outf='INCAR.new')
-        incar = 'INCAR.new'
+    ### link job + subjob
     if subjob:
-        add_inckv_bysubjob(job, subjob, incopt)
+        fjob = job + subjob
+    else:
+        fjob = job
+    print(f"job {job} fullname-job {fjob}")
+    if not os.path.isfile(f"INCAR.{fjob}"):
+        if fjob in jg_incar:
+            print(f"modify {incar} byjob")
+            modify_incar_byjob(incar, fjob, outf='INCAR.new')
+            incar = 'INCAR.new'
+            print(f"modify {incar} by job {fjob}")
+        else:
+            add_inckv_bysubjob(job, subjob, incopt)
+    
+    ### additional change 
     if incopt:
         ### make modify the present INCAR file
         modify_incar_bykv(incar, incopt, outf='INCAR.new', mode='m')
         incar = 'INCAR.new'
+        print(f"modify {incar} by option {incopt}")
+
     os.system(f"cp {incar} {ndir}/INCAR")
     print(f"{incar} was copied to {ndir}/INCAR")
+    ### change into INCAR.newjob
+    #if incar == 'INCAR.new':
+    #    os.system(f"mv {incar} INCAR.{job}")
+    #    print(f"{incar} was renamed to INCAR.{job}")
 
     ### 5: Link: 5: Link: 5: Link: 5: Link: 5: Link: make link for CHGCAR, WAVECAR
-    if job in jg_link:
+    if fjob in jg_linkw or fjob in jg_linkc:
         os.chdir(ndir)
         ### select CHGCAR or WAVECAR
-        if job == 'cont' or job == 'pchg':
-            if os.path.isfile(f'../{odir}/WAVECAR'):
-                s = f"ln -s ../{odir}/WAVECAR ."
-                os.system(s)
-                print(f"WAVECAR is linked to {ndir}")
-            else:
-                print("can't link to WAVECAR")
-        else:    
-            if os.path.isfile(f'../{odir}/CHGCAR'):
-                s = f"ln -s ../{odir}/CHGCAR ."
-                os.system(s)
-                print(f"CHGCAR is linked to {ndir}")
-            else:
-                print("can't link to CHGCAR")
+        if fjob in jg_linkw and os.path.isfile(f'../{odir}/WAVECAR'):
+            s = f"ln -s ../{odir}/WAVECAR ."
+            os.system(s)
+            print(f"WAVECAR is linked to {ndir}")
+        else:
+            print("can't link to WAVECAR")
+        if fjob in jg_linkc and os.path.isfile(f'../{odir}/CHGCAR'):
+            s = f"cp ../{odir}/CHGCAR ."
+            os.system(s)
+            print(f"CHGCAR is linked to {ndir}")
+        else:
+            print("can't link to CHGCAR")
         os.chdir(pwd)
 
     ### 6: Job submit: qsub
@@ -208,10 +233,13 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
     return 0
 
 def main():
+    '''
+    input   spw[a2]     after scf write WAVECAR, CHGCAR(2), PROCAR(a-default)
+    '''
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job
-    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','pchg','chg','chgw','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
-    parser.add_argument('-sj', '--subjob', default='sp', choices=['sp', 'cool', 'heat','quench'], help='sp for fake and others for md')
+    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','pchg','chg','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
+    parser.add_argument('-sj', '--subjob', choices=['w','w2','sp', 'cool', 'heat','quench'], help='sp for fake and others for md')
         ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()
     gdirectory.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')
@@ -222,7 +250,7 @@ def main():
     goutput = parser.add_mutually_exclusive_group()
     goutput.add_argument('-n', '--newdirs', nargs='+', help='specify new dirname in case one job')
     goutput.add_argument('-s', '--suffix', help='specify suffix of new directory')
-    goutput.add_argument('-a', '--fixed_atom', help='atom symbol to be fixed')      # default='H'
+    goutput.add_argument('-fa', '--fixed_atom', help='atom symbol to be fixed')      # default='H'
     ### modify 4 files
     ### INCAR
     parser.add_argument('-i', '--incar', help='specify incar file or dir: m for modify')
@@ -241,6 +269,9 @@ def main():
     args = parser.parse_args()
 
     pwd = os.getcwd()
+
+    #print(f"after parse_args: fixed atoms {args.fixed_atom}") # error: -al conceived by -a l
+
     ### get old dirnames list
     if args.dirs:
         old_dirs = args.dirs
@@ -260,9 +291,12 @@ def main():
             if args.suffix:
                 ndir = odir+args.suffix
             elif args.fixed_atom:
+                print(f"fixed atoms {args.fixed_atom}")
                 ndir = odir+"fixed"+args.fixed_atom
             else:
                 ndir = odir+f'{args.job}'
+                if args.subjob:
+                    ndir += f'{args.subjob}'
             new_dirs.append(ndir)
             #i += 1
         

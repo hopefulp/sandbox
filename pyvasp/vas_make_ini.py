@@ -13,7 +13,7 @@ import re
 import string
 from common     import *
 from vas_qsub   import get_queue_pt, qsub_command
-from mod_vas    import *
+from libvas    import *
 from libposcar import get_poscar, get_dnames4pos 
 from libincar  import modify_incar_bykv, add_inckv_bysubjob
 
@@ -60,8 +60,9 @@ def get_incar(ifile):
 ################# 1       2        3       4         5        6     7           8         9        10      11    12 13 14   15   16  
 def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt, dirnames, option, allprepared, iofile, qx,qN,qn,vasp_exe,lkisti,Lrun):
     '''
-    job/subjob  sp
+    job/subjob  sp/
                     kp,
+                    mag     read INCAR.spmag
                 md
                     nve, NVT: heat, cool 
     poscars     list of poscar
@@ -196,17 +197,24 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
             print("Use wdir KPOINTS")
 
         ### 3. get INCAR :: use make_incar.py
+        if job:
+            jobname = job
+            if subjob:
+                jobname += subjob
+
         incar_repo=f"{ini_dvasp}/INCAR.{job}"
         ### 3.1 Use inserted INCAR by -i option
-        
         if incar and os.path.exists(incar):
             if os.path.isfile(incar):
                 f_incar = incar
             elif os.path.isdir(incar):
                 f_incar = incar + '/INCAR'
-        ### 3.2 if job exists, use INCAR.job
-        elif job and os.path.isfile(f"INCAR.{job}"):
+        ### 3.2 if job exists, use INCAR.job or INCAR.job{subjob}
+        elif os.path.isfile(f"INCAR.{jobname}"):
+            f_incar = f"INCAR.{jobname}"
+        elif os.path.isfile(f"INCAR.{job}"):
             f_incar = f"INCAR.{job}"
+            
         ### 3.3 if INCAR is prepared in wdir
         elif allprepared and os.path.isfile("INCAR"):
             print(f"INCAR in cwd will be used")
@@ -293,8 +301,8 @@ def main():
             job = kp: 
     '''
     parser = argparse.ArgumentParser(description='prepare vasp input files: -s for POSCAR -p POTCAR -k KPOINTS and -i INCAR')
-    parser.add_argument('-j', '--job', choices=['pchg','chg','md','nnff','mdnve','nnffnve', 'ini','zpe','mol','wav','opt','copt','sp','noD','fake','kp','neb','pseudo'], help='inquire for each file')
-    parser.add_argument('-sj', '--subjob', choices=['sp', 'cool', 'heat','quench', 'kp'], help='sp for fake and others for md')
+    parser.add_argument('-j', '--job', default='opt', choices=['pchg','chg','md','nnff','mdnve','nnffnve', 'ini','zpe','mol','wav','opt','copt','sp','noD','fake','kp','neb','pseudo'], help='inquire for each file')
+    parser.add_argument('-sj', '--subjob', choices=['sp','mag','cool', 'heat','quench', 'kp'], help='sp for fake and others for md')
     parser.add_argument('-n', '--ndirs', default=5, type=int, help="number or dirs to make")
     ### POSCARs
     gposcar = parser.add_mutually_exclusive_group()

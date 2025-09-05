@@ -175,7 +175,7 @@ def get_iatoms_in_group(zmin, zmax, coord, loc):
     return ind
 
 
-def obtain_atomlist0(zminmax, poscar, atom_species, loc):
+def obtain_atomilist0_z(zminmax, poscar, atom_species, loc):
     '''
     obtain_atomlist0: '0' denotes starting atom index
     input
@@ -207,7 +207,32 @@ def obtain_atomlist0(zminmax, poscar, atom_species, loc):
     print(f"{whereami():>15}(): indices {ind0_select} total {len(ind0_select)}")
     return ind0_select
 
-     
+def obtain_atomilist0_kind(poscar, atom_species):
+    '''
+    input   atom_species
+    output  index list starting from 0
+            return 1d, 2d
+    dim     make 1d list or 2d list depending on atom species
+
+    '''
+    _, atoms  = parse_poscar(poscar, 'atoms')
+    _, natoms_str = parse_poscar(poscar, 'natoms')
+    natoms = list(map(int, natoms_str))
+
+    idx1d = []
+    idx2d = []
+    for atom in atom_species:
+        iacc = 0
+        for aname, natom in zip(atoms, natoms):
+            if atom == aname:
+                ### start from iacc
+                li = list(range(iacc, iacc+natom))
+                idx1d.extend(li)
+                idx2d.append(li)
+            iacc += natom
+    return idx1d, idx2d
+
+    
 
 def get_atoms_poscar(line):
     if atom in lines[0]:

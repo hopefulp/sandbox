@@ -11,7 +11,7 @@ import shutil
 import re
 from common     import *
 from vas_qsub   import get_queue_pt, qsub_command
-from mod_vas    import *
+from libvas    import *
 from mod_poscar import get_poscar, pos2dirname
 
 home = os.environ['HOME']

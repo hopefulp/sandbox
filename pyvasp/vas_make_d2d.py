@@ -11,7 +11,7 @@ import re
 from common import *
 from libposcar import get_poscar
 from vas_qsub import qsub_command
-from mod_vas  import *
+from libvas  import *
 from incar_change import change_incar_byjob
 
 ### vasp input order

@@ -10,7 +10,7 @@ import sys
 import numpy as np
 from common         import dir_files
 from libposcar     import parse_poscar, obtain_atomlist0
-from mod_kpoints    import read_kpoints
+from libkpoints    import read_kpoints
 '''
 def get_iatoms_in_group(zmin, zmax, coord, job):
     ind=[]

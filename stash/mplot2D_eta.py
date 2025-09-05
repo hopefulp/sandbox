@@ -450,12 +450,25 @@ def auto_nvector(x,y):
     plt.show()
     return 0
 ### most1
-def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=None,Lsave=False, colors=None, vertical=None, v_legend=None):
+def mplot_nvector(x, y, plot_dict=None, xlabel=None, ylabel=None, xlim=None, title=None, legend=None,Lsave=False, colors=None, vertical=None, v_legend=None):
+
+#def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=None):
     '''
+    dx=1.0, input before
     call with x=[] and y=[ [...
     x:: [] or [size]
     y:: [size] or [[size],[size],...[size]]
+    plot_dict   keys    xlabel, ylabel, xlim, title, colors
     '''
+    ### get components of plot_dict
+    if plot_dict:
+        title   = plot_dict.get("title",    "")
+        xlabel  = plot_dict.get("xlabel",   "")
+        ylabel  = plot_dict.get("ylabel",   "")
+        xlim    = plot_dict.get("xlim",     "")
+        ylim    = plot_dict.get('ylim',     "")
+        legend  = plot_dict.get("legend",   "")
+        colors  = plot_dict.get("colors",   "")
     if not colors:
         if not legend:
             legend="add legend"
@@ -501,8 +514,11 @@ def mplot_nvector(x, y, dx=1.0, title=None, xlabel=None, ylabel=None, legend=Non
     #    print(f"Error:: obscure in y-dim {ys.ndim}")
     ### ADD LEGEND
     plt.legend(loc=1)                # locate after plot
-    #plt.xlim([-20.0, 15.0])
-    #ax.set_xlim([-25, 15])
+    if xlim:
+        print(f"xlim in mplot2D.mplot_nvector {xlim}")
+        plt.xlim(xlim)
+        #ax.set_xlim(xlim)
+    plt.ylim(bottom=0)
     ax.xaxis.set_major_locator(ticker.AutoLocator())
     ax.yaxis.set_major_locator(ticker.AutoLocator())
     plt.show()

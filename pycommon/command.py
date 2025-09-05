@@ -153,7 +153,7 @@ kisti.pbs       =   f"\tqst.py : runs 'qstat -f' to see long jobnames\
                     \n{pbs.queue}\
                     "
 
-def show_command(work, subwork, job_submit, qname, vjob, inf, keyvalues, nodename, nnode, nproc, nodelist, sftype, dtype, partition,poscar, nhl,idata,ndata):
+def show_command(work, subwork, job_submit, qname, vjob, vsjob, inf, keyvalues, nodename, nnode, nproc, nodelist, sftype, dtype, partition,poscar, nhl,idata,ndata):
     
     if keyvalues:
         kw1 = keyvalues[0]
@@ -162,6 +162,7 @@ def show_command(work, subwork, job_submit, qname, vjob, inf, keyvalues, nodenam
     kisti.vas = f"\t(VASP) :: (std, skylake, pbs_vasp.sh --> pbs_vasp_kisti_skl.sh)\
                 \n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -al : all prepared except POSCAR\
                 \n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -j {vjob}\
+                \n\t\t$ kpy vas_make_ini.py -s POSCAR.{qname} -j {vjob} -al\
                 \n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp.sh "
     kisti.vas += f"\n\t    :: RERUN Opt for failed opt"
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
@@ -183,7 +184,8 @@ def show_command(work, subwork, job_submit, qname, vjob, inf, keyvalues, nodenam
     kisti.vas += f"\n\t\t$ qsub -N {qname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
     kisti.vas += f"\n\t\t    pbs_vasp_kisti_skl2 for half use of cpu for memory issue"
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.{qname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 -e g : more info_vasp.py"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.{qname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 : more info_vasp.py"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s POSCAR.{qname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 -e g :gamma"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j {vjob} -r on -s POSCAR.{qname} -d dnameid : o-overwrite n-not submit job"
     kisti.vas += f"\n\t    :: (OORINano)"
     kisti.vas += f"\n\t\t$ qsub -N {qname} -v cat='orr' pbs_vasp_kisti_skl.sh"
@@ -199,22 +201,29 @@ def show_command(work, subwork, job_submit, qname, vjob, inf, keyvalues, nodenam
     slurm.vas = f"==== Job submission\
             \n\t:: INI\
             \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
-            \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc} -al : all prepared except POSCAR "
-    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
-    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
-    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
-    slurm.vas += f"\n\t:: kpoints sampling"
-    slurm.vas += f"\n\t$ vas_make_ini.py -j kp -s POSCAR -kd 2 -kps 2 1 4 1 6 1 8 1 -x {partition} -N {nnode}"
-    slurm.vas +=  "\n\t:: For memory issue"
-    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -c {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
-    slurm.vas += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} --ntasks-per-node {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
-    slurm.vas += "\n\toptions::"
-    slurm.vas += "\n\t    -J for jobname and dirname"
-    slurm.vas += "\n\t    -p for partition: X1-8, X2-12, X3-20 process"
-    slurm.vas += "\n\t    -N number of nodes "
-    slurm.vas += f"\n\t    -n number of total processes: {nproc} <= {nnode} * {nXn[partition]}, which proceed -c"
-    slurm.vas += f"\n\t    -c (--cpus-per-task: ncpu/2 per node for memory {ncpu}"
-    slurm.vas += f"\n\t    --ntasks-per-node {nXn[partition]/2} in case doesnot know ncpu/node"
+            \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc} -al : all prepared except POSCAR\
+            \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -sj {vsjob} -x {partition} -N {nnode} -np {nproc} -al : in case subjob\
+            \n\t    : if qsub fails but dir exists\
+            \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
+            \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
+            \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh\
+            \n\t    : to run vasp.5\
+            \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=v=5 /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
+            \n\t    : kpoints sampling\
+            \n\t\t$ vas_make_ini.py -j kp -s POSCAR -kd 2 -kps 2 1 4 1 6 1 8 1 -x {partition} -N {nnode}\
+            \n\t    : For memory issue\
+            \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} -c {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
+            \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} --ntasks-per-node {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
+            \n\t:: continuous job\
+            \n\t    $ vas_make_cont.py -d {dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
+            \n\t::options\
+            \n\t    -J for jobname and dirname\
+            \n\t    -p for partition: X1-8, X2-12, X3-20 process\
+            \n\t    -N number of nodes\
+            \n\t    -n number of total processes: {nproc} <= {nnode} * {nXn[partition]}, which proceed -c\
+            \n\t    -c (--cpus-per-task: ncpu/2 per node for memory {ncpu}\
+            \n\t    --ntasks-per-node {nXn[partition]/2} in case doesnot know ncpu/node\
+            "
     slurm.siesta = " === Job submission"
     slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_siesta.sh"
     #slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
@@ -444,6 +453,7 @@ def main():
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '-q', '--qname', default='test', help="queue name for qsub shown by qstat")
     parser.add_argument('-vj','--vas_job', default='sp', help="vasp job input for vas_make_ini.py")
+    parser.add_argument('-sj','--vas_subjob', default='mag', help="vasp subjob input for vas_make_ini.py to make INCAR.spmag")
     parser.add_argument('-kv', '--keyvalues', nargs='*', help='change a keyword in print')
     parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
     ### flowing slurm option
@@ -477,7 +487,7 @@ def main():
     else:
         qname=args.qname
 
-    show_command(args.work,args.subwork,args.job_submit,qname,args.vas_job,infile,args.keyvalues,args.nodename,args.nnode,args.nproc,args.nodelist, args.func_type,args.data_type,args.xpartition,args.poscar, args.hidden_layers, args.idata, args.ndata)
+    show_command(args.work,args.subwork,args.job_submit,qname,args.vas_job,args.vas_subjob,infile,args.keyvalues,args.nodename,args.nnode,args.nproc,args.nodelist, args.func_type,args.data_type,args.xpartition,args.poscar, args.hidden_layers, args.idata, args.ndata)
 
 if __name__ == "__main__":
     main()

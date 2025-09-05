@@ -1,6 +1,6 @@
 #!/home/joonho/anaconda3/bin/python
 import argparse
-import mod_vas
+import libvas
 
 def main():
     '''
