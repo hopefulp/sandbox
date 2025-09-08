@@ -9,7 +9,7 @@ import re
 import sys
 from common         import *
 #from nnff.amp_ini   import ampdb
-from mod_vas        import vasf_ini, vasf_out
+from libvas        import vasf_ini, vasf_out
 
 q_list=[]
 def dir_clean(   pwd,      selection, works, subwork,  linux_job, Linc_dir, exclude,excl_fnames,new_dir,Lshowmatch,Lall_rm, Lyes, Loutf):

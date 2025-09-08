@@ -1,6 +1,6 @@
 #!/home/joonho/anaconda3/bin/python
 
-from libvasimport get_hostname
+from libvas import get_hostname
 from server_env import nXn
 import sys
 import re

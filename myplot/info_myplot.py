@@ -40,7 +40,7 @@ mplplot.mplot_pdnf =    "plot multiple files using pandas for ordering\
                         \n\t    will be deprecated to use mplot_pdnf.py\
                         \n\tUsage:: mplot_pd2f.py 1-2filenames options\
                         "
-mplplot.myplot2D    =   "several kinds of 2d plot method\
+mplplot.mplot2D    =   "several kinds of 2d plot method\
                         \n\tdef mplot_twinx:\
                         \n\tdef mplot_nvector:\
                         \n\t    called by:\

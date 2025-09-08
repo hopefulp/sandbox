@@ -4,7 +4,7 @@ import argparse
 import re
 import sys
 import numpy as np
-from myplot2D import mplot_nvector, mplot_twinx
+from mplot2D import mplot_nvector, mplot_twinx
 from plot_job import get_jobtitle, Ni_6x
 from my_chem import *
 from common import *

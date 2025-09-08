@@ -216,6 +216,8 @@ def show_command(work, subwork, job_submit, qname, vjob, vsjob, inf, keyvalues, 
             \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} --ntasks-per-node {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
             \n\t:: continuous job\
             \n\t    $ vas_make_cont.py -d {dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
+            \n\t    $ vas_make_cont.py -d {dirname} -j {vjob} -sj {vsjob} -x {partition} -N {nnode} -np {nproc}\
+            \n\t\tsbatch -J {dirname}{vjob} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
             \n\t::options\
             \n\t    -J for jobname and dirname\
             \n\t    -p for partition: X1-8, X2-12, X3-20 process\

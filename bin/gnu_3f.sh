@@ -18,7 +18,7 @@ TITLE=$dirname
 #eps
 term=png
 extens=png
-RANGE='[-15:] [:20]'
+RANGE='[-3:3] [:]'
 STYLE1=" u (\$1):(\$2)  w l lt 3 lw 0.5 "
 STYLE2=" u (\$1):(\$2)  w l lt 1 lw 0.5 "
 STYLE3=" u (\$1):(\$2)  w l lt -1 lw 0.5 "

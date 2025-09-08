@@ -5,7 +5,7 @@ import argparse
 import re
 import sys
 import numpy as np
-from myplot2D import mplot_nvector, mplot_twinx
+from mplot2D import mplot_nvector, mplot_twinx
 from plot_job import get_jobtitle
 from plot_job import Ni_4x as Nix
 from my_chem import *
@@ -171,10 +171,21 @@ def get_title(name):
     if x is included in file, modify
     if 1st line is label, modify
 """    
-def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscale,colors,Ltwinx,icy_right,ylabel_r):
+def draw_file(flist,icx,x_ext,icy,job,plot_dict,Lsave,yscale,twin_dict):
     '''
     flist   file list
     icy     list
+    
+    if plot_dict.get("xlabel"): title = plot_dict['xlabel']
+    if args.ylabel: plot_dict['ylabel'] = args.ylabel
+    if args.xlim:   plot_dict['xlim']   = args.xlim
+    if args.title:  plot_dict['title']  = args.title
+    if args.colors: plot_dict['colors'] = args.colors
+    if args.legends:plot_dict['legend'] = args.legends
+    twin_dict['Ltx'] = args.twinx
+    if args.icfy2:  twin_dict['ic_y2']  = args.icfy2
+    if args.ylabel2:twin_dict['ylabel2']= args.ylabel2  
+
     '''
     if not x_ext:
         x=[]
@@ -182,28 +193,29 @@ def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
         x = x_ext
     nysize = len(x)
     ### modify get title
-    if not title:
-        title = get_title(flist[0])
+    if not plot_dict.get("title"):
+        plot_dict['title'] = get_title(flist[0])
+        
     #    tag_title=1
     #else:
     #    job_title=get_jobtitle(job,title, xlabel, ylabel)
     #    tag_title=0
-    ### if 1 file, prepare line_label=[]
-    if len(flist) == 1:
-        if not line_label:
-            line_label=[]
-    ### if n files, label will be filename
-    else:
-        if line_label:
-            if len(flist) != len(line_label):
+    ### if 1 file, prepare legend=[]
+    ### try nfile
+
+    ### obtain legend
+    if not plot_dict.get("legend"):
+        legend=[]                   # each column may have legend and obtained later
+        if len(flist) != 1:
+            if len(flist) != len(legend):
                 print("Input y-label accurately")
                 sys.exit(1)
-        else:
-            line_label=[]
             for f in flist:
-                pre, _ = fname_decom(f)
-                line_label.append(pre)
+                dirname, pre, _ = dirfname_decom(f)
+                legend.append(dirname)
+            plot_dict['legend'] = legend
     ### in function: draw_f
+    x_2d=[]
     y_2d=[]
     ### scan file list
     for f1 in flist:
@@ -214,73 +226,85 @@ def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
             i = 0
             ### if 1 file, get line-labels here
             for line in lines:
-                if i==0:
+                items = line.strip().split()
+                if len(flist) == 1 and i == 0:
                     ### if there is character, read labels
                     if parsing.is_there_char(line.strip()):
-                        items = line.strip().split()
                         ncol = len(items)
-                        #if not icx:
-                        #    icx=0
+                        if not icx:
+                            icx=0
                         print(f"use icx {icx}")
                         x_title = items.pop(icx)
-                        if not xlabel:
+                        if not plot_dict.get("xlabel"):
                             xlabel = x_title
-                        if not line_label:
+                        if not legend:
                             for item in items:
-                                line_label.append(item)
+                                legend.append(item)
                         if not icy:
                             icy=[n for n in range(1,ncol)]
                             print(f"use icy {icy}")
-                        ### reduce icy2 1
-                        icy2 = [ y2-1 for y2 in icy_right if icx < y2 ]
-                        print(f"{icy_right}")
+                        ### in case twinx
+                        if twin_dict['Ltx']:
+                            ### reduce icy2 1
+                            if twin_dict.get('ic_y2'):
+                                icy2 = [ y2-1 for y2 in twin_dict.get('ic_y2') if icx < y2 ]
+                            print(f"{twin_dict.get('ic_y2')}")
                         i += 1
                         continue
-                ### read data line from file                        
-                items = line.strip().split()
-                if items:
-                    #if not x and 'icx' in locals():
-                    if 'icx' in locals():
-                        x.append(float(items[icx]))
-                        #print("add x:", x)
-                        #x_value.append(float(items[icx-1]))
-                    #y_line = []     # convert string to float for a list
-                    ### if one file, get ys
-                    if len(flist) == 1:
-                        for y in icy:
-                            #y_line.append(float(items[y-1]))    # make 1D array
-                            #print(f"{y} {items[y-1]}")
-                            y_val.append(float(items[y]))    # make 1D array
-                            #y.append(y_line)                # make 2D array
+                    ### if 1st line is data, not legend
                     else:
-                        y_val.append(float(items[0]))
+                        x_val.append(items[icx])
+                        y_val.append(items[icy[0]])                # for nfile, use 2nd column
+                ### read data line from 2nd line  
+                ### for several files --> no column title                      
+                else:
+                    if items:
+                        if 'icx' in locals():
+                            x_val.append(float(items[icx])) # what is difference between x and x_val
+                        ### if one file, get ys
+                        if len(flist) == 1:
+                            for y in icy:
+                                #y_line.append(float(items[y-1]))    # make 1D array
+                                #print(f"{y} {items[y-1]}")
+                                y_val.append(float(items[y]))    # make 1D array
+                                #y.append(y_line)                # make 2D array
+                        else:
+                            y_val.append(float(items[1]))       # for nfile, use 2nd column
                 i+=1
+                
             ### y_2d: 1 y_val, nfiles
             ###       n y_val, 1 files
-            y_2d.append(y_val)                    
+            y_2d.append(y_val)
+            x_2d.append(x_val)                              # x cols could be different    
             #y_nfile.append(y_val)                    
     ### y.ndim can be 1 or 2
+    ### x_2d 
+    '''
     if not x:
         if x_val:
             x = x_val
         #else:
         #    x=Nix
+    '''
     ### function: draw_f()
+    ### try nfile
     if len(flist) == 1:
         ### if 1 y_val
         #y = y_val
         ### if n y_val
-        print(f"size of y: {len(line_label)}")
+        print(f"size of y: {len(legend)}")
         ndata = len(y_2d[0])
         nrow  = ndata/ncol      # ?
-        new_array=np.array(y_2d[0]).reshape(-1,len(line_label))
+        new_array=np.array(y_2d[0]).reshape(-1,len(legend))
         print(f"shape of y-data {new_array.shape}")
         y = [*zip(*new_array)]
         print(f"shape of y-data {np.array(y).shape}")
     ### in case several files: icy2(y-right axis) == file index of icy_right
     else:
+        x = x_2d
         y = y_2d
-        icy2 = icy_right
+        if twin_dict['Ltx']:
+            icy2 = twin_dict.get('ic_y2')
     ### scaling with 0-th axis: y shape was ready for [y1, y2, ...,yn]
     ### scaling canbe *|+ for view in plot
     ### BE & SCF_TOTAL ['-1', '-j2cal'], NBO & BE ['-1'], 4f for EDA ['-j2cal'], NBO & CT ['-1','-j2c']
@@ -290,26 +314,26 @@ def draw_file(flist,icx,x_ext,icy,job,title,xlabel,ylabel,line_label,Lsave,yscal
     #yscale = [4158.65, 4158.65, 0]
     #y=np.array(y)+np.array(yscale)[:,None]
     #yscale=[0.01,0.01,1.0]
-    print(f"{np.array(y).shape} {np.array(yscale).shape} yscale={yscale}")
+    print(f"x: {np.array(x).shape}")
+    print(f"y: {np.array(y).shape} {np.array(yscale).shape} yscale={yscale}")
     if len(yscale) == 1:
         y=np.array(y)*yscale[0]
     else:
         y=np.array(y)*np.array(yscale)[:,None]
         
-    print(f"x before call mplot: {x} ")
-    if Ltwinx:
+    if twin_dict['Ltx']:
         print("before draw mplot_twinx")
-        print(f"title = {title} xlabel = {xlabel}")
-        yl2=[]
-        yl2.append(ylabel)
-        yl2.append(ylabel_r)
+        print(f"title = {plot_dict['title']} xlabel = {plot_dict['xlabel']}")
+        #yl2=[]
+
+        #yl2.append(ylabel)
+        #yl2.append(ylabel_r)
         #print(f"x {np.array(x).shape}, y {np.array(y).shape}, y2 {np.array(icy2).shape}")
-        mplot_twinx(x, y, icy2, title=title, xlabel=xlabel, ylabel=yl2, legend=line_label, Lsave=Lsave, Colors=colors)
+        mplot_twinx(x, y, plot_dict, twin_dict, Lsave=Lsave)
     else:
-        print(f"x={x}")
         print("before draw mplot_nvector")
-        print(f"title = {title} xlabel = {xlabel}")
-        mplot_nvector(x, y, title=title, xlabel=xlabel, ylabel=ylabel, Lsave=Lsave, legend=line_label,Colors=colors)
+        print(f"title = {plot_dict.get('title')} xlabel = {plot_dict.get('xlabel')}")
+        mplot_nvector(x, y, plot_dict, Lsave=Lsave)
     return 0
 
 def draw_v(y_val, job, title, xtitle, ytitle, Lsave,yscale):
@@ -333,10 +357,8 @@ def main():
     inp.add_argument('-v', '--values', nargs='*', help=' input y-values as y')
     inp.add_argument('-f', '--files', nargs='+',help='add all the files')
     #parser.add_argument('-xv', '--xvalues', nargs='*', help='X values')
-
     #g_value=parser.add_argument_group('Values', description="get argument as y-values")
     #g_value.add_argument('-yv', nargs='+', type=float, help='list y-values')
-    
     xvalues=parser.add_mutually_exclusive_group()
     xvalues.add_argument('-icx', '--icolumn_x', type=int, default=0, help='column index of X')
     xvalues.add_argument('-x', '--x_ext', help='x-coord is supplied externally')
@@ -349,20 +371,47 @@ def main():
     g_twin.add_argument('-tx', '--twinx', action="store_true", help='using two y-axes with twin x ticks')
     #g_twin.add_argument('-icy2', '--second_iy', default=[2], nargs="+", type=int, help='designate the index of y for 2nd y-axis')
     g_twin.add_argument('-icfy2', '--second_iy', default=[1], nargs='+', type=int, help='designate the index of y[columns or files] for 2nd y-axis')
-    g_twin.add_argument('-yl2', '--second_yl', default='E(ev)', help='input left y-axis title')
+    g_twin.add_argument('-yl2', '--ylabel2', default='E(ev)', help='input left y-axis title')
     parser.add_argument('-j', '--job', help='job of qcmo|ai|gromacs')
-    parser.add_argument('-t', '--title', help='title of figure would be filename')
-    parser.add_argument('-xl', '--xlabel', help='X title, label in mpl')
-    parser.add_argument('-yl', '--ylabel', help='Y title, label in mpl')
-    parser.add_argument('-yls', '--ylabels', nargs='*', help='Y labels for legend')
-    parser.add_argument('-c', '--colors', nargs='*', help='Y label for legend')
-    parser.add_argument('-s', '--save', action='store_true', help='Save figure')
+    plot = parser.add_argument_group(title='PLOT')
+    plot.add_argument('-t', '--title', help='title of figure would be filename')
+    plot.add_argument('-xl', '--xlabel', help='X title, label in mpl')
+    plot.add_argument('-yl', '--ylabel', help='Y title, label in mpl')
+    plot.add_argument('-xi', '--xlim', nargs=2, type=float, help='xrange xmin, xmax')
+    plot.add_argument('-yi', '--ylim', nargs=2, type=float, help='yrange ymin, ymax')
+    plot.add_argument('-lg', '--legend', nargs='*', help='Y labels for legend')
+    plot.add_argument('-c', '--colors', nargs='*', help='Y label for legend')
+    plot.add_argument('-s', '--save', action='store_true', help='Save figure')
+    parser.add_argument('-u', '--usage', action='store_true', help='prints usage and exit')
     args = parser.parse_args()
+
+    if args.usage:
+        print(f"Plot from several files with different x-values\
+              \n\tmplot_f.py -f Tea2SnI4spdos/TDOSF0.dat Tea2SnI4VInmspdos/TDOSF0.dat TEA2SnI4pEtOaspdos/TDOSF0.dat\
+ -t TDOS -xl 'E - E$_F$ [eV]' -lg pristine V$_I$ EtO -xi -3.0 3.0 -yi 0.0 150 -c r y m\
+              \n\t\
+              ")
+        sys.exit(0)
 
     ### use input values as y[]
     print(f"yscales {args.y_scale}")
+
+    plot_dict={}
+    if args.xlabel: plot_dict['xlabel'] = args.xlabel
+    if args.ylabel: plot_dict['ylabel'] = args.ylabel
+    if args.xlim:   plot_dict['xlim']   = args.xlim
+    if args.ylim:   plot_dict['ylim']   = args.ylim
+    if args.title:  plot_dict['title']  = args.title
+    if args.colors: plot_dict['colors'] = args.colors
+    if args.legend: plot_dict['legend'] = args.legend
+
+    twin_dict={}
+    twin_dict['Ltx'] = args.twinx
+    if args.second_iy:  twin_dict['ic_y2']  = args.second_iy
+    if args.ylabel2:    twin_dict['ylabel2']= args.ylabel2  
+
     if args.values:
-        draw_v(args.values,args.job,args.title,args.xlabel,args.ylabel,args.save,args.y_scale)
+        draw_v(args.values,args.job,plot_dict, args.save,args.y_scale)
     ### use input files
     elif args.files:
         print(f"read files {args.files}")
@@ -376,7 +425,7 @@ def main():
         ### n columns in 1 file, twinx: 1 column for nfiles, working ?
         print(args.second_iy)
         print(f"x before draw_file: {x}")
-        draw_file(args.files, args.icolumn_x, x,args.icolumn_y,args.job,args.title,args.xlabel,args.ylabel,args.ylabels,args.save,args.y_scale, args.colors, args.twinx, args.second_iy, args.second_yl)
+        draw_file(args.files, args.icolumn_x, x, args.icolumn_y,args.job,plot_dict,args.save,args.y_scale, twin_dict)
             #draw_1file(args.files[0],args.icolumn_x,args.icolumn_y,args.title,args.xlabel,args.ylabel,args.save)
     else:
         print("Error:: Turn on -v for values or -f files")

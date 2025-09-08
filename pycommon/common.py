@@ -375,6 +375,17 @@ def fname_decom(fname):
     fn = '_'.join(fname_parts)
     return fn, suff        
 
+def dirfname_decom(dirfname):
+    dfname = dirfname.split('/')
+    if len(dfname) != 2:
+        print("Error: %s has not dot in file name" % fname)
+        exit(1)
+    dirname = dfname[0]
+    fname_parts = fname_decom(dfname[1])
+    suff = fname_parts.pop()
+    fn = '_'.join(fname_parts)
+    return dirname, fname_parts[0], suff, fn       
+
 fname_parsing = fname_decom
 
 def find_file(dname, f_root):
