@@ -77,15 +77,21 @@ def main():
         description="Generate bond dissociation geometries for diatomic molecule."
     )
     parser.add_argument("-a","--atoms", nargs=2, default=["H", "H"], help="Two atoms for dissociation)")
-    parser.add_argument("-rmme","--rminmaxeq", nargs='*', type=float, default=[0.5, 10, 0.74], help="Minimum bond length in Å (default=0.5)")
+    parser.add_argument("-rmme","--rminmaxeq", nargs='*', type=float, default=[0.5, 10, 0.74], help="minimum maximum equilibrium distance in Å (default=0.5)")
     parser.add_argument("-np", "--npoints", type=int, default=10,  help="Number of geometries (default=10) between r_eq ~ r_max")
     parser.add_argument("-npl", "--npoints_left", type=int, default=3,  help="Number of geometries between r_min ~ r_eq")
-    #parser.add_argument("--points", type=int, default=10,  help="Number of geometries (default=10)")
-
     parser.add_argument("-o","--outdir", default="geometries", help="Output directory (default=geometries)")
-    parser.add_argument("-p", "--prefix", default="mol", help="File prefix for outputs (default=mol)")
+    parser.add_argument("-p", "--prefix", default="H2p", help="File prefix for outputs (default=mol)")
+    parser.add_argument('-u', '--usage',   action='store_true', help='print usage')
 
     args = parser.parse_args()
+
+    if args.usage:
+        print('Make two atom dissociation\
+              \n\tbuild_struct.py -a H H -rmme 0.5 10 0.74 -np 15 -p H2 for neutral\
+              \n\tbuild_struct.py -a H H -rmme 0.7 10 1.06 -np 15 -p H2p for H2 cation\
+              ')
+        sys.exit(0)
 
     os.makedirs(args.outdir, exist_ok=True)
 
@@ -113,7 +119,7 @@ def main():
 
     for i, r in enumerate(distances, 1):
         atoms = generate_diatomic(atom1, atom2, r)
-        fname = os.path.join(args.outdir, f"{args.prefix}_{i:03d}.fdf")
+        fname = os.path.join(args.outdir, f"{args.prefix}_{r:05.2f}.fdf")
         write_fdf(fname, atoms)
         print(f"Written: {fname} at r = {r:.3f} Å")
 

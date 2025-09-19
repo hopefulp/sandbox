@@ -6,7 +6,7 @@ import inspect
 import numpy as np
 import weakref
 import glob
-from mystr import get_char_series_by_two
+#from libstr import get_char_series_by_two
 #from varname import nameof
 
 """
@@ -26,10 +26,10 @@ from mystr import get_char_series_by_two
 """
 
 class MyClass_obj(dict):
-    instances = []      # gathers object weak reference
+    instances = []                                              # class variable gathers object weak reference
     def __init__(self, name=None):
-        self.__class__.instances.append(weakref.proxy(self))    # obj.__class__ : class MyClass
-        self.name = name                                        # obj.__class__.instances : instances is class variable
+        self.__class__.instances.append(weakref.proxy(self))    # obj.__class__ : class MyClass, instance[] includes "self_object"
+        self.name = name                                        # obj.name receives argument in a=MyClass(name)
 
 class MyClass(MyClass_obj):
     pass
@@ -89,11 +89,16 @@ def dir_classify_n(lsorted, class_instance, class_dict,Lwrite=1):
     #print(classobj_dict_key)
     luse=[]
     ukeys=[]        # used keys
-    lsuff=['py','sh','csh','pl']
+    lsuff=['py','sh','csh','pl','']                 # '' include binary file without extension
     for f in class_dict.__dict__.keys():             # as for keys == py_fname(.py)
         Ltag = False
+
         for suf in lsuff:
-            fsuf = f + '.' + suf
+            if suf:
+                fsuf = f + '.' + suf
+            ### include binary file without extenstion
+            else:
+                fsuf = f
             if fsuf in lsorted:                      # scan for keys
                 luse.append(fsuf)
                 lsorted.remove(fsuf)                 # remove key.py
@@ -102,6 +107,8 @@ def dir_classify_n(lsorted, class_instance, class_dict,Lwrite=1):
                 continue
         if Ltag ==  True:
             continue
+
+    
 
         #print(f" in dir_classify():   {f}")      # to print all the not-selected files
     ### classify modules used
@@ -136,7 +143,14 @@ def dir_classify(lsorted, classobj_dict_key,classobj_dict,Lwrite=1):
             for f in luse:
                 print(f"    {f}     ")
     return ukeys
-
+def get_char_series_by_two(chars):
+    '''
+    chars should have two character
+    '''
+    ch1 = chars[0]
+    ch2 = chars[-1]
+    lchar = [chr(ch) for ch in range(ord(ch1), ord(ch2)+1)]
+    return lchar
 def classify_dirs(lsorted, classobj_dict_key,classobj_dict):
     """ classify directories """
     c_obj = classobj_dict[classobj_dict_key]

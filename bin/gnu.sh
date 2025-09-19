@@ -10,19 +10,19 @@ echo "Input file is $infile"
 
 dirname=`basename $PWD`
 TITLE=$dirname
-
-
 #term='postscript' 
 #eps
 #extens='png'
+RANGE='[][:-15]'
 #STYLE1=" u ((\$1-$asymp)*$hkj)  w lp lt 1 lw 3 "
-STYLE1=" u (\$1):(\$2)  w lp lt 1 lw 3 "
-STYLE2=" u 1 w lp lt 29 lw 3 "
+STYLE1=" u (\$1):(\$2)  w lp lt 1 lw 3"
+STYLE2=" u (\$1):(\$3)  w lp lt 29 lw 3"
+#STYLE2=" u 1 w lp lt 29 lw 3"
 gnuplot -persist << EOF
-set xlabel 'a(A)'
+set xlabel 'r(A)'
 set ylabel 'E(eV)'
 set title "$TITLE"
-plot $RANGE "$infile"  $STYLE1
+plot $RANGE "$infile"  $STYLE1, "$infile"  $STYLE2
 EOF
 #set term $term
 #set out "$1.$extens"

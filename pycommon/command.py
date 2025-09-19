@@ -227,8 +227,18 @@ def show_command(work, subwork, job_submit, qname, vjob, vsjob, inf, keyvalues, 
             \n\t    --ntasks-per-node {nXn[partition]/2} in case doesnot know ncpu/node\
             "
     slurm.siesta = " === Job submission"
-    slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_siesta.sh"
+    slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_siesta.sh\
+            \n\t:: Alpha Project\
+            \n\t    1. Generate geometry: build_struct.py\
+            \n\t\t1.1 make job distribution code for dissociation distance)\
+            \n\t    2. Given distance, job distribution for each r_c\
+            \n\t\t2.1 obtain optimal r_c and energy\
+            \n\t    3. Two plots for LDA and half\
+            "
+    
     #slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+
+
     if nproc != nnode * nXn[partition]:
         print("Warning!! Not using all the processes in the node")
 

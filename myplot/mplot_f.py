@@ -360,7 +360,7 @@ def main():
     #g_value=parser.add_argument_group('Values', description="get argument as y-values")
     #g_value.add_argument('-yv', nargs='+', type=float, help='list y-values')
     xvalues=parser.add_mutually_exclusive_group()
-    xvalues.add_argument('-icx', '--icolumn_x', type=int, default=0, help='column index of X')
+    xvalues.add_argument('-icx', '--icolumn_x', type=int, default=0, help='i-col start from 0')
     xvalues.add_argument('-x', '--x_ext', help='x-coord is supplied externally')
     g_file=parser.add_argument_group('Files', description="get input files")
     #g_file.add_argument('-nc', '--ncolumn', default=1, type=int, help='number of columns in each file')

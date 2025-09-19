@@ -9,7 +9,6 @@ import matplotlib as mpl
 import matplotlib.ticker as ticker
 import sys, re
 import scipy
-import my_chem 
 import numpy as np
 from common import *
 
@@ -452,14 +451,21 @@ def auto_nvector(x,y):
 ### most1
 #def mplot_nvector(x, y, plot_dict=None, xlabel=None, ylabel=None, xlim=None, title=None, legend=None,Lsave=False, colors=None, vertical=None, v_legend=None):
 
+Lprint = 0
+
 def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=None):
     '''
+    input
+        x.shape     
+        y.shape     
     dx=1.0, input before
     call with x=[] and y=[ [...
     x:: [] or [size]
     y:: [size] or [[size],[size],...[size]]
     plot_dict   keys    xlabel, ylabel, xlim, title, colors
     '''
+    print(f"input shape {np.array(x).shape} {np.array(y).shape}")
+
     ### get components of plot_dict
     if plot_dict:
         title   = plot_dict.get("title",    "")
@@ -467,14 +473,14 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=Non
         ylabel  = plot_dict.get("ylabel",   "")
         xlim    = plot_dict.get("xlim",     "")
         ylim    = plot_dict.get('ylim',     "")
-        legend  = plot_dict.get("legend",   "")
+        legends  = plot_dict.get("legends",   "")
         colors  = plot_dict.get("colors",   "")
     if not colors:
-        fig, ax = common_figure(ncolor = len(legend))
-        print("no color input")
+        fig, ax = common_figure(ncolor = len(legends))
+        if Lprint: print("no color input")
     else:
         fig, ax = common_figure()
-        print("colors")
+        if Lprint: print("colors")
 
     #plt.locator_params(axis='x', nbins=10)
     ys = np.array(y)
@@ -519,12 +525,12 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=Non
             ### if the final letter is 'f'
             if colors[i][-1] == 'f':
                 color = colors[i][:-1]
-                plt.fill_between(xs,ys[i,:], alpha=0.5, label=legend[i] , color=color)
+                plt.fill_between(xs,ys[i,:], alpha=0.5, label=legends[i] , color=color)
             else:
-                print(f"size x {len(xs)}, size y {len(list(ys[i,:]))}, size legend {len(legend)} size color {len(colors)}")
-                plt.plot(xs,ys[i,:],  label=legend[i] , color=colors[i])
+                print(f"size x {len(xs)}, size y {len(list(ys[i,:]))}, size legend {len(legends)} size color {len(colors)}")
+                plt.plot(xs,ys[i,:],  label=legends[i] , color=colors[i])
         else:
-            plt.plot(xs,ys[i,:],  label=legend[i] )
+            plt.plot(xs,ys[i,:],  label=legends[i] )
 
     if vertical is not None:
         plt.axvline(x=vertical, color='k', linestyle='--', linewidth=1.5, label=v_legend)

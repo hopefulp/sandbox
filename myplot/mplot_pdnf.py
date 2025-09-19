@@ -111,10 +111,10 @@ def nfplot_pd(fin, icx, icy, ptype, title, mpl_xticks, data_label):
 def main():
     parser  = argparse.ArgumentParser(description='line extraction from file and plot')
     parser.add_argument( 'fname', nargs='+', help='input file')
-    parser.add_argument( '-ix', '--icx', default=0, help='index for x-axis')
-    parser.add_argument( '-iy', '--icy', default=[1], type=int, nargs='+', help='set column in input file')
+    parser.add_argument( '-i', '--icx', default=0, help='index for x-axis, starting from 0')
+    parser.add_argument( '-j', '--jcy', default=[1], type=int, nargs='+', help='set column in input file')
     #parser.add_argument( '-s', '--save', action="store_true", help='save figure option')
-    parser.add_argument( '-pd', '--pandas', action='store_false', help="use pandas to extract number and to use ordering")
+    parser.add_argument( '-pd', '--pandas', action='store_true', help="use pandas to extract number and to use ordering")
     dfplot    = parser.add_argument_group(title = 'pandas plot')
     dfplot.add_argument( '-t', '--title', default='Train-Test', help='title')
     dfplot.add_argument('-pt',  '--plot_type', default='plot', choices=['plot','scatter','histo'], help="plot type") 
@@ -129,7 +129,7 @@ def main():
     
     ### use pandas or not
     if args.pandas:
-        nfplot_pd(args.fname, args.icx, args.icy, args.plot_type, args.title, mpl_xticks, args.datalabel)
+        nfplot_pd(args.fname, args.icx, args.jcy, args.plot_type, args.title, mpl_xticks, args.datalabel)
     else:
         fplot(args.fname, args.icx, args.icy, args.plot_type, args.title, mpl_xticks)
     return 0
