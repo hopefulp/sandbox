@@ -1,5 +1,3 @@
-#!/home/joonho/anaconda3/bin/python
-
 #!/usr/bin/env python3
 import argparse
 import numpy as np
@@ -8,13 +6,42 @@ from ase.data import atomic_numbers
 from libsci import generate_distances
 import os, sys
 
+
+
+"""
+Create ASE Atoms object for diatomic molecule with distance r (Å).
+cell z-axis is changing
+
 def generate_diatomic(atom1, atom2, r):
-    """Create ASE Atoms object for diatomic molecule with distance r (Å)."""
     atoms = Atoms(f'{atom1}{atom2}',
                   positions=[[0, 0, 0], [0, 0, r]],
                   pbc=False)
     atoms.center(vacuum=10.0)  # add vacuum padding
     return atoms
+"""
+
+def generate_diatomic(atom1, atom2, r, cell_size, vacuum=10.0):
+    """Create ASE Atoms object for diatomic molecule with distance r (Å).
+       Cell size is based on maximum distance + 2*vacuum.
+       Atoms are centered along the z-axis."""
+    z_center = cell_size / 2.0
+    z1 = z_center - r / 2.0
+    z2 = z_center + r / 2.0
+
+    atoms = Atoms(
+        f'{atom1}{atom2}',
+        positions=[
+            [cell_size / 2.0, cell_size / 2.0, z1],
+            [cell_size / 2.0, cell_size / 2.0, z2],
+        ],
+        cell=[cell_size, cell_size, cell_size],
+        pbc=False
+    )
+    return atoms
+
+
+
+
 
 def get_num_species(atoms):
     atom_kinds = []
@@ -78,6 +105,7 @@ def main():
     )
     parser.add_argument("-a","--atoms", nargs=2, default=["H", "H"], help="Two atoms for dissociation)")
     parser.add_argument("-rmme","--rminmaxeq", nargs='*', type=float, default=[0.5, 10, 0.74], help="minimum maximum equilibrium distance in Å (default=0.5)")
+    parser.add_argument("-vl", "--vacuum_length", type=float, default=10.0,  help="Number of geometries (default=10) between r_eq ~ r_max")
     parser.add_argument("-np", "--npoints", type=int, default=10,  help="Number of geometries (default=10) between r_eq ~ r_max")
     parser.add_argument("-npl", "--npoints_left", type=int, default=3,  help="Number of geometries between r_min ~ r_eq")
     parser.add_argument("-o","--outdir", default="geometries", help="Output directory (default=geometries)")
@@ -112,13 +140,15 @@ def main():
     else:
         req = None
 
+    cell_size = rmax + 2 * args.vacuum_length
+
     if req:
         distances = generate_distances(rmin, req, rmax, n_short=args.npoints_left, n_long=args.npoints)
     else:
         distances = np.linspace(rmin, rmax, args.npoints)
 
     for i, r in enumerate(distances, 1):
-        atoms = generate_diatomic(atom1, atom2, r)
+        atoms = generate_diatomic(atom1, atom2, r, cell_size, args.vacuum_length)
         fname = os.path.join(args.outdir, f"{args.prefix}_{r:05.2f}.fdf")
         write_fdf(fname, atoms)
         print(f"Written: {fname} at r = {r:.3f} Å")

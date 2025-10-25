@@ -455,9 +455,9 @@ Lprint = 0
 
 def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=None):
     '''
-    input
-        x.shape     
-        y.shape     
+    input               python              numpy.shape
+        x.shape         msize e.g. 18       (msize, )
+        y.shape         (n, msize)          (n, msize)
     dx=1.0, input before
     call with x=[] and y=[ [...
     x:: [] or [size]
@@ -475,7 +475,7 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=Non
         ylim    = plot_dict.get('ylim',     "")
         legends  = plot_dict.get("legends",   "")
         colors  = plot_dict.get("colors",   "")
-    if not colors:
+    if 'colors' not in locals():
         fig, ax = common_figure(ncolor = len(legends))
         if Lprint: print("no color input")
     else:

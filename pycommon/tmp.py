@@ -202,8 +202,6 @@ def show_command(work, subwork, job_submit, qname, package_job, subjob, inf, key
     if 'dirname' not in locals():
         dirname = qname
     ncpu =  int(nXn[partition]/2)
-    ldirname = dirname.split('-')
-    jid = ldirname[1]
     slurm.vas = f"==== Job submission\
             \n\t:: INI\
             \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
@@ -237,18 +235,13 @@ def show_command(work, subwork, job_submit, qname, package_job, subjob, inf, key
             \n\t:: Alpha Project\
             \n\t    (Two atom dissociation)\
             \n\t    Match with VASP: -q dirname (wdir=cal), -pj (-vj) vasp_job (siesta job=3.alpha) subjob (siesta input)\
-            \n\t\tBatch1:\
-            \n\t\t    ./batch1-dft.sh  {dirname} X{partition}      : dirname(cal-dir) should match with Makefile\
+            \n\t\tbatch1-dft.sh  {dirname} X{partition}      : dirname(cal-dir) should match with Makefile\
             \n\t\t    1. make copy      : Makefile makes wdir\
             \n\t\t    2. move to wdir\
             \n\t\t    3. build_struct.py -a H H -rmme 0.7 10 1.06 -np 15 -p H2p    : make geometry-dir\
             \n\t\t\t3.1    make job distribution code for dissociation distance)\
             \n\t\t    4. template/a1_run_dft.sh geometries $caldir $part           : qsub run DFT\
-            \n\t\tBatch1b:\
-            \n\t\t    ./batch1b.sh  {dirname} X{partition}\
-            \n\t\tBatch2:\
-            \n\t\t    ./batch2-alpha.sh {dirname} X{partition} {sjob}           : for both the same alpha\
-            \n\t\t    ./batch2-alpha.sh {dirname} X{partition} {sjob} {sinput}    : for both different alpha\
+            \n\t\tbatch2-alpha.sh {dirname} X{partition} {sjob} {sinput}\
             \n\t\t    [0] in case different .ion\
             \n\t\t\tsave dft .ion file\
             \n\t\t\tcopy ion file to all the subdirectory\
@@ -256,34 +249,15 @@ def show_command(work, subwork, job_submit, qname, package_job, subjob, inf, key
             \n\t\t    1. template/a2_make_rcutdir.sh {dirname} {subjob} {sinput}\
             \n\t\t\tmakes subdirectories of r_cut_distance\
             \n\t\t    2. template/a3_run_rcut.sh {dirname} X{partition} {subjob}\
-            \n\t\tBatch2b:\
-            \n\t\t    ./batch2b.sh {dirname} X{partition} {sjob}    : runs for only 2\
             \n\t\t\tRuns alpha-dft at each dist/{dirname}/r_cut directory\
             \n\t\tAnalysis:\
-            \n\t\t    ./dir_job.sh {dirname} run {sjob}    : display all\
-            \n\t\t    ./dir_job.sh {dirname} run {sjob} | grep None ; some job submits fail due to fast queue submit\
-            \n\t\t\tif there is None, run batch2b\
-            \n\t\t    ./dir_job.sh {dirname} run {sjob} | grep minimum > {dirname}.dat      : display all\
+            \n\t\t    ./dir_job.sh {dirname} run      : display all\
+            \n\t\t    ./dir_job.sh {dirname} run | grep minimum > {dirname}.dat      : display all\
             \n\t\tPlots:\
             \n\t\t    (Energy)\
-            \n\t\t    mplot_pd.py {dirname}.dat -i 0 -j  3 2 -dl dft '+alpha' -t 'H$_2^+$: DFT+alpha-{jid}' -c b r\
-            \n\t\t    (R$_cut$)\
-            \n\t\t    mplot_pd.py {dirname}.dat -i 0 -j 1 -xlm 0 5 -ylm 1.5 4 -yl 'r_c [A]' -dl 'r$_{{cut}}$' -t 'H$_2^+$: DFT+alpha-{jid}'\
-            \n\t\t    (plane average)\
-            \n\t\t    pav2vh.py  directory/SystemLabel.[VH|RHO]\
-            \n\t\t\tPAV.txt\
-            \n\t\t    mplot_pd.py PAV.txt -yl 'VH [eV]' -t 'VH: alpha -0.5 vs 0.0'\
-            \n\t\tDirectory job:\
-            \n\t\t    ./dir_job.sh {dirname} job\
-            \n\t\t    Options:\
-            \n\t\t\t copy : distribute wdir to r_cut directory\
-            \n\t\tRepetitive Jobs::\
-            \n\t\t    Source modification & apply it to the test directory\
-            \n\t\t\t(DFTA_HOME) $ make dist\
-            \n\t\t\t(TEST_HOME) $ dir_job.sh {dirname} copy {sjob}\
-            \n\t\t    DFT-alpha run at r_c directory\
-            \n\t\t\t(TEST_HOME) $ dir_job.sh {dirname} run {sjob}       ! energy analysis shows failed directories\
-            \n\t\t\t(TEST_HOME) $ ./batch2b.sh {dirname} X{partition} {sjob}      ! qsub at failed directories\
+            \n\t\t    mplot_pd.py {dirname}.dat -i 0 -j  3 2 -dl dft '+alpha' -t 'H$_{2}^{+}$: DFT+alpha-0.5' -c b r\
+#            \n\t\t    (R$_{cut}$)\
+#            \n\t\t     mplot_pd.py cala-0.5.dat -i 0 -j 1 -xlm 0 5 -ylm 1.5 4 -yl 'r_c [A]' -dl 'r$_{cut}$' -t 'H$_{2}^{+}$: DFT+alpha-0.5'\
             "
     
     #slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
@@ -515,7 +489,7 @@ def main():
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
     parser.add_argument('-qn', '-q', '--qname', default='test', help="queue name for qsub shown by qstat")
     parser.add_argument('-pj','--package_job', default='sp', help="vasp job input for vas_make_ini.py; siesta alpha dir")
-    parser.add_argument('-sj','--package_subjob', default='mag', help="vasp subjob input for vas_make_ini.py to make INCAR.spmag; siesta input")
+    parser.add_argument('-sj','--pakcage_subjob', default='mag', help="vasp subjob input for vas_make_ini.py to make INCAR.spmag; siesta input")
     parser.add_argument('-kv', '--keyvalues', nargs='*', help='change a keyword in print')
     parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
     ### flowing slurm option
@@ -533,11 +507,6 @@ def main():
     mlg.add_argument('-hl', '--hidden_layers', nargs='*', default=['4','4','4'], help="hidden layers in integer")
 
     args = parser.parse_args()
-
-    if args.work == 'siesta':
-        args.package_subjob = 'switch'
-        if args.package_job == 'sp':
-            args.package_job = '2.alpha'
 
     if not args.infile:
         if args.subwork == 'amp':

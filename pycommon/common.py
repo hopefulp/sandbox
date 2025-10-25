@@ -380,6 +380,45 @@ def f_root(fname):
 fname_root = f_root
 fname_ext  = f_ext
 
+def fname_contract(fname):
+    froot = f_root(fname)
+    fext  = f_ext(fname)
+    jobname = froot + fext
+    return jobname
+
+def fname_contract_args(absdir, fdir=[2,0]):
+    """
+    Convert path like H2p_00.70/3.alpha/rc4.80
+    → jobname like d0070rc480
+    input   absdir  is directory, not file
+    """
+
+    dirnames=[]
+
+    base = os.path.basename(absdir)          # e.g. "rc4.80"
+    parent = os.path.basename(os.path.dirname(absdir))  # e.g. "3.alpha"
+    grandparent = os.path.basename(os.path.dirname(os.path.dirname(absdir)))  # e.g. "H2p_00.70"
+
+    dirnames.append(base)
+    dirnames.append(parent)
+    dirnames.append(grandparent)
+
+    fstr=""
+
+    # from "H2p_00.70" → "0070"
+
+    #for idir in fdir:
+    #    str1 = dirnames[idir].split("_")[-1]
+    #    str1 = str1.replace(".", "").zfill(4)
+    dist = grandparent.split("_")[-1]  # "00.70"
+    dist = dist.replace(".", "").zfill(4)  # "0070"
+
+    # from "rc4.80" → "rc480"
+    rc = base.replace(".", "")  # "rc480"
+
+    return f"d{dist}{rc}"
+
+
 def fname_decom(fname):
     fname_parts = fname.split('.')
     if len(fname_parts) < 2:

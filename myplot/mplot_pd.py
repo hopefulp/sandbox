@@ -3,9 +3,7 @@
     2021.02.22 pandas is imported to sort x-values with ccdd
 '''
 import argparse
-import re
 import sys
-import numpy as np
 from mplot2D import mplot_nvector
 from libfile import load_table
 
@@ -40,12 +38,21 @@ def main():
     dfplot.add_argument('-xl', '--xlabel', default='r (A)', help='xlabel for diss distance in A')
     dfplot.add_argument('-yl', '--ylabel', default='E [eV]', help='ylabel for energy (eV)')
     dfplot.add_argument('-c', '--colors', nargs='*', default=['r','g','b','k'], help='colors')
-    dfplot.add_argument('-xi', '--xlim', nargs=2, type=float, help='xrange xmin, xmax')
-    dfplot.add_argument('-yi', '--ylim', nargs=2, type=float, help='yrange ymin, ymax')
+    dfplot.add_argument('-xlm', '--xlim', nargs=2, type=float, help='xrange xmin, xmax')
+    dfplot.add_argument('-ylm', '--ylim', nargs=2, type=float, help='yrange ymin, ymax')
     dfplot.add_argument('-xst', '--xs_type', default='numerical', choices=['evenly','numerical'], help="x-ticks spacing rule")
-    dfplot.add_argument( '-dl', '--datalabel', help='how to write data labels, columns name in df for only y-values')
+    dfplot.add_argument( '-dl', '--datalabel', nargs='*', help='how to write data labels, columns name in df for only y-values')
+    parser.add_argument('-u', '--usage',   action='store_true', help='print usage')
 
     args = parser.parse_args()
+
+    if args.usage:
+        print('Make two atom dissociation\
+              \n\tbuild_struct.py -a H H -rmme 0.5 10 0.74 -np 15 -p H2 for neutral\
+              \n\tbuild_struct.py -a H H -rmme 0.7 10 1.06 -np 15 -p H2p for H2 cation\
+              ')
+        sys.exit(0)
+
     mpl_xticks={}
     mpl_xticks['xspacing'] = args.xspacing
     mpl_xticks['xs_type'] = args.xs_type
@@ -61,7 +68,7 @@ def main():
     if args.plot_type:  plot_dict['type']   = args.plot_type
     if 'mpl_xticks' in locals(): plot_dict['xtick']  = mpl_xticks
 
-    
+    print(f"{args.title}")
     ### use pandas or not
     plot_pd(args.fname, args.icx, args.jcy, plot_dict, sep=args.sep)
 
