@@ -49,7 +49,7 @@ def main():
                 copy from input POSCAR
     '''
     parser = argparse.ArgumentParser(description="add atoms, vel block")
-    parser.add_argument('poscar', help="poscar to be modified")
+    parser.add_argument('poscar', default='POSCAR', help="poscar to be modified")
     parser.add_argument('-j', '--job', default='add', choices=['bomb','add','rm','zpe', 'md','sort'], help="job of poscar changing")
     ### select existing atom or add atoms for bomb
     #gatoms =  parser.add_mutually_exclusive_group()
@@ -91,8 +91,8 @@ def main():
             mode = 'sl'     # select atom list interval: 3-7
         elif args.job == 'rm':
             mode = 'si'     # select atom index: 3-7 or 3 5 8 etc
-        elif args.job == 'bomb': # line for example
-            mode = 'a'      # add 
+        elif args.job == 'bomb' or args.job == 'add': # line for example
+            mode = 'a'      # add append 
         else:
             mode = 'vel'
         #print(f"input error: select or add atoms via -s or -a")
@@ -100,6 +100,8 @@ def main():
     ### outfile name need to be passed
     if args.outfile:
         outfile = args.outfile
+        if not 'POSCAR' in outfile:
+            outfile = 'POSCAR.' + outfile
     elif args.suffix:
         outfile = args.poscar + args.suffix
     else:

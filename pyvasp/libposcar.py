@@ -436,7 +436,9 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
             zcoords.append(zcoord + lzoffset[i])
         else:
             zcoords.append(zcoord)
-    if Lprint: print(f"{cd}: zmax {zmax} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
+    if Lprint: 
+        print(f"{cd}: zmax {zmax} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
+        print(f"if takes longer time, reduce interatomic distance by -d less than {r_crit}")
 
     if ztag == 'top':
         comp_atoms = []             # no need to compare with existing atoms
@@ -680,8 +682,8 @@ def modify_POSCAR(poscar, job='zpe', mode=None, mod_atoms=None, zpos=None, temp=
     #print(f"ind {ind}  {npre_unsel} unselected in {whereami()}()")
 
     ### for sigma for MBD (Maxwell-Boltzmann distribution)
-    if 'add' in job:
-        atom_oldfull_list = make_atomfullist(atomsold, natomsold)       # As for original POSCAR,
+    #if 'add' in job:
+    #    atom_oldfull_list = make_atomfullist(atomsold, natomsold)       # As for original POSCAR,
     atom_fullist = make_atomfullist(latoms, lnatoms)
         #atom_fullist = atom_oldfull_list
 
@@ -753,7 +755,7 @@ def modify_POSCAR(poscar, job='zpe', mode=None, mod_atoms=None, zpos=None, temp=
             coords = coords[:i] + coords[i+1:]
         print(f"len coords {len(coords)} in {whereami()}()")
         lines.extend(coords)
-    ### job == 'bomb'
+    ### job == 'bomb' or 'add'
     else:
         lines.extend(coords)                            # copy original coords
         ### Make additional coordinates for added atoms
@@ -825,9 +827,12 @@ def modify_POSCAR(poscar, job='zpe', mode=None, mod_atoms=None, zpos=None, temp=
                     #else: # use the same T as substrate
                     v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
                     #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
-                    if not v_reverse:
-                        v *= -1
-                    s = lineformat.write([0.0, 0.0, v]) + "\n"
+                    if 'bomb' in job:
+                        if not v_reverse:
+                            v *= -1
+                        s = lineformat.write([0.0, 0.0, v]) + "\n"
+                    else:
+                        s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
                 else:
                     if re.match('c', vel_type):
                         s = vel_orig[i]

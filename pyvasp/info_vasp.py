@@ -342,6 +342,7 @@ outcar.outcar_zpe_ts    = "Read OUTCAR: calculate T*S energy\
                         "
 outcar.outcar_zpe_ts_mj = "original version of zpe from mjstar"
 md.oszicar              = "MD is stored in OSZICAR and analysis\
+                        \n\t\t:: Make POSCAR for md -> use '-w poscar'\
                         \n\t\tOptions: \
                         \n\t\t    -y    keys lined by '+' for Etot Efree E0pot Ekin Skin Spot\
                         \n\t\t          Etot = Efree(E0pot)+Ekin+Skin+Spot\
@@ -352,6 +353,8 @@ md.oszicar              = "MD is stored in OSZICAR and analysis\
                         \n\t\t    (NVE)\
                         \n\t\t    oszicar.py HfSe2L1O12O6 -y E0pot Ekin  -iy2 1\
                         "
+#md.pos_modify       = print(poscar.pos_modify)     # not working
+
 analysis.vas_anal    =   "(.sh) Charge analysis of Bader\
                         \n\tjobs: bader bader2(spin) convasp dos bchg end\
                         \n\tUsage: Run just above vasp directory\
