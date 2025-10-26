@@ -153,7 +153,8 @@ kisti.pbs       =   f"\tqst.py : runs 'qstat -f' to see long jobnames\
                     \n{pbs.queue}\
                     "
 
-def show_command(work, subwork, job_submit, qname, package_job, subjob, inf, keyvalues, nodename, nnode, nproc, nodelist, sftype, dtype, partition,poscar, nhl,idata,ndata):
+def show_command(work, subwork, job_submit, qname, package_job, subjob, inf, keyvalues, nodename, nnode, nproc,\
+                nodelist, sftype, dtype, partition,poscar, nhl,idata,ndata):
     
     # get siesta, vasp input together
     vjob = sjob = package_job   
@@ -202,8 +203,10 @@ def show_command(work, subwork, job_submit, qname, package_job, subjob, inf, key
     if 'dirname' not in locals():
         dirname = qname
     ncpu =  int(nXn[partition]/2)
-    ldirname = dirname.split('-')
-    jid = ldirname[1]
+    jid = '00'
+    if '-' in dirname:
+        ldirname = dirname.split('-')
+        jid = ldirname[1]
     slurm.vas = f"==== Job submission\
             \n\t:: INI\
             \n\t    $ vas_make_ini.py -s POSCAR.{dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
