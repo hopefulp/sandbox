@@ -256,8 +256,8 @@ def show_command(work, subwork, job_submit, qname, package_job, subjob, inf, key
             \n\t\tPlots:\
             \n\t\t    (Energy)\
             \n\t\t    mplot_pd.py {dirname}.dat -i 0 -j  3 2 -dl dft '+alpha' -t 'H$_{2}^{+}$: DFT+alpha-0.5' -c b r\
-#            \n\t\t    (R$_{cut}$)\
-#            \n\t\t     mplot_pd.py cala-0.5.dat -i 0 -j 1 -xlm 0 5 -ylm 1.5 4 -yl 'r_c [A]' -dl 'r$_{cut}$' -t 'H$_{2}^{+}$: DFT+alpha-0.5'\
+#           \n\t\t    (R$_{cut}$)\
+#           \n\t\     mplot_pd.py cala-0.5.dat -i 0 -j 1 -xlm 0 5 -ylm 1.5 4 -yl 'r_c [A]' -dl 'r$_{cut}$' -t 'H$_{2}^{+}$: DFT+alpha-0.5'\
             "
     
     #slurm.siesta += f"\n        sbatch -J {dirname} -p X{partition} -N {nnode} -n {nproc} --export=exe='gam' /home/joonho/sandbox/pypbs/slurm_sbatch.sh"

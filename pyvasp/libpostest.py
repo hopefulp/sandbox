@@ -529,11 +529,8 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
         lines.append(line)
     return lines
 
-### aselect and addatoms are compatible
-#def modify_POSCAR(poscar, job='zpe', aselect=None, mod_atoms=None, zpos=None, temp=300, htemp=None,\
-#            vel_type='random', outf='POSCAR', r_crit=None, asort=None, nlevel=None):
-def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, temp=300, htemp=None,\
-            Lvel=False, vel_type=None, outf='POSCAR', r_crit=None, asort=None, nlevel=None):
+def modify_POSCAR(poscar, job='zpe', mode=None, mod_atoms=None, zpos=None, temp=300, htemp=None,\
+            vel_type='random',v_reverse=False, outf='POSCAR', r_crit=None, asort=None, nlevel=None):
     '''
     Modularize POSCAR part
     inputs:
@@ -544,7 +541,6 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                     vel      N/A assign velocity in the given configuration
                     sort    sl    change latomnames, lnatoms
                     rm      si   atom index
-        (mode, mod_atoms) -> (aselect, addatoms)
         mode        sl, si  selection index in atom list or just atom index
                     a       add format O12; atom symbol:natom
         mod_atoms   modified atoms
@@ -582,8 +578,9 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
 
     print(f"Write to {outf} in {whereami()}()")
     ### obtain (modify) atom indices
-    if len(addatoms) == 1:
-        addatoms0 = addatoms[0]   # use mod_atoms0 for 'sl' or 'a'
+    print(f"mod_atoms {mod_atoms} {len(mod_atoms)}")
+    if len(mod_atoms) == 1:
+        mod_atoms0 = mod_atoms[0]   # use mod_atoms0 for 'sl' or 'a'
 
     lines = []
     ### obtain each block and write from parse_POSCAR
@@ -597,16 +594,16 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
     line_na, lnatoms = parse_poscar(poscar, block='natoms')
     ntotalold = sum(lnatoms)
     
-    print(f"addatoms: {addatoms}, job: {job} in {whereami()}()")
+    print(f"mode: {mode}, job: {job} in {whereami()}()")
     if not line:
         line = line1
         latoms = atoms1      # line1 is saved for atom line
-    ### addatoms [07]
-    if addatoms and addatoms0: #mod_atoms0.isalpha():
-        i = startnum(addatoms0)
+    ### O7 is addatom
+    if mode == 'a': #mod_atoms0.isalpha():
+        i = startnum(mod_atoms0)
         #print(f"starting number index {i} in {whereami()}() module {__name__}")
-        add_atomname = addatoms0[:i]           # atom name to be added
-        add_natom = int(addatoms0[i:])     # natom to be added
+        add_atomname = mod_atoms0[:i]           # atom name to be added
+        add_natom = int(mod_atoms0[i:])     # natom to be added
         ### split alphabet and numeric: O7, O29, He7
         line = line.rstrip() + f'  {add_atomname}' + '\n'       # do not use \t which raise type error in Vasp
         latomsold = latoms[:]
@@ -617,9 +614,9 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
         lnatoms.append(add_natom)
 
     ### matoms is integer in natom lines of POSCAR for mode='sl' or atom index list for mode='si'
-    elif aselect == 'sl':
-        if addatoms0.isdigit():
-            ind = int(addatoms0)               # index for atom selection in POSCAR atom line
+    elif mode == 'sl':
+        if mod_atoms0.isdigit():
+            ind = int(mod_atoms0)               # index for atom selection in POSCAR atom line
         elif job == 'sort' and re.search('-',matoms):
             indices = re.split('-', matoms)
             ind = int(indices[0])
@@ -654,7 +651,7 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
             line_na = "  ".join(map(str, new_natoms)) + "\n"
             #print(f"natom line: {new_natoms_tobesored}"); # sys.exit(12)
             #print(f"lnatom_tobesorted: {lnatom_tobesorted}")
-    elif aselect == 'si': #selection by index
+    elif mode == 'si': #selection by index
         ### change str into integer
         int_matoms = list(map(int, mod_atoms))
         if job == 'rm':
@@ -673,9 +670,8 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                     sys.exit(100)
             line_na = "  ".join(map(str, lnatoms)) + "\n"
             print(f"line_na {line_na} in {whereami()}()")
-    
-    #if vel_type:
-    #    ind = -1                        # all the atoms in atom index
+    elif mode == 'vel':
+        ind = -1                        # all the atoms in atom index
     ### add atom
     lines.append(line)                  # job=rm does not remove all the atoms
     #sys.exit(11)
@@ -693,11 +689,11 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
         #atom_fullist = atom_oldfull_list
 
     ### define number of unselected atoms (npre_unsel) and selected atoms (z-coord bombard) for selection mode
-    if addatoms:
+    if mode == 'a':
         npre_unsel  = ntotalold
         nselatoms   = add_natom
         ind         = -1            # for print sentence
-    elif aselect == 'sl':
+    elif mode == 'sl':
         ### calculate index for selected atoms: movable in zpe, velocity in bombardment
         #ind = atoms.indeadd) -> not to try find using atom name
         nselatoms = lnatoms[ind]              # natoms to be moved for zpe
@@ -707,9 +703,11 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                 npre_unsel += na                  # npre_unsel = natoms before selected (movable) atoms
         if job == 'zpe':
             lines.append("Selective dynamics\n")
-    elif Lvel:
+    elif mode == 'vel':
         npre_unsel  = ntotalold
         nselatoms = 0
+        
+
     
     ### for Cartesian or Direct    
     line, cd = parse_poscar(poscar, block='cd'); lines.append(line)
@@ -762,7 +760,7 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
     else:
         lines.extend(coords)                            # copy original coords
         ### Make additional coordinates for added atoms
-        if addatoms:
+        if mode == 'a':
             ### for Orthorhombic crystal structure
             #z_coord = 'above'
             zmax = get_zmax(poscar)
@@ -784,7 +782,7 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
     ### unselected atoms have random vx, vy, vz
     ### selected atom will have -vz only with magnitue of |v|=sqrt(vx**2+vy**2+vz**2)   
     ### for job == 'rm' use 'rmmd' to include vel
-    if 'bomb' in job or 'md' in job or Lvel:
+    if 'bomb' in job or 'md' in job or vel_type:
         vel_orig, _ = parse_poscar(poscar, block='vel')
         ### addtional velocity block as cartisian coordinate (A/fs)
         print(f"original vel {len(vel_orig)} in job {job}")
