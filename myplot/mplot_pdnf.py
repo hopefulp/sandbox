@@ -60,7 +60,7 @@ def fplot(fin, icx, icy, ptype, title, mpl_xticks ):
     return 0 
 
 
-def nfplot_pd(fin, icx, icy, ptype, title, mpl_xticks, data_label):
+def nfplot_pd(fin, icx, jcy, ptype, title, mpl_xticks, data_label):
     nfile=len(fin)
     dlabels=[]
     for i in range(nfile):

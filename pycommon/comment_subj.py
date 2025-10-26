@@ -33,6 +33,7 @@ nico2               = MyClass('nico2')
 sno2                = MyClass('sno2')
 water               = MyClass('water')
 mxene               = MyClass('mxene')
+hfse2               = MyClass('hfse2')
 
 amp.scripts.run  =  "\n    == Scripts ==\
                     \n\t== AMP direct Run Test\
@@ -599,7 +600,15 @@ mxene.myplot    = "\t" + table.mplot_gibbs
 mxene.plot2     =  "\tmplot_gibbs.py MXNB-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.37)' 'G($U_{Eq}$=2.73)' 'G($U_{Ch}$=3.42)' -c k b g r -ymin -11 -ymax 24\
                    mplot_gibbs.py MX-MXNB-Ueq.csv -l 'MXene' 'MX-NB' -c b r -t 'U$_{Eq}$'\
                    "
-
+hfse2.poscar    = 'POSCAR modification for insertion of new 3-4 O atoms\
+                    \n\t$ kpy - is required to run at KISTI\
+                    \n\tBombing system temp (500 K) makes the bombing slow -> increase temp by -t\
+                    \n\tInsertion at interface needs high T to get over attraction to both sides\
+                    \n\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Hfopt -j add -a O4 -v -t 500 -ht 800 -z 10 -v -d 2 -o HfSe2L1O36HfiO4\
+                    \n\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Hfopt -j add -a O4 -v -t 500 -ht 800 -z 10 -v -vt -z -d 2 -o HfSe2L1O36HfiO4\
+                    \nRun VASP\
+                    \n\t$ kpy vas_make_ini.py -s POSCAR.HfSe2L1O36MoiO4 -j mdnve -k g -d d2510c\
+                    '
 
 def print_obj(job):
     print("Instances:: ", end='')

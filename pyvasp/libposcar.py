@@ -784,7 +784,7 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
     ### unselected atoms have random vx, vy, vz
     ### selected atom will have -vz only with magnitue of |v|=sqrt(vx**2+vy**2+vz**2)   
     ### for job == 'rm' use 'rmmd' to include vel
-    if 'bomb' in job or 'md' in job or Lvel:
+    if Lvel:
         vel_orig, _ = parse_poscar(poscar, block='vel')
         ### addtional velocity block as cartisian coordinate (A/fs)
         print(f"original vel {len(vel_orig)} in job {job}")
@@ -831,13 +831,14 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                         vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)
                     #else: # use the same T as substrate
                     v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
-                    #s = lineformat.write([0.0, 0.0, -vz[0])]) + "\n"
-                    if 'bomb' in job:
-                        if not v_reverse:
-                            v *= -1
+                    ### define velocity using vel_type
+                    if vel_type == 'zup':
                         s = lineformat.write([0.0, 0.0, v]) + "\n"
+                    elif vel_type == 'zdn':
+                        s = lineformat.write([0.0, 0.0, -v]) + "\n"
                     else:
                         s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
+                    
                 else:
                     if re.match('c', vel_type):
                         s = vel_orig[i]

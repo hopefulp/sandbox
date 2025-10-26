@@ -70,7 +70,7 @@ def main():
     parser.add_argument('-t', '--temp', type=float, default=500,  help="system temperature T(K) for atomic velocity")
     parser.add_argument('-ht', '--hypertherm', type=float, help="velocity for input atoms T(eV,K)")
     parser.add_argument('-v', '--Lvelocity', action='store_true', help="include velocity in POSCAR")
-    parser.add_argument('-vt', '--vel_type', choices=['r','random', 'copy', '-z', '+z'], help="T for atom velocity, why not random")
+    parser.add_argument('-vt', '--vel_type', choices=['r','random', 'copy', 'zup', 'zdn'], help="T for atom velocity, why not random")
     #parser.add_argument('-vr', '--vel_reverse', action='store_true', help="make bombing to upside")
     parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
     parser.add_argument('-as', '--sort', nargs='*', help="order of atoms in sorting")

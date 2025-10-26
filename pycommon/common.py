@@ -594,7 +594,7 @@ def main():
     parser.add_argument('-f', '--funcname', help='function name')
     args = parser.parse_args()
 
-    get_dirs_prefix(args.dirs)
+    #get_dirs_prefix(args.dirs)
 
 if __name__ == '__main__':
     main()
