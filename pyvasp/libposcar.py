@@ -816,6 +816,8 @@ def modify_POSCAR(poscar, job='zpe', mode=None, mod_atoms=None, zpos=None, temp=
                     #sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs 
                     #vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
                     ### in case hyperthermal species, convert eV to T and assign to selected atoms
+                    print(f"{vx[0]:6.3f} {vy[0]:6.3f} {vz[0]:6.3f}")
+
                     if htemp and htemp < 100.:
                         # use eV in velocity units
                         pass
