@@ -600,15 +600,24 @@ mxene.myplot    = "\t" + table.mplot_gibbs
 mxene.plot2     =  "\tmplot_gibbs.py MXNB-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.37)' 'G($U_{Eq}$=2.73)' 'G($U_{Ch}$=3.42)' -c k b g r -ymin -11 -ymax 24\
                    mplot_gibbs.py MX-MXNB-Ueq.csv -l 'MXene' 'MX-NB' -c b r -t 'U$_{Eq}$'\
                    "
-hfse2.poscar    = 'POSCAR modification for insertion of new 3-4 O atoms\
+hfse2.poscar    = "POSCAR modification for insertion of new 3-4 O atoms\
                     \n\t$ kpy - is required to run at KISTI\
-                    \n\tBombing system temp (500 K) makes the bombing slow -> increase temp by -t\
-                    \n\tInsertion at interface needs high T to get over attraction to both sides\
-                    \n\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Hfopt -j add -a O4 -v -t 500 -ht 800 -z 10 -v -d 2 -o HfSe2L1O36HfiO4\
-                    \n\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Hfopt -j add -a O4 -v -t 500 -ht 800 -z 10 -v -vt -z -d 2 -o HfSe2L1O36HfiO4\
-                    \nRun VASP\
-                    \n\t$ kpy vas_make_ini.py -s POSCAR.HfSe2L1O36MoiO4 -j mdnve -k g -d d2510c\
-                    '
+                    \n\tVASP for NVE\
+                    \n\t    (Insertion) at interface needs high T to get over attraction to both sides\
+                    \n\t\tBombing system temp (500 K) makes the bombing slow -> increase temp by -t\
+                    \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Hfopt -j add -a O4 -t 500 -ht 800 -z 10   -v -d 2 -o HfSe2L1O36HfiO4\
+                    \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Moopt -j add -a O4 -t 500 -ht 800 -z 9.8  -v -d 2 -o HfSe2L1O36MoiO4\
+                    \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt  -j add -a O4 -t 500 -ht 800 -z 10   -v -d 2 -o HfSe2L1O36WiO4\
+                    \n\t\t: Many O's and high system T\
+                    \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt -j add -a O6 -t 600 -o HfSe2L1O36WiO6T6H  -z 10 -d 2 -vt zdn -ht 800\
+                    \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt -j add -a O8 -t 800 -o HfSe2L1O36WiO8T8H  -z 10 -d 2 -vt zdn -ht 800\
+                    \n\t    (NVE)\
+                    \n\t\t$ kpy vas_make_ini.py -s POSCAR.HfSe2L1O36MoiO4 -j mdnve -k g -d d2510c\
+                    \n\tQuenching (VASP-NVT)\
+                    \n\t    Copy CONTCAR for input: removing floating Se atoms\
+                    \n\t    (NVT)\
+                    \n\t\t$ kpy vas_make_ini.py -s CONTCAR.HfSe2O3m2Se -j md -io TEBEG 1300 TEEND 500 -k g -d HfSe2O3Q\
+                    "
 
 def print_obj(job):
     print("Instances:: ", end='')
