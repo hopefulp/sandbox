@@ -548,13 +548,16 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
         mode        sl, si  selection index in atom list or just atom index
                     a       add format O12; atom symbol:natom
         mod_atoms   modified atoms
-                    sl       atoms in the list index
+                    sl       atoms in the list index -> l6
                     a       add find lattice constand and distribute added atoms
                             append N atoms
                     s   select from atoms & natoms list in POSCAR
                         ?Hf, O, Mo, S, O -> O1, O2 
                         atomlist in POSCAR for movable in zpe calculation
                     vel assign velocity to all the atoms depending on T
+        aselect     l6      atom kinds list index
+                    i3-7    atom index
+
         zpos        the posotion in z-axis where atoms to be added
                     top: above of surface atom 4 A away from top atom
                     z1 [z2]: position of z-value or inbetween two z-values
@@ -582,8 +585,13 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
 
     print(f"Write to {outf} in {whereami()}()")
     ### obtain (modify) atom indices
-    if len(addatoms) == 1:
+    if addatoms and len(addatoms) == 1:
         addatoms0 = addatoms[0]   # use mod_atoms0 for 'sl' or 'a'
+
+    listkind = 'nameindex'
+    if aselect:
+        if re.match('i', aselect):
+            listkind = 'atomindex'
 
     lines = []
     ### obtain each block and write from parse_POSCAR
@@ -602,7 +610,7 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
         line = line1
         latoms = atoms1      # line1 is saved for atom line
     ### addatoms [07]
-    if addatoms and addatoms0: #mod_atoms0.isalpha():
+    if 'addatoms0' in locals(): #mod_atoms0.isalpha():
         i = startnum(addatoms0)
         #print(f"starting number index {i} in {whereami()}() module {__name__}")
         add_atomname = addatoms0[:i]           # atom name to be added
@@ -616,64 +624,68 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
         natomsold = lnatoms[:]
         lnatoms.append(add_natom)
 
-    ### matoms is integer in natom lines of POSCAR for mode='sl' or atom index list for mode='si'
-    elif aselect == 'sl':
-        if addatoms0.isdigit():
-            ind = int(addatoms0)               # index for atom selection in POSCAR atom line
-        elif job == 'sort' and re.search('-',matoms):
-            indices = re.split('-', matoms)
-            ind = int(indices[0])
-            indf = int (indices[-1])
-            ### contract atom line
-            atom_kinds_tobesorted = latoms[ind:indf+1]
-            if asort:
-                atom_sort = asort
-            else:
-                print(f"input atoms to be sorted: -as ")
-                atom_sort = get_atom_kinds(atom_kinds_tobesorted)
-            #print(f"atom_sort {atom_sort}")
-            latom_indices_tobesorted=[ atom_sort.index(a) for a in atom_kinds_tobesorted]
-            new_latoms = latoms[:ind]
-            new_latoms.extend(atom_sort)
-            new_latoms.extend(latoms[indf+1:])
-            print(f"{new_latoms}")
-            line = "  ".join(new_latoms) + "\n"
-            #print(line); print(f"latom line {latom_indices_tobesorted}")
-            #if job == 'sort':               # change natoms list
-            ### sum natomslist following latom_indices_tobesorted
-            lnatom_tobesorted = lnatoms[ind: indf+1]
-            nselatoms = sum(lnatom_tobesorted)
-            new_natoms_tobesored = np.zeros(len(atom_sort)).astype(int)
-            for i, inatom in enumerate(lnatom_tobesorted):
-                #print(f"{i}: {inatom}")
-                new_natoms_tobesored[latom_indices_tobesorted[i]] += inatom
-            new_natoms = lnatoms[:ind]
-            new_natoms.extend(list(new_natoms_tobesored))
-            new_natoms.extend(lnatoms[indf+1:])
-            #print(f"new natoms: {new_natoms}")
-            line_na = "  ".join(map(str, new_natoms)) + "\n"
-            #print(f"natom line: {new_natoms_tobesored}"); # sys.exit(12)
-            #print(f"lnatom_tobesorted: {lnatom_tobesorted}")
-    elif aselect == 'si': #selection by index
-        ### change str into integer
-        int_matoms = list(map(int, mod_atoms))
-        if job == 'rm':
-            rm_lnatoms_ind=[]
-            for iatom in int_matoms: # iatom is sorted
-                sum_natoms = 0
-                for i, natom in enumerate(lnatoms):
-                    sum_natoms += int(natom)
-                    if iatom < sum_natoms:   # delete atom
-                        rm_lnatoms_ind.append(i)
-                        break
-            for ind_rm in rm_lnatoms_ind:
-                lnatoms[ind_rm] -= 1
-                if lnatoms[ind_rm] == 0:
-                    print(f"all the {ind_rm}-th atoms are removed")
-                    sys.exit(100)
-            line_na = "  ".join(map(str, lnatoms)) + "\n"
-            print(f"line_na {line_na} in {whereami()}()")
-    
+    ### modify if addatoms and aselect are at the same time
+    elif aselect:
+        if listkind == 'nameindex':
+            #if addatoms0.isdigit():
+            #    ind = int(addatoms0)               # index for atom selection in POSCAR atom line
+            if job == 'sort' and re.search('-',matoms):
+                indices = re.split('-', matoms)
+                ind = int(indices[0])
+                indf = int (indices[-1])
+                ### contract atom line
+                atom_kinds_tobesorted = latoms[ind:indf+1]
+                if asort:
+                    atom_sort = asort
+                else:
+                    print(f"input atoms to be sorted: -as ")
+                    atom_sort = get_atom_kinds(atom_kinds_tobesorted)
+                #print(f"atom_sort {atom_sort}")
+                latom_indices_tobesorted=[ atom_sort.index(a) for a in atom_kinds_tobesorted]
+                new_latoms = latoms[:ind]
+                new_latoms.extend(atom_sort)
+                new_latoms.extend(latoms[indf+1:])
+                print(f"{new_latoms}")
+                line = "  ".join(new_latoms) + "\n"
+                #print(line); print(f"latom line {latom_indices_tobesorted}")
+                #if job == 'sort':               # change natoms list
+                ### sum natomslist following latom_indices_tobesorted
+                lnatom_tobesorted = lnatoms[ind: indf+1]
+                nselatoms = sum(lnatom_tobesorted)
+                new_natoms_tobesored = np.zeros(len(atom_sort)).astype(int)
+                for i, inatom in enumerate(lnatom_tobesorted):
+                    #print(f"{i}: {inatom}")
+                    new_natoms_tobesored[latom_indices_tobesorted[i]] += inatom
+                new_natoms = lnatoms[:ind]
+                new_natoms.extend(list(new_natoms_tobesored))
+                new_natoms.extend(lnatoms[indf+1:])
+                #print(f"new natoms: {new_natoms}")
+                line_na = "  ".join(map(str, new_natoms)) + "\n"
+                #print(f"natom line: {new_natoms_tobesored}"); # sys.exit(12)
+                    #print(f"lnatom_tobesorted: {lnatom_tobesorted}")
+        elif listkind == 'atomindex': #selection by index
+            ### change str into integer
+            int_matoms = list(map(int, mod_atoms))
+            if job == 'rm':
+                rm_lnatoms_ind=[]
+                for iatom in int_matoms: # iatom is sorted
+                    sum_natoms = 0
+                    for i, natom in enumerate(lnatoms):
+                        sum_natoms += int(natom)
+                        if iatom < sum_natoms:   # delete atom
+                            rm_lnatoms_ind.append(i)
+                            break
+                for ind_rm in rm_lnatoms_ind:
+                    lnatoms[ind_rm] -= 1
+                    if lnatoms[ind_rm] == 0:
+                        print(f"all the {ind_rm}-th atoms are removed")
+                        sys.exit(100)
+                line_na = "  ".join(map(str, lnatoms)) + "\n"
+                print(f"line_na {line_na} in {whereami()}()")
+        else:
+            print(f"atom selection list kind should defined")
+            sys.exit(101)
+
     #if vel_type:
     #    ind = -1                        # all the atoms in atom index
     ### add atom
@@ -697,9 +709,10 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
         npre_unsel  = ntotalold
         nselatoms   = add_natom
         ind         = -1            # for print sentence
-    elif aselect == 'sl':
+    elif aselect and listkind == 'nameindex':
         ### calculate index for selected atoms: movable in zpe, velocity in bombardment
         #ind = atoms.indeadd) -> not to try find using atom name
+        ind = int(aselect[1:])
         nselatoms = lnatoms[ind]              # natoms to be moved for zpe
         npre_unsel = 0
         for i, na in enumerate(lnatoms):
@@ -707,9 +720,9 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                 npre_unsel += na                  # npre_unsel = natoms before selected (movable) atoms
         if job == 'zpe':
             lines.append("Selective dynamics\n")
-    elif Lvel:
-        npre_unsel  = ntotalold
-        nselatoms = 0
+    #elif Lvel:
+    #    npre_unsel  = ntotalold
+    #    nselatoms = 0
     
     ### for Cartesian or Direct    
     line, cd = parse_poscar(poscar, block='cd'); lines.append(line)

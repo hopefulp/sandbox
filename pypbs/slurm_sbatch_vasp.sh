@@ -52,6 +52,7 @@ cd $wdir
 
 echo "npar = $npar" >> $logfile
 sed -i "s/.*NPAR.*/NPAR = $npar/" INCAR
+sed -i "/^[[:space:]]*NCORE/s/^/#/" INCAR
 if [ $hmem ]; then
     mpiproc=$(expr $SLURM_JOB_NUM_NODES \* $SLURM_CPUS_PER_NODE / 2 )
     echo "high memory = $hmem; mpiproc $mpiproc per node is half of $SLURM_CPUS_PER_NODE" >> $logfile

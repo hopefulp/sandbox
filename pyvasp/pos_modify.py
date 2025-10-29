@@ -63,7 +63,7 @@ def main():
                         help="VASP job for POSCAR")
     ### select and add might be compatible
     #gatoms =  parser.add_mutually_exclusive_group()
-    parser.add_argument('-s', '--aselect', help="atom or list index")
+    parser.add_argument('-s', '--aselect', help="atom kinds [l] or atom list [i]; l6, i3-7 etc")
     parser.add_argument('-a', '--addatoms', nargs='*', help="atom kinds followed by natom O4 S3 etc")
     parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
     parser.add_argument('-d', '--distance', default = 3.0, type=float, help="interdistance creteria for implantation")
@@ -102,7 +102,11 @@ def main():
     #else:
     ### using job -a and -s can be defined
 
-    if args.job == 'sort':
+    aselect=args.aselect
+    addatoms=args.addatoms
+    ### select in POSCAR
+    '''
+    if args.job == 'sort' or args.job == 'md':
         if not args.select:
             aselect = 'sl'     # select atom list interval: 3-7
         else:
@@ -117,6 +121,7 @@ def main():
 
     if 'aselect' not in locals():
         aselect = args.aselect
+    ''' 
 
     Lvelocity = False
     if args.Lvelocity:

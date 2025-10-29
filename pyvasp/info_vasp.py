@@ -163,11 +163,11 @@ poscar.pos_sort     ="pos_sort.py POSCAR -al atom_list -z\
 poscar.pos_modify   ="change POSCAR\
                     \n\tmain routine in libposcar.modify_POSCAR()\
                     \n\tOptions:\
-                    \n\t    -j  zpe, bomb, add, addbomb\
+                    \n\t    -j  should define --aselect --addatoms\
                     \n\t        sel   sel  add    add  : how to add or select atoms\
                     \n\t        coord vel  coord vel   : only coordinate|add velocity\
                     \n\t        addbomb: append atoms after POSCAR\
-                    \n\t    -a  add atoms, O12, Fe2, ...\
+                    \n\t    -a  --addatoms add atoms, O12, Fe2, ...\
                     \n\t    -z  location on z-axis: top or float [float]\
                     \n\t\ttop: 4 Ang away from top of system\
                     \n\t\t z1: at z1 position\
@@ -178,6 +178,9 @@ poscar.pos_modify   ="change POSCAR\
                     \n\tUsage:\
                     \n\t    pos_modify.py POSCAR.HfSe2sc34 -j bomb -a O6 -z 1.2 2.3 -t 600 -o POSCAR.HfSe2O12L2 \
                     \n\t    pos_modify.py POSCAR.HfSe2L1O36Hfsub -j sort -s 1-10 -as Se O\
+                    \n\t    (add on top)\
+                    \n\t\tadd: pos_modify.py d2710a/CONTCAR -j add -a O4 -t 500 -ht 800 -v -o HfSe2L1O36HfiO4tO4\
+                    \n\t\tvel: \
                     "
 poscar.libposcar    ="library for pos_modify\
                     \n\tAttributes:\
