@@ -102,28 +102,34 @@ def main():
     #else:
     ### using job -a and -s can be defined
 
-    aselect=args.aselect
-    addatoms=args.addatoms
+    if args.aselect:
+        aselect=args.aselect
+    if args.addatoms:
+        addatoms=args.addatoms
     ### select in POSCAR
-    '''
-    if args.job == 'sort' or args.job == 'md':
-        if not args.select:
-            aselect = 'sl'     # select atom list interval: 3-7
-        else:
-            aselect = args.select
-    elif args.job == 'rm':
-        if not args.select:
-            aselect = args.select     # select atom index: 3-7 or 3 5 8 etc
-        else:
-            aselect = 'si'
+    
+    if args.job == 'sort' or args.job == 'md' or args.job == 'rm':
+        if not args.aselect:
+            aselect = 'ia'     # atom index all
+        if args.job == 'md':
+            Lvelocity = True
     elif args.job == 'bomb' or args.job == 'add' or args.job == 'inter': # line for example
-        addatoms = args.addatoms      # add append 
+        if 'addatoms' not in locals():
+            print("Error: addatoms should be put in for job {args.job}")
+            sys.exit(1)
+        if args.job == 'bomb' or args.job == 'inter':
+            Lvelocity = True
+            if args.job == 'bomb':
+                vel_type = 'zdn'
+            elif args.job == 'inter':
+                vel_type = 'random'
 
     if 'aselect' not in locals():
         aselect = args.aselect
-    ''' 
+    
+    if 'Lvelocity' not in locals():
+        Lvelocity = False
 
-    Lvelocity = False
     if args.Lvelocity:
         if not args.vel_type:
             vel_type = 'r'
