@@ -126,7 +126,8 @@ def main():
 
     if 'aselect' not in locals():
         aselect = args.aselect
-    
+    if 'addatoms' not in locals():
+        addatoms = None
     if 'Lvelocity' not in locals():
         Lvelocity = False
 
