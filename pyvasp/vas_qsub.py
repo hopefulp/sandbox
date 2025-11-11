@@ -66,7 +66,7 @@ def qsub_command(ndir, X=3, nnode=4, np=None, option=None, vasp_exe=None, lkisti
     if hostname == 'kisti':
         if vasp_exe:
             if 'g' in vasp_exe:
-                str_vasp = "-v exe=gamma"
+                str_vasp = "-v exe=gam"
             elif 'xy' in vasp_exe:
                 str_vasp = "-v exe=xyrelax"
             elif 'ncl' in vasp_exe:
@@ -97,6 +97,17 @@ def qsub_command(ndir, X=3, nnode=4, np=None, option=None, vasp_exe=None, lkisti
         else:
             s = f"qsub -N {ndir} {str_vasp} $SB/pypbs/pbs_vasp_kisti_skl.sh"
     elif hostname == 'pt':
+        if vasp_exe:
+            if 'g' in vasp_exe:
+                str_vasp = "--export=exe=gam"
+                sec_str_vasp = ",=exe=gam"
+            elif 'xy' in vasp_exe:
+                str_vasp = "--export=exe=xyrelax"
+            elif 'ncl' in vasp_exe:
+                str_vasp = "--export=exe=ncl"
+        else:
+            str_vasp = ""
+
         if not X or not nnode:
             qx, qN = get_queue_pt(qx=X)
         if np:
@@ -105,13 +116,13 @@ def qsub_command(ndir, X=3, nnode=4, np=None, option=None, vasp_exe=None, lkisti
             nproc = nnode * nXn[X]
         if option == 'mem':
             hproc = int(nXn[X]/2)
-            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -c {hproc} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -c {hproc} --export=hmem=1{sec_str_vasp} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
         elif option == 'opt':
-            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_vaspopt.sh"
+            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} {str_vasp} /home/joonho/sandbox/pypbs/slurm_sbatch_vaspopt.sh"
         elif option == 'sim':
-            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
+            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} {str_vasp} /home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
         else:
-            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+            s = f"sbatch -J {ndir} -p X{X} -N {nnode} -n {nproc} {str_vasp} /home/joonho/sandbox/pypbs/slurm_sbatch.sh"
     else:
         print(f"No qsub command for {hostname}")
         s=''

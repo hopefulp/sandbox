@@ -361,7 +361,15 @@ def main():
     if job == 'kp':
         job = 'sp'
         subjob = 'kp'
-        
+
+    if args.executable:
+        vas_executable =  args.executable
+    else:
+        if 'g' in args.kpoints:
+            vas_executable = 'gamma'
+        else:
+            vas_executable = None
+
     ### JOB = FAKE
     if job == 'fake':
         job = subjob
@@ -440,10 +448,10 @@ def main():
             print(f"kp_string {kp_str}, dirname {dirname} in function {whereami()}()")
             dname.append(dirname)  # dname is string
             ##########     1      2        3         4            5         6            7             8          9        10           11          12            13               14        15              16          17         18
-            make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+            make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, vas_executable, args.lkisti, Lrun)
     else:
         ##########     1      2        3         4              5            6            7             8               9        10           11          12            13               14        15              16            17         18
-        make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, args.executable, args.lkisti, Lrun)
+        make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, vas_executable, args.lkisti, Lrun)
     return 0
 
 if __name__ == '__main__':
