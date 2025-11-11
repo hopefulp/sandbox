@@ -21,7 +21,7 @@ echo "NPROC = $NPROC" >> $log_file
 echo start >> $log_file
 date >> $log_file
 
-if [ $exe == 'gamma' ]; then
+if [ $exe == 'gam' ]; then
     EXEC="$HOME/bin/vasp_gam"
 elif [ $exe == 'xyrelax' ]; then
     EXEC="$HOME/bin/vasp_std-xy"
