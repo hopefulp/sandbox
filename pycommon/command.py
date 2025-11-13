@@ -529,7 +529,7 @@ def main():
     parser.add_argument('work', choices=['slurm','kisti','amp','qchem','ga','gpu','vasp','pbs','siesta'],  help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-sw', '--subwork', choices=['vasp', 'mldyn', 'nc', 'crr', 'amp', 'vaspnc', 'vasnc'], help="one of amp, qchem, mldyn for ML dyn")
     parser.add_argument('-js','--job_submit', default='qsub', choices=['chi','qsub','getqsub', 'node'],  help="where the job running ")
-    parser.add_argument('-qn', '-q', '--qname', default='test', help="queue name for qsub shown by qstat")
+    parser.add_argument('-qn', '-q', '--qname', default='POSCAR.test', help="queue name for qsub shown by qstat")
     parser.add_argument('-pj','--package_job', default='sp', help="vasp job input for vas_make_ini.py; siesta alpha dir")
     parser.add_argument('-sj','--package_subjob', default='mag', help="vasp subjob input for vas_make_ini.py to make INCAR.spmag; siesta input")
     parser.add_argument('-kv', '--keyvalues', nargs='*', help='change a keyword in print')
