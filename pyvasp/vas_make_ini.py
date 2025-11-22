@@ -362,13 +362,12 @@ def main():
         job = 'sp'
         subjob = 'kp'
 
+    vas_executable = None
     if args.executable:
         vas_executable =  args.executable
     else:
-        if 'g' in args.kpoints:
+        if args.kpoints and 'g' in args.kpoints:
             vas_executable = 'gamma'
-        else:
-            vas_executable = None
 
     ### JOB = FAKE
     if job == 'fake':
