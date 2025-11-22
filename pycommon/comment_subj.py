@@ -601,12 +601,12 @@ mxene.plot2     =  "\tmplot_gibbs.py MXNB-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.3
                    mplot_gibbs.py MX-MXNB-Ueq.csv -l 'MXene' 'MX-NB' -c b r -t 'U$_{Eq}$'\
                    "
 hfse2.poscar    = "POSCAR modification for insertion of new 3-4 O atoms\
-                    \n\t$ kpy - is required to run at KISTI\
+                    \n\t$ (kpy):: bash function to run at KISTI\
                     \n\tVASP for NVE\
                     \n\t    (Insertion) at interface needs high T to get over attraction to both sides\
                     \n\t\tBombing system temp (500 K) makes the bombing slow -> increase temp by -t\
                     \n\t\t(L1)\
-                    \n\t\t$ pos_modify.py POSCAR.HfSe2sc34 -j bomb -a O4 -t 500 -ht 600 -o POSCAR.HfSe2L1O3\
+                    \n\t\t$ kpy pos_modify.py POSCAR.HfSe2sc34 -j bomb -a O4 -t 500 -ht 600 -o POSCAR.HfSe2L1O3\
                     \n\t\t(L2)\
                     \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Hfopt -j add -a O4 -t 500 -ht 800 -z 10   -v -d 2 -o HfSe2L1O36HfiO4\
                     \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Moopt -j add -a O4 -t 500 -ht 800 -z 9.8  -v -d 2 -o HfSe2L1O36MoiO4\
