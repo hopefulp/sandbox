@@ -602,23 +602,21 @@ mxene.plot2     =  "\tmplot_gibbs.py MXNB-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.3
                    "
 hfse2.poscar    = "POSCAR modification for insertion of new 3-4 O atoms\
                     \n\t$ (kpy):: bash function to run at KISTI\
-                    \n\tVASP for NVE\
-                    \n\t    (Insertion) at interface needs high T to get over attraction to both sides\
-                    \n\t\tBombing system temp (500 K) makes the bombing slow -> increase temp by -t\
-                    \n\t\t(L1)\
+                    \n\tInsertion in POSCAR: at interface needs high T to get over attraction to both sides\
+                    \n\t    : Bombing system temp (500 K) makes the bombing slow -> increase temp by -t\
+                    \n\t    (L1: on top surface)\
                     \n\t\t$ kpy pos_modify.py POSCAR.HfSe2sc34 -j bomb -a O4 -t 500 -ht 600 -o POSCAR.HfSe2L1O3\
-                    \n\t\t(L2)\
+                    \n\t    (L2: at bilayer interface HfO2/TMD)\
                     \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Hfopt -j add -a O4 -t 500 -ht 800 -z 10   -v -d 2 -o HfSe2L1O36HfiO4\
                     \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Moopt -j add -a O4 -t 500 -ht 800 -z 9.8  -v -d 2 -o HfSe2L1O36MoiO4\
                     \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt  -j add -a O4 -t 500 -ht 800 -z 10   -v -d 2 -o HfSe2L1O36WiO4\
-                    \n\t\t: Many O's and high system T\
+                    \n\t\t (Many O's and high system T)\
                     \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt -j add -a O6 -t 600 -o HfSe2L1O36WiO6T6H  -z 10 -d 2 -vt zdn -ht 800\
-                    \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt -j add -a O8 -t 800 -o HfSe2L1O36WiO8T8H  -z 10 -d 2 -vt zdn -ht 800\
-                    \n\t    (NVE)\
+                    \t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt -j add -a O8 -t 800 -o HfSe2L1O36WiO8T8H  -z 10 -d 2 -vt zdn -ht 800\
+                    \tNVE VASP\
                     \n\t\t$ kpy vas_make_ini.py -s POSCAR.HfSe2L1O36MoiO4 -j mdnve -k g -d d2510c\
-                    \n\tQuenching (VASP-NVT)\
+                    \n\tNVT-Quenching VASP\
                     \n\t    Copy CONTCAR for input: removing floating Se atoms\
-                    \n\t    (NVT)\
                     \n\t\t$ kpy vas_make_ini.py -s CONTCAR.HfSe2O3m2Se -j md -io TEBEG 1300 TEEND 500 -k g -d HfSe2O3Q\
                     "
 
