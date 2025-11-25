@@ -59,11 +59,12 @@ def main():
     '''
     parser = argparse.ArgumentParser(description="add atoms, vel block")
     parser.add_argument('poscar', default='POSCAR', help="poscar to be modified")
-    parser.add_argument('-j', '--job', default='add', choices=['bomb','inter','add','rm','zpe', 'md','sort'],\
+    parser.add_argument('-j', '--job', default='add', choices=['bomb','inter','add','rm','zpe','md','sort','split','atype'],\
                         help="VASP job for POSCAR")
     ### select and add might be compatible
     #gatoms =  parser.add_mutually_exclusive_group()
-    parser.add_argument('-s', '--aselect', help="atom kinds [l] or atom list [i]; l6, i3-7 etc")
+    parser.add_argument('-s', '--aselect', help="atom kinds [l] or atom list [i]; l6,l6-4,l6+3,O,O-4,i3-7 etc")
+    #parser.add_argument('-sn', '--aselect_number', help="if select atom atom kind, number of atoms")
     parser.add_argument('-a', '--addatoms', nargs='*', help="atom kinds followed by natom O4 S3 etc")
     parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
     parser.add_argument('-d', '--distance', default = 3.0, type=float, help="interdistance creteria for implantation")
@@ -73,7 +74,7 @@ def main():
     parser.add_argument('-vt', '--vel_type', choices=['r','random', 'copy', 'zup', 'zdn'], help="T for atom velocity, why not random")
     #parser.add_argument('-vr', '--vel_reverse', action='store_true', help="make bombing to upside")
     parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
-    parser.add_argument('-as', '--sort', nargs='*', help="order of atoms in sorting")
+    parser.add_argument('-ls', '--sort', nargs='*', help="sort list: order of atoms in sorting")
     parser.add_argument('-u', '--usage', action='store_true', help = 'print usage')
     gfname =  parser.add_mutually_exclusive_group()
     gfname.add_argument('-suf', '--suffix',     help="add suffix to outfile")
@@ -86,12 +87,12 @@ def main():
                 \n\t-j job = bomb, add, rm, zpe, md, sort\
                 \n\t    sort: mode = 'sl', -a list interval\
                 \n\t    bomb: mode = 'sl' or 'a', input velocity for -a addatoms or -a select by index with -t temp and -ht hypertemp\
+                \n\t    split: aselect index lO\
                 \n\t\tkpy pos_modify.py CONTCAR.HfSe2L1 -j bomb -a O8 -t 800 -ht 1000 -o POSCAR.HfSe2L1 -z 10 -d 2.5\
                 \n\t    rm  : mode = 'si'\
-                \n\t-m mode:\
-                \n\t    sl: -a 3-9, select list interval\
-                \n\t    si: -a 3-7 or 1 3 8 select atom indices\
-                \n\t    a : -a O6 atom_name + natom\
+                \n\t    -s:  atom selection: O, O-4, O+4, l2, i3-9, select list interval\
+                \n\t\tO: oxygen, O-4: split O from last 4, l1: second atom, i3-7: atom index\
+                \n\t    -a : add atom, -a O6 atom_name + natom\
                 ")
         sys.exit(1)
         # if no selection, assign vel to all atoms in given config
@@ -131,15 +132,17 @@ def main():
     if 'Lvelocity' not in locals():
         Lvelocity = False
 
+    vel_type = None
     if args.Lvelocity:
         if not args.vel_type:
             vel_type = 'r'
         else:
             vel_type = args.vel_type
         Lvelocity = True
-    elif args.vel_type:
-        Lvelocity = True
-        vel_type = args.vel_type
+    else:
+        if args.vel_type:
+            Lvelocity = True
+            vel_type = args.vel_type
 
     #else:
     #    mode = 'vel'
@@ -153,7 +156,10 @@ def main():
     elif args.suffix:
         outfile = args.poscar + args.suffix
     else:
-        outfile = args.poscar + args.job
+        if args.job == 'split' or args.job == 'atype':
+            outfile = args.poscar + ".vas"
+        else:
+            outfile = args.poscar + args.job
 
     #if not args.velocity_type:
     #    if 'md' in args.job:

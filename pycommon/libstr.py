@@ -37,7 +37,40 @@ def find_sep(s):
         if Lprint: print(f"delimiter is None in {whereami()}")
     return sep
 
-  
+def li2str(li, delimit=None, Lline=False):
+    '''
+    list to string
+        delimit delimiter between list elements, default=''
+    '''
+
+    if Lline:
+        endline='\n'
+    else:
+        endline=""
+
+    if delimit == None:
+        st = "".join(str(x) for x in li) + endline
+    else:
+        st = delimit + delimit.join(str(x) for x in li) + endline
+    return st
+'''
+def li2line(li, delimit=None):
+    
+    #new_line = " ".join(latoms) + "\n"
+    new_line = " ".join(str(x) for x in li) + "\n"
+    return new_line
+'''
+def list2dict(li):
+    it = iter(li)
+    dic = dict(zip(it,it))
+    return dic
+
+def print_list(li):
+    st = list2str(li)
+    print(st)
+    return st
+
+
 
    
 

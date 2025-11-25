@@ -44,9 +44,9 @@ def main():
     regex = re.compile('__')    # only detect it starts with lower case
     #if args.switch==False and args.mod == 'sys':
     if args.switch==False:
-        mod_name = 'comment_sys'
-    else:
         mod_name = 'comment_subj'
+    else:
+        mod_name = 'comment_sys'
     my_module = importlib.import_module(mod_name)
 
     if not args.job:

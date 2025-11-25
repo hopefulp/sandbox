@@ -8,6 +8,7 @@ from univ_const import k_B, amu     # k_B (J/K), amu = atomic mass unit (kg) wil
 from ase.data import atomic_masses, chemical_symbols, vdw_radii    # atomic weight, symbol with same order in the lists
 from my_stat import get_MBD_1D
 from parsing import startnum
+from libstr import li2str
 
 '''
 def get_ntatom(st):
@@ -134,6 +135,66 @@ def parse_poscar(pos, block = None, opt=None):
             except IndexError:
                 return None, None
             return b_vel, ntotal
+
+def apply_split_spec(latoms, lnatoms, spec):
+    """
+    latoms  : list of atom symbols, e.g. ['Hf', 'Se', 'O']
+    lnatoms : list of counts,      e.g. [24, 48, 20]
+    spec    : string like 'O+4' or 'O-4'
+    
+    Returns new_latoms, new_lnatoms
+    where O → O, Oa and the count is split.
+    """
+    import re
+
+    m = re.fullmatch(r'([A-Za-z][A-Za-z0-9]*)\s*([+-])\s*(\d+)', spec.strip())
+    if not m:
+        raise ValueError(f"Invalid spec: {spec!r}. Expected like 'O+4' or 'Fe-3'.")
+
+    elem, sign, num_str = m.groups()
+    k = int(num_str)
+
+    # find element index
+    try:
+        i = latoms.index(elem)
+    except ValueError:
+        raise ValueError(f"Element {elem!r} not found in latoms: {latoms}")
+
+    total = lnatoms[i]
+    if k <= 0 or k >= total:
+        raise ValueError(
+            f"Split amount {k} invalid for {elem} with total {total} "
+            f"(must be between 1 and {total-1})."
+        )
+
+    # Decide how to split:
+    #   'O+4' → [4, 16]
+    #   'O-4' → [16, 4]
+    if sign == '+':
+        first  = k
+        second = total - k
+    else:  # sign == '-'
+        first  = total - k
+        second = k
+
+    # Build new lists
+    new_latoms  = latoms[:i] + [elem, elem + 'a'] + latoms[i+1:]
+    new_lnatoms = lnatoms[:i] + [first, second] + lnatoms[i+1:]
+
+    return new_latoms, new_lnatoms
+
+def change_atom_type(latoms, aselect):
+    ### aselect is atom name
+    acount = 0
+    new_atoms=[]
+    for a in latoms:
+        if a == aselect:
+            acount += 1
+        if acount >= 2:
+            a += 'a'
+        new_atoms.append(a)
+    return new_atoms
+
 
 def coord_d2c(poscar):
     '''
@@ -543,12 +604,12 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                     addbomb a   add molecule and velocity to -z axis
                     vel      N/A assign velocity in the given configuration
                     sort    sl    change latomnames, lnatoms
+                    split|atype only change latom & lnatoms
+                        split   O to O and Oa using aselect O+4, Fe-3, etc
+                        atype   change 'O O' into 'O Oa'
                     rm      si   atom index
-        (mode, mod_atoms) -> (aselect, addatoms)
-        mode        sl, si  selection index in atom list or just atom index
-                    a       add format O12; atom symbol:natom
-        mod_atoms   modified atoms
-                    sl       atoms in the list index -> l6
+
+                                               atoms in the list index -> l6
                     a       add find lattice constand and distribute added atoms
                             append N atoms
                     s   select from atoms & natoms list in POSCAR
@@ -557,6 +618,8 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                     vel assign velocity to all the atoms depending on T
         aselect     l6      atom kinds list index
                     i3-7    atom index
+                    O       atom kind
+                        O-4 O[-4:], O+3 O[:3], 
 
         zpos        the posotion in z-axis where atoms to be added
                     top: above of surface atom 4 A away from top atom
@@ -588,11 +651,6 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
     if addatoms and len(addatoms) == 1:
         addatoms0 = addatoms[0]   # use mod_atoms0 for 'sl' or 'a'
 
-    listkind = 'nameindex'
-    if aselect:
-        if re.match('i', aselect):
-            listkind = 'atomindex'
-
     lines = []
     ### obtain each block and write from parse_POSCAR
     line1, atoms1 = parse_poscar(poscar, block='title'); lines.append(line1) # atoms might appear 1st line
@@ -604,7 +662,18 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
     print(f'paxes {paxes} in {whereami()}()')
     line_na, lnatoms = parse_poscar(poscar, block='natoms')
     ntotalold = sum(lnatoms)
-    
+
+    if aselect:
+        if re.match('i', aselect):
+            listkind = 'atomindex'
+        elif re.match('l', aselect):
+            listkind = 'nameindex'
+        else:
+            ### apply split: aselect type = O+4, etc
+            listkind = None
+
+
+
     print(f"addatoms: {addatoms}, job: {job} in {whereami()}()")
     if not line:
         line = line1
@@ -683,8 +752,18 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                 line_na = "  ".join(map(str, lnatoms)) + "\n"
                 print(f"line_na {line_na} in {whereami()}()")
         else:
-            print(f"atom selection list kind should defined")
-            sys.exit(101)
+            if job == 'split':
+                print(f"job {job}: change head")
+                latoms, lnatoms = apply_split_spec(latoms, lnatoms, aselect)    # renew latoms, lnatoms
+                line = li2str(latoms, delimit="   ", Lline=True)                  # renew atom line
+                line_na = li2str(lnatoms, delimit="   ", Lline=True)              # renew natom line
+                print(f"{latoms} {lnatoms}")
+            elif job == 'atype':
+                new_atoms = change_atom_type(latoms, aselect)   # renew latoms
+                line = li2str(new_atoms, delimit="   ", Lline=True)               # renew atom line
+            else:
+                print(f"atom selection list kind should defined")
+                sys.exit(101)
 
     #if vel_type:
     #    ind = -1                        # all the atoms in atom index
@@ -733,7 +812,11 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
     ## modify selective dynamics for ZPE
     new_coords=[]
     new_coords_rem=[]
-    if job == 'zpe':
+    ### if not update in coordinates
+    if job == 'split' or job == 'atype':
+        lines.extend(coords)
+
+    elif job == 'zpe':
         ### coords -> new_coords in ZPE
         for i, line_coord in enumerate(coords):
             if i < npre_unsel:

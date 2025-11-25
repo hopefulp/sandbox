@@ -179,8 +179,9 @@ poscar.pos_modify   ="change POSCAR\
                     \n\t    pos_modify.py POSCAR.HfSe2sc34 -j bomb -a O6 -z 1.2 2.3 -t 600 -o POSCAR.HfSe2O12L2 \
                     \n\t    pos_modify.py POSCAR.HfSe2L1O36Hfsub -j sort -s 1-10 -as Se O\
                     \n\t    (add on top)\
-                    \n\t\tadd: pos_modify.py d2710a/CONTCAR -j add -a O4 -t 500 -ht 800 -v -o HfSe2L1O36HfiO4tO4\
-                    \n\t\tvel: \
+                    \n\t\tadd atom: pos_modify.py d2710a/CONTCAR -j add -a O4 -t 500 -ht 800 -vt copy -o HfSe2L1O36HfiO4tO4\
+                    \n\t\tadjust position on top in 2D plane via ase\
+                    \n\t\tadd vel: \
                     "
 poscar.libposcar    ="library for pos_modify\
                     \n\tAttributes:\

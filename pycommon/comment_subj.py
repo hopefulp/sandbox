@@ -600,7 +600,7 @@ mxene.myplot    = "\t" + table.mplot_gibbs
 mxene.plot2     =  "\tmplot_gibbs.py MXNB-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.37)' 'G($U_{Eq}$=2.73)' 'G($U_{Ch}$=3.42)' -c k b g r -ymin -11 -ymax 24\
                    mplot_gibbs.py MX-MXNB-Ueq.csv -l 'MXene' 'MX-NB' -c b r -t 'U$_{Eq}$'\
                    "
-hfse2.poscar    = "POSCAR modification for insertion of new 3-4 O atoms\
+hfse2.poscar    = "  POSCAR modification for insertion of new 3-4 O atoms\
                     \n\t$ (kpy):: bash function to run at KISTI\
                     \n\tInsertion in POSCAR: at interface needs high T to get over attraction to both sides\
                     \n\t    : Bombing system temp (500 K) makes the bombing slow -> increase temp by -t\
@@ -613,9 +613,17 @@ hfse2.poscar    = "POSCAR modification for insertion of new 3-4 O atoms\
                     \n\t\t (Many O's and high system T)\
                     \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt -j add -a O6 -t 600 -o HfSe2L1O36WiO6T6H  -z 10 -d 2 -vt zdn -ht 800\
                     \t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt -j add -a O8 -t 800 -o HfSe2L1O36WiO8T8H  -z 10 -d 2 -vt zdn -ht 800\
-                    \tNVE VASP\
+                    \n\tVESTA plot: change atom type or split atom for coloring\
+                    \n\t    Change type only: select O, change atom type of 2nd O to Oa\
+                    \n\t\t$ pos_modify.py POSCAR.HfSe2L1aO8QO4 -j atype -s O\
+                    \n\t    Split atom with second atom type: O to Oa\
+                    \n\t\t$ pos_modify.py CONTCAR.HfSe2L1aO8QO4p5 -j split -s O-4\
+                    \n\t\t    Makes CONTCAR.HfSe2L1aO8QO4p5.vas VESTA input file\
+                    \n\t\t    New atom type: suffix a, e.g. Oa for O\
+                    \n  MD run: NVE-NVT (VASP)\
+                    \n\tNVE\
                     \n\t\t$ kpy vas_make_ini.py -s POSCAR.HfSe2L1O36MoiO4 -j mdnve -k g -d d2510c\
-                    \n\tNVT-Quenching VASP\
+                    \n\tNVT-Quenching\
                     \n\t    Copy CONTCAR for input: removing floating Se atoms\
                     \n\t\t$ kpy vas_make_ini.py -s CONTCAR.HfSe2O3m2Se -j md -io TEBEG 1300 TEEND 500 -k g -d HfSe2O3Q\
                     "

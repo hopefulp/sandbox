@@ -134,8 +134,8 @@ def common_figure(ctype='dark', ncolor=4, Ltwinx=False):
         import colorsys
     else:
         from cycler import cycler
-    ### control figure size (2,6) for x-axis is 1/5
-    fig = plt.figure(figsize=(10,6))         # def figsize=(10,6)
+
+    fig = plt.figure(figsize=(10,6))
     ax = plt.axes()
     mpl.rcParams.update({'font.size':12})
     #ax.tick_params(axis='both', which='major', labelsize=25)
@@ -348,9 +348,6 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     #ax2.set_ylabel(ylabel2, fontsize=25, color='g')
     ax2.set_ylabel(ylabel2, fontsize=25)
     #ax2.set_ylim(-2,2)
-    tick_interval = 4.0
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_interval))
-    ax2.yaxis.set_major_locator(ticker.MultipleLocator(tick_interval))
     pls=[]
     print(f"y-right axis: index {iy_right} {len(ys)} {whereami()}")
     for i in range(len(ys)):
@@ -380,25 +377,6 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     ax.legend(loc=2)            # 2
     ax2.legend(loc=4)           # 1
     plt.legend()
-    ### make the same y-scale in both size
-    y_interval_ref = 18.30
-    if iy_right:
-        ymin, ymax = ax.get_ylim()
-        y_interval = ymax - ymin
-        if 'y_interval_ref' in locals():
-            diff_interval = y_interval - y_interval_ref
-            ymin_new = ymin + diff_interval/2.
-            ymax_new = ymax - diff_interval/2.
-            ax.set_ylim(ymin_new, ymax_new)
-            y_interval = y_interval_ref
-        ymin2, ymax2 = ax2.get_ylim()
-        print(f"initial: ymin2 {ymin2} ymax2 {ymax2} y_interval {y_interval}")
-        y2_interval = ymax2 - ymin2
-        diff_interval = y2_interval - y_interval
-        ymin2_new = ymin2 + diff_interval/2.
-        ymax2_new = ymax2 - diff_interval/2.
-        ax2.set_ylim(ymin2_new, ymax2_new)
-        print(f"final: ymin2 {ymin2_new} ymax2 {ymax2_new}")
     #common_figure_after()
     #x_ticks = ['PP', 'PPP', 'PNP', 'PNP-bridged']
     #plt.xticks(x_ticks)
@@ -470,9 +448,11 @@ def auto_nvector(x,y):
         plt.plot(x,y[i])
     plt.show()
     return 0
+### most1
+#def mplot_nvector(x, y, plot_dict=None, xlabel=None, ylabel=None, xlim=None, title=None, legend=None,Lsave=False, colors=None, vertical=None, v_legend=None):
 
-### For twinx, mplot_twinx
 Lprint = 0
+
 def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=None):
     '''
     input               python              numpy.shape
@@ -573,6 +553,55 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=Non
         fig.savefig("dos.png", dpi=150)
     return 0
 
+
+def mplot_nvector_v1(x, y, dx=1.0, Title=None, Xtitle=None, Ytitle=None, Ylabels=None, Lsave=False, Colors=None, Ltwinx=None):
+    '''
+    call with x=[] and y=[ [...
+    x:: [] or [size]
+    y:: [size] or [[multi],[multi],...size]
+    '''
+    if Ltwinx:
+        ax2 = ax.twinx()
+        ax2.set_ylabel("Kinetic energy(kJ/mol)")
+        ax2.tick_params(axis='y', labelcolor='g', labelsize=10)
+
+    ys = np.array(y)
+    if len(x) != 0:
+        xsize = len(x)
+    else:
+        xsize = ys.shape[0]
+        x=range(xsize)
+    #print("hmm: {}".format(xsize))
+    print(f"{x} :: {ys}")
+    #plt.xticks(np.arange(min(x), max(x)+1, int(max(x)/dx)))
+    #plt.xticks(np.arange(min(x), max(x)+1))
+    #if tag=='x-sub':
+    #    #xlabels = [item.get_text() for item in ax.get_xticklabels()]
+    #    xlabels = tag_value
+    #    ax.set_xticklabels(xlabels)
+
+    plt.title(Title)
+    if Xtitle:
+        plt.xlabel(Xtitle, fontsize=15)
+    plt.ylabel(Ytitle, fontsize=15)
+    #ax.xaxis.set_major_locator(plt.NullLocator())
+    #print(f"x, y shape:: {np.array(x).shape} {y.shape}")
+    if ys.ndim == 1:
+        plt.plot(x, y, 'bo-')
+        #plt.scatter(x, y)
+    elif ys.ndim == 2:
+        for i in range(len(Ylabels)):
+            #plt.plot(x,ys[i,:], 'o-', label=Ylabels[i] )
+            plt.plot(x,ys[i,:], label=Ylabels[i] )
+    else:
+        print(f"Error:: obscure in y-dim {ys.ndim}")
+    ### ADD LEGEND
+    plt.legend(loc=2)                   # locate after plot
+    common_figure_after()              # comment to remove legend box 
+    plt.show()
+    if Lsave:
+        plt.savefig(figname, dpi=150)
+    return 0
 
 def draw_histogram(y, nbin, Lsave, fname):
     n, bins, patches = plt.hist(y, nbin)
