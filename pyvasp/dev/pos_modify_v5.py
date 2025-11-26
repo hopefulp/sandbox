@@ -41,7 +41,6 @@ def main():
         sort    sort atoms, natoms line by two indices
     #Depending on Job modify these arguments
     natom       add_atoms|sel_list
-    Latom: 'a' add or 's' select
         a[dd]   increas the natom
                 'O4' atom name followed by number of atoms to be added
             (bomb, add)     
@@ -63,19 +62,17 @@ def main():
     parser.add_argument('-j', '--job', default='add', choices=['bomb','inter','add','rm','zpe','md','sort','split','atype'],\
                         help="VASP job for POSCAR")
     ### select and add might be compatible
-    gatoms =  parser.add_mutually_exclusive_group()
-    gatoms.add_argument('-s', '--select', help="[l,i,aname]; l:atomname list, i:atomindex list, atomname: l6,l6-4,l6+3,O,O-4,i3-7 etc")
+    #gatoms =  parser.add_mutually_exclusive_group()
+    parser.add_argument('-s', '--aselect', help="atom kinds [l] or atom list [i]; l6,l6-4,l6+3,O,O-4,i3-7 etc")
     #parser.add_argument('-sn', '--aselect_number', help="if select atom atom kind, number of atoms")
-    gatoms.add_argument('-a', '--add', help="atom kinds followed by natom O4 S3 etc")
-    #gatoms.add_argument('-a', '--add', nargs='*', help="atom kinds followed by natom O4 S3 etc")
-    gvel = parser.add_argument_group(title='velocity')
-    gvel.add_argument('-v', '--Lvelocity', action='store_true', help="include velocity in POSCAR")
-    gvel.add_argument('-t','-T', '--temp', type=float, default=500,  help="system temperature T(K) for atomic velocity")
-    gvel.add_argument('-ht', '--hypertherm', default=600, type=float, help="velocity for input atoms T(eV,K)")
-    gvel.add_argument('-vt', '--vel_type', default='zdn', choices=['r','random', 'copy', 'zup', 'zdn'], help="T for atom velocity, why not random")
-    gvel.add_argument('-vr', '--vel_reverse', action='store_true', help="make bombing to upside")
+    parser.add_argument('-a', '--addatoms', nargs='*', help="atom kinds followed by natom O4 S3 etc")
     parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
     parser.add_argument('-d', '--distance', default = 3.0, type=float, help="interdistance creteria for implantation")
+    parser.add_argument('-t', '--temp', type=float, default=500,  help="system temperature T(K) for atomic velocity")
+    parser.add_argument('-ht', '--hypertherm', type=float, help="velocity for input atoms T(eV,K)")
+    parser.add_argument('-v', '--Lvelocity', action='store_true', help="include velocity in POSCAR")
+    parser.add_argument('-vt', '--vel_type', choices=['r','random', 'copy', 'zup', 'zdn'], help="T for atom velocity, why not random")
+    #parser.add_argument('-vr', '--vel_reverse', action='store_true', help="make bombing to upside")
     parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
     parser.add_argument('-ls', '--sort', nargs='*', help="sort list: order of atoms in sorting")
     parser.add_argument('-u', '--usage', action='store_true', help = 'print usage')
@@ -101,32 +98,54 @@ def main():
         # if no selection, assign vel to all atoms in given config
     ### args.mode is divided into -s and -a
     ### -s and -a is not compatible at the moment
+    #if args.mode:
+    #    mode = args.mode
+    #else:
+    ### using job -a and -s can be defined
 
-    ### if atoms has 'S': select in POSCAR else add to POSCAR
-    if args.add:
-        atoms = 'A' + args.add
-    else:
-        atoms = args.select
-
-    ### Using job: assign 'S' or 'A'
-    Lvelocity = args.Lvelocity
+    if args.aselect:
+        aselect=args.aselect
+    if args.addatoms:
+        addatoms=args.addatoms
+    ### select in POSCAR
+    
     if args.job == 'sort' or args.job == 'md' or args.job == 'rm':
+        if not args.aselect:
+            aselect = 'ia'     # atom index all
         if args.job == 'md':
             Lvelocity = True
     elif args.job == 'bomb' or args.job == 'add' or args.job == 'inter': # line for example
+        if 'addatoms' not in locals():
+            print("Error: addatoms should be put in for job {args.job}")
+            sys.exit(1)
         if args.job == 'bomb' or args.job == 'inter':
             Lvelocity = True
             if args.job == 'bomb':
                 vel_type = 'zdn'
             elif args.job == 'inter':
                 vel_type = 'random'
-    if args.vel_type:
-        vel_type = args.vel_type
 
-    ### make temp dict
-    dic_vel = {}
-    if Lvelocity:
-        dic_vel={'t':args.temp, 'ht': args.hypertherm, 'vt': args.vel_type,'vr':args.vel_reverse}
+    if 'aselect' not in locals():
+        aselect = args.aselect
+    if 'addatoms' not in locals():
+        addatoms = None
+    if 'Lvelocity' not in locals():
+        Lvelocity = False
+
+    vel_type = None
+    if args.Lvelocity:
+        if not args.vel_type:
+            vel_type = 'r'
+        else:
+            vel_type = args.vel_type
+        Lvelocity = True
+    else:
+        if args.vel_type:
+            Lvelocity = True
+            vel_type = args.vel_type
+
+    #else:
+    #    mode = 'vel'
     #print(f"input error: select or add atoms via -s or -a")
     #sys.exit(1)
     ### outfile name need to be passed
@@ -142,7 +161,16 @@ def main():
         else:
             outfile = args.poscar + args.job
 
-    modify_POSCAR(args.poscar, job=args.job, xatoms=atoms, dic_vel=dic_vel, zpos=args.zcoord, nlevel=args.nlevel,\
+    #if not args.velocity_type:
+    #    if 'md' in args.job:
+    #        vel_type = 'random'
+    #    elif 'bomb' in args.job or args.job == 'rm':
+    #        vel_type = 'copy'
+    #if 'bomb' in args.job:
+    ### job = bomb or addbomb
+    #pos_bombardment(args.poscar, args.job, atoms, args.zcoord, args.temp, args.velocity, args.nlevel, outfile)
+    modify_POSCAR(args.poscar, job=args.job, aselect = aselect, addatoms=addatoms, zpos=args.zcoord, \
+    temp=args.temp, htemp=args.hypertherm, Lvel = Lvelocity, vel_type=vel_type, nlevel=args.nlevel,\
     asort=args.sort, r_crit=args.distance, outf=outfile)
 
     return 0

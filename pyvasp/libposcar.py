@@ -593,8 +593,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
 ### aselect and addatoms are compatible
 #def modify_POSCAR(poscar, job='zpe', aselect=None, mod_atoms=None, zpos=None, temp=300, htemp=None,\
 #            vel_type='random', outf='POSCAR', r_crit=None, asort=None, nlevel=None):
-def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, temp=300, htemp=None,\
-            Lvel=False, vel_type=None, outf='POSCAR', r_crit=None, asort=None, nlevel=None):
+def modify_POSCAR(poscar, job='zpe', xatoms=None, dic_vel=None, zpos=None, outf='POSCAR', r_crit=None, asort=None, nlevel=None):
     '''
     Modularize POSCAR part
     inputs:
@@ -610,31 +609,34 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                     rm      si   atom index
 
                                                atoms in the list index -> l6
-                    a       add find lattice constand and distribute added atoms
-                            append N atoms
-                    s   select from atoms & natoms list in POSCAR
+
+        xatoms      if start with 'A': add
+                    else: select
+            add     O5, etc
+            select  : [l, i, aname]: starting letter defines selection
+                    l6      atom kinds list index starting from 0
+                    i3-7    atom index  starting from 1
+                    O       atom kind
                         ?Hf, O, Mo, S, O -> O1, O2 
                         atomlist in POSCAR for movable in zpe calculation
-                    vel assign velocity to all the atoms depending on T
-        aselect     l6      atom kinds list index
-                    i3-7    atom index
-                    O       atom kind
-                        O-4 O[-4:], O+3 O[:3], 
+                        O-4 O[-4:], O+3 O[:3]
+        dic_vel     {'t': temparature, 'ht', hypertempearture, 'vt': vel_type}
+            t       temperature for velocity  T
+            ht      hyper_temperature for hyperthermal species in plasma
+            vt     'random' for assign following T
+                    'copy' to copy original file
+            vr      boolean for bombing to +z direction
 
-        zpos        the posotion in z-axis where atoms to be added
+                zpos        the posotion in z-axis where atoms to be added
                     top: above of surface atom 4 A away from top atom
                     z1 [z2]: position of z-value or inbetween two z-values
-        temp        temperature for velocity  T
-        htemp       hyper_temperature for hyperthermal species in plasma
-        vel_type    'random' for assign following T
-                    'copy' to copy original file
-        v_reverse   boolean for bombing to +z direction
         nlevel      number of levels to add O atoms in multi level
         r_crit      reference distance between atoms: as for existing atoms not generating atoms
     variables:
-        iatom       atom index
-        atoms       atom list in POSCAR
-        natoms      number of atoms list in POSCAR
+        lidx        atomindex, nameindex, name
+            atomindex   atom start from 1, 2, 3, ...
+            nameindex   atom list in POSCAR
+            name        start w. name
         matoms      a   atom species followed by natom to be added in modifying POSCAR
                     sl   integer in atom species line
                         two integers linked by '-' to be contract in atom list
@@ -648,8 +650,10 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
 
     print(f"Write to {outf} in {whereami()}()")
     ### obtain (modify) atom indices
-    if addatoms and len(addatoms) == 1:
-        addatoms0 = addatoms[0]   # use mod_atoms0 for 'sl' or 'a'
+    Ladd = False
+    if re.match('A', xatoms):
+        Ladd = True
+        xatoms = xatoms[1:]
 
     lines = []
     ### obtain each block and write from parse_POSCAR
@@ -657,33 +661,34 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
     line, scale = parse_poscar(poscar, block='scale'); lines.append(line)
     nline, paxes = parse_poscar(poscar, block='paxes'); lines.extend(nline)
 
-    ### deal with atomname & natom lines together to deal with job=rm
+    ### deal with name & natom lines together to deal with job=rm
     line, latoms = parse_poscar(poscar, block='atoms')
     print(f'paxes {paxes} in {whereami()}()')
     line_na, lnatoms = parse_poscar(poscar, block='natoms')
     ntotalold = sum(lnatoms)
 
-    if aselect:
-        if re.match('i', aselect):
-            listkind = 'atomindex'
-        elif re.match('l', aselect):
-            listkind = 'nameindex'
+    ### select option
+    if not Ladd:
+        if re.match('i', xatoms):
+            lidx = 'atomindex'
+            xatoms=xatoms[1:]
+        elif re.match('l', xatoms):
+            lidx = 'nameindex'
+            xatoms=xatoms[1:]
         else:
+            lidx = 'name'
             ### apply split: aselect type = O+4, etc
-            listkind = None
 
-
-
-    print(f"addatoms: {addatoms}, job: {job} in {whereami()}()")
+#    print(f"addatoms: {addatoms}, job: {job} in {whereami()}()")
     if not line:
         line = line1
         latoms = atoms1      # line1 is saved for atom line
     ### addatoms [07]
-    if 'addatoms0' in locals(): #mod_atoms0.isalpha():
-        i = startnum(addatoms0)
+    if Ladd: #mod_atoms0.isalpha():
+        i = startnum(xatoms)
         #print(f"starting number index {i} in {whereami()}() module {__name__}")
-        add_atomname = addatoms0[:i]           # atom name to be added
-        add_natom = int(addatoms0[i:])     # natom to be added
+        add_atomname = xatoms[:i]           # atom name to be added
+        add_natom = int(xatoms[i:])     # natom to be added
         ### split alphabet and numeric: O7, O29, He7
         line = line.rstrip() + f'  {add_atomname}' + '\n'       # do not use \t which raise type error in Vasp
         latomsold = latoms[:]
@@ -693,9 +698,9 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
         natomsold = lnatoms[:]
         lnatoms.append(add_natom)
 
-    ### modify if addatoms and aselect are at the same time
-    elif aselect:
-        if listkind == 'nameindex':
+    ### Select atoms: modify if addatoms and aselect are at the same time
+    else:
+        if lidx == 'nameindex':
             #if addatoms0.isdigit():
             #    ind = int(addatoms0)               # index for atom selection in POSCAR atom line
             if job == 'sort' and re.search('-',matoms):
@@ -732,7 +737,7 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                 line_na = "  ".join(map(str, new_natoms)) + "\n"
                 #print(f"natom line: {new_natoms_tobesored}"); # sys.exit(12)
                     #print(f"lnatom_tobesorted: {lnatom_tobesorted}")
-        elif listkind == 'atomindex': #selection by index
+        elif lidx == 'atomindex': #selection by name index in atom line
             ### change str into integer
             int_matoms = list(map(int, mod_atoms))
             if job == 'rm':
@@ -751,15 +756,16 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                         sys.exit(100)
                 line_na = "  ".join(map(str, lnatoms)) + "\n"
                 print(f"line_na {line_na} in {whereami()}()")
+        ### xatom starts from atom name
         else:
             if job == 'split':
                 print(f"job {job}: change head")
-                latoms, lnatoms = apply_split_spec(latoms, lnatoms, aselect)    # renew latoms, lnatoms
+                latoms, lnatoms = apply_split_spec(latoms, lnatoms, xatoms)    # renew latoms, lnatoms
                 line = li2str(latoms, delimit="   ", Lline=True)                  # renew atom line
                 line_na = li2str(lnatoms, delimit="   ", Lline=True)              # renew natom line
                 print(f"{latoms} {lnatoms}")
             elif job == 'atype':
-                new_atoms = change_atom_type(latoms, aselect)   # renew latoms
+                new_atoms = change_atom_type(latoms, xatoms)   # renew latoms
                 line = li2str(new_atoms, delimit="   ", Lline=True)               # renew atom line
             else:
                 print(f"atom selection list kind should defined")
@@ -784,14 +790,14 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
         #atom_fullist = atom_oldfull_list
 
     ### define number of unselected atoms (npre_unsel) and selected atoms (z-coord bombard) for selection mode
-    if addatoms:
+    if Ladd:
         npre_unsel  = ntotalold
         nselatoms   = add_natom
         ind         = -1            # for print sentence
-    elif aselect and listkind == 'nameindex':
+    elif lidx == 'nameindex':
         ### calculate index for selected atoms: movable in zpe, velocity in bombardment
         #ind = atoms.indeadd) -> not to try find using atom name
-        ind = int(aselect[1:])
+        ind = int(xatoms)
         nselatoms = lnatoms[ind]              # natoms to be moved for zpe
         npre_unsel = 0
         for i, na in enumerate(lnatoms):
@@ -858,7 +864,7 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
     else:
         lines.extend(coords)                            # copy original coords
         ### Make additional coordinates for added atoms
-        if addatoms:
+        if Ladd:
             ### for Orthorhombic crystal structure
             #z_coord = 'above'
             zmax = get_zmax(poscar)
@@ -880,7 +886,7 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
     ### unselected atoms have random vx, vy, vz
     ### selected atom will have -vz only with magnitue of |v|=sqrt(vx**2+vy**2+vz**2)   
     ### for job == 'rm' use 'rmmd' to include vel
-    if Lvel:
+    if dic_vel:
         vel_orig, _ = parse_poscar(poscar, block='vel')
         ### addtional velocity block as cartisian coordinate (A/fs)
         print(f"original vel {len(vel_orig)} in job {job}")
@@ -891,9 +897,9 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
             lines.append(f"{os.linesep}")
             lines.extend(vel_orig)
         else:
-            print(f"Add velocity at {temp} K for up to {npre_unsel} atom")
+            print(f"Add velocity at {dic_vel['t']} K for up to {npre_unsel} atom")
             lines.append("\n")
-            T = temp
+            T = dic_vel['t']
             mu = 0.0                # mean value for M-B distribution
             amukT = amu/(k_B * T)
             ms2angfs = 1.E-5         # from m/s to (1E10/1E15) Ang/fs
@@ -905,7 +911,7 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                 vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)    # N.B. each v's are list of size 
                 ### if POSCAR has velocity block, read it
                 if i < npre_unsel:
-                    if re.match('c', vel_type):
+                    if re.match('c', dic_vel['vt']):
                         s = vel_orig[i]
                     else:
                         s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
@@ -917,26 +923,26 @@ def modify_POSCAR(poscar, job='zpe', aselect=None, addatoms=None, zpos=None, tem
                     ### in case hyperthermal species, convert eV to T and assign to selected atoms
                     print(f"{vx[0]:6.3f} {vy[0]:6.3f} {vz[0]:6.3f}")
 
-                    if htemp and htemp < 100.:
+                    if dic_vel['ht'] and dic_vel['ht'] < 100.:
                         # use eV in velocity units
                         pass
-                    elif htemp: # use high T as velocity units
-                        T = htemp
+                    elif dic_vel['ht']: # use high T as velocity units
+                        T = dic_vel['ht']
                         amukT = amu/(k_B * T)
                         sigma = 1./np.sqrt(atomic_weight*amukT) * ms2angfs
                         vx, vy, vz = get_MBD_1D(loc=mu, scale=sigma, size=1)
                     #else: # use the same T as substrate
                     v = np.sqrt(vx[0]**2 + vy[0]**2 + vz[0]**2)
                     ### define velocity using vel_type
-                    if vel_type == 'zup':
+                    if dic_vel['vt'] == 'zup':
                         s = lineformat.write([0.0, 0.0, v]) + "\n"
-                    elif vel_type == 'zdn':
+                    elif dic_vel['vt'] == 'zdn':
                         s = lineformat.write([0.0, 0.0, -v]) + "\n"
                     else:
                         s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
                     
                 else:
-                    if re.match('c', vel_type):
+                    if re.match('c', dic_vel['vt']):
                         s = vel_orig[i]
                     else:
                         s = lineformat.write([vx[0], vy[0], vz[0]]) + "\n"
