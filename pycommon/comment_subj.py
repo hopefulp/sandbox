@@ -610,8 +610,8 @@ hfse2.poscar    = "  POSCAR modification for insertion of new 3-4 O atoms\
                     \n\t\t    1. move atoms and save: velocity deleted\
                     \n\t\t    2. split O to two O's in POSCAR\
                     \n\t\t    3. Add velocity in POSCAR\
-                    \n\t\t\t$ kpy pos_modify.py POSCAR.HfSe2sc34 -j md -s O2 -t 500 -ht 600 -v -o HfSe2L1O36HfiO4\
-                    \n\t\t\t$ kpy pos_modify.py POSCAR.HfSe2sc34 -j md -s l2 -t 500 -ht 600 -v -o HfSe2L1O36HfiO4\
+                    \n\t\t\t$ kpy pos_modify.py POSCAR.HfSe2sc34 -j md -s l3 -t 500 -o HfSe2L1O36HfiO4\
+                    \n\t\t\t$ kpy pos_modify.py POSCAR.HfSe2sc34 -j md -s O2 -t 500 -ht 600 -o HfSe2L1O36HfiO4\
                     \n\t    (L2: at bilayer interface HfO2/TMD)\
                     \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Hfopt -j add -a O4 -t 500 -ht 800 -z 10   -v -d 2 -o HfSe2L1O36HfiO4\
                     \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Moopt -j add -a O4 -t 500 -ht 800 -z 9.8  -v -d 2 -o HfSe2L1O36MoiO4\
