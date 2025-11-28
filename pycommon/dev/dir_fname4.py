@@ -6,16 +6,15 @@ import os
 import sys
 from common import *
 
-def make_newfname(fname, pattern, dic_writing):
+def make_newfname(fname, pattern, style, ch_word):
     ### ap for append; rp for replace
-    print(f"{fname} {pattern} {dic_writing}")
-    if dic_writing['style'] == 'ap':
-        ### rename root or just append suffix
-        if dic_writing['opt'] == 'root' and re.search('\.',fname):
+    print(f"{fname} {pattern} {style} {ch_word}")
+    if style == 'ap':
+        if re.search('\.',fname):
             fn = re.split('\.',fname)
-            new_fname = fn[0] + dic_writing['word'] + '.' + fn[1]
+            new_fname = fn[0] + ch_word + '.' + fn[1]
         else:
-            new_fname = fname + dic_writing['word']
+            new_fname = fname + ch_word
     elif style == 'rp':
         if not ch_word:
             ch_word = ""
@@ -23,26 +22,26 @@ def make_newfname(fname, pattern, dic_writing):
     return new_fname
 
 
-def ch_fname_recursive(dir1, job, m_tag, pattern, Linverse, dic_writing, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, run):
+def ch_fname_recursive(dir1, job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, run):
     print(f"{dir1}")
     if not dir1:
         pwd = os.getcwd()
         dir1 = pwd
     print(f"####.... enter {dir1} directory")
     os.chdir(dir1)
-    ch_fname(job, m_tag, pattern, Linverse, dic_writing, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, run)
+    ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, run)
 
     p_files = os.listdir('.')
     for f in p_files:
         ### without check not link-directory, this makes error
         if os.path.isdir(f) and not os.path.islink(f):
-            ch_fname_recursive(f, job, m_tag, pattern, Linverse, dic_writing, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, run)
+            ch_fname_recursive(f, job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions,ex_opt, dir_out, Lparents,Lrecur, run)
     os.chdir('..')
     print(f"####....... exit {dir1} directory")
     return 0
 
 
-def ch_fname(job, m_tag, pattern, Linverse, dic_writing, L_dir, exceptions, ex_opt, dir_out, Lparents,Lrecur, Lrun):
+def ch_fname(job, m_tag, pattern, Linverse, style, ch_word, L_dir, exceptions, ex_opt, dir_out, Lparents,Lrecur, Lrun):
     pwd = os.getcwd()
 
     # pattern should have 1 element
@@ -96,7 +95,7 @@ def ch_fname(job, m_tag, pattern, Linverse, dic_writing, L_dir, exceptions, ex_o
             job = 'mv'
         for fname in l_file:
             ### 
-            new_name = make_newfname(fname, pattern[0], dic_writing)
+            new_name = make_newfname(fname, pattern[0], style, ch_word)
             #new_name = fname.replace(patt, new_patt)
             ### rename file with extension
             '''
@@ -142,18 +141,14 @@ def ch_fname(job, m_tag, pattern, Linverse, dic_writing, L_dir, exceptions, ex_o
 def main():
     parser = argparse.ArgumentParser(description='Command Line Interface to deal with directory')
     parser.add_argument( 'job', choices=['ls', 'mv', 'rm', 'rename', 'cp', 'chmod'],  help='shell command: ?mvdir')
-    #group = parser.add_mutually_exclusive_group()
-    #group.add_argument( '-p', '--prefix', nargs='*', help='prefix of filename')
-    #group.add_argument( '-s', '--suffix', nargs='*', help='list several suffixes')
-    #group.add_argument( '-m', '--match', nargs='*', help='find matching string')
-    parser.add_argument( '-mt', '--match_type', default='m', choices=['p', 'm', 's'], help='find matching string in prefix, middle, suffix')
-    parser.add_argument( '-ms', '--match_string', nargs='*', help='input matching string')
-    parser.add_argument( '-i', '--infiles', nargs='*', help='input file list')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument( '-p', '--prefix', nargs='*', help='prefix of filename')
+    group.add_argument( '-s', '--suffix', nargs='*', help='list several suffixes')
+    group.add_argument( '-m', '--match', nargs='*', help='find matching string')
+    group.add_argument( '-i', '--infiles', nargs='*', help='input file list')
     parser.add_argument( '-v', '--inverse', action='store_true', help='after find matching, inverse the selection')
-    grewrite = parser.add_argument_group(title='file name rewriting method')
-    grewrite.add_argument('-rs', '--rewrite_style', default='rp', choices=['ap', 'rp', 'mo'], help='fname changing style: append, replace, mode')
-    grewrite.add_argument( '-rw', '--rewrite_word', help='string for replacement, if not empty')
-    grewrite.add_argument( '-ro', '--rewrite_option', help='which word to be replaced: use period or not')
+    parser.add_argument('-st', '--style', default='rp', choices=['ap', 'rp', 'mo'], help='fname changing style: append, replace, mode')
+    parser.add_argument( '-rw', '--replace_word', help='string for replacement, if not empty')
     #change.add_argument('-a', '--append', help="add suffix by -a to the original filename without extension")
     #change.add_argument('-mo', '--mode', default='755', choices=['755','644'], help="input chmod")
     parser.add_argument( '-id', '--include_dir', action='store_true', help='include dirname to filename')
@@ -165,7 +160,6 @@ def main():
     parser.add_argument( '-r', '--run', action='store_true', help='run or not-False')
     args = parser.parse_args()
 
-    '''
     ### select matching style
     if args.prefix:
         matching=args.prefix
@@ -183,17 +177,12 @@ def main():
     else:
         print("matching should be given")
         return 1
-    '''
-    matching = args.match_string
-    m_tag = args.match_type
-
-    dic_rewrite = {'style': args.rewrite_style, 'word':args.rewrite_word, 'opt': args.rewrite_option}
 
     pwd = os.getcwd()
     if args.recursive:
-        ch_fname_recursive(pwd, args.job, m_tag, matching, args.inverse, dic_rewrite, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.include_parents,args.recursive, args.run)
+        ch_fname_recursive(pwd, args.job, m_tag, matching, args.inverse, args.style, args.replace_word, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.include_parents,args.recursive, args.run)
     else:
-        ch_fname(args.job, m_tag, matching, args.inverse, dic_rewrite, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.include_parents,args.recursive, args.run)
+        ch_fname(args.job, m_tag, matching, args.inverse, args.style, args.replace_word, args.include_dir, args.excluded, args.excluded_opt, args.directory,args.include_parents,args.recursive, args.run)
 
 if __name__ == "__main__":
     main()

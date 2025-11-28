@@ -185,27 +185,6 @@ def yes_or_no(question):
     else:
         return False
 
-def list2str(li, delimit=None):
-    '''
-    list to string
-        delimit delimiter between list elements, default=''
-    '''
-
-    if delimit == None:
-        st = "".join(str(x) for x in li)
-    else:
-        st = delimit.join(str(x) for x in li)
-    return st
-
-def list2dict(li):
-    it = iter(li)
-    dic = dict(zip(it,it))
-    return dic
-
-def print_list(li):
-    st = list2str(li)
-    print(st)
-    return st
 
 def get_answers(question):
     reply = str(input(question)).strip()
@@ -263,6 +242,7 @@ def get_files_patterns(m_type, pattern, wdir, Ldir=False, Linverse=False, Lparen
             ### for search
             elif m_type == 'm':
                 if re.search(patt, fname):
+                    print(f"patten {patt} in fname {fname}")
                 ### if it is dir skip
                     if Ldir or not os.path.isdir(fname):
                         matched_files.append(fname)
