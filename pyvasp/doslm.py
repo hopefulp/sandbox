@@ -14,10 +14,11 @@ import re
 import os
 import sys
 import numpy as np
-from libposcar import obtain_atomilist0_z, obtain_atomilist0_kind
-from libdoscar import *
-from common     import list2str, whereami
-from mplot2D   import mplot_nvector #, auto_nvector
+from libposcar  import obtain_atomilist0_z, obtain_atomilist0_kind
+from libdoscar  import *
+from libstr     import li2str
+from common     import whereami
+from mplot2D    import mplot_nvector #, auto_nvector
 from parsing    import convert_2lst2D
 
 def get_filename(idos, f_pre, arr_atom, eshift, l, m):

@@ -3,7 +3,8 @@
 import argparse
 import os
 import re
-from common import dir_files, MyClass, list2str, f_root, f_ext
+from common import dir_files, MyClass, li2str, f_root, f_ext
+from libstr import li2str
 import comment_subj
 import comment_sys
 from server_env import nXn
@@ -332,8 +333,8 @@ def show_command(work, subwork, job_submit, qname_in, vjob, inf, keyvalues, node
 
         elif subwork == 'amp':
             if nhl:
-                hlstr1 = list2str(nhl, delimit=" ")
-                hl2str = list2str(nhl)
+                hlstr1 = li2str(nhl, delimit=" ")
+                hl2str = li2str(nhl)
                 if not qname:
                     qname = 'hl'+hl2str
             if not qname:

@@ -60,13 +60,13 @@ def li2line(li, delimit=None):
     new_line = " ".join(str(x) for x in li) + "\n"
     return new_line
 '''
-def list2dict(li):
+def li2dic(li):
     it = iter(li)
     dic = dict(zip(it,it))
     return dic
 
 def print_list(li):
-    st = list2str(li)
+    st = li2str(li)
     print(st)
     return st
 

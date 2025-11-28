@@ -13,9 +13,10 @@ import re
 import string
 from common     import *
 from vas_qsub   import get_queue_pt, qsub_command
-from libvas    import *
-from libposcar import get_poscar, get_dnames4pos 
-from libincar  import modify_incar_bykv, add_inckv_bysubjob
+from libvas     import *
+from libposcar  import get_poscar, get_dnames4pos 
+from libincar   import modify_incar_bykv, add_inckv_bysubjob
+from libstr     import li2str, li2dic
 
 home = os.environ['HOME']
 hostname = get_hostname()
@@ -101,7 +102,7 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
         #if yes_or_no(q):
         ### kpoins are input one by one
         #if Lktest:
-        #    dirname += 'k' + list2str(kpoints)
+        #    dirname += 'k' + li2str(kpoints)
         #print(f"dirname {dirname} in function {whereami()}()")
         if not os.path.isfile(poscar):
             print(f"ERROR: {poscar} doesnot exist for POSCAR")
@@ -227,7 +228,7 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
         if incopt:
             if type(incopt) != dict: 
                 print(f"1st change of incopt by -io {incopt}")
-                incopt = list2dict(incopt)
+                incopt = li2dic(incopt)
             
 
         ### subjob for MD: cool, heat, quench
@@ -443,7 +444,7 @@ def main():
                 kp_in = list(kp)
             print(kp_in)
             kp_str = list(map(str, kp_in))
-            dirname = dirnames[0]+'k'+list2str(kp_in)
+            dirname = dirnames[0]+'k'+li2str(kp_in)
             print(f"kp_string {kp_str}, dirname {dirname} in function {whereami()}()")
             dname.append(dirname)  # dname is string
             ##########     1      2        3         4            5         6            7             8          9        10           11          12            13               14        15              16          17         18

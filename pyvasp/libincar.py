@@ -25,8 +25,8 @@ import re
 import os
 import sys
 from fline_edit import inf_print
-from common import list2dict, whereami
-
+from common import whereami
+from libstr import li2dic
 
 ### INCAR ORDER for display
 ordered_incar_keys=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','NSIM','LPLANE','ISTART','ICHARG','ISPIN','ENCUT','NELM','NELMIN','NELMDL','EDIFF','ISYM','ADDGRID','LREAL','LASPH','LMAXMIX','NELECT','MAGMOM','NUPDOWN','ISMEAR','SIGMA','AMIX','BMIX','AMIN','IWAVPRE','ISIF','IBRION','NSW','POTIM','EDIFFG','TEBEG', 'TEEND','SYMPREC', 'SMASS', 'MDALGO', 'NBLOCK', 'NWRITE','LPETIM','LWAVE','LCHARG','LAECHG','LVTOT','LVHAR','LORBIT','NEDOS','EMIN','EMAX','LPARD','NBMOD','EINT','LSEPB','LSEPK','NFREE','LEPSILON','LMONO','IDIPOL','LDIPOL','GGA_COMPAT','LSORBIT','IVDW','LVDWSCS','LDAU','LDAUTYPE','LDAUL','LDAUU','LDAUJ','LDAUPRINT', 'ICORELEVEL', 'CLNT', 'CLN', 'CLL', 'CLZ', 'LSCALAPACK', 'IMAGES', 'SPRING', 'LCLIMB' ]
@@ -172,7 +172,7 @@ def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
     if mode == 'm':
     ### inp_kv should be dict or even number of list elements
         if isinstance(inp_kv, list):
-            kws = list2dict(inp_kv)
+            kws = li2dic(inp_kv)
             print(f"{kws} in {whereami()} at {__file__}")
         elif isinstance(inp_kv, dict):
             kws = inp_kv

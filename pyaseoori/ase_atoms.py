@@ -11,7 +11,7 @@ import numpy as np
 import sys
 import re
 from ase.cluster import *
-from common import list2str
+from libstr import li2str
 
 def atoms_modify(str, atom_ind):
     atoms = io.read(str)
