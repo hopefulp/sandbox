@@ -3,8 +3,9 @@ import argparse
 import re
 import os
 import sys
-from common import list2dict, whereami
-from libincar import modify_incar_bykv
+from common     import  whereami
+from libstr     import li2dic
+from libincar   import modify_incar_bykv
 
 ### optional 1: change INCAR by kv-dict
 def change_incar_bydic(incar, kws, outf='incar'):
@@ -49,8 +50,8 @@ def main():
     if args.job:
         change_incar_byjob(f, args.job, outf=outf)
     elif args.keyvalue:
-        ### change list2dict
-        dic = list2dict(args.keyvalue)
+        ### change li2dic
+        dic = li2dic(args.keyvalue)
         change_incar_bydic(f, dic, outf=outf)
     return 0
 

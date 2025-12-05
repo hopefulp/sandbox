@@ -7,7 +7,8 @@ import sys
 import json
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
-from common     import get_dirfiles, yes_or_no, list2dict
+from common     import get_dirfiles, yes_or_no 
+from libstr     import li2dic
 from libincar   import modify_incar_byjob, modify_incar_bykv, add_inckv_bysubjob
 from libposcar  import modify_POSCAR, pos2dirname, get_poscar
 from libvas     import get_hostname, jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_linkw, jg_linkc
@@ -32,7 +33,7 @@ def change_incar(odir, ndir, job, incar_opt, incar_kws, incar_remove):
         if incar_kws:
             print(f"{incar_kws}")
             #kv = json.load(incar_kws)
-            kws = list2dict(incar_kws)
+            kws = li2dic(incar_kws)
             dic.update(kws)
 
         elif incar_remove:
@@ -87,7 +88,7 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
 
     ### treat INCAR
     if incopt:
-        incopt = list2dict(incopt)    # value = dict for k-w pair 
+        incopt = li2dic(incopt)    # value = dict for k-w pair 
     ### 0: make a new dir
     try: 
         subprocess.call(['mkdir', f'{ndir}'])     # str f'mkdir {ndir}' is not wokring

@@ -202,7 +202,7 @@ def show_command(work, subwork, job_submit, qname_in, package_job, subjob, inf, 
     kisti.vas += f"\n\t\t(NVT) $ kpy vas_make_ini.py -s {qname_in} -j md -io TEBEG 1300 TEEND 500 -k g -d HfSe2O3Q"
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s {qname_in} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 : more info_vasp.py"
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s {qname_in} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 -e g :gamma"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s {qname_in} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -e g -n 6 : gamma"
     kisti.vas += f"\n\t\t(overwrite)"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j {vjob} -s {qname_in} -r on -al -d dnameid : o-overwrite n-not submit job"
     kisti.vas += f"\n\t    :: (OORINano)"
