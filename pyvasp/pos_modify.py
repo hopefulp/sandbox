@@ -76,8 +76,9 @@ def main():
     gvel.add_argument('-vr', '--vel_reverse', action='store_true', help="make bombing to upside")
     parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
     parser.add_argument('-d', '--distance', default = 3.0, type=float, help="interdistance creteria for implantation")
-    parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
-    parser.add_argument('-ls', '--sort', nargs='*', help="sort list: order of atoms in sorting")
+#    parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
+    ### may combine job-dependent unique option:: sort - sort list, 
+    parser.add_argument('-sl', '--sort_list', nargs='*', help="sort list: order of atoms in sorting")
     parser.add_argument('-u', '--usage', action='store_true', help = 'print usage')
     gfname =  parser.add_mutually_exclusive_group()
     gfname.add_argument('-suf', '--suffix',     help="add suffix to outfile")
@@ -106,7 +107,10 @@ def main():
     if args.add:
         atoms = 'A' + args.add
     else:
-        atoms = args.select
+        if args.select:
+            atoms = args.select
+        else:
+            atoms = 'all'       # if not add, not select, select all the atoms
 
     ### Using job: assign 'S' or 'A'
     Lvelocity = args.Lvelocity
@@ -142,8 +146,9 @@ def main():
         else:
             outfile = args.poscar + args.job
 
-    modify_POSCAR(args.poscar, job=args.job, xatoms=atoms, dic_vel=dic_vel, zpos=args.zcoord, nlevel=args.nlevel,\
-    asort=args.sort, r_crit=args.distance, outf=outfile)
+    ### nlevel=args.nlevel,
+    modify_POSCAR(args.poscar, job=args.job, xatoms=atoms, dic_vel=dic_vel, zpos=args.zcoord,\
+    asort=args.sort_list, r_crit=args.distance, outf=outfile)
 
     return 0
 

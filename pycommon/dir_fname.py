@@ -9,7 +9,11 @@ from common import *
 def make_newfname(fname, pattern, dic_writing):
     ### ap for append; rp for replace
     print(f"{fname} {pattern} {dic_writing}")
-    if dic_writing['style'] == 'ap':
+    style = dic_writing['style']
+    if dic_writing['word']:
+        ch_word = dic_writing['word']
+
+    if  style == 'ap':
         ### rename root or just append suffix
         if dic_writing['opt'] == 'root' and re.search('\.',fname):
             fn = re.split('\.',fname)
@@ -17,7 +21,7 @@ def make_newfname(fname, pattern, dic_writing):
         else:
             new_fname = fname + dic_writing['word']
     elif style == 'rp':
-        if not ch_word:
+        if not 'ch_word' in locals():
             ch_word = ""
         new_fname = fname.replace(pattern, ch_word)
     return new_fname
@@ -142,11 +146,11 @@ def ch_fname(job, m_tag, pattern, Linverse, dic_writing, L_dir, exceptions, ex_o
 def main():
     parser = argparse.ArgumentParser(description='Command Line Interface to deal with directory')
     parser.add_argument( 'job', choices=['ls', 'mv', 'rm', 'rename', 'cp', 'chmod'],  help='shell command: ?mvdir')
-    #group = parser.add_mutually_exclusive_group()
-    #group.add_argument( '-p', '--prefix', nargs='*', help='prefix of filename')
-    #group.add_argument( '-s', '--suffix', nargs='*', help='list several suffixes')
-    #group.add_argument( '-m', '--match', nargs='*', help='find matching string')
-    parser.add_argument( '-mt', '--match_type', default='m', choices=['p', 'm', 's'], help='find matching string in prefix, middle, suffix')
+    gmatch = parser.add_mutually_exclusive_group()
+    gmatch.add_argument( '-p', '--prefix', nargs='*', help='prefix of filename')
+    gmatch.add_argument( '-s', '--suffix', nargs='*', help='list several suffixes')
+    gmatch.add_argument( '-m', '--match', nargs='*', help='find matching string')
+    gmatch.add_argument( '-mt', '--match_type', default='m', choices=['p', 'm', 's'], help='find matching string in prefix, middle, suffix')
     parser.add_argument( '-ms', '--match_string', nargs='*', help='input matching string')
     parser.add_argument( '-i', '--infiles', nargs='*', help='input file list')
     parser.add_argument( '-v', '--inverse', action='store_true', help='after find matching, inverse the selection')
@@ -165,7 +169,6 @@ def main():
     parser.add_argument( '-r', '--run', action='store_true', help='run or not-False')
     args = parser.parse_args()
 
-    '''
     ### select matching style
     if args.prefix:
         matching=args.prefix
@@ -177,15 +180,15 @@ def main():
         matching=args.match
         m_tag = 'm'
     ### specify filename
+    elif args.match_type:
+        matching = args.match_string
+        m_tag = args.match_type
     elif args.infile:
         matching=args.infiles
         m_tag = 'f'
     else:
         print("matching should be given")
         return 1
-    '''
-    matching = args.match_string
-    m_tag = args.match_type
 
     dic_rewrite = {'style': args.rewrite_style, 'word':args.rewrite_word, 'opt': args.rewrite_option}
 
