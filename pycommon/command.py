@@ -200,6 +200,7 @@ def show_command(work, subwork, job_submit, qname_in, package_job, subjob, inf, 
     kisti.vas += f"\n\t    :: MD"
     kisti.vas += f"\n\t\t(NVE) $ kpy vas_make_ini.py -s {qname_in} -j mdnve -k g -d d2510c"
     kisti.vas += f"\n\t\t(NVT) $ kpy vas_make_ini.py -s {qname_in} -j md -io TEBEG 1300 TEEND 500 -k g -d HfSe2O3Q"
+    kisti.vas += f"\n\t\t(NVT) $ qsub -N {qname_in} -v exe=gam $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s {qname_in} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 : more info_vasp.py"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s {qname_in} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -e g -n 6 : gamma"

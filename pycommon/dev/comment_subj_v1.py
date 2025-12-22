@@ -2,7 +2,6 @@ from common import MyClass_str as MyClass
 from parsing import str_decom as parse_str
 from info_common import filejob
 from info_myplot import table
-from textwrap   import dedent
 #from common import MyClass
 #import comment_sys as mod_sys
 
@@ -601,58 +600,39 @@ mxene.myplot    = "\t" + table.mplot_gibbs
 mxene.plot2     =  "\tmplot_gibbs.py MXNB-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.37)' 'G($U_{Eq}$=2.73)' 'G($U_{Ch}$=3.42)' -c k b g r -ymin -11 -ymax 24\
                    mplot_gibbs.py MX-MXNB-Ueq.csv -l 'MXene' 'MX-NB' -c b r -t 'U$_{Eq}$'\
                    "
-
-hfse2.poscar = dedent("""
-    POSCAR modification for insertion of new 4 O atoms
-
-    Purpose
-    -------
-    Modify POSCAR / CONTCAR to insert O atoms at top/interfaces.
-    High temperature is required to overcome strong attraction to both sides of the interface.
-
-    Basic usage (KISTI / kpy)
-    ------------------------
-        slurm: pos_modify.py POSCAR
-        KISTI: kpy pos_modify.py POSCAR 
-
-    Insertion cases
-    ---------------
-    (L1) Top surface
-        kpy pos_modify.py {POSCAR} -j bomb -a O4 -t 500 -ht 600 -o {POSCAR}O4
-
-        if move atoms and save in POSCAR -> velocity deleted
-            - Split O into two O atoms in POSCAR
-            - Add velocity for MD run
-
-        kpy pos_modify.py {POSCAR} -j md -s l3 -t 500 -ht 600 -v -o {POSCAR}md
-
-    (L2) Bilayer interface (HfO2 / TMD)
-        (up)
-        kpy pos_modify.py {POSCAR} -j add -a O4 -t 500 -ht 800 -z 10 -d 2 -v -vt zup -o {POSCAR}iuO4
-        (down)
-        kpy pos_modify.py {POSCAR} -j add -a O4 -t 600 -ht 800 -z 10 -d 2 -vt zdn -o {POSCAR}iO4
-            e.g.: Hf z=10, Mo 9.8, W 10
-
-
-    VESTA visualization
-    -------------------
-    Change atom type only:
-        pos_modify.py {POSCAR} -j atype -s O
-
-    Split atom (O → Oa):
-        pos_modify.py {POSCAR} -j split -s O-4 → Generates *.vas file for VESTA
-
-    MD runs (VASP)
-    --------------
-    NVE:
-        kpy vas_make_ini.py -s {POSCAR} -j mdnve -k g -d d2510c
-    NVT (quenching):
-        kpy vas_make_ini.py -s {POSCAR} -j md -io TEBEG 1300 TEEND 500 -k g -d d#####
-        (md):
-        kpy vas_make_ini.py -s {POSCAR} -j md -io TEBEG 500 TEEND 500 -k g -d d#####
-        
-    """)
-
+hfse2.poscar    = "  POSCAR modification for insertion of new 3-4 O atoms\
+                    \n\t$ (kpy):: bash function to run at KISTI\
+                    \n\tInsertion in POSCAR: at interface needs high T to get over attraction to both sides\
+                    \n\t    : Bombing system temp (500 K) makes the bombing slow -> increase temp by -t\
+                    \n\t    (L1: on top surface)\
+                    \n\t\t$ kpy pos_modify.py POSCAR.HfSe2sc34 -j bomb -a O4 -t 500 -ht 600 -o POSCAR.HfSe2L1O3\
+                    \n\t\t(to move position of input atoms)\
+                    \n\t\t    1. move atoms and save: velocity deleted\
+                    \n\t\t    2. split O to two O's in POSCAR\
+                    \n\t\t    3. Add velocity in POSCAR\
+                    \n\t\t\t$ kpy pos_modify.py POSCAR.HfSe2sc34 -j md -s l3 -t 500 -o HfSe2L1O36HfiO4\
+                    \n\t\t\t$ kpy pos_modify.py POSCAR.HfSe2sc34 -j md -s O2 -t 500 -ht 600 -o HfSe2L1O36HfiO4\
+                    \n\t    (L2: at bilayer interface HfO2/TMD)\
+                    \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Hfopt -j add -a O4 -t 500 -ht 800 -z 10   -v -d 2 -o HfSe2L1O36HfiO4\
+                    \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Moopt -j add -a O4 -t 500 -ht 800 -z 9.8  -v -d 2 -o HfSe2L1O36MoiO4\
+                    \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt  -j add -a O4 -t 500 -ht 800 -z 10   -v -d 2 -o HfSe2L1O36WiO4\
+                    \n\t\t (Many O's and high system T)\
+                    \n\t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt -j add -a O6 -t 600 -o HfSe2L1O36WiO6T6H  -z 10 -d 2 -vt zdn -ht 800\
+                    \t\t$ kpy pos_modify.py CONTCAR.HfSe2L1O36Wopt -j add -a O8 -t 800 -o HfSe2L1O36WiO8T8H  -z 10 -d 2 -vt zdn -ht 800\
+                    \n\tVESTA plot: change atom type or split atom for coloring\
+                    \n\t    Change type only: select O, change atom type of 2nd O to Oa\
+                    \n\t\t$ pos_modify.py POSCAR.HfSe2L1aO8QO4 -j atype -s O\
+                    \n\t    Split atom with second atom type: O to Oa\
+                    \n\t\t$ pos_modifyp.y CONTCAR.HfSe2L1aO8QO4p5 -j split -s O-4\
+                    \n\t\t    Makes CONTCAR.HfSe2L1aO8QO4p5.vas VESTA input file\
+                    \n\t\t    New atom type: suffix a, e.g. Oa for O\
+                    \n  MD run: NVE-NVT (VASP)\
+                    \n\tNVE\
+                    \n\t\t$ kpy vas_make_ini.py -s POSCAR.HfSe2L1O36MoiO4 -j mdnve -k g -d d2510c\
+                    \n\tNVT-Quenching\
+                    \n\t    Copy CONTCAR for input: removing floating Se atoms\
+                    \n\t\t$ kpy vas_make_ini.py -s CONTCAR.HfSe2O3m2Se -j md -io TEBEG 1300 TEEND 500 -k g -d HfSe2O3Q\
+                    "
 
 def print_obj(job=None, poscar=None):
     if poscar:
