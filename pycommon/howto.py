@@ -4,7 +4,7 @@ import argparse
 import re
 import importlib
 
-def jobs(mod_comm, att, subkey):
+def jobs(mod_comm, att, subkey, args):
     #subkeys = mod_comm.__dict__[att].__dict__.keys()
     print(att)
     subkeys = list(mod_comm.__dict__[att].__dict__) # list of dict returns keys
@@ -38,6 +38,7 @@ def main():
     #parser.add_argument('-m', '--mod', default='sys', choices=['sys', 'sub'], help='which branch: system|subject')
     parser.add_argument('-s', '--switch', action='store_true', help='choose module comm_sub')
     parser.add_argument('-j', '--job', help='select one attribute')
+    parser.add_argument('-p', '--args', nargs='*', help='args such as POSCAR name')
     parser.add_argument('-k', '--subkey', help='select one key for subkeys')
     args = parser.parse_args()
 
@@ -54,7 +55,7 @@ def main():
         if mod_name == 'comment_sys':
             print(f"\t    -s for other attributes in module 'comment_subj.py' ")
     else:
-        jobs(my_module, args.job, args.subkey)
+        jobs(my_module, args.job, args.subkey, args.args)
 
 if __name__ == "__main__":
     main()

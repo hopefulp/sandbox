@@ -643,7 +643,7 @@ def modify_POSCAR(poscar, job='zpe', xatoms=None, dic_vel=None, zpos=None, outf=
                     si   integers of atom list
     '''
     ### define constants
-    #nlevel = 1         # deprecated for now
+    nlevel = 1         # deprecated for now
     z_top = 4           # Ang from top surface
     interdist = 4       # between added O atoms
     interdist_mid = 3   # at crowded space of interface
