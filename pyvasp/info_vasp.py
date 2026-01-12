@@ -282,6 +282,7 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\t    doslm.py -al -1 10-19 -ash 1 10 -eF\
                         \n\t    doslm.py -p -xi -10 3 -yi 0 2 -al 85  3 3 -ash 1 1 1 -lg O-2p Sn-5s Sn-5p -t EtO -l p s p -c 0.5f r b\
                         \n\t    doslm.py -al -1 -ash 1 -p -xi -6 2 -yi 0 150  -t 'MoS2-NH' -lg TDOS -v -eF\
+                        \n\t    doslm.py -al 0-74 75-77 -ash  75 3 -p -xi -5 1.5 -c r b -yi 0 100 -v -lg 'MoS$_2$' 'NH$_2$'\
                         \n\t    (Pt-C60-x): doslm.py -al -1 2 54 55 -ash 1 1 1 1\
                         \n\t(3) to plot ldos of slab w.r.t. VBM: obtain VBM in slab (1)\
                         \n\t    doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -e -1.169\

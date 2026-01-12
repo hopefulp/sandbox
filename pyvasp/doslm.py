@@ -77,7 +77,7 @@ def plot_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, plot_dict, Lvertic
     plot x=lene, y=dos in pdos2d
     '''
     Ef, Lspin, Ldoserr = read_doscar(doscar, option='head')
-    
+    #Ef = -1.9
     if Lplot:
         legends = []
 
@@ -229,7 +229,8 @@ def main():
     plot.add_argument('-xi', '--xlim', nargs=2, type=float, help='xrange xmin, xmax')
     plot.add_argument('-yi', '--ylim', nargs=2, type=float, help='yrange ymin, ymax')
     plot.add_argument('-t', '--title', default='MoS2-NH$_{x}$', help='title for plot')
-    plot.add_argument('-c', '--colors', nargs='*', default=['r','g','b','k'], help='colors')
+    #plot.add_argument('-c', '--colors', nargs='*', default=['r','g','b','k'], help='colors')
+    plot.add_argument('-c', '--colors', nargs='*', help='colors')
     plot.add_argument('-lg', '--legend', nargs='*', help='input the same number of legends with plot')
     parser.add_argument('-u', '--usage', action='store_true', help='prints usage and exit')
     args = parser.parse_args()

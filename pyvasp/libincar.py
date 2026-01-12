@@ -50,13 +50,15 @@ noD_out     = ['IVDW']
 opt_change  = {'NSW': 1000}
 opt_active  = {'ISIF': 2, 'IBRION': 2, 'POTIM': 0.3, 'NSW': 1000, 'EDIFFG': -0.01}
 ### chg, sp
+### NSW = 0 for A+B, A, B
 chg_out     = ['ISIF', 'IBRION', 'EDIFFG', 'POTIM']
 chg_change  = {'LCHARG': '.T.'}
 sp_out      = chg_out
 sp_change   = {'LCHARG': '.F.'}
 ### spw to write PROCAR for matching kpoints in WAVCAR and PROCAR for pchg calculation
-spw_change  = {'ISTART': 0, 'ICHARG': 2, 'LWAVE':'.TRUE.', 'LCHARG': '.TRUE.', 'LORBIT': 11}
-#spw2_change = {'ISTART': 0, 'ICHARG': 2, 'LWAVE':'.TRUE.', 'LCHARG': '.TRUE.'}
+### for band calculation LWAVE = .TRUE. , LORBIT doesn't need
+#spw_change = {'ISTART': 0, 'ICHARG': 2, 'LCHARG': '.TRUE.'}
+spw_change = {'ISTART': 0, 'ICHARG': 2, 'LCHARG': '.TRUE.', 'LWAVE':'.TRUE.'}
 
 ### Cell OPT
 copt_change = {'NSW': 1000}

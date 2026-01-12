@@ -493,8 +493,9 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=Non
         ylabel  = plot_dict.get("ylabel",   "")
         xlim    = plot_dict.get("xlim",     "")
         ylim    = plot_dict.get('ylim',     "")
-        legends  = plot_dict.get("legends",   "")
+        legends  = plot_dict.get("legend",   "")
         colors  = plot_dict.get("colors",   "")
+
     if 'colors' not in locals():
         fig, ax = common_figure(ncolor = len(legends))
         if Lprint: print("no color input")
@@ -524,7 +525,15 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=Non
     #xlabel = 'E - E$_F$ [eV]'
     plt.xlabel(xlabel, fontsize=12)
     plt.ylabel(ylabel, fontsize=12)
-    print(f"xlabel: {xlabel}, ys.ndim {ys.ndim} ")
+    print(f"xlabel: {xlabel}, ys.ndim {ys.ndim} and loop for i = {len(ys)} ")
+    '''
+    print(f"legends {legends}")
+    if not 'legends' in locals():
+        legends=[]
+        for i in range(len(ys)):
+            legends.append(f'legend_{i:1d}')
+    '''
+    plt.rcParams['lines.linewidth'] = 2
     for i in range(len(ys)):
         ### treat xdim
         if xdim == 1:
@@ -541,6 +550,8 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=Non
         else:
         '''
         #print(f"x dim {len(x)}, y dim {ys[i,:].shape} label {legend[i]}")
+        print(f"x dim {len(x)}, y dim {ys[i,:].shape} in function {whereami()}()")
+        #print(f"colors {colors}")
         if colors:
             ### if the final letter is 'f'
             if colors[i][-1] == 'f':
@@ -548,9 +559,13 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=Non
                 plt.fill_between(xs,ys[i,:], alpha=0.5, label=legends[i] , color=color)
             else:
                 print(f"size x {len(xs)}, size y {len(list(ys[i,:]))}, size legend {len(legends)} size color {len(colors)}")
-                plt.plot(xs,ys[i,:],  label=legends[i] , color=colors[i])
+                plt.plot(xs,ys[i,:],  label=legends[i], color=colors[i])
         else:
-            plt.plot(xs,ys[i,:],  label=legends[i] )
+            #if legends:
+            if 0:
+                plt.plot(xs,ys[i,:],  label=legends[i] )
+            else:
+                plt.plot(xs,ys[i,:])
 
     if vertical is not None:
         plt.axvline(x=vertical, color='k', linestyle='--', linewidth=1.5, label=v_legend)
@@ -559,7 +574,7 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=Non
     #else:
     #    print(f"Error:: obscure in y-dim {ys.ndim}")
     ### ADD LEGEND
-    plt.legend(loc=1)                # locate after plot
+    #plt.legend(loc=1)                # locate after plot
     if xlim:
         print(f"xlim in mplot2D.mplot_nvector {xlim}")
         plt.xlim(xlim)
