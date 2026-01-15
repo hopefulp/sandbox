@@ -1,16 +1,16 @@
-#!/home/joonho/anaconda3/bin/python
+# ============================================================
+# Generic utilities
+# ============================================================
 
 import os
-import re
-import sys
-from common import *
-# touch1d.py
-import time
 
 def walk_dirs( root, dir_work, *, follow_symlinks=False, exclude_dirs=None, **work_kwargs ):
     """
     Generic recursive directory walker.
     Calls dir_work(path, **work_kwargs) in every directory.
+        dir_clean
+        dir_touch
+        etc
     """
     if not root:
         root = os.getcwd()
@@ -45,37 +45,3 @@ def walk_dirs( root, dir_work, *, follow_symlinks=False, exclude_dirs=None, **wo
         )
 
     print(f"#### exit  {root}")
-
-
-# clean1d.py
-
-def dir_clean(
-    path,
-    works,
-    subjob,
-    prefix,
-    suffix,
-    matches,
-    exclude,
-    excl_fnames,
-    new_dir,
-    Lshowmatch,
-    Lall_rm,
-    Lyes,
-):
-    print(f"[CLEAN] {path}")
-
-    # if old code assumes cwd, do:
-    # os.chdir(path)
-    # but ideally refactor to use full paths
-
-
-def dir_touch(path):
-    print(f"[TOUCH] {path}")
-
-    for name in os.listdir(path):
-        fpath = os.path.join(path, name)
-        if os.path.isfile(fpath) and not os.path.islink(fpath):
-            os.utime(fpath, None)
-
-

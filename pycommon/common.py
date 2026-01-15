@@ -307,7 +307,7 @@ def get_files_prefix(prefixes, dirname, Lshow=None, Ldir=None, sub_match=None):
         prefixes = new_prefixes 
 
     for pref in prefixes:
-        print(f"prefix: {pref} in {whereami()} of module {__name__}")
+        #print(f"prefix: {pref} in {whereami()} of module {__name__}")
         for fname in os.listdir(dirname):
             # re.match finds only prefix
             if re.match(pref, fname):

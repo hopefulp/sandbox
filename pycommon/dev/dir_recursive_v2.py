@@ -5,9 +5,7 @@ import os
 import re
 import sys
 from common import *
-from libdir.walker import walk_dirs
-from libdir.clean import dir_clean, CleanConfig
-from libdir.jobs import dir_touch
+from libdir import walk_dirs,  dir_clean, dir_touch, CleanConfig
 from functools import partial
 
 def main():
