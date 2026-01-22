@@ -25,10 +25,10 @@ jg_poscar=['ini', 'zpe']        # ini uses, zpe modifies, others use CONTCAR
 jg_kpoints=['dos','kp']         # band: file is required for each symmetry, kp for change kp file
 ### sp for write CHGCAR, WAVCAR
 #jg_incar=['sp','cont','opt','copt','vdw','chg','chgw','dos','pchg','band','mag','kisti','neb']  # required
-jg_incar=['cont','spw','mag','dos','band']
+jg_incar=['cont','spw','mag','dos','band','pchg','pchgB']
 jg_potcar=['lda','gga']
-jg_linkw=['cont','dos','band','pchg']
-jg_linkc=['cont','dos','band','pchg']
+jg_linkw=['cont','dos','band','pchg','pchgB']
+jg_linkc=['cont','dos','band','pchg','pchgB']
 
 jg_subdir=['neb']
 

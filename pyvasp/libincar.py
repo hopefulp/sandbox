@@ -49,10 +49,12 @@ noD_out     = ['IVDW']
 ### OPT
 opt_change  = {'NSW': 1000}
 opt_active  = {'ISIF': 2, 'IBRION': 2, 'POTIM': 0.3, 'NSW': 1000, 'EDIFFG': -0.01}
-### chg, sp
+### CHG|SP: chg, pchg, pbchg [Bader] are different
 ### NSW = 0 for A+B, A, B
 chg_out     = ['ISIF', 'IBRION', 'EDIFFG', 'POTIM']
 chg_change  = {'LCHARG': '.T.'}
+pchgB_out   =   ['ISTART']
+pchgB_change = {'ICHARG': 11, 'LAECHG': '.TRUE.'}     
 sp_out      = chg_out
 sp_change   = {'LCHARG': '.F.'}
 ### spw to write PROCAR for matching kpoints in WAVCAR and PROCAR for pchg calculation
@@ -264,8 +266,10 @@ def modify_incar_byjob(incar, job, outf='INCAR.new'):
             dict_change.update(band_active)
         icout = dosband_out
         #Lcomment = 1
+    elif job == 'pchgB':
+        dict_change = pchgB_change
     else:
-        print(f"no {job} defined in {whereami()}")
+        print(f"no {job} defined in {whereami()}() in module {__file__}")
         sys.exit(101)
 
     modify_incar_bykv(incar, dict_change, icout=icout, outf=outf, mode = 'm')

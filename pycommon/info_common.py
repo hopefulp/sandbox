@@ -46,17 +46,23 @@ comment.comment_subj=   "\tINFO: SCIENCE JOB \
                         "
 comment.info_common=   "\tInformation file for $SB/pycommon"
 
+dirjob.libdir       =   "library package for directory job"
 
-dirjob.dir_clean      =   "=============================== DIRECTORY JOB =====================================\
-                        \n\t\tclean one directory by one option: works, prefixes, suffixes, matches\
-                        \n\t\t    -work {qchem,ai,amp,pbs} -j rm[mv] -jd new_dir ? by -prefix -suffix -middle match -e excluded -ef 'exclude these files' \
+dirjob.dir_jobs     =   "=============================== DIRECTORY JOB =====================================\
+                        \n\t\tLayered Structure::\
+                        \n\t\t    import libdir/walker, clean, jobs\
+                        \n\t\t    run walk_dirs(path, dir_job()) \
+                        \n\t\t    run dir_work()[=dir_job] in in libdir/walker\
+                        \n\t\t    clean.dir_clean runs policy\
                         \n\t\tOptions::\
                         \n\t\t    exclusive:\
                         \n\t\t\t-w multiple works in [amp|pbs|slurm|vasp|nc|lammps] add more in case extension\
                         \n\t\t\t-p multiple prefixes\
                         \n\t\t\t-s multiple sufixes\
                         \n\t\t\t-m multiple matches\
-                        \n\t\t    -j [rm,mv,cp,ln] default='rm'\
+                        \n\t\t    -R  --recursive\
+                        \n\t\t    -j  --dirjob  [clean, touch]\
+                        \n\t\t    -sj --shelljob  [rm(default),mv,cp,ln]\
                         \n\t\t    -id include dir such as 'rm -r'\
                         \n\t\t    -nd input directory: default=pwd\
                         \n\t\t    -y execute command without asking: default-asking\
@@ -65,23 +71,14 @@ dirjob.dir_clean      =   "=============================== DIRECTORY JOB =======
                         \n\t\t    -ef: excluded files\
                         \n\t\t\tln: in case the change of dirname, link files are broken\
                         \n\t\tUsage::\
-                        \n\t\t    dir_clean.py [dir] -w amp -sw ini\
-                        \n\t\t    dir_clean.py -d NN20 -w amp -j ln -y\
+                        \n\t\t    dir_jobs.py -j clean -w pbs\
+                        \n\t\t    dir_jobs.py -j touch -R\
                         \n\t\t    dir_clean.py -w vasp -ef CHGCAR\
                         \n\t\t    dir_clean.py -p d2709 -id\
                         \n\t\t    (?) clean1d.py -s out -ef 6-CC-NiFe-A-relax.out 5-FePNP-CO2.out -j mv -jd j631gs_v3.2\
                         \n\t\t    dir_clean.py -w vasp -d\
                         \n\t\t    : remove only vasp output files\
-                        "
-dirjob.clean_dirs   =   "clean dirs:: same with 'clean1d.py'\
-                        \n\t\t input directory is list\
-                        "
-dirjob.clean_recur  = "clean one dir recursively\
-                        \n\t\timport dir_clean() from clean1d.py to clean one directory\
-                        \n\t\tUsage::\
-                        \n\t\t    clean_recur.py -w pwd\
                         \n\t\t    clean_recur.py -d NN20 -w amp -j ln -y\
-                        \n\t\t\trf. clean1d.py for options\
                         "
 dirjob.cli_dir      =   "simple command inside directory\
                         \n\t\tdir1_cli.sh gitpush\

@@ -86,6 +86,9 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
     '''
     pwd = os.getcwd()
 
+    vjob = job
+    if subjob:
+        vjob += subjob
     ### treat INCAR
     if incopt:
         incopt = li2dic(incopt)    # value = dict for k-w pair 
@@ -100,9 +103,9 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
     odir_full = f'{pwd}/{odir}'
     print(odir_full)
     ### 1: POSCAR
-    if job in jg_poscar:    # use POSCAR
+    if vjob in jg_poscar:    # use POSCAR
         ### zpe: modify POSCAR
-        if job == 'zpe':
+        if vjob == 'zpe':
             modify_POSCAR(f"{odir}/CONTCAR", fixatom)
             print(f"{odir}/CONTCAR was modified to POSCAR")
             poscar = f'{pwd}/POSCAR'
@@ -123,7 +126,7 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
     print(f"{poscar} was copied to {ndir}/POSCAR in case no subdirectories")
 
     ### 2: POTCAR
-    if not job in jg_potcar:
+    if not vjob in jg_potcar:
         potcar = f'{odir}/POTCAR'
     else:
         # under construction
@@ -132,6 +135,8 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
     print(f"{potcar} was copied to {ndir}")
 
     ### 3: KPOINTS
+    ### copy old dir: zpe, wav, pchg
+    ### change KPONTS in jg_kpoints: 'dos','kp'
     old_kpoints = odir + '/KPOINTS'
     
     #if vgroup == 1 or vgroup == 2:
@@ -145,25 +150,24 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
         elif os.path.isfile(kfsuff):
             kpoints = kfsuff
     ### use -j job
-    #elif vgroup == 3:
-    elif job == 'zpe' or job == 'wav':
-        kpoints = odir + '/KPOINTS'
-    elif os.path.isfile(f'KPOINTS.{job}'):
-        kpoints = 'KPOINTS.'+job
+    elif os.path.isfile(f'KPOINTS.{vjob}'):
+        kpoints = 'KPOINTS.'+vjob
     elif os.path.isfile('KPOINTS'):
         kpoints = 'KPOINTS'
-    else:
-        kpoints = old_kpoints
     
-    print(f"{old_kpoints} is modified to KPOINTS.new")
-    if job in jg_kpoints:
-        new_kpoints = 'KPOINTS.new'
-        mod_kpoints(old_kpoints, outf=new_kpoints, kmulti=3)
+    if 'kpoints' in locals():
+        os.system(f'cp {kpoints} {ndir}/KPOINTS')
+        print(f"{kpoints} was copied to {ndir}/KPOINTS")
     else:
-        new_kpoints = kpoints
-    os.system(f'cp {new_kpoints} {ndir}/KPOINTS')
-
-    print(f"{new_kpoints} was copied to {ndir}/KPOINTS")
+        print(f"{old_kpoints} is modified to KPOINTS.new")
+        if vjob in jg_kpoints:
+            new_kpoints = 'KPOINTS.new'
+            mod_kpoints(old_kpoints, outf=new_kpoints, kmulti=3)
+            os.system(f'cp {new_kpoints} {ndir}/KPOINTS')
+            print(f"{new_kpoints} was copied to {ndir}/KPOINTS")
+        else:
+            print(f"no rule for making KPOINTS")
+            sys.exit(3)
 
     ###### 4: INCAR
     ### 4.1 Use it, if defined
@@ -173,27 +177,23 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
         elif os.path.isdir(f"{incar}") and os.path.isfile(f"{incar}/INCAR"):
             incar = f"{incar}/INCAR"
     ### 4.2 try INCAR.job 
-    elif os.path.isfile(f"INCAR.{job}{subjob}"):
-        incar = f"INCAR.{job}{subjob}"
-    elif os.path.isfile(f"INCAR.{job}"):
-        incar = f"INCAR.{job}"
+    elif os.path.isfile(f"INCAR.{vjob}"):
+        incar = f"INCAR.{vjob}"
+    #elif os.path.isfile(f"INCAR.{job}"):
+    #    incar = f"INCAR.{job}"
     ### 4.3 Use odir/INCAR for job = cont, ...
     #elif not job in jg_incar:
     else:
         incar = f"{odir}/INCAR"
     ### if incar needs to be modified: kw for active, remove for comment out
     ### link job + subjob
-    if subjob:
-        fjob = job + subjob
-    else:
-        fjob = job
-    print(f"job {job} fullname-job {fjob}")
-    if not os.path.isfile(f"INCAR.{fjob}"):
-        if fjob in jg_incar:
+    print(f"job {job} fullname-job {vjob}")
+    if not os.path.isfile(f"INCAR.{vjob}"):
+        if vjob in jg_incar:
             print(f"modify {incar} byjob")
-            modify_incar_byjob(incar, fjob, outf='INCAR.new')
+            modify_incar_byjob(incar, vjob, outf='INCAR.new')
             incar = 'INCAR.new'
-            print(f"modify {incar} by job {fjob}")
+            print(f"modify {incar} by job {vjob}")
         else:
             add_inckv_bysubjob(job, subjob, incopt)
     
@@ -212,16 +212,16 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
     #    print(f"{incar} was renamed to INCAR.{job}")
 
     ### 5: Link: 5: Link: 5: Link: 5: Link: 5: Link: make link for CHGCAR, WAVECAR
-    if fjob in jg_linkw or fjob in jg_linkc:
+    if vjob in jg_linkw or vjob in jg_linkc:
         os.chdir(ndir)
         ### select CHGCAR or WAVECAR
-        if fjob in jg_linkw and os.path.isfile(f'../{odir}/WAVECAR'):
+        if vjob in jg_linkw and os.path.isfile(f'../{odir}/WAVECAR'):
             s = f"ln -s ../{odir}/WAVECAR ."
             os.system(s)
             print(f"WAVECAR is linked to {ndir}")
         else:
             print("can't link to WAVECAR")
-        if fjob in jg_linkc and os.path.isfile(f'../{odir}/CHGCAR'):
+        if vjob in jg_linkc and os.path.isfile(f'../{odir}/CHGCAR'):
             s = f"cp ../{odir}/CHGCAR ."
             os.system(s)
             print(f"CHGCAR is linked to {ndir}")
@@ -239,8 +239,9 @@ def main():
     '''
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job
-    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','pchg','chg','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
-    parser.add_argument('-sj', '--subjob', choices=['w','w2','sp', 'cool', 'heat','quench'], help='sp for fake and others for md')
+    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','chg','pchg','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
+    parser.add_argument('-sj', '--subjob', choices=['w','w2','sp', 'cool', 'heat','quench','B'],\
+             help='sp for fake and others for md, for pchg, B for Bader')
         ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()
     gdirectory.add_argument('-d','-do', '--dirs', nargs='+', help='specify directories')

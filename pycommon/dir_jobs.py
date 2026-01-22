@@ -12,14 +12,14 @@ from functools import partial
 
 def main():
     parser = argparse.ArgumentParser( description='directory operations (clean, touch, ...)' )
-    # NEW: top-level job
-    parser.add_argument('-j', '--job', choices=['clean', 'touch'], default='clean', help='directory job type' )
+    # NEW: top-level dirjob
+    parser.add_argument('-j', '--dirjob', choices=['clean', 'touch'], default='clean', help='directory dirjob type' )
     # NEW: subjob (old -j)
     parser.add_argument( '-sj', '--shelljob', choices=['rm', 'mv', 'cp', 'ln'], default='rm', help='file operation for clean' )
     parser.add_argument('-d', '--dir1', help='input work directory')
     ### choose: p, s, m, w
     gselection = parser.add_mutually_exclusive_group()
-    gselection.add_argument( '-w', '--works', nargs='*', choices=['qchem','amp','vasp','pbs','slurm','lmp','nc'], help='remove depending on job')
+    gselection.add_argument( '-w', '--works', nargs='*', choices=['qchem','amp','vasp','pbs','slurm','lmp','nc'], help='remove depending on dirjob')
     gselection.add_argument('-p', '--prefix', nargs='*')
     gselection.add_argument('-s', '--suffix', nargs='*')
     gselection.add_argument('-m', '--match', nargs='*')
@@ -29,15 +29,24 @@ def main():
     parser.add_argument('-ms', '--match_show', action='store_true')
     parser.add_argument('-a', '--all_remove', action='store_true')
     parser.add_argument('-y', '--yes', action='store_true')
+    parser.add_argument('-R', '--recursive', action='store_true')
+    parser.add_argument('-u', '--usage', action='store_true')
 
     args = parser.parse_args()
 
-    # ---- validation ----
-    if args.job == 'clean':
-        if args.works:
-            selection = 'w'
-            slist = args.works
-        elif args.prefix:
+    if args.usage:
+        print(f"1. select one of jobs [clean|touch")
+        print(f"2. select one of selection rule [-p|-m|-s|-w]")
+        print(f"3. -R for recursive")
+        print(f"Usage::")
+        print(f"\tdir_jobs.py -j clean -w pbs")
+        print(f"\tdir_jobs.py -j touch -R")
+        sys.exit(0)
+    path = os.path.abspath(args.dir1 or os.getcwd())
+
+    if args.dirjob == 'clean':
+
+        if args.prefix:
             selection = 'p'
             slist = args.prefix
         elif args.suffix:
@@ -46,6 +55,9 @@ def main():
         elif args.match:
             selection = 'm'
             slist = args.match
+        elif args.works:
+            selection = 'w'
+            slist = args.works        
         else:
             parser.error("one of -w/-p/-m/-s is required for clean")
 
@@ -66,9 +78,16 @@ def main():
             )
 
         clean_work = partial(dir_clean, config=config)
-        walk_dirs(args.dir1, clean_work)
-    elif args.job == 'touch':
-        walk_dirs(args.dir1, dir_touch)
+
+        if args.recursive:
+            walk_dirs(args.dir1, clean_work)
+        else:
+            clean_work(path)
+    elif args.dirjob == 'touch':
+        if args.recursive:
+            walk_dirs(args.dir1, dir_touch)
+        else:
+            dir_touch(path)
     else:
         print("Present dir_works: clean, touch inserted by -j")
         sys.exit(0)
