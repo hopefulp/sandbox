@@ -24,11 +24,6 @@ echo "HOSTNAME    JOB_NAME   Nproc" >> $logfile
 echo "$partname  $jobname $SLURM_NTASKS " >> $logfile
 echo "NODELIST: $nodelist"
 
-cd $SLURM_JOB_NAME
-mkdir OUT
-cp input/* OUT
-cd OUT
-
 #mpirun -np $SLURM_NTASKS msdft-1.6 < RUN.fdf > output.log
 mpirun -np $SLURM_NTASKS siesta < RUN.fdf > output.log
 

@@ -40,9 +40,9 @@ cont_change = {'ISTART': 1, 'ICHARG':0}     # read WAVECAR
 band_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'LCHARG': '.F.'}
 dosband_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
 band_active = {'LORBIT': 11}
-dos_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'ALGO':'Normal', 'EDIFF':1E-5, 'LCHARG': '.F.'}
+dos_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'ALGO':'Normal', 'EDIFF':1E-5, 'LCHARG': '.F.', 'ISMEAR': -5}
 #dosband_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
-dos_active = {'LORBIT': 11, 'NEDOS': 4001, 'EMIN':-10, 'EMAX':4}
+dos_active = {'LORBIT': 11, 'NEDOS': 1001, 'EMIN':-10, 'EMAX':10}
 ### VDW
 vdw_active  = {'IVDW': 12}
 noD_out     = ['IVDW']
@@ -54,7 +54,8 @@ opt_active  = {'ISIF': 2, 'IBRION': 2, 'POTIM': 0.3, 'NSW': 1000, 'EDIFFG': -0.0
 chg_out     = ['ISIF', 'IBRION', 'EDIFFG', 'POTIM']
 chg_change  = {'LCHARG': '.T.'}
 pchgB_out   =   ['ISTART']
-pchgB_change = {'ICHARG': 11, 'LAECHG': '.TRUE.'}     
+pchgB_change = {'ICHARG': 11, 'LAECHG': '.TRUE.'}    
+pchg_active = { 'LPARD': 'T', 'LSEPB' : 'FALSE', 'IBAND' : '304', 'LSEPK' : 'FALSE', 'KPUSE' : '1 2 3 4' } 
 sp_out      = chg_out
 sp_change   = {'LCHARG': '.F.'}
 ### spw to write PROCAR for matching kpoints in WAVCAR and PROCAR for pchg calculation
@@ -268,11 +269,13 @@ def modify_incar_byjob(incar, job, outf='INCAR.new'):
         #Lcomment = 1
     elif job == 'pchgB':
         dict_change = pchgB_change
+    elif job == 'pchg':
+        dict_change = pchg_active
     else:
         print(f"no {job} defined in {whereami()}() in module {__file__}")
         sys.exit(101)
 
-    modify_incar_bykv(incar, dict_change, icout=icout, outf=outf, mode = 'm')
+    modify_incar_bykv(incar, dict_change, icout=icout, outf=outf, mode = 'm') 
     '''
     if Lcomment == 1:
         if job == 'dos':

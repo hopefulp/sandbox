@@ -187,19 +187,20 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, n
         incar = f"{odir}/INCAR"
     ### if incar needs to be modified: kw for active, remove for comment out
     ### link job + subjob
-    print(f"job {job} fullname-job {vjob}")
+    print(f"job {job} fullname-job {vjob} in {__file__}")
     if not os.path.isfile(f"INCAR.{vjob}"):
         if vjob in jg_incar:
             print(f"modify {incar} byjob")
-            modify_incar_byjob(incar, vjob, outf='INCAR.new')
-            incar = 'INCAR.new'
-            print(f"modify {incar} by job {vjob}")
+            modify_incar_byjob(incar, vjob, outf=f'INCAR.{vjob}')
+            incar = f'INCAR.{vjob}'
+            #print(f"modify {incar} by job {vjob}")
         else:
             add_inckv_bysubjob(job, subjob, incopt)
     
     ### additional change 
     if incopt:
         ### make modify the present INCAR file
+        print(f"modify {incar} by input -io")
         modify_incar_bykv(incar, incopt, outf='INCAR.new', mode='m')
         incar = 'INCAR.new'
         print(f"modify {incar} by option {incopt}")
@@ -240,7 +241,7 @@ def main():
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job
     parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','chg','pchg','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
-    parser.add_argument('-sj', '--subjob', choices=['w','w2','sp', 'cool', 'heat','quench','B'],\
+    parser.add_argument('-sj', '--subjob', choices=['w','wlp','w2','sp', 'cool', 'heat','quench','B'],\
              help='sp for fake and others for md, for pchg, B for Bader')
         ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()

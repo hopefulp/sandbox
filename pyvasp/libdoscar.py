@@ -98,6 +98,10 @@ def read_doscar(filename="DOSCAR", atom_indices=None, l=None, option='dos'):
     # Read header: 1st and n_header line; 3 more lines for checking DOS value error
     natom, Emax, Emin, n_ene, Ef, Ldoserr, Lspin = doscar_Bheader(lines[0:n_header+3])
 
+    #if max(atom_indices) > natom:
+    #    print(f"ERROR: max atom index {max(atom_indices)} exceeds natom {natom}")
+    #    sys.exit(1)
+
     if option == 'head':
         return Ef, Lspin, Ldoserr
 

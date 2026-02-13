@@ -269,9 +269,9 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\t\t    len(ash) is number of plots\
                         \n\t    -c colors: r b k etc & decimal number + f\
                         \n\t\tfloatf: float for thickness and f for filling space\
-                        \n\t    -e [f|float_value]: f for Fermi level, value for VBM shift\
+                        \n\t    -e [f|V|E][shift_energy]: f, V, E energy shift for Fermi, VBM, user-defined\
                         \n\t    -p store_true for plot\
-                        \n\t    -v add vertical line of EF in plot\
+                        \n\t    -v True - plot vertical lines\
                         \n\t    -xi, -yi: x and y range\
                         \n\t    -lg legend list which should be match with plot number and ash\
                         \n\t\tcalls myplot2D.mplot_nvector\
@@ -283,6 +283,7 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\t    doslm.py -p -xi -10 3 -yi 0 2 -al 85  3 3 -ash 1 1 1 -lg O-2p Sn-5s Sn-5p -t EtO -l p s p -c 0.5f r b\
                         \n\t    doslm.py -al -1 -ash 1 -p -xi -6 2 -yi 0 150  -t 'MoS2-NH' -lg TDOS -v -eF\
                         \n\t    doslm.py -al 0-74 75-77 -ash  75 3 -p -xi -5 1.5 -c r b -yi 0 100 -v -lg 'MoS$_2$' 'NH$_2$'\
+                        \n\t    doslm.py -al 0-74 75-77 -ash  75 3 -p -xi -3 4 -c r b -yi 0 80 -v -e V-2.63 F\
                         \n\t    (Pt-C60-x): doslm.py -al -1 2 54 55 -ash 1 1 1 1\
                         \n\t(3) to plot ldos of slab w.r.t. VBM: obtain VBM in slab (1)\
                         \n\t    doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -e -1.169\

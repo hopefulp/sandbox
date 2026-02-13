@@ -63,6 +63,7 @@ def main():
     #my_module.__dict__['POSCAR'] = "anything"
     ### try to pass args 
     if not args.job:
+        print(my_module.__file__)
         my_module.print_obj( job = args.job, poscar=args.poscar )
         if mod_name == 'comment_subj':
             print(f"\t    -s for other attributes in module 'comment_sys.py' ")

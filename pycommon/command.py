@@ -238,10 +238,17 @@ def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, k
             \n\t    : For memory issue\
             \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} -c {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
             \n\t\tsbatch -J {dirname} -p X{partition} -N {nnode} --ntasks-per-node {ncpu} --export=hmem=1 /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
-            \n\t:: continuous job\
-            \n\t    $ vas_make_cont.py -d {dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
-            \n\t    $ vas_make_cont.py -d {dirname} -j {vjob} -sj {subjob} -x {partition} -N {nnode} -np {nproc}\
+            \n\t:: CONT job\
+            \n\t    $ (cont)vas_make_cont.py -d {dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
+            \n\t    $ ( sp) vas_make_cont.py -d {dirname} -j {vjob} -sj {subjob} -x {partition} -N {nnode} -np {nproc}\
+            \n\t\t: opt is followed by sp with writing CHGCAR, WAVECAR\
             \n\t\tsbatch -J {dirname}{vjob} -p X{partition} -N {nnode} -n {nproc} /home/joonho/sandbox/pypbs/slurm_sbatch.sh\
+            \n\t    $ (chg) vas_make_cont.py -d {dirname} -j {vjob} -sj B -x {partition} -N {nnode} -np {nproc}\
+            \n\t\t: CDD (charge density difference) calculates fragment A & B w. frozen geometry\
+            \n\t    $ (pchg)vas_make_cont.py -d {dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
+            \n\t    $ (dos) vas_make_cont.py -d {dirname} -j {vjob} -io NEDOS 6000 EMIN -30 EMAX 5 -x {partition} -N {nnode} -np {nproc}\
+            \n\t    $ (mag) vas_make_cont.py -d {dirname} -j {vjob} -io MAGMOM '75*0 1 0 0' ISYM 0  -x {partition} -N {nnode} -np {nproc}\
+            \n\t\t: input MAGAMOM, ISYM = 0 for symmetry can suppress magnetism in some case\
             \n\t::options\
             \n\t    -J for jobname and dirname\
             \n\t    -p for partition: X1-8, X2-12, X3-20 process\

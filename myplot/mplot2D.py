@@ -473,11 +473,15 @@ def auto_nvector(x,y):
 
 ### For twinx, mplot_twinx
 Lprint = 0
-def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=None):
+def mplot_nvector(x, y, plot_dict=None, Lsave=False, lvertical=None, v_legend=None):
     '''
     input               python              numpy.shape
         x.shape         msize e.g. 18       (msize, )
         y.shape         (n, msize)          (n, msize)
+        plot_dict       see below
+        Lsave
+        lvertcal        list of values for vertical lines
+        v_legend        list w. the same size of lvertical
     dx=1.0, input before
     call with x=[] and y=[ [...
     x:: [] or [size]
@@ -563,12 +567,14 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, vertical=None, v_legend=Non
         else:
             #if legends:
             if 0:
-                plt.plot(xs,ys[i,:],  label=legends[i] )
+                plt.plot(xs,ys[i,:],  label=legends[i])
             else:
                 plt.plot(xs,ys[i,:])
 
-    if vertical is not None:
-        plt.axvline(x=vertical, color='k', linestyle='--', linewidth=1.5, label=v_legend)
+    if lvertical:
+        plt.axvline(x=lvertical[0], color='k', linestyle='-', linewidth=1.5, label=v_legend[0])
+        if len(lvertical) == 2:
+            plt.axvline(x=lvertical[1], color='k', linestyle='--', linewidth=1.5, label=v_legend[1])
 
 
     #else:

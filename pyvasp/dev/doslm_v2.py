@@ -55,22 +55,15 @@ def make_vert_line(fname, Ene, maxdos=10):
 
 
 
-def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lvertical):
+def plot_doscar(doscar, ofile, alist02d, eshift, l, m, Lplot, plot_dict, Lvertical):
     '''
-    Input   doscar
-            ofile
-            
-            alist02d    groups of atom list in 2D list: [[3,4,5],[10,11]]
-                        0   stands for atom index starts from 0
-                        -1  for TDOS
-                        atom groups determins by atom.shape of -sh
-            leshift     list of 1 or 2 values: use 1st one for shift, the 2nd for plot if Lvertical
-                        len(leshift) = 1    shift, if Lvertical plot
-                                       2    shift for 1st, if Lvertical plot 1st w. solid, 2nd w. dotted
-            l           list with the same size of alist02d: [s, p]
-            m
+    alist02d    groups of atom list in 2D list: [[3,4,5],[10,11]]
+                0   stands for atom index starts from 0
+                -1  for TDOS
+                atom groups determins by atom.shape of -sh
+    l           list with the same size of alist02d: [s, p]
+    m
 
-    
     works for one list
     alist0      start from 0
     arr_atoms   start from 1
@@ -87,28 +80,16 @@ def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lverti
     #Ef = -1.9
     if Lplot:
         legends = []
-    
-    if leshift:
-        nvertical = len(leshift)
-        eshift = leshift[0]
-        ene_shift = float(eshift[1:])
+
+    if eshift:
         if re.search('f', eshift, re.I):
             Eshift = f"F{Ef:5.3f}"
             ### make F0 vertical line at E=0.00
-            make_vert_line("EF0.dat", 0.00)      # kw maxdos=10 default
+            make_vert_line("E0.dat", 0.00)      # kw maxdos=10 default
         elif re.search('v', eshift, re.I):
-            Eshift = f"V{ene_shift:5.3f}"
-            make_vert_line('Evbm.dat', 0.00)
+            Eshift = f"V{float(eshift[1:]):5.3f}"
         else:
-            Eshift = f"EShift{ene_shift:5.3f}"
-            make_vert_line('EShift.dat', 0.00)
-        if nvertical == 2:
-            eshift = leshift[1]
-            if re.search('f', eshift, re.I):
-                ene2nd = Ef
-                ene_2nd_shift = ene2nd - ene_shift
-                #Eshift_2nd = f"F{ene_2nd_shift:5.3f}"
-            make_vert_line('Second_line.dat', ene_2nd_shift )  # 2nd vertical line w.r.t. shift energy
+            Eshift = f"E{float(eshift[1:]):5.3f}"
     else:
         Eshift = None
         ### make F0 vertical line at E=F0
@@ -187,22 +168,18 @@ def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lverti
                 legend=re.split('\.',fname)[0]
             legends.append(legend)
         '''
-    vertical_lines= []
-    v_legend = []
-    if leshift:
+    vertical=None
+    v_legend = None
+    if eshift:
+        ene_shift = float(Eshift[1:])
         lene = list(np.array(lene)-ene_shift)
     if Lvertical:
-        if nvertical >= 1:
-            v_legend.append('VBM')
-        if nvertical == 2:
-            v_legend.append('Fermi level')
-        if leshift: 
-            vertical_lines.append(0.0)
-            if nvertical == 2:
-                vertical_lines.append(ene_2nd_shift)
+        v_legend = 'Fermi level'
+        if eshift: 
+            vertical = 0.0
         else:
-            vertical_lines.append(float(Ef))
-    print(f"plot vertical line at {vertical_lines}")
+            vertical = float(Ef)
+    print(f"plot vertical line at {vertical}")
     if Lplot:
         ### make legend
         if plot_dict.get('legend'):
@@ -224,7 +201,7 @@ def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lverti
     if Lplot:
         ### before plot
         print(f"Before plot: ene dim {len(lene)}, pdos2d {np.array(pdos2d).shape}  in function {whereami()}() in module {__name__}")
-        mplot_nvector(lene, pdos2d, plot_dict=plot_dict, Lsave=True, lvertical=vertical_lines, v_legend=v_legend)
+        mplot_nvector(lene, pdos2d, plot_dict=plot_dict, Lsave=True, vertical=vertical, v_legend=v_legend)
     return 0
 
 def main():
@@ -241,7 +218,7 @@ def main():
     parser.add_argument('-dz', '--delta_z', default=0.1, type=float, help='use zmax or delta_z')
     parser.add_argument('-loc', '--location', default='in', choices=['in', 'out'], help='outside or inside of zmin')
     parser.add_argument('-as', '--atom_species', nargs='+', default=['O'], help='specify atom species')
-    parser.add_argument('-e', '--energy_shift', nargs='*', help='[F|value], -eF[f], -e-3.5 for E such as VBM')
+    parser.add_argument('-e', '--energy_shift', help='[F|value], -eF[f], -e-3.5 for E such as VBM')
     parser.add_argument('-l', '--ql', nargs='*', help='angular quantum number')
     parser.add_argument('-m', '--qm', type=int, nargs='*', help='magnetic quantum number')
     plot = parser.add_argument_group(title='PLOT')
