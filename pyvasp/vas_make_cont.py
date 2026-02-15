@@ -241,7 +241,7 @@ def main():
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job
     parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','chg','pchg','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag','kisti'], help='inquire for each file ')
-    parser.add_argument('-sj', '--subjob', choices=['w','wlp','w2','sp', 'cool', 'heat','quench','B'],\
+    parser.add_argument('-sj', '--subjob', choices=['w','wlp','w2','sp', 'cool', 'heat','quench','B','kisti'],\
              help='sp for fake and others for md, for pchg, B for Bader')
         ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()
