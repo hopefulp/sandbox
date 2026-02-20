@@ -219,7 +219,7 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, q
         print('vasp job need to be inclued')
         #add_inckv_bysubjob(job, subjob, incopt)
     
-    if cluster == 'kisti':
+    if Lcheck_server and cluster == 'kisti':
         dict_ch, incar_rm = modify_incar_byjob(cluster)
         if dict_ch: dict_change.update(dict_ch)
         if incar_rm: incar_remove.extend(incar_rm)
@@ -294,7 +294,7 @@ def main():
     parser.add_argument('-pos', '--poscar', help='incar POSCAR.name for job==ini')
     parser.add_argument('-r', '--run', action='store_true', help='Run without asking')
     qsub = parser.add_argument_group(title='qsub')
-    qsub.add_argument('-ch', '--check_server', action='store_true', help='check server for incar change')
+    qsub.add_argument('-cs', '--check_server', action='store_true', help='check server for incar change')
     qsub.add_argument('-x', '--partition', type=int,            help='partition number in qsub')
     qsub.add_argument('-N', '--nnode',     type=int,            help='number of nodes in qsub')
     qsub.add_argument('-np', '--nproc',    type=int,            help='nprocess in qsub')
@@ -312,8 +312,8 @@ def main():
             parser.error("Need partition(str), nnode (int) and nproc (int) with partition (str)")
             sys.exit(1)
         queue = QueueConfig(args.partition, args.nnode, args.nproc)
-    elif cluster == "kisti":
-        queue = None
+    #elif cluster == "kisti":
+    #    queue = None
         
     #print(f"after parse_args: fixed atoms {args.fixed_atom}") # error: -al conceived by -a l
 
