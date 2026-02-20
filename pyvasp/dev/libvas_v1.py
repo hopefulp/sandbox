@@ -15,7 +15,6 @@ import sys
 import argparse
 from common import whereami
 from oorinano import atoms as ncatoms
-from libcluster import detect_cluster
 
 ### VASP ini & outfiles
 vasf_out=['CHG','CHGCAR','CONTCAR','DOSCAR','EIGENVAL','IBZKPT','OSZICAR','OUTCAR','PCDAT','REPORT','vasprun.xml','WAVECAR',  'XDATCAR']
@@ -28,9 +27,8 @@ jg_kpoints=['dos','kp']         # band: file is required for each symmetry, kp f
 #jg_incar=['sp','cont','opt','copt','vdw','chg','chgw','dos','pchg','band','mag','kisti','neb']  # required
 jg_incar=['cont','spw','mag','dos','band','pchg','pchgB']
 jg_potcar=['lda','gga']
-### mag: CHGCAR can be read but WAVECAR
-jg_linkw=['cont','dos','band','pchg','pchgB'      ]
-jg_linkc=['cont','dos','band','pchg','pchgB','mag']
+jg_linkw=['cont','dos','band','pchg','pchgB']
+jg_linkc=['cont','dos','band','pchg','pchgB']
 
 jg_subdir=['neb']
 
@@ -45,6 +43,21 @@ incar_kw={  'ISTART': '0', 'ICHARG': '2', 'ISPIN': '1', 'MAGMOM': f'{natom} * 0'
             'ENCUT' : '400', 'NELMIN': '4', 'NELM' : '500', 'EDIFF': '1E-4', 'ISYM': '0', 'ADDGRID':'.TRUE.', 'LREAL':'Auto'
             }
 
+def get_hostname():
+    '''
+    get host identity using hostname in linux
+    '''
+    
+    hostname = os.popen('hostname').read().rstrip()
+    print(hostname)
+    if re.match('login0', hostname):
+        hname = 'kisti'
+    elif re.match('tgm-master',hostname):
+        hname = 'pt'
+    else:
+        hname = hostname
+    return hname    
+
 def get_vasp_repository():
     """ 
         my vasp repository for POTCAR & KPOTINS 
@@ -52,19 +65,19 @@ def get_vasp_repository():
     global ini_dvasp
 
     ### subprocess is not working
-    #cluster = subprocess.popen('cluster', stdout=subprocess.PIPE, shell=True)
+    #hostname = subprocess.popen('hostname', stdout=subprocess.PIPE, shell=True)
     #proc = subprocess.Popen(["cat", "/etc/services"], stdout=subprocess.PIPE, shell=True)
     #(out, err) = proc.communicate()
     #print "program output:", out
-    cluster = detect_cluster()
+    hostname = get_hostname()
     user=os.getenv('USER')
-    #if cluster == 'chi' or cluster == 'pt' or cluster == 'iron' or cluster == 'mlet':
-    if cluster == 'kisti':
+    #if hostname == 'chi' or hostname == 'pt' or hostname == 'iron' or hostname == 'mlet':
+    if hostname == 'kisti':
         ini_dvasp = f"/home01/{user}/sandbox/pyvasp/ini"
     else:
         ini_dvasp = '/home/joonho/sandbox/pyvasp/ini'
 
-    print(f"{__name__}:{whereami()}:: vasp repository is {ini_dvasp} in system {cluster}")
+    print(f"{__name__}:{whereami()}:: vasp repository is {ini_dvasp} in system {hostname}")
     if not os.access(ini_dvasp, os.F_OK):
         print("Error:: the directory cannot be found\n stop")
         exit(1)

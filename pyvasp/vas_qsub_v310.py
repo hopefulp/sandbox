@@ -1,8 +1,6 @@
 #!/home/joonho/anaconda3/bin/python
 
 from dataclasses import dataclass
-from typing import Optional
-
 from libcluster import detect_cluster
 from server_env import nXn
 from common import yes_or_no
@@ -18,9 +16,9 @@ import sys
 
 @dataclass
 class QueueConfig:
-    partition: int        # e.g. 1~6
+    partition: int   # e.g. 1~6
     nnode: int
-    nproc: Optional[int] = None
+    nproc: int | None = None
 
 
 # ==========================================================
@@ -29,12 +27,12 @@ class QueueConfig:
 
 def qsub_command(
     ndir,
-    queue: Optional[QueueConfig] = None,
-    option: Optional[str] = None,
-    vasp_exe: Optional[str] = None,
-    lkisti: Optional[str] = None,
-    Lrun: Optional[bool] = None,
-    cluster: Optional[str] = None,
+    queue: QueueConfig | None = None,
+    option: str | None = None,
+    vasp_exe: str | None = None,
+    lkisti: str | None = None,
+    Lrun: bool | None = None,
+    cluster: str | None = None,
 ):
     """
     Build and optionally execute job submission command.
@@ -52,7 +50,7 @@ def qsub_command(
         cmd = _build_slurm_command(ndir, queue, option, vasp_exe)
 
     else:
-        raise RuntimeError("No submission rule for cluster: {}".format(cluster))
+        raise RuntimeError(f"No submission rule for cluster: {cluster}")
 
     print(cmd)
 
@@ -76,30 +74,30 @@ def _build_kisti_command(ndir, option, vasp_exe, lkisti):
     if option == "mem":
         hproc = np // 2
         return (
-            "qsub -N {} "
-            "-l select={}:ncpus={}:mpiprocs={}:ompthreads=1 "
-            "$SB/pypbs/pbs_vasp_kisti_skl.sh"
-        ).format(ndir, nnode, np, hproc)
+            f"qsub -N {ndir} "
+            f"-l select={nnode}:ncpus={np}:mpiprocs={hproc}:ompthreads=1 "
+            f"$SB/pypbs/pbs_vasp_kisti_skl.sh"
+        )
 
     if option and "long" in option:
         hour = _extract_hour(option, default=96)
         return (
-            "qsub -N {} -q long "
-            "-l walltime={}:00:00 "
-            "$SB/pypbs/pbs_vasp_kisti_skl.sh"
-        ).format(ndir, hour)
+            f"qsub -N {ndir} -q long "
+            f"-l walltime={hour}:00:00 "
+            f"$SB/pypbs/pbs_vasp_kisti_skl.sh"
+        )
 
     if option == "opt":
-        return "qsub -N {} $SB/pypbs/pbs_vasp_kisti_sklopt.sh".format(ndir)
+        return f"qsub -N {ndir} $SB/pypbs/pbs_vasp_kisti_sklopt.sh"
 
     if lkisti == "kp":
         return (
-            "qsub -N {} {} "
-            "-l walltime=1:00:00 "
-            "$SB/pypbs/pbs_vasp_kisti_skl.sh"
-        ).format(ndir, str_vasp)
+            f"qsub -N {ndir} {str_vasp} "
+            f"-l walltime=1:00:00 "
+            f"$SB/pypbs/pbs_vasp_kisti_skl.sh"
+        )
 
-    return "qsub -N {} {} $SB/pypbs/pbs_vasp_kisti_skl.sh".format(ndir, str_vasp)
+    return f"qsub -N {ndir} {str_vasp} $SB/pypbs/pbs_vasp_kisti_skl.sh"
 
 
 def _kisti_vasp_flag(vasp_exe):
@@ -120,7 +118,7 @@ def _kisti_vasp_flag(vasp_exe):
 # PT (SLURM)
 # ==========================================================
 
-def _build_slurm_command(ndir, queue, option, vasp_exe):
+def _build_slurm_command(ndir, queue: QueueConfig, option, vasp_exe):
 
     X = queue.partition
     nnode = queue.nnode
@@ -136,34 +134,34 @@ def _build_slurm_command(ndir, queue, option, vasp_exe):
     if option == "mem":
         hproc = nXn[X] // 2
         return (
-            "sbatch -J {} -p X{} "
-            "-N {} -c {} "
-            "--export=hmem=1 "
-            "/home/joonho/sandbox/pypbs/slurm_sbatch.sh"
-        ).format(ndir, X, nnode, hproc)
+            f"sbatch -J {ndir} -p X{X} "
+            f"-N {nnode} -c {hproc} "
+            f"--export=hmem=1 "
+            f"/home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+        )
 
     if option == "opt":
         return (
-            "sbatch -J {} -p X{} "
-            "-N {} -n {} "
-            "{} "
-            "/home/joonho/sandbox/pypbs/slurm_sbatch_vaspopt.sh"
-        ).format(ndir, X, nnode, nproc, str_vasp)
+            f"sbatch -J {ndir} -p X{X} "
+            f"-N {nnode} -n {nproc} "
+            f"{str_vasp} "
+            f"/home/joonho/sandbox/pypbs/slurm_sbatch_vaspopt.sh"
+        )
 
     if option == "sim":
         return (
-            "sbatch -J {} -p X{} "
-            "-N {} -n {} "
-            "{} "
-            "/home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
-        ).format(ndir, X, nnode, nproc, str_vasp)
+            f"sbatch -J {ndir} -p X{X} "
+            f"-N {nnode} -n {nproc} "
+            f"{str_vasp} "
+            f"/home/joonho/sandbox/pypbs/slurm_sbatch_sim.sh"
+        )
 
     return (
-        "sbatch -J {} -p X{} "
-        "-N {} -n {} "
-        "{} "
-        "/home/joonho/sandbox/pypbs/slurm_sbatch.sh"
-    ).format(ndir, X, nnode, nproc, str_vasp)
+        f"sbatch -J {ndir} -p X{X} "
+        f"-N {nnode} -n {nproc} "
+        f"{str_vasp} "
+        f"/home/joonho/sandbox/pypbs/slurm_sbatch.sh"
+    )
 
 
 def _slurm_vasp_flag(vasp_exe):

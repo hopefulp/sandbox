@@ -27,6 +27,7 @@ import sys
 from fline_edit import inf_print
 from common import whereami
 from libstr import li2dic
+from copy import deepcopy
 
 ### INCAR ORDER for display
 ordered_incar_keys=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','NSIM','LPLANE','ISTART','ICHARG','ISPIN','ENCUT','NELM','NELMIN','NELMDL','EDIFF','ISYM','ADDGRID','LREAL','LASPH','LMAXMIX','NELECT','MAGMOM','NUPDOWN','ISMEAR','SIGMA','AMIX','BMIX','AMIN','IWAVPRE','ISIF','IBRION','NSW','POTIM','EDIFFG','TEBEG', 'TEEND','SYMPREC', 'SMASS', 'MDALGO', 'NBLOCK', 'NWRITE','LPETIM','LWAVE','LCHARG','LAECHG','LVTOT','LVHAR','LORBIT','NEDOS','EMIN','EMAX','LPARD','NBMOD','EINT','LSEPB','LSEPK','NFREE','LEPSILON','LMONO','IDIPOL','LDIPOL','GGA_COMPAT','LSORBIT','IVDW','LVDWSCS','LDAU','LDAUTYPE','LDAUL','LDAUU','LDAUJ','LDAUPRINT', 'ICORELEVEL', 'CLNT', 'CLN', 'CLL', 'CLZ', 'LSCALAPACK', 'IMAGES', 'SPRING', 'LCLIMB' ]
@@ -35,6 +36,7 @@ ordered_incar_keys=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','N
 ### job_mod for the existing value
 ### job_comment for comment out
 ### job_uncomment to make it active
+
 cont_change = {'ISTART': 1, 'ICHARG':0}     # read WAVECAR
 ### Band structure & DOS: change params and comment out
 band_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'LCHARG': '.F.'}
@@ -61,7 +63,7 @@ sp_change   = {'LCHARG': '.F.'}
 ### spw to write PROCAR for matching kpoints in WAVCAR and PROCAR for pchg calculation
 ### for band calculation LWAVE = .TRUE. , LORBIT doesn't need
 #spw_change = {'ISTART': 0, 'ICHARG': 2, 'LCHARG': '.TRUE.'}
-spw_change = {'ISTART': 0, 'ICHARG': 2, 'LCHARG': '.TRUE.', 'LWAVE':'.TRUE.'}
+spw_change = {'ISTART': 0, 'ICHARG': 2, 'LCHARG': '.TRUE.', 'LWAVE':'.TRUE.', 'NSW':0}
 
 ### Cell OPT
 copt_change = {'NSW': 1000}
@@ -72,10 +74,22 @@ zpe_active  = {'NFREE': 2}
 zpe_out     = ['NPAR']
 ### MAGMOM
 #mag_active = {'ISPIN': 2}
-mag_change = {'ISPIN': 2}
+mag_change = {'ISTART': 0, 'ICHARG': 1, 'ISPIN': 2, 'ISYM': 0}
 ### KISTI: param in follows param out to replace
 kisti_out = ['NPAR']
 kisti_in = {'NPAR': ['NCORE', 20]}
+kisti_change = {'NCORE': 20}
+### change: w.r.t. key -> value change
+### active: if start with # -> remove #
+### out   : comment out to remove the kv line
+JOB_RULES = {
+    "cont": {"change": cont_change,     "active": {},           "out": []},
+    "dos" : {"change": dos_change ,     "active": dos_active,   "out": dosband_out},
+    "band": {"change": band_change ,    "active": band_active,  "out": dosband_out},
+    "mag":  {"change": mag_change ,     "active": {},           "out": []},
+    "spw":  {"change": spw_change ,     "active": {},           "out": []},
+    "kisti":{"change": kisti_change ,   "active": {},           "out": kisti_out},
+}
 
 
 def replace_line(dic, key, job=None):
@@ -241,161 +255,32 @@ def add_inckv_bysubjob(job, subjob, incdic):
     
     return incdic
 
-def modify_incar_byjob(incar, job, outf='INCAR.new'):
+#def modify_incar_byjob(incar, job, outf='INCAR.new'):
+def modify_incar_byjob(job):
     '''
+    Modified    Do not write updated INCAR
+                Return dict_change, incar_to_remove
     pass job with job + subjob
-    job = cont, spw, spw2
-        spw     write WAVECAR, CHGCAR, 
-    simply call modify_incar_kv by assigning incar_kv by job
+    job = cont, spw, spw2,
+        spw     write WAVECAR, CHGCAR
+    Return:
+        dict_change (merged change+active)
+        icout (list)
     '''
 
-    #Lcomment = 0
-    icout = None        # to treat comment out key-list
-
-    if job == 'cont':
-        dict_change = cont_change
-    elif job == 'spw':
-        dict_change = spw_change
-    elif job == 'mag':
-        dict_change = mag_change
-    elif job == 'dos' or job == 'band':
-        if job == 'dos':
-            dict_change = dos_change
-            dict_change.update(dos_active)
-        else:
-            dict_change = band_change
-            dict_change.update(band_active)
-        icout = dosband_out
-        #Lcomment = 1
-    elif job == 'pchgB':
-        dict_change = pchgB_change
-    elif job == 'pchg':
-        dict_change = pchg_active
-    else:
-        print(f"no {job} defined in {whereami()}() in module {__file__}")
+    if job not in JOB_RULES:
+        print(f"no {job} in JOB_RULES in {whereami()}() in module {__file__}")
         sys.exit(101)
 
-    modify_incar_bykv(incar, dict_change, icout=icout, outf=outf, mode = 'm') 
-    '''
-    if Lcomment == 1:
-        if job == 'dos':
-            dict_out    = dos_out
-        modify_incar_bykv(outf, dict_out, outf=outf, mode = 'c')
-    '''
-    return 0
+    rule = JOB_RULES[job]
 
-def modify_incar_byjob2(incar, job, dic=None, opt='ac', suff=None):
-    #os.system(f"cp {INCAR} INCAR")
-    #line_change_dict('INCAR', vasp_job.zpe)
-    print(f"running in {whereami()}:{__file__}")
-    if suff:
-        outf = f"INCAR.{suff}"
-    else:
-        outf  = f"INCARnew.{job}"
-    ### common dict for modification
-    if f'{job}_change' in globals():
-        paramch   = eval(f'{job}_change')
-    ### in case comment out: list
-    if f'{job}_out' in globals():
-        paramout  = eval(f'{job}_out')
-    ### in case uncomment: dict
-    if f'{job}_active' in globals():
-        paramin   = eval(f'{job}_active')
-    if f'{job}_in' in globals():
-        paramrep  = eval(f'{job}_in')
-    #print(f"setting: paramch {paramch} add {dic}")
-    if dic:
-        print(f"is this True {dic}")
-        ### append params
-        if 'a' in opt:
-            if 'paramin' in locals():
-                paramin.update(dic)
-                print("extend dict")
-            else:
-                paramin = dic
-        ### change params
-        elif 'c' in opt:
-            if 'paramch' in locals():
-                paramch.update(dic)
-            else:
-                paramch = dic
-        ### out params
-        elif 'o' in opt:
-            if 'paramout' in locals():
-                paramout.update(dic)
-            else:
-                paramout = dic
-    #print(f"param active {paramin} param change {paramch}")
-    # print(f"param comment out {paramout}")
-    i=0
-    iline=0
-    with open(incar) as f:
-        lines = f.readlines()
-    print(f"write to {outf}")
-    ### open output file and write line by line of input INCAR
-    #print(paramin.keys())
-    with open(outf, 'w') as f:    
-        for line in lines:
-            iline += 1
-            lst = line.strip().split()
-            if len(lst) == 0:
-                f.write(line)
-                continue
-            else:
-                first_item = lst[0]
-            ### [1] check paramin
-            ### param uncomment: when active and change: first activate and change
-            if 'paramin' in locals() and paramin :
-                for key in paramin.keys():
-                    tag_match = False
-                    if key in first_item:
-                        if first_item == f'#{key}':
-                            newline = line[1:]
-                            print(f"paramin:{newline} i {i} {iline}")
-                            i += 1
-                        ### if option == 'ac', in activation, replace at the same time
-                        if opt and 'c' in opt:
-                            line = replace_line(paramin, key, job) + "\n"
-                        tag_match = True    # used in change
-                        ### as for 1 key appearance, just apply once
-                        #continue
-                ### only apply once then remove key
-                #if tag_match == True:
-                #    del paramin[key]
-            ### [2]                
-            ### param change
-            if 'paramch' in locals() and paramch:
-                for key in paramch.keys():
-                    tag_match = False
-                    ### replace finds only the first letter is active
-                    if re.match(key, first_item):
-                        line = replace_line(paramch, key, job) + "\n"
-                        tag_match == True
-                ### when remove a key, all the keys are not applied
-                #if tag_match == True:
-                #    del paramch[key]
-            ### [3]
-            ### param comment out
-            tag_out = False
-            if  'paramout' in locals() and paramout :
-                for param in paramout: # this is list
-                    if param in line:
-                        #print(f"param out:{param} i {i} {iline}")
-                        i += 1
-                        line = comment_out_line(first_item, job)
-                        tag_out = True
-                #if tag_match == True:
-                #    paramout.remove(param)
-                    
-                        ### param rep comes together with param out
-                        if param in paramrep:
-                            addline = add_line( paramrep, param, job )
-                            f.write(addline)
-            #print(f"{iline} line: {line}")
-            f.write(line)
+    ### generate new dict (not touch original)
+    dict_change = {}
+    dict_change.update(rule.get("change", {}))
+    dict_change.update(rule.get("active", {}))
+    icout = list(rule.get("out", []))
 
-    return outf
-
+    return dict_change, icout
 
 def main():
     parser = argparse.ArgumentParser(description='test for INCAR change')
