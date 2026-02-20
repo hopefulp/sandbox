@@ -24,6 +24,7 @@ vasf_ini=['POSCAR','KPOINTS','INCAR','POTCAR']
 ### VASP jobs group with file to be modified
 jg_poscar=['ini', 'zpe']        # ini uses, zpe modifies, others use CONTCAR
 jg_kpoints=['dos','kp']         # band: file is required for each symmetry, kp for change kp file
+jg_kpoints_copy=['sp', 'spw', 'cont', 'mag',]
 ### sp for write CHGCAR, WAVCAR
 #jg_incar=['sp','cont','opt','copt','vdw','chg','chgw','dos','pchg','band','mag','kisti','neb']  # required
 jg_incar=['cont','spw','mag','dos','band','pchg','pchgB']

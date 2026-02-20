@@ -11,7 +11,7 @@ from common     import get_dirfiles, yes_or_no
 from libstr     import li2dic
 from libincar   import modify_incar_byjob, modify_incar_bykv, add_inckv_bysubjob
 from libposcar  import modify_POSCAR, pos2dirname, get_poscar
-from libvas     import jg_poscar, jg_kpoints, jg_incar, jg_potcar, jg_linkw, jg_linkc
+from libvas     import jg_poscar, jg_kpoints,jg_kpoints_copy, jg_incar, jg_potcar, jg_linkw, jg_linkc
 from libkpoints import mod_kpoints
 from vas_qsub   import qsub_command, QueueConfig
 from libcluster import detect_cluster
@@ -156,6 +156,10 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, q
     ### use -j job
     elif os.path.isfile(f'KPOINTS.{vjob}'):
         kpoints = 'KPOINTS.'+vjob
+    ### inherit KPOINTS from mother directory
+    elif vjob in jg_kpoints_copy:
+        kpoints = old_kpoints
+    ### usde at wdir/KPOINTS
     elif os.path.isfile('KPOINTS'):
         kpoints = 'KPOINTS'
     
