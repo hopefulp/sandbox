@@ -304,7 +304,7 @@ def main():
 
     pwd = os.getcwd()
 
-    cluster = args.switch_server if args.switch_server else detect_cluster()
+    cluster = detect_cluster()
     ### Make queue system: if args.partition, get partition, nnode, nproc
     queue = None
     if cluster == "pt":
