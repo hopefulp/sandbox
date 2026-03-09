@@ -497,7 +497,7 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, lvertical=None, v_legend=No
         ylabel  = plot_dict.get("ylabel",   "")
         xlim    = plot_dict.get("xlim",     "")
         ylim    = plot_dict.get('ylim',     "")
-        legends  = plot_dict.get("legend",   "")
+        legends  = plot_dict.get("legends",   "")
         colors  = plot_dict.get("colors",   "")
 
     if 'colors' not in locals():
@@ -506,6 +506,15 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, lvertical=None, v_legend=No
     else:
         fig, ax = common_figure()
         if Lprint: print("colors")
+
+    if len(colors) == len(legends)/2:
+        color_type=[]
+        for color in colors:
+            color_type.append(color+'-')
+            color_type.append(color+'--')
+        colors = color_type
+
+    print(f"ncolors {len(colors)}, nlegends {(legends)} in function {whereami()}()")
 
     #plt.locator_params(axis='x', nbins=10)
     ys = np.array(y)
@@ -520,7 +529,7 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, lvertical=None, v_legend=No
             x=range(xsize)
     else:
         xdim = 2
-    print(f"xdim={xdim}")
+    #print(f"xdim={xdim}")
     if xdim == 1:
         print(f"x= {xsize}, y={ys.shape} in {whereami()}()")
     else:
@@ -562,8 +571,9 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, lvertical=None, v_legend=No
                 color = colors[i][:-1]
                 plt.fill_between(xs,ys[i,:], alpha=0.5, label=legends[i] , color=color)
             else:
-                print(f"size x {len(xs)}, size y {len(list(ys[i,:]))}, size legend {len(legends)} size color {len(colors)}")
-                plt.plot(xs,ys[i,:],  label=legends[i], color=colors[i])
+                plt.plot(xs,ys[i,:],  colors[i], label=legends[i], )
+            print(f"plot {i}-plot with type {colors[i]}")
+            #print(f"size x {len(xs)}, size y {len(list(ys[i,:]))}, size legend {len(legends)} size color {len(colors)}")
         else:
             #if legends:
             if 0:

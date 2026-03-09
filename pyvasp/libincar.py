@@ -36,15 +36,22 @@ ordered_incar_keys=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','N
 ### job_mod for the existing value
 ### job_comment for comment out
 ### job_uncomment to make it active
-
+### 1: CONT
 cont_change = {'ISTART': 1, 'ICHARG':0}     # read WAVECAR
+### 2: SP no CHGCAR, WAVECAR in previous job so start w. (0, 2)
+### no Lorbit: presentation tool for l-decompose
+sp_out      = ['ISIF', 'IBRION', 'EDIFFG', 'POTIM']
+sp_change   = {'LCHARG': '.F.'}
+spw_out     = list(sp_out) 
+spw_change  = {'ISTART': 0, 'ICHARG': 2, 'LCHARG': '.TRUE.', 'LWAVE':'.TRUE.', 'NSW':0}
+
 ### Band structure & DOS: change params and comment out
 band_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'LCHARG': '.F.'}
 dosband_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
 band_active = {'LORBIT': 11}
-dos_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'ALGO':'Normal', 'EDIFF':1E-5, 'LCHARG': '.F.', 'ISMEAR': -5}
+dos_change = {'ISTART': 1, 'ICHARG': 11, 'NSW': 0, 'IBRION': -1,'ALGO':'Normal', 'EDIFF':1E-5, 'LCHARG': '.F.', 'ISMEAR': 0}
 #dosband_out    = ['POTIM', 'ISIF', 'EDIFFG'] # for comment out
-dos_active = {'LORBIT': 11, 'NEDOS': 1001, 'EMIN':-10, 'EMAX':10}
+dos_active = {'LORBIT': 11, 'NEDOS': 4001, 'EMIN':-10, 'EMAX':4}
 ### VDW
 vdw_active  = {'IVDW': 12}
 noD_out     = ['IVDW']
@@ -53,17 +60,14 @@ opt_change  = {'NSW': 1000}
 opt_active  = {'ISIF': 2, 'IBRION': 2, 'POTIM': 0.3, 'NSW': 1000, 'EDIFFG': -0.01}
 ### CHG|SP: chg, pchg, pbchg [Bader] are different
 ### NSW = 0 for A+B, A, B
-chg_out     = ['ISIF', 'IBRION', 'EDIFFG', 'POTIM']
+chg_out     = sp_out
 chg_change  = {'LCHARG': '.T.'}
 pchgB_out   =   ['ISTART']
-pchgB_change = {'ICHARG': 11, 'LAECHG': '.TRUE.'}    
+pchgB_change = {'ICHARG': 11, 'LAECHG': '.TRUE.'}
+### if copied from spw, include DOSCAR option also
+pchg_change  = dos_change.copy()
 pchg_active = { 'LPARD': 'T', 'LSEPB' : 'FALSE', 'IBAND' : '304', 'LSEPK' : 'FALSE', 'KPUSE' : '1 2 3 4' } 
-sp_out      = chg_out
-sp_change   = {'LCHARG': '.F.'}
-### spw to write PROCAR for matching kpoints in WAVCAR and PROCAR for pchg calculation
-### for band calculation LWAVE = .TRUE. , LORBIT doesn't need
-#spw_change = {'ISTART': 0, 'ICHARG': 2, 'LCHARG': '.TRUE.'}
-spw_change = {'ISTART': 0, 'ICHARG': 2, 'LCHARG': '.TRUE.', 'LWAVE':'.TRUE.', 'NSW':0}
+
 
 ### Cell OPT
 copt_change = {'NSW': 1000}
@@ -87,7 +91,8 @@ JOB_RULES = {
     "dos" : {"change": dos_change ,     "active": dos_active,   "out": dosband_out},
     "band": {"change": band_change ,    "active": band_active,  "out": dosband_out},
     "mag":  {"change": mag_change ,     "active": {},           "out": []},
-    "spw":  {"change": spw_change ,     "active": {},           "out": []},
+    "pchg": {"change": pchg_change,     "active": pchg_active,  "out": []}, # from spw
+    "spw":  {"change": spw_change ,     "active": {},           "out": spw_out},
     "kisti":{"change": kisti_change ,   "active": {},           "out": kisti_out},
 }
 

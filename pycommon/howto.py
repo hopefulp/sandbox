@@ -11,36 +11,73 @@ def format_text(text, mod):
     return text
 
 
-def jobs(mod_comm, att, subkey, poscar=None):
-    #subkeys = mod_comm.__dict__[att].__dict__.keys()
-    print(att)
-    subkeys = list(mod_comm.__dict__[att].__dict__) # list of dict returns keys
+def jobs(mod_comm, job_att, subkey=None, poscar=None):
+
+    obj = getattr(mod_comm, job_att, None)
+    if obj is None:
+        print("No such job")
+        return 0
+
+    print(job_att)
     print('---------------------------------------------')
-    print(f"key:: {att}, sub_keys:: {subkeys}")
-    sel_subkeys=[]
-    #if isinstance(mod_comm.__dict__[att].__dict__[keyss[0]],dict):
-    ### use select next key here
-    if subkey:
-        #subkey = subkey.upper()
-        sel_subkeys.append(subkey)
-    else:
-        sel_subkeys.extend(subkeys[:])
-    for i, key in enumerate(sel_subkeys):
-        print(f"subkey-{i} {key}")          #1st att(server), 2nd sge 
-        ### if second key is dict
-        if isinstance(mod_comm.__dict__[att].__dict__[key], dict):   # value of 'sge' is dict
-        #print("here is True")
-            for k in mod_comm.__dict__[att].__dict__[key].__dict__.keys():
-                #print(f" k is {k}")
-                print(mod_comm.__dict__[att].__dict__[key].__dict__[k].format(POSCAR=poscar))
-            #sub_keys.append(key)
-        ### only 1st key (hfse2) is dict, poscar is not dict
-        else:
-            print(mod_comm.__dict__[att].__dict__[key].format(POSCAR=poscar))
-    if not subkey:
-        print(f"Use -k for subkey in {subkeys}")
+
+    # =========================
+    # SUMMARY MODE
+    # =========================
+    if subkey is None:
+
+        for name, value in vars(obj).items():
+
+            if name.startswith("_"):
+                continue
+
+            # Case 1: direct documentation string
+            if isinstance(value, str):
+                print(f"{job_att}.{name}")
+
+            # Case 2: nested namespace (e.g. vasp.make)
+            elif hasattr(value, "__dict__"):
+
+                for subname, subvalue in vars(value).items():
+
+                    if subname.startswith("_"):
+                        continue
+
+                    if isinstance(subvalue, str):
+                        print(f"{job_att}.{name}.{subname}")
+
+        print("\nUse -k for detail")
+        return 0
+
+    # =========================
+    # DETAIL MODE
+    # =========================
+    value = getattr(obj, subkey, None)
+    if value is None:
+        print("No such subkey")
+        return 0
+
+    print(f"{job_att}.{subkey}")
+    print('---------------------------------------------')
+
+    # If leaf string → print doc
+    if isinstance(value, str):
+        print(value.format(POSCAR=poscar) if poscar else value)
+        return 0
+
+    # If namespace → print nested docs
+    for name, subvalue in vars(value).items():
+
+        if name.startswith("_"):
+            continue
+
+        if isinstance(subvalue, str):
+            print(f"\n{name}")
+            print(subvalue.format(POSCAR=poscar) if poscar else subvalue)
 
     return 0
+
+
 
 def main():
     parser = argparse.ArgumentParser(description="shows dictionary for all: work, system, package  ")
@@ -49,7 +86,9 @@ def main():
     parser.add_argument('-j', '--job', help='select one attribute')
     parser.add_argument('-p', '--poscar', help='args such as POSCAR name')
     parser.add_argument('-k', '--subkey', help='select one key for subkeys')
+    parser.add_argument('-u', '--usage', action='store_true', help='print first keys')
     args = parser.parse_args()
+    
 
     regex = re.compile('__')    # only detect it starts with lower case
     #if args.switch==False and args.mod == 'sys':
@@ -62,7 +101,7 @@ def main():
     ### same as
     #my_module.__dict__['POSCAR'] = "anything"
     ### try to pass args 
-    if not args.job:
+    if not args.job or args.usage:
         print(my_module.__file__)
         my_module.print_obj( job = args.job, poscar=args.poscar )
         if mod_name == 'comment_subj':

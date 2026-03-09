@@ -7,6 +7,11 @@ required mode: lm-decomposed (such as l1m0), more for input atomlist style (incl
 
 input   atom list which starts from 0
 output  pdos atom index which starts from 1
+
+not supported
+    LSorbit = .true. for non-collinear
+    Lnoncollinear
+    SOC-resolved DOS
 '''
 import json
 import argparse
@@ -53,6 +58,15 @@ def make_vert_line(fname, Ene, maxdos=10):
     f0.close()
     return 0
 
+def double_legend_colors(plot_dict):
+    legend_spin = []
+    color_spin = []
+    for legend, color in zip(plot_dict['legends'], plot_dict['colors']):
+        legend_spin.append(legend+'-up')
+        legend_spin.append(legend+'-down')
+        color_spin.extend([color, color])
+    #plot_dict['colors'] = color_spin
+    plot_dict['legends'] = legend_spin
 
 
 def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lvertical):
@@ -83,7 +97,7 @@ def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lverti
     pdos2d      gathers dos
     plot x=lene, y=dos in pdos2d
     '''
-    Ef, Lspin, Ldoserr = read_doscar(doscar, option='head')
+    Ef, Lspin, Ldoserr = read_doscar_orig(doscar, option='head')
     #Ef = -1.9
     if Lplot:
         legends = []
@@ -165,12 +179,27 @@ def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lverti
         print(f"dimensions lene, dos: {len(list(lene))} {len(list(dos_data))} in module {__name__}")
 
         ### gather only dos data in 2nd column
-        pdos2d.append(dos_data[:,1])
+        #pdos2d.append(dos_data[:,1])   # spin-unpol
+        ### spin polarized
+        if dos_data.shape[1] == 2:
+            pdos2d.append(dos_data[:,1])
+            Lspin = 1
+
+        elif dos_data.shape[1] == 3:
+            pdos2d.append(dos_data[:,1])       # spin down mirrored
+            pdos2d.append(dos_data[:,2])        # spin up
+            #pdos2d.append(dos_data[:,2])       # spin down mirrored
+            Lspin = 2
+        
         
         ### writing TDOS[].dat pdosa[].dat in the one atom list; to write several dos at one file f.write out of for loop
         fout=open(fname, 'w')
         for i in range(len(lene)):
-            fout.write(f"{lene[i]:10.3f}  {dos_data[i,1]:10.4f}\n")
+            if dos_data.shape[1] == 2:
+                fout.write(f"{lene[i]:10.3f} {dos_data[i,1]:10.4f}\n")
+            elif dos_data.shape[1] == 3:
+                #fout.write(f"{lene[i]:10.3f} {dos_data[i,1]:10.4f} {dos_data[i,2]:10.4f}\n")
+                fout.write(f"{lene[i]:10.3f} {dos_data[i,2]:10.4f} {dos_data[i,1]:10.4f} \n")
         fout.close()
         print(f"{whereami():>15}(): write atoms {list(arr_atoms)} to {fname} ")
         '''
@@ -203,22 +232,24 @@ def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lverti
         else:
             vertical_lines.append(float(Ef))
     print(f"plot vertical line at {vertical_lines}")
+
     if Lplot:
         ### make legend
-        if plot_dict.get('legend'):
-            if len(plot_dict['legend']) == len(pdos2d):
+        if Lspin == 2:
+            double_legend_colors(plot_dict)
+        if plot_dict.get('legends'):
+            if len(plot_dict['legends']) == len(pdos2d):
                 pass
             else:
-                print(f"number of legends are different from data: {len(plot_dict['legend'])} {plot_dict['legend']}")
+                print(f"number of legends are different from data: {len(plot_dict['legends'])} {plot_dict['legends']}")
                 sys.exit(10)
         elif legends:
-            plot_dict['legend'] = legends
+            plot_dict['legends'] = legends
         else:
             ### make legends
             for i in range(len(pdos2d)):
                 legends.append(f"Model-{i}")
-            plot_dict['legend'] = legends
-            
+            plot_dict['legends'] = legends
     ### plot here
     
     if Lplot:
@@ -296,7 +327,7 @@ def main():
     if args.ylim:   plot_dict['ylim']   = args.ylim
     if args.title:  plot_dict['title']  = args.title
     if args.colors: plot_dict['colors'] = args.colors
-    if args.legend: plot_dict['legend'] = args.legend
+    if args.legend: plot_dict['legends'] = args.legend
     ####                  1            2        3             4           5         6      7         8   
     plot_doscar(args.doscar, args.ofile, alist0, args.energy_shift,args.ql,args.qm,args.plot,plot_dict,args.vertical) 
 

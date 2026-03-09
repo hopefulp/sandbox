@@ -197,6 +197,9 @@ def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, k
     kisti.vas += f"\n\t\t$ qsub -N {jname} -l select={nnode}:ncpus=40:mpiprocs={nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t\t$ qsub -N {jname} $SB/pypbs/pbs_vasp_kisti_skl2.sh"
     kisti.vas += f"\n\t\t    pbs_vasp_kisti_skl2 for half use of cpu for memory issue"
+    kisti.vas += f"\n\t    :: CONT"
+    kisti.vas += f"\n\t\t(mag) $ kpy vas_make_cont.py -s {jobname} -j mag -io MAGMOM \"75*0 4.5 2*1.5\" -cs"
+    kisti.vas += f"\n\t\t\t-cs: check server in case job in pt to kisti to remove NPAR"
     kisti.vas += f"\n\t    :: MD"
     kisti.vas += f"\n\t\t(NVE) $ kpy vas_make_ini.py -s {jobname} -j mdnve -k g -d d2510c"
     kisti.vas += f"\n\t\t(NVT) $ kpy vas_make_ini.py -s {jobname} -j md -io TEBEG 1300 TEEND 500 -k g -d HfSe2O3Q"
@@ -247,7 +250,7 @@ def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, k
             \n\t\t: CDD (charge density difference) calculates fragment A & B w. frozen geometry\
             \n\t    $ (pchg)vas_make_cont.py -d {dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
             \n\t    $ (dos) vas_make_cont.py -d {dirname} -j {vjob} -io NEDOS 6000 EMIN -30 EMAX 5 -x {partition} -N {nnode} -np {nproc}\
-            \n\t    $ (mag) vas_make_cont.py -d {dirname} -j {vjob} -io MAGMOM '75*0 1 0 0' ISYM 0  -x {partition} -N {nnode} -np {nproc}\
+            \n\t    $ (mag) vas_make_cont.py -d {dirname} -j {vjob} -io MAGMOM '75*0 4.5 2*1.5' -x {partition} -N {nnode} -np {nproc}\
             \n\t\t: input MAGAMOM, ISYM = 0 for symmetry can suppress magnetism in some case\
             \n\t::options\
             \n\t    -J for jobname and dirname\

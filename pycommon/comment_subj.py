@@ -26,6 +26,7 @@ qchem.server.chi        = MyClass('qchem.server.chi')
 qchem.server.kisti      = MyClass('qchem.server.kisti')
 vasp                = MyClass('vasp')
 vasp.server             = MyClass('vasp.server')
+vasp.make               = MyClass('vasp.make')
 vasp.scripts            = MyClass('vasp.scripts')
 vasp.postproc           = MyClass('vasp.postproc')
 vasp.slab               = MyClass('vasp.slab')
@@ -364,7 +365,7 @@ vasp.run            = "=== VASP ===\
                     \n\t    run: mpirun -np 4 $VASP_HOME/vasp.5.4.4/bin/vasp_std > sidos.out\
                     \n\tKISTI\
                     "
-vasp.scripts.make_incar = "\n    === Usage ===\
+vasp.make.incar = "\n    === Usage ===\
                     \n\tMAKE incar.key:\
                     \n\t    -sys [bulk|surface|mol]\
                     \n\t    -md [nve|nvt|npt], -t dft[lda,gga,pe,rp,re,re0,revdw,re0vdw,etc]\
@@ -383,10 +384,21 @@ vasp.scripts.make_incar = "\n    === Usage ===\
                     \n\t    vmake_incar.py --rw r\
                     \n\t\tmakes INCAR by reading incar.key with --read option\
                     "
-vasp.scripts.make_ini = "\n\tMAKE 1st VASP Directory:\
-                    \n\t    $ vmake_ini.py -a O H -d dirname\
+vasp.make.ini =     "\n\tMAKE 1st VASP Directory:\
+                    \n\t    $ vas_make_ini.py -j job -p POSCAR.a -k kp -i incar\
                     \n\t\tKPOINTS=gamma, POTCAR from VaspINI by default and use 'incar.key' for INCAR"
-vasp.scripts.make_2ndDir =  "\n\tMAKE VASP Dir from Dir\
+vasp.make.cont =    "\n\tMAKE continue (2nd) VASP Directory:\
+                    \n\t    $ vas_make_cont.py -j job -d dirname -n newdir (default: dirnamejob)\
+                    \n\t\t (cont)   : vas_make_cont.py -d test -j opt -x 3 -N 1 -np 20\
+                    \n\t\t (sp  )   : vas_make_cont.py -d test -j sp -sj mag -x 3 -N 1 -np 20\
+                    \n\t\t (chg )   : vas_make_cont.py -d test -j sp -sj B -x 3 -N 1 -np 20\
+                    \n\t\t (pchg)   : vas_make_cont.py -d test -j sp -x 3 -N 1 -np 20\
+                    \n\t\t (dos)    : vas_make_cont.py -d test -j sp -io NEDOS 6000 EMIN -30 EMAX 5 -x 3 -N 1 -np 20 \
+                    \n\t\t (mag)    : vas_make_cont.py -d test -j sp -io MAGMOM '75*0 4.5 2*1.5' -x 3 -N 1 -np 20\
+                    \n\t\t (kisti)  : kpy vas_make_cont.py -d MoS2Hsc55NH2 -j mag -io MAGMOM '75*0 4.5 1.5 1.5' -cs\
+                    "
+
+vasp.make_d2d =     "\n\tMAKE VASP Dir from Dir\
                     \n\t    $ vmake_d2d.py old_dir new_dir job_type[ini,cont,hybrid,md,dos,band,pchg]\
                     \n\t\t make new_dir from old_dir\
                     \n\t\t ini: copy POSCAR\

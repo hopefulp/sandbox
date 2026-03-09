@@ -73,8 +73,115 @@ def change_Bheadline(old, Emin, Erep, ngrid, new_ngrid):
     print(f"{new_headline} with {Erep} for {Emin} ")
     return new_headline  
 
+import numpy as np
+import sys
 
-def read_doscar(filename="DOSCAR", atom_indices=None, l=None, option='dos'):
+n_header = 5
+dos_err = 100
+
+l_map = {'s': [1], 'p': [2,3,4], 'd': [5,6,7,8,9]}
+
+
+def read_doscar_header(lines):
+    natom = int(lines[0].split()[0])
+
+    info = lines[n_header].split()
+    Emax, Emin, ngrid, Ef = float(info[0]), float(info[1]), int(info[2]), float(info[3])
+
+    first = lines[n_header+1].split()
+    ncol = len(first)
+
+    if ncol == 3:
+        Lspin = False
+    elif ncol == 5:
+        Lspin = True
+    else:
+        print("Unknown DOSCAR format")
+        sys.exit(1)
+
+    return natom, ngrid, Ef, Lspin
+
+
+def read_doscar(filename="DOSCAR", atom_indices=None, l='t'):
+    """
+    Returns:
+        non-spin → (nE,2)
+        spin     → (nE,3)
+    """
+
+    with open(filename) as f:
+        lines = f.readlines()
+
+    natom, nE, Ef, Lspin = read_doscar_header(lines)
+
+    # ----- read energy grid -----
+    tdos_start = n_header + 1
+    tdos_end = tdos_start + nE
+    tdos_block = lines[tdos_start:tdos_end]
+
+    energy = np.loadtxt(tdos_block, usecols=0)
+
+    # =========================
+    # TDOS
+    # =========================
+    if atom_indices[0] == 0:
+
+        if not Lspin:
+            dos = np.loadtxt(tdos_block, usecols=1)
+            return np.column_stack((energy, dos))
+
+        else:
+            dos_up = np.loadtxt(tdos_block, usecols=1)
+            dos_dn = np.loadtxt(tdos_block, usecols=2)
+            return np.column_stack((energy, dos_up, dos_dn))
+
+    # =========================
+    # PDOS
+    # =========================
+
+    if l not in l_map:
+        if l == 't':
+            col_idx = sum(l_map.values(), [])
+        else:
+            print("Unknown orbital type")
+            sys.exit(1)
+    else:
+        col_idx = l_map[l]
+
+    pdos_start = n_header + 1 + nE
+
+    if not Lspin:
+        summed = np.zeros(nE)
+
+    else:
+        summed_up = np.zeros(nE)
+        summed_dn = np.zeros(nE)
+
+    for atom in atom_indices:
+
+        block_start = pdos_start + (atom - 1) * (nE + 1)
+        atom_block = lines[block_start+1 : block_start+1+nE]
+        data = np.loadtxt(atom_block)
+
+        if not Lspin:
+            for idx in col_idx:
+                summed += data[:, idx]
+
+        else:
+            for idx in col_idx:
+                up_col = 2*idx - 1
+                dn_col = 2*idx
+                summed_up += data[:, up_col]
+                summed_dn += data[:, dn_col]
+
+    if not Lspin:
+        return np.column_stack((energy, summed))
+    else:
+        return np.column_stack((energy, summed_up, summed_dn))
+
+
+
+def read_doscar_orig(filename="DOSCAR", atom_indices=None, l='t', option='dos'):
     """
     option: head    
             TDOS
@@ -89,6 +196,8 @@ def read_doscar(filename="DOSCAR", atom_indices=None, l=None, option='dos'):
     
     Returns:
         dos_data: np.ndarray – array with shape (n_ene, 2), columns = [energy, summed_dos]
+        non-spin    -> (nE, 2)
+        spin        -> (nE, 3)
     """
     with open(filename, 'r') as f:
         lines = f.readlines()
@@ -165,7 +274,26 @@ def read_doscar(filename="DOSCAR", atom_indices=None, l=None, option='dos'):
     print(f"dos_data {dos_data.shape} in {whereami()}() in module {__name__}")
     return dos_data
 
-### from mod_doscar.py
+### by ChatGPT
+def read_doscar_header(lines):
+    natom = int(lines[0].split()[0])
+
+    info = lines[n_header].split()
+    Emax, Emin, ngrid, Ef = float(info[0]), float(info[1]), int(info[2]), float(info[3])
+
+    first = lines[n_header+1].split()
+    ncol = len(first)
+
+    if ncol == 3:
+        Lspin = False
+    elif ncol == 5:
+        Lspin = True
+    else:
+        print("Unknown DOSCAR format")
+        sys.exit(1)
+
+    return natom, ngrid, Ef, Lspin
+
 def obtain_doscar_head(fname):
     '''
     read DOSCAR
