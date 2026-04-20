@@ -21,7 +21,6 @@ from libincar   import modify_incar_bykv, add_inckv_bysubjob
 from libstr     import li2str, li2dic
 
 home = os.environ['HOME']
-hostname = get_hostname()
 pseudo_pot={'new':'Pot-new', 'potpaw-pbe-new':'Pot-new', 'old':'pot-old', 'potpaw-pbe-old':'pot-old'}
 global pwd, ini_dvasp
 
@@ -293,7 +292,7 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
             s = f'nebmake.pl POSCAR POSCAR_fin {nimages}'
             os.system(s)
         #if not os.path.isfile('POTCAR'):   # to make new POTCAR 
-        if hostname == 'kisti':
+        if cluster == 'kisti':
             s = f"python {home}/sandboxg/pyvasp/genpotcar.py -pp pbe"
         else:
             #s = home + "/sandboxg/pyvasp/genpotcar.py -pp pbe"
