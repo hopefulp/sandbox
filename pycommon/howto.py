@@ -11,6 +11,18 @@ def format_text(text, mod):
     return text
 
 
+def first_doc_line(text, poscar=None):
+    if not isinstance(text, str):
+        return ""
+    if poscar:
+        text = text.format(POSCAR=poscar)
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped:
+            return stripped
+    return ""
+
+
 def jobs(mod_comm, job_att, subkey=None, poscar=None):
 
     obj = getattr(mod_comm, job_att, None)
@@ -30,10 +42,12 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
 
             if name.startswith("_"):
                 continue
+            if name == "name":
+                continue
 
             # Case 1: direct documentation string
             if isinstance(value, str):
-                print(f"{job_att}.{name}")
+                print(f"{job_att}.{name}: {first_doc_line(value, poscar=poscar)}")
 
             # Case 2: nested namespace (e.g. vasp.make)
             elif hasattr(value, "__dict__"):
@@ -42,9 +56,11 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
 
                     if subname.startswith("_"):
                         continue
+                    if subname == "name":
+                        continue
 
                     if isinstance(subvalue, str):
-                        print(f"{job_att}.{name}.{subname}")
+                        print(f"{job_att}.{name}.{subname}: {first_doc_line(subvalue, poscar=poscar)}")
 
         print("\nUse -k for detail")
         return 0
@@ -82,7 +98,14 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
 def main():
     parser = argparse.ArgumentParser(description="shows dictionary for all: work, system, package  ")
     #parser.add_argument('-m', '--mod', default='sys', choices=['sys', 'sub'], help='which branch: system|subject')
-    parser.add_argument('-s', '--switch', action='store_true', help='choose module comm_sub')
+    parser.add_argument(
+        '-s',
+        '--switch',
+        nargs='?',
+        const=True,
+        default=False,
+        help='choose module comment_sys; optionally pass POSCAR after -s',
+    )
     parser.add_argument('-j', '--job', help='select one attribute')
     parser.add_argument('-p', '--poscar', help='args such as POSCAR name')
     parser.add_argument('-k', '--subkey', help='select one key for subkeys')
@@ -91,6 +114,9 @@ def main():
     
 
     regex = re.compile('__')    # only detect it starts with lower case
+    if isinstance(args.switch, str) and not args.poscar:
+        args.poscar = args.switch
+
     #if args.switch==False and args.mod == 'sys':
     if args.switch==False:
         mod_name = 'comment_subj'
@@ -103,7 +129,7 @@ def main():
     ### try to pass args 
     if not args.job or args.usage:
         print(my_module.__file__)
-        my_module.print_obj( job = args.job, poscar=args.poscar )
+        my_module.print_obj(job=args.job)
         if mod_name == 'comment_subj':
             print(f"\t    -s for other attributes in module 'comment_sys.py' ")
     else:

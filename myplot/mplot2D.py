@@ -135,7 +135,7 @@ def common_figure(ctype='dark', ncolor=4, Ltwinx=False):
     else:
         from cycler import cycler
     ### control figure size (2,6) for x-axis is 1/5
-    fig = plt.figure(figsize=(10,6))         # def figsize=(10,6)
+    fig = plt.figure(figsize=(2,6))         # def figsize=(10,6)
     ax = plt.axes()
     mpl.rcParams.update({'font.size':12})
     #ax.tick_params(axis='both', which='major', labelsize=25)
@@ -309,7 +309,7 @@ def xtitle_font(tit):
 
 
 ### twinx1: used for md.ene, normal data file
-def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=None, Lsave=False, colors=None):
+def mplot_twinx(x, y, iy_right, plot_dict=None, Lsave=False):
     '''
     called from "amp_plot_stat.py"
     call with x=[] and y=[ [...
@@ -317,6 +317,24 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     y:: [size] or [[size],[size],...[size]]
     len(ylabel) == 2
     '''
+    title = ""
+    xlabel = ""
+    ylabel = ""
+    xlim = None
+    ylim = None
+    ylim2 = None
+    legends = []
+    colors = []
+    if plot_dict:
+        title = plot_dict.get("title", "")
+        xlabel = plot_dict.get("xlabel", "")
+        ylabel = plot_dict.get("ylabel", "")
+        xlim = plot_dict.get("xlim")
+        ylim = plot_dict.get("ylim")
+        ylim2 = plot_dict.get("ylim2")
+        legends = plot_dict.get("legends", [])
+        colors = plot_dict.get("colors", [])
+
     if iy_right:
         fig, ax, ax2 = common_figure(ctype='cycle', ncolor = len(y), Ltwinx=True)
     else:
@@ -332,10 +350,13 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     plt.title(title)
     if xlabel:
         plt.xlabel(xlabel, fontsize=25)
-    if isinstance(ylabel, str): ylabel1 = ylabel2 = ylabel
+    if isinstance(ylabel, str):
+        ylabel1 = ylabel2 = ylabel
     elif isinstance(ylabel, list):
         ylabel1 = ylabel[0]
-        ylabel2 = ylabel[1]
+        ylabel2 = ylabel[1] if len(ylabel) > 1 else ylabel[0]
+    else:
+        ylabel1 = ylabel2 = None
     ### try autocolor
     #plt.ylabel(ylabel1, fontsize=25, color='r')
     #ax.tick_params(axis='y', colors='r')
@@ -346,12 +367,11 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
     #ax.xaxis.set_major_locator(plt.NullLocator())
     #print(f"x, y shape:: {np.array(x).shape} {np.array(y).shape} and ylabel {ylabel} in {whereami()}")
     #ax2.set_ylabel(ylabel2, fontsize=25, color='g')
-    ax2.set_ylabel(ylabel2, fontsize=25)
-    #ax2.set_ylim(-2,2)
-    tick_interval = 4.0
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_interval))
-    ax2.yaxis.set_major_locator(ticker.MultipleLocator(tick_interval))
+    if iy_right:
+        ax2.set_ylabel(ylabel2, fontsize=25)
     pls=[]
+    left_series = []
+    right_series = []
     print(f"y-right axis: index {iy_right} {len(ys)} {whereami()}")
     for i in range(len(ys)):
         if i in iy_right: 
@@ -359,12 +379,14 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
             #else:       color='tab:green'
             #plt.yticks(color='g')
             #p2, = ax2.plot(x, ys[i,:], '-', color='g', label=legend[i])
-            print(f"{legend[i]} in y-right axis with color")
+            if legends:
+                print(f"{legends[i]} in y-right axis with color")
             if colors:
-                p2, = ax2.plot(x, ys[i,:], '-',  label=legend[i], color=colors[i])
+                p2, = ax2.plot(x, ys[i,:], '-',  label=legends[i], color=colors[i])
             else:
-                p2, = ax2.plot(x, ys[i,:], '-',  label=legend[i])
+                p2, = ax2.plot(x, ys[i,:], '-',  label=legends[i] if legends else None)
             pls.append(p2)
+            right_series.append(np.asarray(ys[i, :], dtype=float))
         else:
             #ax2.tick_params(axis='y')
             #if Colors:  color = Colors.pop(i)       #color = 'tab:' + Colors.pop(0)
@@ -372,38 +394,105 @@ def mplot_twinx(x, y, iy_right, title=None, xlabel=None, ylabel=None, legend=Non
             #plt.yticks(color='r')
             #p1, = ax.plot(x, ys[i,:], '-', color='r',  label=legend[i])
             if colors:
-                p1, = ax.plot(x, ys[i,:], '-', label=legend[i], color=colors[i])
+                p1, = ax.plot(x, ys[i,:], '-', label=legends[i], color=colors[i])
             else:
-                p1, = ax.plot(x, ys[i,:], '-', label=legend[i])
+                p1, = ax.plot(x, ys[i,:], '-', label=legends[i] if legends else None)
             pls.append(p1)
+            left_series.append(np.asarray(ys[i, :], dtype=float))
     #plt.legend(pls, Ylabels, loc=2)
-    ax.legend(loc=2)            # 2
-    ax2.legend(loc=4)           # 1
-    plt.legend()
-    ### make the same y-scale in both size
-    y_interval_ref = 18.30
-    if iy_right:
-        ymin, ymax = ax.get_ylim()
-        y_interval = ymax - ymin
-        if 'y_interval_ref' in locals():
-            diff_interval = y_interval - y_interval_ref
-            ymin_new = ymin + diff_interval/2.
-            ymax_new = ymax - diff_interval/2.
-            ax.set_ylim(ymin_new, ymax_new)
-            y_interval = y_interval_ref
-        ymin2, ymax2 = ax2.get_ylim()
-        print(f"initial: ymin2 {ymin2} ymax2 {ymax2} y_interval {y_interval}")
-        y2_interval = ymax2 - ymin2
-        diff_interval = y2_interval - y_interval
-        ymin2_new = ymin2 + diff_interval/2.
-        ymax2_new = ymax2 - diff_interval/2.
-        ax2.set_ylim(ymin2_new, ymax2_new)
-        print(f"final: ymin2 {ymin2_new} ymax2 {ymax2_new}")
+    #ax.legend(loc=2)            # 2
+    #if iy_right:
+    #    ax2.legend(loc=4)           # 1
+    #plt.legend()
+
+    major_tick_interval = 4.0
+    minor_tick_interval = 2.0
+
+    def apply_tick_spacing(axis, limits, side='left', centered_major=False):
+        ymin, ymax = limits
+        major_ticks = None
+        if centered_major:
+            span = ymax - ymin
+            offset = (span % major_tick_interval) / 2.0
+            start = ymin + offset
+            major_ticks = np.arange(start, ymax, major_tick_interval)
+            axis.yaxis.set_major_locator(ticker.FixedLocator(major_ticks))
+        else:
+            axis.yaxis.set_major_locator(ticker.MultipleLocator(major_tick_interval))
+        axis.yaxis.set_minor_locator(ticker.MultipleLocator(minor_tick_interval))
+        if side == 'right':
+            axis.tick_params(axis='y', which='major', left=False, right=True, labelleft=False, labelright=True)
+            axis.tick_params(axis='y', which='minor', left=False, right=True, labelleft=False, labelright=False)
+        else:
+            axis.tick_params(axis='y', which='major', left=True, right=False, labelleft=True, labelright=False)
+            axis.tick_params(axis='y', which='minor', left=True, right=False, labelleft=False, labelright=False)
+
+    def get_integer_limits(series_list):
+        if not series_list:
+            return None
+        values = np.concatenate(series_list)
+        values = values[np.isfinite(values)]
+        if values.size == 0:
+            return None
+        ymin = int(np.floor(values.min()))
+        ymax = int(np.ceil(values.max()))
+        if ymin == ymax:
+            ymax = ymin + 1
+        return [ymin, ymax]
+
+    def expand_limits(limits, span):
+        ymin, ymax = limits
+        diff = span - (ymax - ymin)
+        if diff <= 0:
+            return [ymin, ymax]
+        lower = int(np.floor(diff / 2.0))
+        upper = int(np.ceil(diff / 2.0))
+        return [ymin - lower, ymax + upper]
+
+    def match_span_about_center(limits, span):
+        ymin, ymax = limits
+        center = (ymin + ymax) / 2.0
+        half = span / 2.0
+        ymin_new = int(np.floor(center - half))
+        ymax_new = int(np.ceil(center + half))
+        if (ymax_new - ymin_new) < span:
+            ymax_new += 1
+        return [ymin_new, ymax_new]
+
+    left_limits = get_integer_limits(left_series)
+    if left_limits is not None:
+        right_limits = None
+        if iy_right:
+            right_limits = get_integer_limits(right_series)
+            if right_limits is not None:
+                span = max(left_limits[1] - left_limits[0], right_limits[1] - right_limits[0])
+                left_limits = expand_limits(left_limits, span)
+                right_limits = expand_limits(right_limits, span)
+                ax2.set_ylim(right_limits[0], right_limits[1])
+                apply_tick_spacing(ax2, right_limits, side='right', centered_major=True)
+                print(f"left ylim {left_limits}, right ylim {right_limits}")
+        ax.set_ylim(left_limits[0], left_limits[1])
+        apply_tick_spacing(ax, left_limits, side='left')
+    if ylim:
+        ax.set_ylim(ylim[0], ylim[1])
+        apply_tick_spacing(ax, ylim, side='left')
+        if iy_right:
+            if ylim2:
+                right_applied = ylim2
+            elif right_limits is not None:
+                left_span = ylim[1] - ylim[0]
+                right_applied = match_span_about_center(right_limits, left_span)
+            else:
+                right_applied = ylim
+            ax2.set_ylim(right_applied[0], right_applied[1])
+            apply_tick_spacing(ax2, right_applied, side='right', centered_major=True)
     #common_figure_after()
     #x_ticks = ['PP', 'PPP', 'PNP', 'PNP-bridged']
     #plt.xticks(x_ticks)
     #ax.set_xticklabels(x_ticks)
     #plt.locator_params(axis='x', nbins=10)
+    if xlim:
+        ax.set_xlim(xlim[0], xlim[1])
     plt.show()
     if Lsave:
         plt.savefig(figname, dpi=150)
@@ -491,23 +580,30 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, lvertical=None, v_legend=No
     print(f"input shape {np.array(x).shape} {np.array(y).shape}")
 
     ### get components of plot_dict
+    title = ""
+    xlabel = ""
+    ylabel = ""
+    xlim = None
+    ylim = None
+    legends = []
+    colors = []
     if plot_dict:
-        title   = plot_dict.get("title",    "")
-        xlabel  = plot_dict.get("xlabel",   "")
-        ylabel  = plot_dict.get("ylabel",   "")
-        xlim    = plot_dict.get("xlim",     "")
-        ylim    = plot_dict.get('ylim',     "")
-        legends  = plot_dict.get("legends",   "")
-        colors  = plot_dict.get("colors",   "")
+        title   = plot_dict.get("title", "")
+        xlabel  = plot_dict.get("xlabel", "")
+        ylabel  = plot_dict.get("ylabel", "")
+        xlim    = plot_dict.get("xlim")
+        ylim    = plot_dict.get("ylim")
+        legends = plot_dict.get("legends", [])
+        colors  = plot_dict.get("colors", [])
 
-    if 'colors' not in locals():
-        fig, ax = common_figure(ncolor = len(legends))
-        if Lprint: print("no color input")
-    else:
+    if colors:
         fig, ax = common_figure()
         if Lprint: print("colors")
+    else:
+        fig, ax = common_figure(ncolor = len(legends) if legends else len(y))
+        if Lprint: print("no color input")
 
-    if len(colors) == len(legends)/2:
+    if legends and colors and len(colors) == len(legends)/2:
         color_type=[]
         for color in colors:
             color_type.append(color+'-')
@@ -569,14 +665,13 @@ def mplot_nvector(x, y, plot_dict=None, Lsave=False, lvertical=None, v_legend=No
             ### if the final letter is 'f'
             if colors[i][-1] == 'f':
                 color = colors[i][:-1]
-                plt.fill_between(xs,ys[i,:], alpha=0.5, label=legends[i] , color=color)
+                plt.fill_between(xs,ys[i,:], alpha=0.5, label=legends[i] if legends else None , color=color)
             else:
-                plt.plot(xs,ys[i,:],  colors[i], label=legends[i], )
+                plt.plot(xs,ys[i,:],  colors[i], label=legends[i] if legends else None, )
             print(f"plot {i}-plot with type {colors[i]}")
             #print(f"size x {len(xs)}, size y {len(list(ys[i,:]))}, size legend {len(legends)} size color {len(colors)}")
         else:
-            #if legends:
-            if 0:
+            if legends:
                 plt.plot(xs,ys[i,:],  label=legends[i])
             else:
                 plt.plot(xs,ys[i,:])

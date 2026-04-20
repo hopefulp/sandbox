@@ -347,7 +347,7 @@ outcar.outcar_zpe_ts    = "Read OUTCAR: calculate T*S energy\
                         \n\t\t    outcar_zpe_ts.py OUTCAR_test_1_catO2_vib -na 2\
                         "
 outcar.outcar_zpe_ts_mj = "original version of zpe from mjstar"
-md.oszicar              = "MD is stored in OSZICAR and analysis\
+md.oszicar              = "MD plot - read OSZICAR & plot\
                         \n\t\t:: Make POSCAR for md -> use '-w poscar'\
                         \n\t\tOptions: \
                         \n\t\t    -y    keys lined by '+' for Etot Efree E0pot Ekin Skin Spot\
@@ -357,7 +357,8 @@ md.oszicar              = "MD is stored in OSZICAR and analysis\
                         \n\t\t    oszicar.py mdPtbT0300t115s1-last -y Etot Skin Spot+Skin \
                         \n\t\t    oszicar.py mdPtbT0300t115s1-last -y Etot Efree+Ekin Spot+Skin -iy 2 \
                         \n\t\t    (NVE)\
-                        \n\t\t    oszicar.py HfSe2L1O12O6 -y E0pot Ekin  -iy2 1\
+                        \n\t\t    oszicar.py HfSe2L1aO8QO4 -y E0pot Ekin -iy2 1 -xi 0 5000\
+                        \n\t\t    oszicar.py HfSe2L1aO12Q -y E0pot Ekin -iy2 1 -xi 0 1000 -yi -581 -563 -yi2 1 19\
                         "
 #md.pos_modify       = print(poscar.pos_modify)     # not working
 

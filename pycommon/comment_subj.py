@@ -2,6 +2,7 @@ from common import MyClass_str as MyClass
 from parsing import str_decom as parse_str
 from info_common import filejob
 from info_myplot import table
+from info_vasp  import md
 from textwrap   import dedent
 #from common import MyClass
 #import comment_sys as mod_sys
@@ -615,6 +616,8 @@ mxene.plot2     =  "\tmplot_gibbs.py MXNB-4level.csv -l 'G(U=0)' 'G($U_{Dc}$=1.3
                    "
 
 hfse2.poscar = dedent("""
+    POSCAR modification for MD run, VESTA presentation & VASP-runnsing script 
+
     POSCAR modification for insertion of new 4 O atoms
 
     Purpose
@@ -664,7 +667,7 @@ hfse2.poscar = dedent("""
         kpy vas_make_ini.py -s {POSCAR} -j md -io TEBEG 500 TEEND 500 -k g -d d#####
         
     """)
-
+hfse2.md = md
 
 def print_obj(job=None, poscar=None):
     if poscar:

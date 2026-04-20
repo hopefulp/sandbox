@@ -17,7 +17,7 @@ output
     md.dat (default) -of
 '''
 Ltest = 0
-def anal_oszicar(files, outf, ys, iy2s, xlabel, ylabels, title, natom, colors):
+def anal_oszicar(files, outf, ys, iy2s, natom, plot_dict):
     os.system('rm mdlog.dat')
     for fname in files:
         if os.path.isdir(fname):
@@ -132,11 +132,16 @@ def anal_oszicar(files, outf, ys, iy2s, xlabel, ylabels, title, natom, colors):
     #esum = etotnu + ther
     print(f"dimesions for plot: x {np.array(tstep).shape} y {np.array(yplots).shape}, legend {ylegends}")
     if iy2s:
-        mploty2(tstep, yplots, iy2s, legend=ylegends, xlabel=xlabel, ylabel=ylabels, title=title, colors=colors)
+        if not plot_dict.get('legends'):
+            plot_dict['legends'] = ylegends
+        mploty2(tstep, yplots, iy2s, plot_dict=plot_dict)
     else:
-        ylabel = " ".join(ylabels)
-        print(f"{ylabel}")
-        mploty1(tstep, yplots, legend=ylegends, xlabel=xlabel, ylabel=ylabel, title=title, colors=colors)
+        if not plot_dict.get('ylabel'):
+            plot_dict['ylabel'] = "E [eV]"
+        if not plot_dict.get('legends'):
+            plot_dict['legends'] = ylegends
+        print(f"{plot_dict['ylabel']}")
+        mploty1(tstep, yplots, plot_dict=plot_dict)
     #mplot(tstep, [Etot,etotnu, esum], legend=['Etot','Etotptl','Esum'] )
     ### ys.dim = 1
     #mplot(tstep, T)
@@ -149,15 +154,31 @@ def main():
     parser.add_argument('-of', '--outf', default='md.dat', help='save md data')
     #parser.add_argument('-y', '--ys', nargs='+', default=['Etot'], choices=['Etot','Efree','E0pot','Ekin','Spot','Skin'], help='y plots: any combination of Etot Efree E0 Ekin Spot Skin')
     parser.add_argument('-y', '--ys', nargs='+', default=['Etot'], help='y plots: array & combine w. + Etot Efree E0 Ekin Spot Skin')
-    parser.add_argument('-xl', '--xlabel', default='t [fs]',  help='label of x-axis')
-    parser.add_argument('-yl', '--ylabels', default="E [eV]", nargs='*', help='label of y-axis, list for two y-axes')
-    parser.add_argument('-t', '--title', help='title of figure')
-    parser.add_argument('-iy2', '--iy2s', nargs='*', type=int, help='y2 column as python index')
-    parser.add_argument('-c', '--colors', nargs='*', help='color list')
+    plot = parser.add_argument_group(title='PLOT')
+    plot.add_argument('-xl', '--xlabel', default='t [fs]',  help='label of x-axis')
+    plot.add_argument('-yl', '--ylabel', nargs='*', help='label of y-axis, list for two y-axes')
+    plot.add_argument('-xi', '--xlim', nargs=2, type=float, help='x-axis limits: xmin xmax')
+    plot.add_argument('-yi', '--ylim', nargs=2, type=float, help='y-axis limits: ymin ymax')
+    plot.add_argument('-yi2', '--ylim2', nargs=2, type=float, help='right y-axis limits: ymin ymax')
+    plot.add_argument('-t', '--title', help='title of figure')
+    plot.add_argument('-iy2', '--iy2s', nargs='*', type=int, help='y2 column as python index')
+    plot.add_argument('-c', '--colors', nargs='*', help='color list')
+    plot.add_argument('-lg', '--legend', nargs='*', help='input the same number of legends with plot')
     parser.add_argument('-na', '--natom', type=int, help='Ekin/natom to get average kinetic energy/Natom')
     args = parser.parse_args()
-    
-    anal_oszicar(args.file, args.outf, args.ys, args.iy2s, args.xlabel, args.ylabels, args.title, args.natom, args.colors) 
+
+    plot_dict={}
+    if args.xlabel: plot_dict['xlabel'] = args.xlabel
+    if args.ylabel:
+        plot_dict['ylabel'] = args.ylabel if len(args.ylabel) > 1 else args.ylabel[0]
+    if args.xlim:   plot_dict['xlim']   = args.xlim
+    if args.ylim:   plot_dict['ylim']   = args.ylim
+    if args.ylim2:  plot_dict['ylim2']  = args.ylim2
+    if args.title:  plot_dict['title']  = args.title
+    if args.colors: plot_dict['colors'] = args.colors
+    if args.legend: plot_dict['legends'] = args.legend
+
+    anal_oszicar(args.file, args.outf, args.ys, args.iy2s, args.natom, plot_dict) 
 
 if __name__ == '__main__':
     main()
