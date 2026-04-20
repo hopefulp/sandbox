@@ -7,12 +7,14 @@
 ### 2023.04.11 poscar canbe put by prefix: if not make dir, poscar is skipped
 
 import argparse
+import glob
 import os, sys
 import shutil
 import re
 import string
 from common     import *
-from vas_qsub   import get_queue_pt, qsub_command
+from vas_qsub   import QueueConfig, qsub_command
+from libcluster import detect_cluster
 from libvas     import *
 from libposcar  import get_poscar, get_dnames4pos 
 from libincar   import modify_incar_bykv, add_inckv_bysubjob
@@ -22,6 +24,23 @@ home = os.environ['HOME']
 hostname = get_hostname()
 pseudo_pot={'new':'Pot-new', 'potpaw-pbe-new':'Pot-new', 'old':'pot-old', 'potpaw-pbe-old':'pot-old'}
 global pwd, ini_dvasp
+
+def submit_vasp_job(dirname, queue=None, option=None, vasp_exe=None, lkisti=None, Lrun=None, cluster=None):
+    return qsub_command(dirname, queue=queue, option=option, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun, cluster=cluster)
+
+def expand_poscar_patterns(poscar_args):
+    """Expand shell-style POSCAR patterns passed quoted to -s."""
+    poscars = []
+    for poscar_arg in poscar_args:
+        if glob.has_magic(poscar_arg):
+            matches = sorted(glob.glob(poscar_arg))
+            if not matches:
+                print(f"ERROR: pattern {poscar_arg} does not match any POSCAR")
+                sys.exit(101)
+            poscars.extend(matches)
+        else:
+            poscars.append(poscar_arg)
+    return poscars
 
 #    copy {poscar} to POSCAR at cwd
 def get_potcar(pot,atoms):
@@ -59,7 +78,7 @@ def get_incar(ifile):
 
     return 0
 ################# 1       2        3       4         5        6     7           8         9        10      11    12 13 14   15   16  
-def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt, dirnames, option, allprepared, iofile, qx,qN,qn,vasp_exe,lkisti,Lrun):
+def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt, dirnames, option, allprepared, iofile, queue, vasp_exe, lkisti, Lrun, cluster=None):
     '''
     job/subjob  sp/
                     kp,
@@ -120,7 +139,7 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
                 pass
             ### No modification & sumbit and go to next ele in for-loop
             elif Lrun and 's' in Lrun:
-                s = qsub_command(dirname,X=qx,nnode=qN,np=qn, issue=issue, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun)
+                s = submit_vasp_job(dirname, queue=queue, option=option, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun, cluster=cluster)
                 print(f"Job {dirname}  was submitted without modification")
                 continue
             ### overwrite or not
@@ -285,14 +304,11 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
         os.system(s)
         os.chdir(pwd)
         ##################################################
-        ### first determine qx then qN for pt
-        ### if Lrun == n, pass but None, ask in qsub_command
+        ### if Lrun == n, pass but None asks in qsub_command
         if Lrun and 'n' in Lrun:
             pass
         else:
-            if get_hostname()=='pt' and (not qx or not qN):
-                qx, qN = get_queue_pt(qx=qx)
-            s = qsub_command(dirname,X=qx,nnode=qN,np=qn, option=option, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun)
+            s = submit_vasp_job(dirname, queue=queue, option=option, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun, cluster=cluster)
 
     return 0            
 
@@ -307,7 +323,7 @@ def main():
     parser.add_argument('-n', '--ndirs', default=5, type=int, help="number or dirs to make")
     ### POSCARs
     gposcar = parser.add_mutually_exclusive_group()
-    gposcar.add_argument('-s', '--poscar', nargs='+', help='poscars in narrative mode')
+    gposcar.add_argument('-s', '--poscar', nargs='+', help='poscars or shell-style glob patterns, e.g. "POSCAR.HfSe2L1O36Hfcn*"')
     gposcar.add_argument('-p', '--prefix', help='select POSCAR using prefix lists for module common')
     ###
     parser.add_argument('-si', '--idposcar', nargs='+', help='in case poscar has index')
@@ -341,7 +357,7 @@ def main():
     qsub = parser.add_argument_group(title='QUEUE')
     qsub.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
     qsub.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
-    qsub.add_argument('-np', '--nproc', help="number of nproc, total for pt, per node for kisti ")
+    qsub.add_argument('-np', '--nproc', type=int, help="number of nproc, total for pt, per node for kisti ")
     qsub.add_argument('-l', '--lkisti', nargs='*', help="kisti command line input")
     qsub.add_argument('-o', '--option', choices=['opt','mem','long','ml'], help="error,exe; 'opt':converge, 'mem': lack, 'longnnn':long queue, 'ml':ML")
     args = parser.parse_args()
@@ -355,6 +371,12 @@ def main():
         Lrun = None
 
     pwd = os.getcwd()
+    cluster = detect_cluster()
+    queue = None
+    if cluster == "pt":
+        if not args.xpartition or not args.nnode:
+            parser.error("Need -x/--xpartition and -N/--nnode on pt cluster")
+        queue = QueueConfig(args.xpartition, args.nnode, args.nproc)
     ### POSCARs and DIRECTORYs are abtained here and passed to make_vasp_dir()
     ### Apply dirnames to run fake job in KISTI
     job = args.job              # to pass job to function
@@ -400,7 +422,7 @@ def main():
             sys.exit(1)
     ### Normal JOBS: dirnames = list
     elif args.poscar:
-        poscars=args.poscar
+        poscars=expand_poscar_patterns(args.poscar)
         if args.dnames:
             dirnames = args.dnames
         else:
@@ -448,10 +470,10 @@ def main():
             print(f"kp_string {kp_str}, dirname {dirname} in function {whereami()}()")
             dname.append(dirname)  # dname is string
             ##########     1      2        3         4            5         6            7             8          9        10           11          12            13               14        15              16          17         18
-            make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, vas_executable, args.lkisti, Lrun)
+            make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, queue, vas_executable, args.lkisti, Lrun, cluster=cluster)
     else:
         ##########     1      2        3         4              5            6            7             8               9        10           11          12            13               14        15              16            17         18
-        make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, args.xpartition, args.nnode, args.nproc, vas_executable, args.lkisti, Lrun)
+        make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, queue, vas_executable, args.lkisti, Lrun, cluster=cluster)
     return 0
 
 if __name__ == '__main__':
