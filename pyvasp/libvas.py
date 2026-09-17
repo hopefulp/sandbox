@@ -24,14 +24,14 @@ vasf_ini=['POSCAR','KPOINTS','INCAR','POTCAR']
 ### VASP jobs group with file to be modified
 jg_poscar=['ini', 'zpe']        # ini uses, zpe modifies, others use CONTCAR
 jg_kpoints=['dos','kp']         # band: file is required for each symmetry, kp for change kp file
-jg_kpoints_copy=['sp', 'spw', 'cont', 'mag',]
+jg_kpoints_copy=['sp', 'spw', 'cont', 'mag', 'pchgd']
 ### sp for write CHGCAR, WAVCAR
 #jg_incar=['sp','cont','opt','copt','vdw','chg','chgw','dos','pchg','band','mag','kisti','neb']  # required
-jg_incar=['cont','spw','mag','dos','band','pchg','pchgB']
+jg_incar=['cont','spw','mag','dos','band','pchg','pchgB','pchgd']
 jg_potcar=['lda','gga']
 ### mag: CHGCAR can be read but WAVECAR
-jg_linkw=['cont','dos','band','pchg','pchgB'      ]
-jg_linkc=['cont','dos','band','pchg','pchgB','mag']
+jg_linkw=['cont','dos','band','pchg','pchgB','pchgd', 'pchgb']
+jg_linkc=['cont','dos','band','pchg','pchgB','pchgd', 'pchgb', 'mag']
 
 jg_subdir=['neb']
 

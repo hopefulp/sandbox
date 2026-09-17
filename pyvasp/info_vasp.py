@@ -284,6 +284,8 @@ dosband.doslm       =   "extact ldos then plot\
                         \n\t    doslm.py -al -1 -ash 1 -p -xi -6 2 -yi 0 150  -t 'MoS2-NH' -lg TDOS -v -eF\
                         \n\t    doslm.py -al 0-74 75-77 -ash  75 3 -p -xi -5 1.5 -c r b -yi 0 100 -v -lg 'MoS$_2$' 'NH$_2$'\
                         \n\t    doslm.py -al 0-74 75-77 -ash  75 3 -p -xi -3 4 -c r b -yi 0 80 -v -e V-2.63 F\
+                        \n\t    doslm.py -al 0-77 -ash  74 3 -p -xi -3 4 -c m r g c -yi 0 80 -v -e V-2.705 F-1.57 -lg 'MoS$_2$' 'NH$_2$'\
+                        \n\t\tFor VASP does not give E$_F$ at midgap, need to input F energy in code\
                         \n\t    (Pt-C60-x): doslm.py -al -1 2 54 55 -ash 1 1 1 1\
                         \n\t(3) to plot ldos of slab w.r.t. VBM: obtain VBM in slab (1)\
                         \n\t    doslm.py -al 276-285 286 287 314-317 -ash 10 2 4 -e -1.169\
@@ -362,10 +364,31 @@ md.oszicar              = "MD plot - read OSZICAR & plot\
                         "
 #md.pos_modify       = print(poscar.pos_modify)     # not working
 
-analysis.vas_anal    =   "(.sh) Charge analysis of Bader\
-                        \n\tjobs: bader bader2(spin) convasp dos bchg end\
-                        \n\tUsage: Run just above vasp directory\
-                        \n\t    vas_anal.sh bader dirname\
+charge.chgdiff      =   "=== Charge calculation ===============================\
+                        \n\tContinuous calculation for CHGCAR writing\
+                        \n\t    (cont)vas_make_cont.py -d dirname -j sp -sj w -x 3 -N 1 -np 20\
+                        \n\t\tread -d dirname and make dirnamespw for writing CHGCAR\
+                        \n\tCDD calculation\
+                        \n\t    Make two POSCAR from converged geometry\
+                        \n\t\t ag dirnamespw/CONTCAR -> make two files of dirnamespwA and dirnamespwB\
+                        \n\t    Run A (frame) and B (mol) with CHGCAR writing\
+                        \n\t\tvas_make_ini.py -s CONTCAR.MoS2Hsc55NsH2cspwA -i MoS2Hsc55NsH2cspw  -x 5 -N 4 -np 128 -al\
+                        \n\t\t    incar from old dir for spw\
+                        \n\t\tvas_make_ini.py -s CONTCAR.MoS2Hsc55NsH2cspwB -i INCAR.molchg -j sp -x 4 -N 1 -np 2\
+                        \n\t\t    incar from INCAR.molchg prepared for molecule\
+                        \n\t    Plot charge density difference (CDD) using chgdiff.py\
+                        \n\t\tchgsum.pl CHGCAR_A CHGCAR_B > CHGCAR_sum\
+                        \n\t\tchgdiff.pl CHGCAR_AB CHGCAR_sum > CHGCAR_diff\
+                        "
+charge.pchg_split   =   "split CHGCAR into upspin and downspin components for spin-polarized calculations\
+                        \n\tUsage:\
+                        \n\t    chg_split.py\
+                        \n\t\tin    PARCHG\
+                        \n\t\tout   CHGCAR_up, CHGCAR_down\
+                        \n\t    option:\
+                        \n\t\t--interpolate-overflow\
+                        \n\t\t    for some cases, CHGCAR has overflowed value which cannot be read in python\
+                        \n\t\t    the value of '********' is interpolated by the average of neighboring points\
                         "
 charge.charge_bader =   "included in vas_anal.sh\
                         \n\tRead POTCAR for ZVAL\
@@ -374,7 +397,12 @@ charge.charge_bader =   "included in vas_anal.sh\
                         \n\tto compare two configurations w. the same atom index\
                         \n\t    paste adir/bader_pcharge.dat bdir/bader_pcharge.dat | awk '{print $1, $6-$3}'\
                         "
-charge.vas_anal     =   analysis.vas_anal
+charge.vas_anal    =   "(.sh) Charge analysis of Bader\
+                        \n\tjobs: bader bader2(spin) convasp dos bchg end\
+                        \n\tUsage: Run just above vasp directory\
+                        \n\t    vas_anal.sh bader dirname\
+                        "
+analysis.vas_anal     =   charge.vas_anal
 
 ase.ase_fconvert    =""
 ase.ase_vasp        =""
@@ -468,7 +496,7 @@ def classify(Lclassify, work, class_name, job):
     print("\nClass Instances:: ", end='')
     for instance in MyClass.instances:
         print(f"{instance.name}", end=' ')
-    print("\n\t    -w for detail")
+    print("\n\t    -j for detail")
     #print(f"#Comment: -c    for not classification")
 
     return 0        
@@ -477,9 +505,9 @@ def main():
 
     parser = argparse.ArgumentParser(description="display Usage for ~/py_ai")
     parser.add_argument('-c', '--classify', action="store_false", help="classify files ")
-    parser.add_argument('-w','--work',  help="several explanation option ")
+    parser.add_argument('-j','--job',  help="several explanation option ")
     parser.add_argument('-cn', '--cname', help="detail for each class ")
-    parser.add_argument('-j','--job',  help="[val,train,test] ")
+    parser.add_argument('-ml','--mljob',  help="[val,train,test] ")
     #parser.add_argument('-f','--file',  help="input energy data file ")
     #parser.add_argument('-hl','--hidden_layer',nargs='*', default=['4','4','4'], help="list of number of Hidden Layer")
     #parser.add_argument('-el','--energy_limit',default=0.001, type=float,  help="energy_limit for training")
@@ -488,7 +516,7 @@ def main():
     args = parser.parse_args()
 
     #classify(args.classify, args.work, args.cname, args.job, args.file, args.hidden_layer, args.energy_limit,args.ncore, args.graph )
-    classify(args.classify, args.work, args.cname, args.job)
+    classify(args.classify, args.job, args.cname, args.mljob)
 
 if __name__ == "__main__":
     main()

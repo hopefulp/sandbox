@@ -135,7 +135,7 @@ def common_figure(ctype='dark', ncolor=4, Ltwinx=False):
     else:
         from cycler import cycler
     ### control figure size (2,6) for x-axis is 1/5
-    fig = plt.figure(figsize=(2,6))         # def figsize=(10,6)
+    fig = plt.figure(figsize=(10,6))         # (10,6), (2,6)
     ax = plt.axes()
     mpl.rcParams.update({'font.size':12})
     #ax.tick_params(axis='both', which='major', labelsize=25)

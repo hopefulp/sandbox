@@ -69,6 +69,24 @@ def double_legend_colors(plot_dict):
     plot_dict['legends'] = legend_spin
 
 
+def parse_energy_shift(eshift, Ef):
+    if re.search('^f', eshift, re.I):
+        value = eshift[1:]
+        if value:
+            return 'F', float(value), f"F{float(value):5.3f}", 'Fermi level'
+        else:
+            return 'F', float(Ef), f"F{float(Ef):5.3f}", 'Fermi level'
+    elif re.search('^v', eshift, re.I):
+        value = eshift[1:]
+        if not value:
+            print("VBM shift requires an energy value, e.g. -e V-2.704")
+            sys.exit(1)
+        return 'V', float(value), f"V{float(value):5.3f}", 'VBM'
+    else:
+        value = float(eshift)
+        return 'E', value, f"EShift{value:5.3f}", 'Energy shift'
+
+
 def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lvertical):
     '''
     Input   doscar
@@ -98,30 +116,26 @@ def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lverti
     plot x=lene, y=dos in pdos2d
     '''
     Ef, Lspin, Ldoserr = read_doscar_orig(doscar, option='head')
-    #Ef = -1.9
     if Lplot:
         legends = []
+    nvertical = 0
     
     if leshift:
         nvertical = len(leshift)
-        eshift = leshift[0]
-        ene_shift = float(eshift[1:])
-        if re.search('f', eshift, re.I):
-            Eshift = f"F{Ef:5.3f}"
+        shift_kind, ene_shift, Eshift, shift_label = parse_energy_shift(leshift[0], Ef)
+        if shift_kind == 'F':
+            Ef = ene_shift
             ### make F0 vertical line at E=0.00
             make_vert_line("EF0.dat", 0.00)      # kw maxdos=10 default
-        elif re.search('v', eshift, re.I):
-            Eshift = f"V{ene_shift:5.3f}"
+        elif shift_kind == 'V':
             make_vert_line('Evbm.dat', 0.00)
         else:
-            Eshift = f"EShift{ene_shift:5.3f}"
             make_vert_line('EShift.dat', 0.00)
         if nvertical == 2:
-            eshift = leshift[1]
-            if re.search('f', eshift, re.I):
-                ene2nd = Ef
-                ene_2nd_shift = ene2nd - ene_shift
-                #Eshift_2nd = f"F{ene_2nd_shift:5.3f}"
+            second_kind, ene2nd, Eshift_2nd, second_label = parse_energy_shift(leshift[1], Ef)
+            if second_kind == 'F':
+                Ef = ene2nd
+            ene_2nd_shift = ene2nd - ene_shift
             make_vert_line('Second_line.dat', ene_2nd_shift )  # 2nd vertical line w.r.t. shift energy
     else:
         Eshift = None
@@ -221,15 +235,15 @@ def plot_doscar(doscar, ofile, alist02d, leshift, l, m, Lplot, plot_dict, Lverti
     if leshift:
         lene = list(np.array(lene)-ene_shift)
     if Lvertical:
-        if nvertical >= 1:
-            v_legend.append('VBM')
-        if nvertical == 2:
-            v_legend.append('Fermi level')
         if leshift: 
+            if nvertical >= 1:
+                v_legend.append(shift_label)
             vertical_lines.append(0.0)
             if nvertical == 2:
+                v_legend.append(second_label)
                 vertical_lines.append(ene_2nd_shift)
         else:
+            v_legend.append('Fermi level')
             vertical_lines.append(float(Ef))
     print(f"plot vertical line at {vertical_lines}")
 
@@ -272,7 +286,7 @@ def main():
     parser.add_argument('-dz', '--delta_z', default=0.1, type=float, help='use zmax or delta_z')
     parser.add_argument('-loc', '--location', default='in', choices=['in', 'out'], help='outside or inside of zmin')
     parser.add_argument('-as', '--atom_species', nargs='+', default=['O'], help='specify atom species')
-    parser.add_argument('-e', '--energy_shift', nargs='*', help='[F|value], -eF[f], -e-3.5 for E such as VBM')
+    parser.add_argument('-e', '--energy_shift', nargs='*', help='shift energy: F, F-1.627, V-2.704, or -3.5; first value is x-axis shift')
     parser.add_argument('-l', '--ql', nargs='*', help='angular quantum number')
     parser.add_argument('-m', '--qm', type=int, nargs='*', help='magnetic quantum number')
     plot = parser.add_argument_group(title='PLOT')

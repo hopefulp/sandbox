@@ -3,6 +3,27 @@
 import argparse
 import re
 import importlib
+import sys
+from pathlib import Path
+
+
+def job_names_from_source(mod_name):
+    """Return top-level MyClass names without importing the info module.
+
+    Keeping help generation import-free means ``showall.py -h`` still works
+    when an optional module used by one of the documentation files is absent.
+    """
+    source = Path(__file__).with_name(f"{mod_name}.py").read_text()
+    pattern = re.compile(r"^(\w+)\s*=\s*MyClass\(", re.MULTILINE)
+    return list(dict.fromkeys(pattern.findall(source)))
+
+
+def subkey_names(obj):
+    return [
+        name for name, value in vars(obj).items()
+        if not name.startswith("_") and name != "name"
+        and (isinstance(value, str) or hasattr(value, "__dict__"))
+    ]
 
 ### not used
 def format_text(text, mod):
@@ -37,6 +58,11 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
     # SUMMARY MODE
     # =========================
     if subkey is None:
+
+        keys = subkey_names(obj)
+        if keys:
+            print("Available -k values: " + " ".join(keys))
+            print()
 
         for name, value in vars(obj).items():
 
@@ -96,7 +122,17 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="shows dictionary for all: work, system, package  ")
+    # ``-s`` selects system documentation. Detect it before parsing so that
+    # argparse help can show the matching top-level ``-j`` values.
+    system_mode = '-s' in sys.argv[1:] or '--switch' in sys.argv[1:]
+    help_module = 'comment_sys' if system_mode else 'comment_subj'
+    job_names = job_names_from_source(help_module)
+
+    parser = argparse.ArgumentParser(
+        description="shows dictionary for all: work, system, package",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="Available -j values:\n  " + " ".join(job_names),
+    )
     #parser.add_argument('-m', '--mod', default='sys', choices=['sys', 'sub'], help='which branch: system|subject')
     parser.add_argument(
         '-s',
@@ -106,7 +142,7 @@ def main():
         default=False,
         help='choose module comment_sys; optionally pass POSCAR after -s',
     )
-    parser.add_argument('-j', '--job', help='select one attribute')
+    parser.add_argument('-j', '--job', help='select one attribute from the list below')
     parser.add_argument('-p', '--poscar', help='args such as POSCAR name')
     parser.add_argument('-k', '--subkey', help='select one key for subkeys')
     parser.add_argument('-u', '--usage', action='store_true', help='print first keys')

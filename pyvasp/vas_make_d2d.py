@@ -10,13 +10,14 @@ import shutil
 import re
 from common import *
 from libposcar import get_poscar
-from vas_qsub import qsub_command
+from vas_qsub import QueueConfig, qsub_command
+from libcluster import detect_cluster
 from libvas  import *
 from incar_change import change_incar_byjob
 
 ### vasp input order
 ### inputs = [args.poscar, args.kpoints, args.potcar, args.incar]
-def make_vas_d2d(odir, ndir, job, inputs, files, qx, qN, qn, option=None, vasp_exe=None, lkisti=None, Lrun=None):
+def make_vas_d2d(odir, ndir, job, inputs, files, queue, option=None, vasp_exe=None, lkisti=None, Lrun=None, cluster=None):
 
     if not os.path.isdir(odir):
         print(f"there is not {odir} directory, then, stop")
@@ -111,9 +112,7 @@ def make_vas_d2d(odir, ndir, job, inputs, files, qx, qN, qn, option=None, vasp_e
     ### run?
 
     #run_vasp(ndir, xpart, nnode, np, option)
-    if get_hostname()=='pt' and (not qx or not qN):
-        qx, qN = get_queue_pt(qx=qx, opt='long')
-    s = qsub_command(ndir,X=qx,nnode=qN, np=qn, option=option, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun)
+    s = qsub_command(ndir, queue=queue, option=option, vasp_exe=vasp_exe, lkisti=lkisti, Lrun=Lrun, cluster=cluster)
     return 0        
             
                 
@@ -129,9 +128,9 @@ def main():
     parser.add_argument('-k', '--kpoints', help='designate KPOINTS')
     parser.add_argument('-f', '--files', nargs='*', help='copy more files')
     qsub = parser.add_argument_group(title='qsub')
-    qsub.add_argument('-x', '--partition',  help='partition number in qsub')
-    qsub.add_argument('-N', '--nnode',      help='number of nodes in qsub')
-    qsub.add_argument('-np', '--nproc',      help='nprocess in qsub')
+    qsub.add_argument('-x', '--partition',  type=int, help='partition number in qsub')
+    qsub.add_argument('-N', '--nnode',      type=int, help='number of nodes in qsub')
+    qsub.add_argument('-np', '--nproc',     type=int, help='nprocess in qsub')
     #qsub.add_argument('-m', '--hmem', action='store_true', help='in case large supercell, use half of memory')
     qsub.add_argument('-o', '--option', choices=['long', 'mem'], help='option for qsub command line input')
     parser.add_argument('-u', '--usage',   action='store_true', help='print usage')
@@ -139,12 +138,19 @@ def main():
     args = parser.parse_args()
     inputs = [args.poscar, args.kpoints, args.potcar, args.incar, args.incar_option]
 
+    cluster = detect_cluster()
+    queue = None
+    if cluster == "pt":
+        if not args.partition or not args.nnode:
+            parser.error("Need -x/--partition and -N/--nnode on pt cluster")
+        queue = QueueConfig(args.partition, args.nnode, args.nproc)
+
     if args.usage:
         print(f"neb::\
                 \n\t{__file__.split('/')[-1]} {args.odir} {args.ndir}  -j [neb|nebcont] ")
         sys.exit(1)
 
     #make_vas_d2d(args.odir, args.ndir, args.job, inputs, args.files, args.partition, args.nnode, args.nproc, args.hmem)
-    make_vas_d2d(args.odir, args.ndir, args.job, inputs, args.files, args.partition, args.nnode, args.nproc, option=args.option)
+    make_vas_d2d(args.odir, args.ndir, args.job, inputs, args.files, queue, option=args.option, cluster=cluster)
 if __name__ == '__main__':
     main()

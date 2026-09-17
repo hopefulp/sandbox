@@ -30,7 +30,15 @@ from libstr import li2dic
 from copy import deepcopy
 
 ### INCAR ORDER for display
-ordered_incar_keys=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','NSIM','LPLANE','ISTART','ICHARG','ISPIN','ENCUT','NELM','NELMIN','NELMDL','EDIFF','ISYM','ADDGRID','LREAL','LASPH','LMAXMIX','NELECT','MAGMOM','NUPDOWN','ISMEAR','SIGMA','AMIX','BMIX','AMIN','IWAVPRE','ISIF','IBRION','NSW','POTIM','EDIFFG','TEBEG', 'TEEND','SYMPREC', 'SMASS', 'MDALGO', 'NBLOCK', 'NWRITE','LPETIM','LWAVE','LCHARG','LAECHG','LVTOT','LVHAR','LORBIT','NEDOS','EMIN','EMAX','LPARD','NBMOD','EINT','LSEPB','LSEPK','NFREE','LEPSILON','LMONO','IDIPOL','LDIPOL','GGA_COMPAT','LSORBIT','IVDW','LVDWSCS','LDAU','LDAUTYPE','LDAUL','LDAUU','LDAUJ','LDAUPRINT', 'ICORELEVEL', 'CLNT', 'CLN', 'CLL', 'CLZ', 'LSCALAPACK', 'IMAGES', 'SPRING', 'LCLIMB' ]
+ordered_incar_keys=['SYSTEM','GGA','GGA_COMPACT','PREC','ALGO','NPAR','NCORE','NSIM','LPLANE',\
+                    'ISTART','ICHARG','ISPIN','ENCUT','NELM','NELMIN','NELMDL','EDIFF','ISYM','ADDGRID',\
+                    'LREAL','LASPH','LMAXMIX','NELECT','MAGMOM','NUPDOWN','ISMEAR','SIGMA','AMIX','BMIX',\
+                    'AMIN','IWAVPRE','ISIF','IBRION','NSW','POTIM','EDIFFG','TEBEG', 'TEEND','SYMPREC',\
+                    'SMASS', 'MDALGO', 'NBLOCK', 'NWRITE','LPETIM','LWAVE','LCHARG','LAECHG','LVTOT','LVHAR',\
+                    'LORBIT','NEDOS','EMIN','EMAX','LPARD','NBMOD','EINT','LSEPB','LSEPK','IBAND','KPUSE',\
+                    'NFREE','LEPSILON','LMONO','IDIPOL','LDIPOL','GGA_COMPAT',\
+                    'LSORBIT','IVDW','LVDWSCS','LDAU','LDAUTYPE','LDAUL','LDAUU','LDAUJ','LDAUPRINT',\
+                    'ICORELEVEL', 'CLNT', 'CLN', 'CLL', 'CLZ', 'LSCALAPACK', 'IMAGES', 'SPRING', 'LCLIMB' ]
 
 ###### DICT for each job
 ### job_mod for the existing value
@@ -66,7 +74,12 @@ pchgB_out   =   ['ISTART']
 pchgB_change = {'ICHARG': 11, 'LAECHG': '.TRUE.'}
 ### if copied from spw, include DOSCAR option also
 pchg_change  = dos_change.copy()
+pchg_out    = ['MAGMOM']
 pchg_active = { 'LPARD': 'T', 'LSEPB' : 'FALSE', 'IBAND' : '304', 'LSEPK' : 'FALSE', 'KPUSE' : '1 2 3 4' } 
+### pchg for only i-th band for defect calculation, designated by IBAND
+pchgb_change  = dos_change.copy()
+pchgb_out    = pchg_out 
+pchgb_active = { 'LPARD': 'T', 'IBAND' : '304' }
 
 
 ### Cell OPT
@@ -92,6 +105,7 @@ JOB_RULES = {
     "band": {"change": band_change ,    "active": band_active,  "out": dosband_out},
     "mag":  {"change": mag_change ,     "active": {},           "out": []},
     "pchg": {"change": pchg_change,     "active": pchg_active,  "out": []}, # from spw
+    "pchgd": {"change": pchgb_change,   "active": pchgb_active, "out": []}, # designated band from -io IBAND
     "spw":  {"change": spw_change ,     "active": {},           "out": spw_out},
     "kisti":{"change": kisti_change ,   "active": {},           "out": kisti_out},
 }
@@ -211,6 +225,7 @@ def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
     newlist=[]
     ### line analysis for INCAR
     all_keys=[]
+    modified_keys=[]
     for line in lines:
         iline += 1
         ### if key is commented, activate
@@ -223,6 +238,7 @@ def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
                 if line_key in kws.keys():
                     print(f"line mod: {line_key} = {kws[line_key]}")
                     line = f" {line_key}   =  {kws[line_key]}   ! change in libincar.py\n"
+                    modified_keys.append(line_key)
                 if icout:
                     if line_key in icout:
                         line = '#' + line
@@ -233,6 +249,11 @@ def modify_incar_bykv(incar, inp_kv, icout=None, outf='INCAR.mod', mode='m'):
                 #print(f"found input key and values {line_key}, {line_value}")
                 newlist.append(line_value)
     print(f"{iline} was saved in newlist {len(newlist)}")
+    if mode == 'm':
+        for key, value in kws.items():
+            if key not in all_keys and key not in modified_keys:
+                print(f"line add: {key} = {value}")
+                newlist.append(f" {key}   =  {value}   ! added in libincar.py\n")
     ### write new file
     if mode == 'm':
         with open(outf, 'w') as f:
@@ -308,4 +329,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

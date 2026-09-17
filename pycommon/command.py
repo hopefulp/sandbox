@@ -249,6 +249,7 @@ def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, k
             \n\t    $ (chg) vas_make_cont.py -d {dirname} -j {vjob} -sj B -x {partition} -N {nnode} -np {nproc}\
             \n\t\t: CDD (charge density difference) calculates fragment A & B w. frozen geometry\
             \n\t    $ (pchg)vas_make_cont.py -d {dirname} -j {vjob} -x {partition} -N {nnode} -np {nproc}\
+            \n\t      (pchg)vas_make_cont.py -d {dirname} -j {vjob} -sj {subjob} -x {partition} -N {nnode} -np {nproc}\
             \n\t    $ (dos) vas_make_cont.py -d {dirname} -j {vjob} -io NEDOS 6000 EMIN -30 EMAX 5 -x {partition} -N {nnode} -np {nproc}\
             \n\t    $ (mag) vas_make_cont.py -d {dirname} -j {vjob} -io MAGMOM '75*0 4.5 2*1.5' -x {partition} -N {nnode} -np {nproc}\
             \n\t\t: input MAGAMOM, ISYM = 0 for symmetry can suppress magnetism in some case\

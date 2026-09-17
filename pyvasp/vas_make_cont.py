@@ -9,8 +9,8 @@ import subprocess
 from subprocess import Popen, PIPE, STDOUT
 from common     import get_dirfiles, yes_or_no 
 from libstr     import li2dic
-from libincar   import modify_incar_byjob, modify_incar_bykv, add_inckv_bysubjob
-from libposcar  import modify_POSCAR, pos2dirname, get_poscar
+from libincar   import modify_incar_byjob, modify_incar_bykv #, add_inckv_bysubjob
+from libposcar  import modify_POSCAR #, pos2dirname, get_poscar
 from libvas     import jg_poscar, jg_kpoints,jg_kpoints_copy, jg_incar, jg_potcar, jg_linkw, jg_linkc
 from libkpoints import mod_kpoints
 from vas_qsub   import qsub_command, QueueConfig
@@ -93,6 +93,8 @@ def vasp_cont_1dir(job, subjob, odir, ndir, incar, incopt, kopt, Lrun, option, q
     vjob = job
     if subjob:
         vjob += subjob
+    if job == 'pchg' and subjob == 'b':
+        vjob = 'pchgd'
     ### treat INCAR
     if incopt:
         incopt = li2dic(incopt)    # value = dict for k-w pair 
@@ -276,8 +278,8 @@ def main():
     '''
     parser = argparse.ArgumentParser(description='How to make a continuous job dir')
     ### job: KISTI is additional option
-    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','chg','pchg','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag'], help='inquire for each file ')
-    parser.add_argument('-sj', '--subjob', choices=['w','wlp','w2','sp', 'cool', 'heat','quench','B'],\
+    parser.add_argument('-j', '--job', default='cont', choices=['sp','cont','dos','band','chg','pchg','pchgd','md','mdnve','nnff','nnffnve','ini','kp','zpe','mol','wav','vdw','noD','opt','copt','mag'], help='inquire for each file ')
+    parser.add_argument('-sj', '--subjob', choices=['w','wlp','w2','sp', 'cool', 'heat','quench','B','A','b'],\
              help='sp for fake and others for md, for pchg, B for Bader')
         ### old directory selection
     gdirectory = parser.add_mutually_exclusive_group()
@@ -330,6 +332,7 @@ def main():
         print("Usage:: input old job dirs: -d ")
         sys.exit(1)
 
+    ### will it read INCAR.jog or dir/INCAR? 
     ### this is continuous job: use {odir}/INCAR
     incar = args.incar if args.incar else 'dir'
 
