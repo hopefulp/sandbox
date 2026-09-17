@@ -135,6 +135,63 @@ def dict_update(param, dic):
 
 comment = '!'
 
+
+def configure_parallelization_for_cluster(incar, cluster, outf='INCAR.server'):
+    """Normalize NPAR/NCORE for the detected VASP cluster.
+
+    Platinum uses NPAR (default 4 when absent), while KISTI SKL uses
+    NCORE=20.  The alternative keyword is retained as a commented line so
+    the same INCAR remains readable when moved between the two systems.
+    """
+    if cluster not in ('pt', 'kisti'):
+        print(f"parallel INCAR settings unchanged for cluster {cluster}")
+        return incar
+
+    with open(incar) as f:
+        lines = f.readlines()
+
+    target_key = 'NPAR' if cluster == 'pt' else 'NCORE'
+    disabled_key = 'NCORE' if cluster == 'pt' else 'NPAR'
+    default_value = '4' if cluster == 'pt' else '20'
+    key_pattern = re.compile(
+        r'^\s*[#!]?\s*(NPAR|NCORE)\s*=\s*([^\s!#;]+)', re.IGNORECASE
+    )
+    target_written = False
+    newlines = []
+
+    for line in lines:
+        match = key_pattern.match(line)
+        if not match:
+            newlines.append(line)
+            continue
+
+        key = match.group(1).upper()
+        value = match.group(2)
+        if key == target_key and not target_written:
+            if target_key == 'NCORE':
+                value = default_value
+            newlines.append(
+                f" {target_key} = {value} ! activated automatically for {cluster}\n"
+            )
+            target_written = True
+        else:
+            newlines.append(
+                f"# {key} = {value} ! disabled automatically for {cluster}\n"
+            )
+
+    if not target_written:
+        newlines.append(
+            f" {target_key} = {default_value} ! added automatically for {cluster}\n"
+        )
+
+    with open(outf, 'w') as f:
+        f.writelines(newlines)
+    print(
+        f"server INCAR: {target_key} active, {disabled_key} commented "
+        f"for {cluster} -> {outf}"
+    )
+    return outf
+
 def extract_kv_inline(line):
     '''
     Return key, value, status

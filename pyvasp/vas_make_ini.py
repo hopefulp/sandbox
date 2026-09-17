@@ -17,7 +17,8 @@ from vas_qsub   import QueueConfig, qsub_command
 from libcluster import detect_cluster
 from libvas     import *
 from libposcar  import get_poscar, get_dnames4pos 
-from libincar   import modify_incar_bykv, add_inckv_bysubjob
+from libincar   import (modify_incar_bykv, add_inckv_bysubjob,
+                        configure_parallelization_for_cluster)
 from libstr     import li2str, li2dic
 
 home = os.environ['HOME']
@@ -270,6 +271,11 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
             modify_incar_bykv(f_incar, incopt, outf='INCAR.new', mode='m')
             f_incar = 'INCAR.new'
 
+        ### Apply server-specific parallel settings after all other INCAR edits.
+        f_incar = configure_parallelization_for_cluster(
+            f_incar, cluster, outf='INCAR.server'
+        )
+
         com = f'cp {f_incar} {dirname}/INCAR'
         os.system(f'{com}')
         print(f"{f_incar} was copied to {dirname}/INCAR")
@@ -357,7 +363,6 @@ def main():
     qsub.add_argument('-x', '--xpartition', type=int, help="partition in platinum")
     qsub.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
     qsub.add_argument('-np', '--nproc', type=int, help="number of nproc, total for pt, per node for kisti ")
-    qsub.add_argument('-l', '--lkisti', nargs='*', help="kisti command line input")
     qsub.add_argument('-o', '--option', choices=['opt','mem','long','ml'], help="error,exe; 'opt':converge, 'mem': lack, 'longnnn':long queue, 'ml':ML")
     args = parser.parse_args()
 
@@ -380,6 +385,7 @@ def main():
     ### Apply dirnames to run fake job in KISTI
     job = args.job              # to pass job to function
     subjob = args.subjob
+    lkisti = None
     if job == 'kp':
         job = 'sp'
         subjob = 'kp'
@@ -451,8 +457,7 @@ def main():
     ### for kpoints-scan
     #if args.kp_test:
     if subjob == 'kp':
-        if not args.lkisti:
-            args.lkisti = 'kp'  # lkisti is changed to string from list
+        lkisti = 'kp'
         kparray = np.array(args.kpoints_test)
         kps = kparray.reshape([-1,args.kdim])       # shape = n * 2 [ [1, 3], [2,2], [2, 3], ...] fir kdim=2
         for kp in kps:
@@ -469,10 +474,10 @@ def main():
             print(f"kp_string {kp_str}, dirname {dirname} in function {whereami()}()")
             dname.append(dirname)  # dname is string
             ##########     1      2        3         4            5         6            7             8          9        10           11          12            13               14        15              16          17         18
-            make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, queue, vas_executable, args.lkisti, Lrun, cluster=cluster)
+            make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, queue, vas_executable, lkisti, Lrun, cluster=cluster)
     else:
         ##########     1      2        3         4              5            6            7             8               9        10           11          12            13               14        15              16            17         18
-        make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, queue, vas_executable, args.lkisti, Lrun, cluster=cluster)
+        make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, queue, vas_executable, lkisti, Lrun, cluster=cluster)
     return 0
 
 if __name__ == '__main__':
