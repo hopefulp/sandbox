@@ -25,18 +25,22 @@ def subkey_names(obj):
         and (isinstance(value, str) or hasattr(value, "__dict__"))
     ]
 
-### not used
-def format_text(text, mod):
-    if isinstance(text, str) and '{POSCAR}' in text:
-        return text.format(POSCAR=getattr(mod, 'POSCAR', '{POSCAR}'))
+def poscar_dirname(poscar):
+    """Return the POSCAR filename without its POSCAR/CONTCAR prefix."""
+    filename = Path(poscar).name
+    return re.sub(r'^(?:POSCAR|CONTCAR)\.?', '', filename)
+
+
+def format_text(text, poscar=None):
+    if isinstance(text, str) and poscar:
+        return text.format(POSCAR=poscar, DIRNAME=poscar_dirname(poscar))
     return text
 
 
 def first_doc_line(text, poscar=None):
     if not isinstance(text, str):
         return ""
-    if poscar:
-        text = text.format(POSCAR=poscar)
+    text = format_text(text, poscar)
     for line in text.splitlines():
         stripped = line.strip()
         if stripped:
@@ -104,7 +108,7 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
 
     # If leaf string → print doc
     if isinstance(value, str):
-        print(value.format(POSCAR=poscar) if poscar else value)
+        print(format_text(value, poscar))
         return 0
 
     # If namespace → print nested docs
@@ -115,7 +119,7 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
 
         if isinstance(subvalue, str):
             print(f"\n{name}")
-            print(subvalue.format(POSCAR=poscar) if poscar else subvalue)
+            print(format_text(subvalue, poscar))
 
     return 0
 
@@ -124,7 +128,16 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
 def main():
     # ``-s`` selects system documentation. Detect it before parsing so that
     # argparse help can show the matching top-level ``-j`` values.
-    system_mode = '-s' in sys.argv[1:] or '--switch' in sys.argv[1:]
+    switch_value = None
+    for index, arg in enumerate(sys.argv[1:]):
+        if arg in ('-s', '--switch'):
+            next_index = index + 2
+            if next_index < len(sys.argv) and not sys.argv[next_index].startswith('-'):
+                switch_value = sys.argv[next_index]
+            else:
+                switch_value = True
+            break
+    system_mode = switch_value is True
     help_module = 'comment_sys' if system_mode else 'comment_subj'
     job_names = job_names_from_source(help_module)
 
@@ -154,7 +167,7 @@ def main():
         args.poscar = args.switch
 
     #if args.switch==False and args.mod == 'sys':
-    if args.switch==False:
+    if args.switch is False or isinstance(args.switch, str):
         mod_name = 'comment_subj'
     else:
         mod_name = 'comment_sys'

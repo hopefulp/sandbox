@@ -662,9 +662,9 @@ hfse2.poscar = dedent("""
     NVE:
         kpy vas_make_ini.py -s {POSCAR} -j mdnve -k g -d d2510c
     NVT (quenching):
-        kpy vas_make_ini.py -s {POSCAR} -j md -io TEBEG 1300 TEEND 500 -k g -d d#####
+        kpy vas_make_ini.py -s {POSCAR} -j md -io TEBEG 1300 TEEND 500 -k g -d {DIRNAME}Q
         (md):
-        kpy vas_make_ini.py -s {POSCAR} -j md -io TEBEG 500 TEEND 500 -k g -d d#####
+        kpy vas_make_ini.py -s {POSCAR} -j md -io TEBEG 500 TEEND 500 -k g -d {DIRNAME}md
         
     """)
 hfse2.md = md
@@ -695,7 +695,6 @@ def print_obj():
     print("\n\t    -j for detail")
     return 0
 '''
-
 
 
 
