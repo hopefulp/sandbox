@@ -31,16 +31,32 @@ def poscar_dirname(poscar):
     return re.sub(r'^(?:POSCAR|CONTCAR)\.?', '', filename)
 
 
-def format_text(text, poscar=None):
+def structure_source(poscar):
+    """Use a named POSCAR/CONTCAR directly, otherwise use DIR/CONTCAR."""
+    filename = Path(poscar).name
+    if re.match(r'^(?:POSCAR|CONTCAR)(?:\.|$)', filename):
+        return poscar
+    return f"{poscar.rstrip('/')}/CONTCAR"
+
+
+def format_text(text, poscar=None, atom_symbol='O', natom=4):
     if isinstance(text, str) and poscar:
-        return text.format(POSCAR=poscar, DIRNAME=poscar_dirname(poscar))
+        atom_tag = f"{atom_symbol}{natom}"
+        dirname = poscar_dirname(poscar)
+        return text.format(
+            POSCAR=poscar,
+            SOURCE=structure_source(poscar),
+            DIRNAME=dirname,
+            ATOMTAG=atom_tag,
+            JOBDIR=f"{dirname}{atom_tag}",
+        )
     return text
 
 
-def first_doc_line(text, poscar=None):
+def first_doc_line(text, poscar=None, atom_symbol='O', natom=4):
     if not isinstance(text, str):
         return ""
-    text = format_text(text, poscar)
+    text = format_text(text, poscar, atom_symbol, natom)
     for line in text.splitlines():
         stripped = line.strip()
         if stripped:
@@ -48,7 +64,7 @@ def first_doc_line(text, poscar=None):
     return ""
 
 
-def jobs(mod_comm, job_att, subkey=None, poscar=None):
+def jobs(mod_comm, job_att, subkey=None, poscar=None, atom_symbol='O', natom=4):
 
     obj = getattr(mod_comm, job_att, None)
     if obj is None:
@@ -77,7 +93,7 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
 
             # Case 1: direct documentation string
             if isinstance(value, str):
-                print(f"{job_att}.{name}: {first_doc_line(value, poscar=poscar)}")
+                print(f"{job_att}.{name}: {first_doc_line(value, poscar, atom_symbol, natom)}")
 
             # Case 2: nested namespace (e.g. vasp.make)
             elif hasattr(value, "__dict__"):
@@ -90,7 +106,7 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
                         continue
 
                     if isinstance(subvalue, str):
-                        print(f"{job_att}.{name}.{subname}: {first_doc_line(subvalue, poscar=poscar)}")
+                        print(f"{job_att}.{name}.{subname}: {first_doc_line(subvalue, poscar, atom_symbol, natom)}")
 
         print("\nUse -k for detail")
         return 0
@@ -108,7 +124,7 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
 
     # If leaf string → print doc
     if isinstance(value, str):
-        print(format_text(value, poscar))
+        print(format_text(value, poscar, atom_symbol, natom))
         return 0
 
     # If namespace → print nested docs
@@ -119,7 +135,7 @@ def jobs(mod_comm, job_att, subkey=None, poscar=None):
 
         if isinstance(subvalue, str):
             print(f"\n{name}")
-            print(format_text(subvalue, poscar))
+            print(format_text(subvalue, poscar, atom_symbol, natom))
 
     return 0
 
@@ -157,6 +173,8 @@ def main():
     )
     parser.add_argument('-j', '--job', help='select one attribute from the list below')
     parser.add_argument('-p', '--poscar', help='args such as POSCAR name')
+    parser.add_argument('-as', '--atom_symbol', default='O', help='inserted atom symbol (default: O)')
+    parser.add_argument('-na', '--natom', default=4, type=int, help='number of inserted atoms (default: 4)')
     parser.add_argument('-k', '--subkey', help='select one key for subkeys')
     parser.add_argument('-u', '--usage', action='store_true', help='print first keys')
     args = parser.parse_args()
@@ -182,7 +200,7 @@ def main():
         if mod_name == 'comment_subj':
             print(f"\t    -s for other attributes in module 'comment_sys.py' ")
     else:
-        jobs(my_module, args.job, args.subkey, args.poscar)
+        jobs(my_module, args.job, args.subkey, args.poscar, args.atom_symbol, args.natom)
 
 if __name__ == "__main__":
     main()

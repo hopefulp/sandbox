@@ -633,38 +633,38 @@ hfse2.poscar = dedent("""
     Insertion cases
     ---------------
     (L1) Top surface
-        kpy pos_modify.py {POSCAR} -j bomb -a O4 -t 500 -ht 600 -o {POSCAR}O4
+        kpy pos_modify.py {SOURCE} -j bomb -a {ATOMTAG} -t 500 -o {POSCAR}{ATOMTAG} -ht 600
 
         if move atoms and save in POSCAR -> velocity deleted
             - Split O into two O atoms in POSCAR
             - Add velocity for MD run
 
-        kpy pos_modify.py {POSCAR} -j md -s l3 -t 500 -ht 600 -v -o {POSCAR}md
+        kpy pos_modify.py {SOURCE} -j md -s l3 -t 500 -v -o {POSCAR}md -ht 600
 
     (L2) Bilayer interface (HfO2 / TMD)
         (up)
-        kpy pos_modify.py {POSCAR} -j add -a O4 -t 500 -ht 800 -z 10 -d 2 -v -vt zup -o {POSCAR}iuO4
+        kpy pos_modify.py {SOURCE} -j add -a {ATOMTAG} -t 500 -z 10 -d 2 -v -vt zup -o {POSCAR}iu{ATOMTAG} -ht 800
         (down)
-        kpy pos_modify.py {POSCAR} -j add -a O4 -t 600 -ht 800 -z 10 -d 2 -vt zdn -o {POSCAR}iO4
+        kpy pos_modify.py {SOURCE} -j add -a {ATOMTAG} -t 600 -z 10 -d 2 -vt zdn -o {POSCAR}i{ATOMTAG} -ht 800
             e.g.: Hf z=10, Mo 9.8, W 10
 
 
     VESTA visualization
     -------------------
     Change atom type only:
-        pos_modify.py {POSCAR} -j atype -s O
+        pos_modify.py {SOURCE} -j atype -s O
 
     Split atom (O → Oa):
-        pos_modify.py {POSCAR} -j split -s O-4 → Generates *.vas file for VESTA
+        pos_modify.py {SOURCE} -j split -s O-4 → Generates *.vas file for VESTA
 
     MD runs (VASP)
     --------------
     NVE:
-        kpy vas_make_ini.py -s {POSCAR} -j mdnve -k g -d d2510c
+        kpy vas_make_ini.py -s {SOURCE} -j mdnve -k g -d {DIRNAME} -ra
     NVT (quenching):
-        kpy vas_make_ini.py -s {POSCAR} -j md -io TEBEG 1300 TEEND 500 -k g -d {DIRNAME}Q
+        kpy vas_make_ini.py -s {SOURCE} -j md -io TEBEG 1300 TEEND 500 -k g -d {DIRNAME}Q -ra
         (md):
-        kpy vas_make_ini.py -s {POSCAR} -j md -io TEBEG 500 TEEND 500 -k g -d {DIRNAME}md
+        kpy vas_make_ini.py -s {SOURCE} -j md -io TEBEG 500 TEEND 500 -k g -d {DIRNAME}md
         
     """)
 hfse2.md = md
@@ -695,6 +695,3 @@ def print_obj():
     print("\n\t    -j for detail")
     return 0
 '''
-
-
-
