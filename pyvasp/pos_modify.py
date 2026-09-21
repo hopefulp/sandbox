@@ -75,6 +75,8 @@ def main():
     gvel.add_argument('-vt', '--vel_type', default='zdn', choices=['r','random', 'copy', 'zup', 'zdn'], help="T for atom velocity, why not random")
     gvel.add_argument('-vr', '--vel_reverse', action='store_true', help="make bombing to upside")
     parser.add_argument('-z', '--zcoord', default = ['top'], nargs='*', help="'top', one or two z-coord")
+    parser.add_argument('-zo', '--zoffset', default=5.0, type=float,
+                        help="distance above the top surface in angstrom (default: 5)")
     parser.add_argument('-d', '--distance', default = 3.0, type=float, help="interdistance creteria for implantation")
 #    parser.add_argument('-l', '--nlevel', type=int, default=1,  help="atoms displaced in multi levels")
     ### may combine job-dependent unique option:: sort - sort list, 
@@ -147,8 +149,9 @@ def main():
             outfile = args.poscar + args.job
 
     ### nlevel=args.nlevel,
-    modify_POSCAR(args.poscar, job=args.job, xatoms=atoms, dic_vel=dic_vel, zpos=args.zcoord,\
-    asort=args.sort_list, r_crit=args.distance, outf=outfile)
+    modify_POSCAR(args.poscar, job=args.job, xatoms=atoms, dic_vel=dic_vel,
+                  zpos=args.zcoord, zoffset=args.zoffset,
+                  asort=args.sort_list, r_crit=args.distance, outf=outfile)
 
     return 0
 

@@ -633,19 +633,19 @@ hfse2.poscar = dedent("""
     Insertion cases
     ---------------
     (L1) Top surface
-        kpy pos_modify.py {SOURCE} -j bomb -a {ATOMTAG} -t 500 -o {POSCAR}{ATOMTAG} -ht 600
+        kpy pos_modify.py {SOURCE} -j bomb -a {ATOMTAG} -t {TEMPERATURE} --zoffset {ZOFFSET:g} -o {POSCAR}{ATOMTAG} -ht 600
 
         if move atoms and save in POSCAR -> velocity deleted
             - Split O into two O atoms in POSCAR
             - Add velocity for MD run
 
-        kpy pos_modify.py {SOURCE} -j md -s l3 -t 500 -v -o {POSCAR}md -ht 600
+        kpy pos_modify.py {SOURCE} -j md -s l3 -t {TEMPERATURE} -v -o {POSCAR}md -ht 600
 
     (L2) Bilayer interface (HfO2 / TMD)
         (up)
-        kpy pos_modify.py {SOURCE} -j add -a {ATOMTAG} -t 500 -z 10 -d 2 -v -vt zup -o {POSCAR}iu{ATOMTAG} -ht 800
+        kpy pos_modify.py {SOURCE} -j add -a {ATOMTAG} -t {TEMPERATURE} -z 10 -d 2 -v -vt zup -o {POSCAR}iu{ATOMTAG} -ht 800
         (down)
-        kpy pos_modify.py {SOURCE} -j add -a {ATOMTAG} -t 600 -z 10 -d 2 -vt zdn -o {POSCAR}i{ATOMTAG} -ht 800
+        kpy pos_modify.py {SOURCE} -j add -a {ATOMTAG} -t {TEMPERATURE} -z 10 -d 2 -vt zdn -o {POSCAR}i{ATOMTAG} -ht 800
             e.g.: Hf z=10, Mo 9.8, W 10
 
 
@@ -662,9 +662,9 @@ hfse2.poscar = dedent("""
     NVE:
         kpy vas_make_ini.py -s {SOURCE} -j mdnve -k g -d {DIRNAME} -ra
     NVT (quenching):
-        kpy vas_make_ini.py -s {SOURCE} -j md -io TEBEG 1300 TEEND 500 -k g -d {DIRNAME}Q -ra
+        kpy vas_make_ini.py -s {SOURCE} -j md -io TEBEG 1300 TEEND {TEMPERATURE} -k g -d {DIRNAME}Q -ra
         (md):
-        kpy vas_make_ini.py -s {SOURCE} -j md -io TEBEG 500 TEEND 500 -k g -d {DIRNAME}md
+        kpy vas_make_ini.py -s {SOURCE} -j md -io TEBEG {TEMPERATURE} TEEND {TEMPERATURE} -k g -d {DIRNAME}md
         
     """)
 hfse2.md = md

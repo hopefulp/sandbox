@@ -428,7 +428,8 @@ def min_dist_i(p1, atoms, axes):
         #print(f"{p1}:{atom}")
     return min(dist)
 
-def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
+def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0,
+               nlevel=1, zoffset=5.0):
     '''For cubic axes
     pos_coords  original coords of POSCAR in cartesian for pbc comparison
     natom   inserted atoms on vacuum
@@ -449,7 +450,6 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
         zmax = 0
     lzoffset = []
     if ztag == 'top':
-        zoffset = 4.0               # bombing atoms to z-axis from surface, distance between O atoms
         interdist = 5               # compare with inserted O
     else:
         zoffset = 0.0
@@ -475,7 +475,7 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
         zmax *= c_length                # converted to C
     for i in range(nlevel):
         lzoffset.append(zoffset+(zoffset+1)*i)
-    print(f"reset zoffset {zoffset} due to Direct {cd} in function {whereami()}()")
+    print(f"surface zoffset input: {zoffset} Angstrom in {whereami()}()")
 
 
     ### zcoordinates: use zmax for top
@@ -492,13 +492,14 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
     zcoords = []
     ### for inter model no nlevel
     for i in range(nlevel):
-        print(f"{i} with {lzoffset[i]} in zoffset")
+        print(f"level {i}: zoffset {lzoffset[i]} Angstrom")
         if ztag == 'top':
             zcoords.append(zcoord + lzoffset[i])
         else:
             zcoords.append(zcoord)
-    if Lprint: 
-        print(f"{cd}: zmax {zmax} lzoffset {lzoffset} zcoord {zcoords} in {whereami()}()")
+    if Lprint:
+        print(f"{cd}: surface zmax {zmax}, zoffset {lzoffset}, "
+              f"inserted z {zcoords} in {whereami()}()")
         print(f"if takes longer time, reduce interatomic distance by -d less than {r_crit}")
 
     if ztag == 'top':
@@ -593,7 +594,9 @@ def implant_2D(pos_coords, natom, axes, cd, zfix, zmax, r_crit=3.0, nlevel=1):
 ### aselect and addatoms are compatible
 #def modify_POSCAR(poscar, job='zpe', aselect=None, mod_atoms=None, zpos=None, temp=300, htemp=None,\
 #            vel_type='random', outf='POSCAR', r_crit=None, asort=None, nlevel=None):
-def modify_POSCAR(poscar, job='zpe', xatoms=None, dic_vel=None, zpos=None, outf='POSCAR', r_crit=None, asort=None, nlevel=None):
+def modify_POSCAR(poscar, job='zpe', xatoms=None, dic_vel=None, zpos=None,
+                  zoffset=5.0, outf='POSCAR', r_crit=None, asort=None,
+                  nlevel=None):
     '''
     Modularize POSCAR part
     inputs:
@@ -878,7 +881,8 @@ def modify_POSCAR(poscar, job='zpe', xatoms=None, dic_vel=None, zpos=None, outf=
                 d2coords_cart, _ = parse_poscar(poscar, block='coord', opt='lis')
 
             print(f"{d2coords_cart[0]} in function {whereami()}()") 
-            add_coords = implant_2D(d2coords_cart, add_natom, paxes, cd, zpos, zmax, r_crit, nlevel)
+            add_coords = implant_2D(d2coords_cart, add_natom, paxes, cd, zpos,
+                                    zmax, r_crit, nlevel, zoffset)
             #print(f"{add_coords} in {whereami()}()")
             lines.extend(add_coords)
 
