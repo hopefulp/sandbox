@@ -664,7 +664,7 @@ hfse2.poscar = dedent("""
     NVT (quenching):
         kpy vas_make_ini.py -s {SOURCE} -j md -io TEBEG 1300 TEEND {TEMPERATURE} -k g -d {DIRNAME}Q -ra
         (md):
-        kpy vas_make_ini.py -s {SOURCE} -j md -io TEBEG {TEMPERATURE} TEEND {TEMPERATURE} -k g -d {DIRNAME}md
+        kpy vas_make_ini.py -s {SOURCE} -j md -io TEBEG {TEMPERATURE} TEEND {TEMPERATURE} -k g -d {DIRNAME}md -ra
         
     """)
 hfse2.md = md
