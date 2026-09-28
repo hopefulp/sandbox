@@ -144,6 +144,9 @@ dac.build       =   "    Build graphene using nanocore\
                     "
 
 kisti.shell     =   "\t:: Commands in alias.sh or PYTHONPATH\
+                    \n\ttime stamp update:\
+                    \n\t    kpy dir_jobs.py -j touch -R\
+                    \n\t    find . -type f -name 'To_Be_DELETED*' -delete\
                     \n\t(kpy) to run python\
                     \n\t    kpy to run default python instead of shebang\
                     \n\t    $kpy command.py kisti\
@@ -155,7 +158,7 @@ kisti.pbs       =   f"\tqst.py : runs 'qstat -f' to see long jobnames\
                     "
 
 def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, keyvalues, nodename, nnode, nproc,\
-                nodelist, sftype, dtype, partition,poscar, nhl,idata,ndata):
+                nodelist, sftype, dtype, partition, option, nimages, nhl,idata,ndata):
 
     ### jname, dirname
     if 'POSCAR' in jobname:
@@ -164,6 +167,15 @@ def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, k
         jname = jobname[8:]
     else:
         jname = jobname
+
+    # vas_make_ini.py uses the same rule for an automatically named NEB dir:
+    # POSCAR.<name>ini -> <name>neb, otherwise POSCAR.<name> -> <name>neb.
+    if jname.endswith('ini'):
+        neb_jname = '{}neb'.format(jname[:-3])
+    elif jname.endswith('neb'):
+        neb_jname = jname
+    else:
+        neb_jname = '{}neb'.format(jname)
 
     # get siesta, vasp input together
     vjob = sjob = package_job   
@@ -204,6 +216,22 @@ def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, k
     kisti.vas += f"\n\t\t(NVE) $ kpy vas_make_ini.py -s {jobname} -j mdnve -k g -d d2510c"
     kisti.vas += f"\n\t\t(NVT) $ kpy vas_make_ini.py -s {jobname} -j md -io TEBEG 1300 TEEND 500 -k g -d HfSe2O3Q"
     kisti.vas += f"\n\t\t(NVT) $ qsub -N {jobname} -v exe=gam $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t    :: NEB"
+    # VASP divides the total MPI ranks among the NEB images first.  For NEB,
+    # On KISTI, vas_make_ini.py detects job=neb, interprets -N/--nnode as
+    # nodes per image, and overrides the PBS resource line using the product:
+    #     select (total nodes) = nimages * nnode (nodes per image)
+    # With mpiprocs ranks per node, each image therefore receives
+    # nnode * mpiprocs MPI ranks.  Show both commands so the first can prepare
+    # without submission (-r on), allowing manual edits before the explicit
+    # qsub command.  Removing -r on also supports direct submission because
+    # vas_make_ini.py applies the same KISTI/NEB resource calculation itself.
+    neb_nnode = nimages * nnode
+    neb_nproc = nproc or 40
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -s {jobname} -j neb -al -r on -N {nnode} -np {neb_nproc} -ja {option} -ni {nimages}"
+    kisti.vas += f"\n\t\t$ qsub -N {neb_jname} -l select={neb_nnode}:ncpus=40:mpiprocs={neb_nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
+    kisti.vas += f"\n\t\t    PBS select={neb_nnode}: {nimages} images * {nnode} nodes/image"
+    kisti.vas += f"\n\t\tcf. info_vasp.py -j make for further information"
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s {jobname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 : more info_vasp.py"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s {jobname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -e g -n 6 : gamma"
@@ -214,10 +242,6 @@ def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, k
     ### IRON(slurm)
     if not nproc:
         nproc = nnode * nXn[partition]
-    #if poscar and ( re.match('POSCAR', poscar) or re.match('CONTCAR', poscar)):
-    #    if re.match('POSCAR', poscar):
-    #        if poscar[7:] != name:        # name ?
-    #            dirname = poscar[7:]
     if 'dirname' not in locals():
         dirname = jname
     ncpu =  int(nXn[partition]/2)
@@ -442,12 +466,12 @@ def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, k
         elif re.search('vas', subwork) or re.search('nc', subwork):
             if re.search('vas', subwork):
                 print(f"=== Usage ===\
-                        \n\t{os.path.basename(__file__)} {work} -s {poscar} -p 3 -N 4 -n total_proc\
+                        \n\t{os.path.basename(__file__)} {work} -j {jobname} -x 3 -N 4 -np total_proc\
                         \n\tN.B.:: (POSCAR.)name is dirname and jname in qsub") 
                 print("=== Prepare VASP directory in platinum")
-                print(f"    (1) vas_make_ini.py -s {poscar}")
+                print(f"    (1) vas_make_ini.py -s {jobname}")
                 print("\tmake POSCAR POTCAR KPOINTS INCAR & directory")
-                print(f"    python -m myvasp -j getmag -p {poscar}")
+                print(f"    python -m myvasp -j getmag -p {jobname}")
                 print(f"    sed -i 's/.*MAGMOM.*/ mag_moment/' INCAR")
                 print("\tto modify MAGMON in INCAR from POSCAR in module myvasp.py")
                 print(slurm.vas)
@@ -549,11 +573,12 @@ def main():
     parser.add_argument('-no', '--nodename', help='if needed, specify nodename')
     ### flowing slurm option
     parser.add_argument('-inf', '--infile', help='input file in case')
-    parser.add_argument('-N', '--nnode', default=1, type=int, help='number of nodes: if needed')
+    parser.add_argument('-N', '--nnode', default=4, type=int, help='number of nodes; nodes per image for NEB (default: 4)')
     parser.add_argument('-np', '--nproc', type=int, help='number of process: if needed')
     parser.add_argument('-nl', '--nodelist',  help='node list to assign nodes')
     parser.add_argument('-x', '--xpartition', default=3, type=int, choices=[1,2,3,4,5,6], help='if needed, specify nodename')
-    parser.add_argument('-s', '--poscar', default='POSCAR.name', help='if needed, specify nodename')
+    parser.add_argument('-o', '--option', default='POSCAR.fin', help='additional input; final POSCAR for NEB')
+    parser.add_argument('-ni', '--nimages', default=8, type=int, help='number of intermediate images for NEB only (default: 8)')
     parser.add_argument('-id', '--idata', default=0, type=int, help='start index of data')
     parser.add_argument('-nd', '--ndata', default=100, type=int, help='amount of data')
     mlg = parser.add_argument_group(title = 'machine learning args')
@@ -562,6 +587,9 @@ def main():
     mlg.add_argument('-hl', '--hidden_layers', nargs='*', default=['4','4','4'], help="hidden layers in integer")
 
     args = parser.parse_args()
+
+    if args.package_job == 'neb' and args.nimages < 1:
+        parser.error('-ni/--nimages must be at least 1 for NEB')
 
     if args.work == 'siesta':
         args.package_subjob = 'switch'
@@ -579,7 +607,7 @@ def main():
         infile = args.infile
 
 
-    show_command(args.work,args.subwork,args.job_submit,args.jobname,args.package_job,args.package_subjob,infile,args.keyvalues,args.nodename,args.nnode,args.nproc,args.nodelist, args.func_type,args.data_type,args.xpartition,args.poscar, args.hidden_layers, args.idata, args.ndata)
+    show_command(args.work,args.subwork,args.job_submit,args.jobname,args.package_job,args.package_subjob,infile,args.keyvalues,args.nodename,args.nnode,args.nproc,args.nodelist, args.func_type,args.data_type,args.xpartition,args.option,args.nimages, args.hidden_layers, args.idata, args.ndata)
 
 if __name__ == "__main__":
     main()

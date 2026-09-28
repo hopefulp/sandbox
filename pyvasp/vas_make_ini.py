@@ -16,7 +16,7 @@ from common     import *
 from vas_qsub   import QueueConfig, qsub_command
 from libcluster import detect_cluster
 from libvas     import *
-from libposcar  import get_poscar, get_dnames4pos 
+from libposcar  import get_poscar, get_dnames4pos, pos2dirname
 from libincar   import (modify_incar_bykv, add_inckv_bysubjob,
                         configure_parallelization_for_cluster)
 from libstr     import li2str, li2dic
@@ -41,6 +41,19 @@ def expand_poscar_patterns(poscar_args):
         else:
             poscars.append(poscar_arg)
     return poscars
+
+
+def get_neb_dnames(poscars):
+    """Derive NEB directory names, replacing a terminal 'ini' with 'neb'."""
+    dnames = []
+    for poscar in poscars:
+        dirname = pos2dirname(poscar)
+        if dirname.endswith('ini'):
+            dirname = '{}neb'.format(dirname[:-3])
+        elif not dirname.endswith('neb'):
+            dirname = '{}neb'.format(dirname)
+        dnames.append(dirname)
+    return dnames
 
 #    copy {poscar} to POSCAR at cwd
 def get_potcar(pot,atoms):
@@ -78,7 +91,7 @@ def get_incar(ifile):
 
     return 0
 ################# 1       2        3       4         5        6     7           8         9        10      11    12 13 14   15   16  
-def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt, dirnames, option, allprepared, iofile, queue, vasp_exe, lkisti, Lrun, cluster=None):
+def make_vasp_dir(job, subjob, poscars, apotcar, job_options, kpoints, incar, incopt, dirnames, option, allprepared, iofile, queue, vasp_exe, lkisti, Lrun, cluster=None):
     '''
     job/subjob  sp/
                     kp,
@@ -87,9 +100,10 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
                     nve, NVT: heat, cool 
     poscars     list of poscar
     apotcar
-    jobadds NEB final POSCAR
-            ZPE atom lists
-            ... pseudo potentials for H
+    job_options dictionary of job-dependent inputs:
+                NEB: {'final_poscar': str, 'nimages': int}
+                ZPE: {'atoms': list}
+                pseudo: {'pseudo_h': list}
     kpoints     list of 3 digits (str)
     incar
     dirnames
@@ -99,13 +113,12 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
     global ini_dvasp, pwd
 
     if job == 'neb':
-        poscar_fin = jobadds[0]
-        if len(jobadds) == 2:
-            nimages = jobadds[1]
+        poscar_fin = job_options.get('final_poscar')
     elif job == 'pseudo':
-        hpp_list = jobadds
+        if job_options.get('pseudo_h'):
+            hpp_list = job_options['pseudo_h']
     elif job == 'zpe':
-        atoms = jobadds
+        atoms = job_options.get('atoms')
 
     ### 0. obtain default vasp repository
     ini_dvasp = get_vasp_repository()
@@ -283,7 +296,7 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
         ###### 6. make POTCAR; job=neb: cp POSCAR_fin, extract NIMAGES
         ### {wdir} NEB: cp POSCAR_fin
         if job == 'neb':
-            if 'poscar_fin' in locals():
+            if poscar_fin:
                 s = f'cp {poscar_fin} {dirname}/POSCAR_fin'
                 os.system(s)
                 print(f"{poscar_fin} is added for final POSCAR")
@@ -294,7 +307,9 @@ def make_vasp_dir(job, subjob, poscars, apotcar, jobadds, kpoints, incar, incopt
         ### {jobdir} NEB: extract nimages from INCAR; Make POTCAR
         os.chdir(dirname)
         if job == 'neb':
-            nimages = modify_incar_bykv('INCAR', ['IMAGES'], mode='e')[0]
+            nimages = job_options.get('nimages')
+            if nimages is None:
+                nimages = modify_incar_bykv('INCAR', ['IMAGES'], mode='e')[0]
             s = f'nebmake.pl POSCAR POSCAR_fin {nimages}'
             os.system(s)
         #if not os.path.isfile('POTCAR'):   # to make new POTCAR 
@@ -336,7 +351,8 @@ def main():
     parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz, or g for gamma')
     ### job dependent inputs
     #jobargs = parser.add_mutually_exclusive_group(title='job dependent arguments')
-    parser.add_argument('-ja', '--jobadds', nargs='+', help='list of job dependent inputs')
+    parser.add_argument('-ja', '--jobadds', nargs='+', help='job-dependent inputs; see -u/--usage')
+    parser.add_argument('-ni', '--nimages', default=8, type=int, help='number of images for NEB only (default: 8)')
     #jobargs.add_argument('-a', '--atoms', nargs='+', help='list of atoms for what?')
     #jobargs.add_argument('-sf', '--poscar_final',  help='for job=neb, input additional poscar')
     #jobargs.add_argument('-hpp', '--pseudoH', nargs='*', help='include pseudo H list ')
@@ -364,7 +380,42 @@ def main():
     qsub.add_argument('-N', '--nnode', type=int, help="number of nodes, can be used to calculate total nproc")
     qsub.add_argument('-np', '--nproc', type=int, help="number of nproc, total for pt, per node for kisti ")
     qsub.add_argument('-o', '--option', choices=['opt','mem','long','ml'], help="error,exe; 'opt':converge, 'mem': lack, 'longnnn':long queue, 'ml':ML")
+    parser.add_argument('-u', '--usage', action='store_true', help='print job-dependent argument usage')
     args = parser.parse_args()
+
+    if args.usage:
+        print("""Job-dependent inputs (-ja/--jobadds):
+  neb    -ja FINAL_POSCAR -ni NIMAGES
+          FINAL_POSCAR is the final NEB structure.
+          -ni/--nimages defaults to 8.
+  pseudo -ja PSEUDO_H [PSEUDO_H ...]
+          Values passed to genpotcar.py as pseudo-hydrogen potentials.
+  zpe    -ja ATOM [ATOM ...]
+          Atom list for the ZPE calculation.
+
+Examples:
+  vas_make_ini.py -j neb -s POSCAR.ini -ja POSCAR.fin -ni 8
+  vas_make_ini.py -j pseudo -s POSCAR -ja 0.66 1.33
+  vas_make_ini.py -j zpe -s POSCAR -ja 1 2 3
+
+Internally these values are converted to a job_options dictionary before
+being passed to make_vasp_dir().""")
+        return 0
+
+    job_options = {}
+    if args.job == 'neb':
+        if not args.jobadds:
+            parser.error("-j neb requires -ja FINAL_POSCAR")
+        if len(args.jobadds) != 1:
+            parser.error("-j neb accepts only FINAL_POSCAR after -ja; use -ni for NIMAGES")
+        if args.nimages < 1:
+            parser.error("-ni/--nimages must be at least 1 for NEB")
+        job_options['final_poscar'] = args.jobadds[0]
+        job_options['nimages'] = args.nimages
+    elif args.job == 'pseudo':
+        job_options['pseudo_h'] = args.jobadds
+    elif args.job == 'zpe':
+        job_options['atoms'] = args.jobadds
 
     ### running option
     if args.run_all:
@@ -381,6 +432,14 @@ def main():
         if not args.xpartition or not args.nnode:
             parser.error("Need -x/--xpartition and -N/--nnode on pt cluster")
         queue = QueueConfig(args.xpartition, args.nnode, args.nproc)
+    elif cluster == "kisti" and args.job == 'neb':
+        # VASP divides MPI ranks among NEB images first.  On KISTI, -N is
+        # therefore interpreted as nodes per image; override the PBS script's
+        # resource line with select = nimages * nodes_per_image.
+        nimages = job_options.get('nimages', 8)
+        nodes_per_image = args.nnode or 4
+        nproc_per_node = args.nproc or 40
+        queue = QueueConfig(0, nimages * nodes_per_image, nproc_per_node)
     ### POSCARs and DIRECTORYs are abtained here and passed to make_vasp_dir()
     ### Apply dirnames to run fake job in KISTI
     job = args.job              # to pass job to function
@@ -430,6 +489,8 @@ def main():
         poscars=expand_poscar_patterns(args.poscar)
         if args.dnames:
             dirnames = args.dnames
+        elif job == 'neb':
+            dirnames = get_neb_dnames(poscars)
         else:
             dirnames = get_dnames4pos(poscars)     # get dirname from POSCAR.name
     elif args.prefix:
@@ -439,6 +500,8 @@ def main():
         poscars = get_files_prefix(prefixes, pwd)
         if args.dnames:
             dirnames = args.dnames
+        elif job == 'neb':
+            dirnames = get_neb_dnames(poscars)
         else:
             dirnames = get_dnames4pos(poscars)
 
@@ -474,10 +537,10 @@ def main():
             print(f"kp_string {kp_str}, dirname {dirname} in function {whereami()}()")
             dname.append(dirname)  # dname is string
             ##########     1      2        3         4            5         6            7             8          9        10           11          12            13               14        15              16          17         18
-            make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, queue, vas_executable, lkisti, Lrun, cluster=cluster)
+            make_vasp_dir(job, subjob, poscars, args.potcar, job_options, kp_str, args.incar, args.incar_option, dname, args.option, args.all, args.iofile, queue, vas_executable, lkisti, Lrun, cluster=cluster)
     else:
         ##########     1      2        3         4              5            6            7             8               9        10           11          12            13               14        15              16            17         18
-        make_vasp_dir(job, subjob, poscars, args.potcar, args.jobadds, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, queue, vas_executable, lkisti, Lrun, cluster=cluster)
+        make_vasp_dir(job, subjob, poscars, args.potcar, job_options, args.kpoints, args.incar, args.incar_option, dirnames, args.option, args.all, args.iofile, queue, vas_executable, lkisti, Lrun, cluster=cluster)
     return 0
 
 if __name__ == '__main__':

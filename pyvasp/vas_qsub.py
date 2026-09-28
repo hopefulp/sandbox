@@ -43,7 +43,7 @@ def qsub_command(
     cluster = cluster or detect_cluster()
 
     if cluster == "kisti":
-        cmd = _build_kisti_command(ndir, option, vasp_exe, lkisti)
+        cmd = _build_kisti_command(ndir, queue, option, vasp_exe, lkisti)
 
     elif cluster == "pt":
         if not queue:
@@ -66,12 +66,24 @@ def qsub_command(
 # KISTI (PBS)
 # ==========================================================
 
-def _build_kisti_command(ndir, option, vasp_exe, lkisti):
+def _build_kisti_command(ndir, queue, option, vasp_exe, lkisti):
 
     str_vasp = _kisti_vasp_flag(vasp_exe)
 
     nnode = 20
     np = 40
+
+    # A supplied queue overrides the resource line embedded in the PBS script.
+    # NEB uses this to request nimages * nodes_per_image total nodes.
+    if queue:
+        nnode = queue.nnode
+        np = queue.nproc or np
+        vasp_flag = "{} ".format(str_vasp) if str_vasp else ""
+        return (
+            "qsub -N {} {}"
+            "-l select={}:ncpus=40:mpiprocs={}:ompthreads=1 "
+            "$SB/pypbs/pbs_vasp_kisti_skl.sh"
+        ).format(ndir, vasp_flag, nnode, np)
 
     if option == "mem":
         hproc = np // 2
