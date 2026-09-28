@@ -219,20 +219,19 @@ def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, k
     kisti.vas += f"\n\t    :: NEB"
     # VASP divides the total MPI ranks among the NEB images first.  For NEB,
     # On KISTI, vas_make_ini.py detects job=neb, interprets -N/--nnode as
-    # nodes per image.  VASP distributes ranks over the intermediate images
-    # plus the two endpoints (00 and the final directory), so:
-    #     total_images = nimages + 2
-    #     select (total nodes) = total_images * nnode (nodes per image)
+    # nodes per image.  VASP distributes ranks over IMAGES (the intermediate
+    # images); the two endpoint directories are not part of this division:
+    #     select (total nodes) = nimages * nnode (nodes per image)
     # With mpiprocs ranks per node, each image therefore receives
     # nnode * mpiprocs MPI ranks.  The first command asks whether to submit;
     # the explicit qsub line is also shown for submitting an already prepared
     # (and possibly manually edited) directory later.
-    neb_total_images = nimages + 2
-    neb_nnode = neb_total_images * nnode
+    neb_nnode = nimages * nnode
     neb_nproc = nproc or 40
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -s {jobname} -j neb -al -N {nnode} -np {neb_nproc} -ja {option} -ni {nimages}"
+    neb_nproc_option = f" -np {nproc}" if nproc else ""
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -s {jobname} -j neb -al -N {nnode}{neb_nproc_option} -ja {option} -ni {nimages}"
     kisti.vas += f"\n\t\t$ qsub -N {neb_jname} -l select={neb_nnode}:ncpus=40:mpiprocs={neb_nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
-    kisti.vas += f"\n\t\t    PBS select={neb_nnode}: ({nimages} intermediate images + 2 endpoints) * {nnode} nodes/image"
+    kisti.vas += f"\n\t\t    PBS select={neb_nnode}: {nimages} intermediate images * {nnode} nodes/image"
     kisti.vas += f"\n\t\tcf. info_vasp.py -j make for further information"
     kisti.vas += f"\n\t    :: FAKER Job & OVERwrite"
     kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -j fake -s {jobname} -sj {vjob} -al -ra -d d{datetime.now().strftime('%d%H')} -n 6 : more info_vasp.py"

@@ -261,7 +261,13 @@ def make_vasp_dir(job, subjob, poscars, apotcar, job_options, kpoints, incar, in
             if type(incopt) != dict: 
                 print(f"1st change of incopt by -io {incopt}")
                 incopt = li2dic(incopt)
-            
+
+        # Keep the INCAR and generated image directories consistent.  VASP's
+        # IMAGES is the number of intermediate images; endpoints are extra.
+        if job == 'neb':
+            if incopt is None:
+                incopt = {}
+            incopt['IMAGES'] = job_options['nimages']
 
         ### subjob for MD: cool, heat, quench
         if 'md' in job:
@@ -311,7 +317,24 @@ def make_vasp_dir(job, subjob, poscars, apotcar, job_options, kpoints, incar, in
             if nimages is None:
                 nimages = modify_incar_bykv('INCAR', ['IMAGES'], mode='e')[0]
             s = f'nebmake.pl POSCAR POSCAR_fin {nimages}'
-            os.system(s)
+            if os.system(s) != 0:
+                print(f"ERROR: failed to generate NEB images: {s}")
+                sys.exit(98)
+
+            # IMAGES counts intermediate structures.  A valid NEB setup must
+            # also contain the two endpoints, hence directories 00..IMAGES+1.
+            missing_poscars = []
+            for image_index in range(int(nimages) + 2):
+                image_dir = f"{image_index:02d}"
+                image_poscar = os.path.join(image_dir, 'POSCAR')
+                if not os.path.isfile(image_poscar) or os.path.getsize(image_poscar) == 0:
+                    missing_poscars.append(image_poscar)
+            if missing_poscars:
+                print("ERROR: incomplete NEB setup; missing or empty POSCAR files:")
+                for image_poscar in missing_poscars:
+                    print(f"    {image_poscar}")
+                sys.exit(97)
+            print(f"NEB setup validated: IMAGES={nimages}, directories 00..{int(nimages) + 1:02d}")
         #if not os.path.isfile('POTCAR'):   # to make new POTCAR 
         if cluster == 'kisti':
             s = f"python {home}/sandboxg/pyvasp/genpotcar.py -pp pbe"
@@ -433,14 +456,13 @@ being passed to make_vasp_dir().""")
             parser.error("Need -x/--xpartition and -N/--nnode on pt cluster")
         queue = QueueConfig(args.xpartition, args.nnode, args.nproc)
     elif cluster == "kisti" and args.job == 'neb':
-        # VASP divides MPI ranks over the intermediate images and both
-        # endpoints.  On KISTI, interpret -N as nodes per image and override
-        # the PBS resource line with:
-        #     select = (nimages + 2) * nodes_per_image
+        # VASP divides MPI ranks over IMAGES (the intermediate images).  On
+        # KISTI, interpret -N as nodes per image and override the PBS resource
+        # line with: select = nimages * nodes_per_image.
         nimages = job_options.get('nimages', 8)
         nodes_per_image = args.nnode or 4
         nproc_per_node = args.nproc or 40
-        queue = QueueConfig(0, (nimages + 2) * nodes_per_image, nproc_per_node)
+        queue = QueueConfig(0, nimages * nodes_per_image, nproc_per_node)
     ### POSCARs and DIRECTORYs are abtained here and passed to make_vasp_dir()
     ### Apply dirnames to run fake job in KISTI
     job = args.job              # to pass job to function
