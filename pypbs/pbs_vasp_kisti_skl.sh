@@ -21,11 +21,11 @@ echo "NPROC = $NPROC" >> $log_file
 echo start >> $log_file
 date >> $log_file
 
-if [ $exe == 'gam' ]; then
+if [ "${exe:-}" = 'gam' ]; then
     EXEC="$HOME/bin/vasp_gam"
-elif [ $exe == 'xyrelax' ]; then
+elif [ "${exe:-}" = 'xyrelax' ]; then
     EXEC="$HOME/bin/vasp_std-xy"
-elif [ $exe == 'ncl' ]; then
+elif [ "${exe:-}" = 'ncl' ]; then
     EXEC="$HOME/bin/vasp_ncl"
 else
     EXEC="$HOME/bin/vasp_std"
@@ -35,7 +35,7 @@ cd $log_dir/$wdir
 ### treat INCAR in wdir: remove NPAR, set NCORE
 st="NNODE = $PBS_NNODES"
 echo $st >> $log_file
-if [[ $(grep -ic NCORE INCAR) -eq 0  &&  $(grep -ic NPAR INCAR) -ne 0 ]]  ; then
+if [ "$(grep -ic NCORE INCAR)" -eq 0 ] && [ "$(grep -ic NPAR INCAR)" -ne 0 ]; then
     sed -e "/NPAR/a NCORE = 20" -e "s/NPAR/\#NPAR/" -i INCAR
 fi
 
@@ -47,5 +47,3 @@ mv $log_dir/$jobname.log $log_dir/$jobname.out
 
 echo end >> $log_file
 date >> $log_file
-
-

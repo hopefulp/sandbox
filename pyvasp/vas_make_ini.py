@@ -433,13 +433,14 @@ being passed to make_vasp_dir().""")
             parser.error("Need -x/--xpartition and -N/--nnode on pt cluster")
         queue = QueueConfig(args.xpartition, args.nnode, args.nproc)
     elif cluster == "kisti" and args.job == 'neb':
-        # VASP divides MPI ranks among NEB images first.  On KISTI, -N is
-        # therefore interpreted as nodes per image; override the PBS script's
-        # resource line with select = nimages * nodes_per_image.
+        # VASP divides MPI ranks over the intermediate images and both
+        # endpoints.  On KISTI, interpret -N as nodes per image and override
+        # the PBS resource line with:
+        #     select = (nimages + 2) * nodes_per_image
         nimages = job_options.get('nimages', 8)
         nodes_per_image = args.nnode or 4
         nproc_per_node = args.nproc or 40
-        queue = QueueConfig(0, nimages * nodes_per_image, nproc_per_node)
+        queue = QueueConfig(0, (nimages + 2) * nodes_per_image, nproc_per_node)
     ### POSCARs and DIRECTORYs are abtained here and passed to make_vasp_dir()
     ### Apply dirnames to run fake job in KISTI
     job = args.job              # to pass job to function

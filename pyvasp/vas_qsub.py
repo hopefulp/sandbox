@@ -74,7 +74,7 @@ def _build_kisti_command(ndir, queue, option, vasp_exe, lkisti):
     np = 40
 
     # A supplied queue overrides the resource line embedded in the PBS script.
-    # NEB uses this to request nimages * nodes_per_image total nodes.
+    # NEB supplies (intermediate images + 2 endpoints) * nodes_per_image.
     if queue:
         nnode = queue.nnode
         np = queue.nproc or np
