@@ -222,13 +222,12 @@ def show_command(work, subwork, job_submit, jobname, package_job, subjob, inf, k
     # nodes per image, and overrides the PBS resource line using the product:
     #     select (total nodes) = nimages * nnode (nodes per image)
     # With mpiprocs ranks per node, each image therefore receives
-    # nnode * mpiprocs MPI ranks.  Show both commands so the first can prepare
-    # without submission (-r on), allowing manual edits before the explicit
-    # qsub command.  Removing -r on also supports direct submission because
-    # vas_make_ini.py applies the same KISTI/NEB resource calculation itself.
+    # nnode * mpiprocs MPI ranks.  The first command asks whether to submit;
+    # the explicit qsub line is also shown for submitting an already prepared
+    # (and possibly manually edited) directory later.
     neb_nnode = nimages * nnode
     neb_nproc = nproc or 40
-    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -s {jobname} -j neb -al -r on -N {nnode} -np {neb_nproc} -ja {option} -ni {nimages}"
+    kisti.vas += f"\n\t\t$ kpy vas_make_ini.py -s {jobname} -j neb -al -N {nnode} -np {neb_nproc} -ja {option} -ni {nimages}"
     kisti.vas += f"\n\t\t$ qsub -N {neb_jname} -l select={neb_nnode}:ncpus=40:mpiprocs={neb_nproc}:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh"
     kisti.vas += f"\n\t\t    PBS select={neb_nnode}: {nimages} images * {nnode} nodes/image"
     kisti.vas += f"\n\t\tcf. info_vasp.py -j make for further information"
