@@ -187,7 +187,7 @@ def configure_parallelization_for_cluster(incar, cluster, outf='INCAR.server'):
     with open(outf, 'w') as f:
         f.writelines(newlines)
     print(
-        f"server INCAR: {target_key} active, {disabled_key} commented "
+        f"server {incar}: {target_key} active, {disabled_key} commented "
         f"for {cluster} -> {outf}"
     )
     return outf

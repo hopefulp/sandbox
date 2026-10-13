@@ -256,6 +256,8 @@ def make_vasp_dir(job, subjob, poscars, apotcar, job_options, kpoints, incar, in
             print("Error:: cannot find INCAR in job {job} and subjob {subjot}")
             sys.exit()
 
+        print(f"base INCAR selected: {f_incar}")
+
         ### Add incopt
         if incopt:
             if type(incopt) != dict: 
@@ -287,8 +289,10 @@ def make_vasp_dir(job, subjob, poscars, apotcar, job_options, kpoints, incar, in
                                 incopt['NSW'] = 1000
         ### though job != 'md', incopt would work
         if incopt:
+            base_incar = f_incar
             modify_incar_bykv(f_incar, incopt, outf='INCAR.new', mode='m')
             f_incar = 'INCAR.new'
+            print(f"INCAR options applied: {base_incar} -> {f_incar}")
 
         ### Apply server-specific parallel settings after all other INCAR edits.
         f_incar = configure_parallelization_for_cluster(

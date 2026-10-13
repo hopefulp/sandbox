@@ -66,15 +66,14 @@ if [ $ucorr -eq 1 ]; then
     sed -i "s/.*LDAUJ.*/$ldauj/" INCAR
 fi
 
-vasp_dir="/TGM/Apps/VASP/OLD_BIN/5.4.4/O2/NORMAL"
-vasp_ndir="/TGM/Apps/VASP/5.4.4.pl2"
-vasp_dirv6="/TGM/Apps/VASP/bin/6.3.1"
+#vasp_dir="/TGM/Apps/VASP/VASP_BIN/OLD_OLD_BIN/5.4.4/O2/NORMAL"
+#vasp_dirv5="/TGM/Apps/VASP/VASP_BIN/20241206_OLD_BIN/5.4.4.pl2"
+vasp_dir="/TGM/Apps/VASP/VASP_BIN/6.4.3/"
 
-if [ $exe ]; then
-    EXEC="vasp.5.4.4.pl2.O2.NORMAL.${exe}.x"
-else
-    EXEC="vasp.5.4.4.pl2.O2.NORMAL.std.x"
+if [ ! $exe ]; then
+    exe='std'
 fi
+EXEC="vasp.6.4.3.avx512_intel.VTST.VASPSOLPP.VASPCP.DFTD4.HK.SCPC.BEEF.LIBXC.WAN90.HDF5.{exe}.x"
 
 if [ $hmem ]; then
     echo "mpirun -np $mpiproc  ${vasp_dir}/${EXEC}" >> $logfile
