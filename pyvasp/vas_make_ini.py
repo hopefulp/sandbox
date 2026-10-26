@@ -183,7 +183,11 @@ def make_vasp_dir(job, subjob, poscars, apotcar, job_options, kpoints, incar, in
         ### use kp inputs, if KPOINTS ready, KPOINTS.job, make KPOINTS file
         q = 'will you make KPOINTS?'
 
-        if job and os.path.isfile(f"KPOINTS.{job}"):
+        if kpoints and len(kpoints) == 1 and os.path.isfile(kpoints[0]):
+            com = f'cp {kpoints[0]} {dirname}/KPOINTS'
+            os.system(f'{com}')
+            print(f"designated {kpoints[0]} was copied to {dirname}/KPOINTS")
+        elif job and os.path.isfile(f"KPOINTS.{job}"):
             com = f'cp KPOINTS.{job} {dirname}/KPOINTS'
             os.system(f'{com}')
             print(f"{com}")
@@ -375,7 +379,7 @@ def main():
     ###
     parser.add_argument('-si', '--idposcar', nargs='+', help='in case poscar has index')
     parser.add_argument('-pot', '--potcar', choices=['new','potpaw-pbe-new','old','potpaw-pbe-old','potpaw-gga'], help='pseudo potential directory: ')
-    parser.add_argument('-k', '--kpoints', nargs='+', help='input number of k-points in kx, ky, kz, or g for gamma')
+    parser.add_argument('-k', '--kpoints', nargs='+', help='KPOINTS file, k-point mesh kx ky kz, or g for gamma')
     ### job dependent inputs
     #jobargs = parser.add_mutually_exclusive_group(title='job dependent arguments')
     parser.add_argument('-ja', '--jobadds', nargs='+', help='job-dependent inputs; see -u/--usage')

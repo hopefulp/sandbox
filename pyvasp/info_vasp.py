@@ -27,6 +27,7 @@ dosband = MyClass('dosband')
 procar  = MyClass('procar')
 outcar  = MyClass('outcar')
 md      = MyClass('md')
+neb     = MyClass('neb')
 ase     = MyClass('ase')
 charge  = MyClass('charge')
 convert = MyClass('convert')
@@ -363,6 +364,31 @@ md.oszicar              = "MD plot - read OSZICAR & plot\
                         \n\t\t    oszicar.py HfSe2L1aO12Q -y E0pot Ekin -iy2 1 -xi 0 1000 -yi -581 -563 -yi2 1 19\
                         "
 #md.pos_modify       = print(poscar.pos_modify)     # not working
+neb.nebmake =   "=== NEB calculation ===============================\
+                        \n\t\t:: Automated setup with vas_make_ini.py (recommended)\
+                        \n\t\t    vas_make_ini.py -j neb -s POSCAR.systemini -ja POSCAR.systemfin -ni 8 -i INCAR.neb -k KPOINTS.neb -N 2 -np 40\
+                        \n\t\t    -s: optimized initial structure\
+                        \n\t\t    -ja: optimized final structure\
+                        \n\t\t    -ni: number of intermediate images (default: 8)\
+                        \n\t\t    -k KPOINTS.neb: copy the designated NEB KPOINTS file\
+                        \n\t\t    The command sets IMAGES=8 and runs nebmake.pl with 8.\
+                        \n\t\t    It creates 00 and 09 as endpoints and 01..08 as intermediate images.\
+                        \n\t\t    On KISTI, -N is nodes per intermediate image and -np is MPI ranks per node.\
+                        \n\t\t:: Equivalent manual setup\
+                        \n\t\t    nebmake.pl POSCAR.systemini POSCAR.systemfin 8\
+                        \n\t\t    Set IMAGES = 8 in the root INCAR.\
+                        \n\t\t    Keep INCAR, KPOINTS, and POTCAR in the root NEB directory.\
+                        \n\t\t    Run one VASP job from the root; VASP handles all intermediate images.\
+                        "
+neb.neb_recal =   "=== Recalculate NEB ===============================\
+                        \n\t\t:: Copy CONTCAR from the last image to POSCAR and run it again\
+                        \n\t\t    neb-recal.sh neb_dir [01 08]\
+                        \n\t\t\tscan subdir 01~08 and copy CONTCAR to POSCAR if CONTCAR exists\
+                        \n\t\t    Run this only after the previous VASP job has stopped.\
+                        \n\t\t    Submit the root NEB directory again after updating the structures.\
+                        \n\t\t:: Usage\
+                        \n\t\t    qsub -N neb_dir -l select=20:ncpus=40:mpiprocs=40:ompthreads=1 $SB/pypbs/pbs_vasp_kisti_skl.sh\
+                        "
 
 charge.chgdiff      =   "=== Charge calculation ===============================\
                         \n\tContinuous calculation for CHGCAR writing\

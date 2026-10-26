@@ -74,7 +74,7 @@ SYSTEM = NEB
  POTIM  = 0.1        ! (fs) *Frequency calculation(POTIM < 0.02(0.015)), (MD = 1.0 fs), Default=0.5
  EDIFFG = -0.1      ! stopping relaxation loop.(Default= EDIFF*10 / -0.02)
 
- IMAGES = 8   ! number of images including start and final
+ IMAGES = 8   ! number of intermediate images; endpoints are excluded
  SPRING = -5        ! spring constant
  LCLIMB = .TRUE.    ! find TS point
 
