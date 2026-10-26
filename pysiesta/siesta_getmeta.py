@@ -20,6 +20,8 @@ import sys
 import subprocess
 import textwrap
 
+from meta_key import GROUP_LABELS, META_KEYS, META_LABELS
+
 NUM = r'[-+]?(?:\d+\.?\d*|\.\d+)(?:[EeDd][-+]?\d+)?'
 ELEMENTS = ('X H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Sc Ti V Cr Mn Fe Co Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb Te I Xe Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W Re Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th Pa U Np Pu Am Cm Bk Cf Es Fm Md No Lr Rf Db Sg Bh Hs Mt Ds Rg Cn Nh Fl Mc Lv Ts Og').split()
 
@@ -409,7 +411,7 @@ def compact_metadata(record):
         preferred = next((p for p in inputs if Path(p).name == 'RUN.fdf'), None)
         originals = preferred or (inputs[0] if inputs else None)
     originals = file_reference(originals)
-    record['groups'] = {
+    raw_groups = {
         '1_molecular_structure': {'structure_3d': None},
         '2_calculation_conditions': {
             'program_version': calc.get('program_version'),
@@ -432,55 +434,18 @@ def compact_metadata(record):
             'dates': dates,
             'provider': provenance.get('provider'),
             'original_calculation_files': originals}}
+    record['main_metadata'] = {
+        key: main.get(key) for key, _label in META_KEYS['main']}
+    record['groups'] = {
+        META_KEYS[section]['group']: {
+            key: raw_groups[META_KEYS[section]['group']].get(key)
+            for key, _label in META_KEYS[section]['keys']}
+        for section in ('structure', 'calculation', 'results', 'data_source')}
     return record
 
 
-# JSON keys stay stable; these labels are shared by stdout and future web views.
-DISPLAY_LABELS = {
-    'molecular_formula': 'Molecular formula',
-    'molecule_name': 'Molecule name',
-    'data_id': 'Data ID',
-    'atom_count': 'Atom count',
-    'charge_e': 'Charge (e)',
-    'spin_multiplicity': 'Spin multiplicity',
-    'homo_lumo_gap_ev': 'HOMO–LUMO gap (eV)',
-    'exchange_correlation': 'Ex-Corr',
-    'basis_size': 'Basis set size',
-    'pseudopotential_species': 'Pseudopotential species',
-    'program': 'Package',
-    'database_source': 'DB source',
-    'database_source_directory': 'Database source directory',
-    '1_molecular_structure': 'Molecular structure',
-    '2_calculation_conditions': 'Calculation conditions',
-    '3_electronic_structure_results': 'Electronic structure results',
-    '4_provenance': 'Provenance',
-    'structure_3d': '3D structure',
-    'position_angstrom': 'Position (Å)',
-    'cell_angstrom': 'Cell (Å)',
-    'smiles': 'SMILES', 'inchi': 'InChI', 'cas': 'CAS number',
-    'scf_convergence': 'SCF convergence',
-    'spin_orbit': 'Spin–orbit coupling',
-    'total_energy_ev': 'Total energy (eV)',
-    'homo_energy_ev': 'HOMO energy (eV)',
-    'lumo_energy_ev': 'LUMO energy (eV)',
-    'fermi_energy_ev': 'Fermi energy (eV)',
-    'dos_pdos': 'DOS / PDOS',
-    'dipole_moment_debye': 'Dipole moment (Debye)',
-    'total_mu_b': 'Total (μB)', 'local_mu_b': 'Local (μB)',
-    'scf_converged': 'SCF converged',
-    'original_data_id': 'Original data ID', 'id': 'ID', 'doi': 'DOI',
-    'metadata_extracted_utc': 'Metadata extracted (UTC)',
-    'meshcutoff': 'Mesh cutoff',
-    'electronictemperature': 'Electronic temperature',
-    'maxscfiterations': 'Maximum SCF iterations',
-    'scfdmtolerance': 'SCF density matrix tolerance',
-    'scfhtolerance': 'SCF Hamiltonian tolerance',
-    'scfetolerance': 'SCF energy tolerance',
-    'dmtolerance': 'Density matrix tolerance',
-    'paobasissize': 'PAO basis size',
-    'paoenergyshift': 'PAO energy shift',
-    'paosplitnorm': 'PAO split norm',
-}
+# Labels and selected keys are maintained in meta_key.py.
+DISPLAY_LABELS = {**META_LABELS, **GROUP_LABELS}
 
 
 def display_label(name):
@@ -740,13 +705,14 @@ molecule_names.tsv: -n 파일 지정 시 Data ID, 이름, PDF ID, 확실 여부�
         elif args.section == 'main':
             print_table('Main metadata', data['main_metadata'])
         elif args.section != 'all':
-            title, selected = next((k, v) for k,v in data['groups'].items() if k.startswith(args.section+'_'))
-            print_table(display_label(title), selected)
+            detail = META_KEYS[('structure', 'calculation', 'results', 'data_source')[int(args.section) - 1]]
+            selected = data['groups'][detail['group']]
+            print_table(detail['title'], selected)
         else:
             print_table('Main metadata', data['main_metadata'])
             for title, payload in data['groups'].items():
                 print()
-                print_table(display_label(title), payload)
+                print_table(GROUP_LABELS.get(title, display_label(title)), payload)
     except (OSError, ValueError, KeyError, IndexError) as exc:
         parser.exit(2, f'error: {exc}\n')
     return 0
